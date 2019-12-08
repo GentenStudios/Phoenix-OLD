@@ -28,60 +28,55 @@
 
 #pragma once
 
-#include <Quartz2/OpenGL32.hpp>
-#include <Quartz2/Camera.hpp>
+#include <Quartz2/Rect.hpp>
 
-#include <memory>
-#include <Quartz2/Mesh.hpp>
+#include <cstddef>
+#include <unordered_map>
 
 namespace q2
 {
-	enum EChunkRendererStatus
-	{
-		CHUNK_RENDERER_STATUS_READY,
-		CHUNK_RENDERER_STATUS_BAD_SHADERS
-	};
-
-	namespace enums
-	{
-		const char* toString(EChunkRendererStatus status);
-	}
-
-	struct ChunkRendererMesh
-	{
-		GLuint vbo;
-		GLuint vao;
-
-		std::shared_ptr<Mesh> mesh;
-	};
-
-	class ChunkRenderer
+	class BlockTextureAtlas
 	{
 	public:
-		void setup(std::size_t viewWidth, std::size_t viewHeight);
-		void teardown();
+		typedef int           SpriteID;
+		const static SpriteID INVALID_SPRITE = -1;
 
-		void render(Camera* camera);
+		BlockTextureAtlas(std::size_t spriteWidth,
+			std::size_t spriteHeight);
+		BlockTextureAtlas();
+		~BlockTextureAtlas();
 
-		EChunkRendererStatus status() const
-			{ return m_status; }
+		void addTextureFile(const char* texturefilepath);
+		void patch();
+		void setSpriteWidth(std::size_t w);
+		void setSpriteHeight(std::size_t h);
 
-		bool isReady() const
-			{ return m_status == CHUNK_RENDERER_STATUS_READY; }
+		std::size_t getSpriteWidth() const { return m_spriteWidth; }
+		std::size_t getSpriteHeight() const { return m_spriteHeight; }
+		SpriteID    getSpriteIDFromFilepath(const char* filepath);
 
-		void addMesh(const std::shared_ptr<Mesh>& mesh);
+		std::size_t getPatchedTextureWidth() const
+		{
+			return m_patchedTextureWidth;
+		}
 
-		void setTexture(unsigned char* data, std::size_t w, std::size_t h);
+		std::size_t getPatchedTextureHeight() const
+		{
+			return m_patchedTextureHeight;
+		}
+
+		unsigned char* getPatchedTextureData() const
+		{
+			return m_patchedTextureData;
+		}
+
+		RectAABB getSpriteFromID(SpriteID spriteId) const;
 
 	private:
-		GLuint m_terrainShader;
-		GLuint m_texture;
+		std::unordered_map<std::string, SpriteID> m_textureIDMap;
+		std::size_t    m_spriteWidth, m_spriteHeight;
+		unsigned char* m_patchedTextureData;
 
-		std::size_t m_viewWidth;
-		std::size_t m_viewHeight;
-
-		EChunkRendererStatus m_status;
-
-		std::vector<ChunkRendererMesh> m_meshes;
+		std::size_t m_patchedTextureWidth, m_patchedTextureHeight;
 	};
 }

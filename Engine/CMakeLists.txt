@@ -23,6 +23,9 @@ add_library(${PROJECT_NAME}
 	${Headers}/VoxelWorld.hpp
 	${Headers}/Mesh.hpp
 	${Headers}/Vertex.hpp
+	${Headers}/BlocksTextureAtlas.hpp
+	${Headers}/BlocksRegistry.hpp
+	${Headers}/Singleton.hpp
 
 	${Source}/Matrix4x4.cpp
 	${Source}/Ray.cpp
@@ -34,6 +37,8 @@ add_library(${PROJECT_NAME}
 	${Source}/Chunk.cpp
 	${Source}/VoxelWorld.cpp
 	${Source}/Mesh.cpp
+	${Source}/BlocksTextureAtlas.cpp
+	${Source}/BlocksRegistry.cpp
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${Headers}/../)
@@ -42,6 +47,8 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 	${CMAKE_CURRENT_LIST_DIR}/ThirdParty/SDL2/include
 	${CMAKE_CURRENT_LIST_DIR}/ThirdParty/glad/include
 	${CMAKE_CURRENT_LIST_DIR}/ThirdParty/ImGui
+	${CMAKE_CURRENT_LIST_DIR}/ThirdParty/stb_image
+	${CMAKE_CURRENT_LIST_DIR}/ThirdParty/stb_rectpack
 	${CMAKE_CURRENT_LIST_DIR}/ThirdParty/ImGui/examples
 )
 

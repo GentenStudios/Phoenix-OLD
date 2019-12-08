@@ -26,62 +26,29 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#pragma once
+#include <Quartz2/BlocksRegistry.hpp>
 
-#include <Quartz2/OpenGL32.hpp>
-#include <Quartz2/Camera.hpp>
+#include <algorithm>
 
-#include <memory>
-#include <Quartz2/Mesh.hpp>
+using namespace q2;
 
-namespace q2
+BlockType* BlockRegistry::registerBlock(BlockType blockInfo)
 {
-	enum EChunkRendererStatus
-	{
-		CHUNK_RENDERER_STATUS_READY,
-		CHUNK_RENDERER_STATUS_BAD_SHADERS
-	};
+	m_blocks.push_back(blockInfo);
+	return &m_blocks.back();
+}
 
-	namespace enums
-	{
-		const char* toString(EChunkRendererStatus status);
-	}
+BlockType* BlockRegistry::getBlockFromID(const char* id)
+{
+	auto it = std::find_if(m_blocks.begin(), m_blocks.end(),
+		[id](const BlockType& block) {
+			return std::strcmp(block.id, id) == 0;
+		});
 
-	struct ChunkRendererMesh
-	{
-		GLuint vbo;
-		GLuint vao;
+	return it == m_blocks.end() ? nullptr : &(*it);
+}
 
-		std::shared_ptr<Mesh> mesh;
-	};
-
-	class ChunkRenderer
-	{
-	public:
-		void setup(std::size_t viewWidth, std::size_t viewHeight);
-		void teardown();
-
-		void render(Camera* camera);
-
-		EChunkRendererStatus status() const
-			{ return m_status; }
-
-		bool isReady() const
-			{ return m_status == CHUNK_RENDERER_STATUS_READY; }
-
-		void addMesh(const std::shared_ptr<Mesh>& mesh);
-
-		void setTexture(unsigned char* data, std::size_t w, std::size_t h);
-
-	private:
-		GLuint m_terrainShader;
-		GLuint m_texture;
-
-		std::size_t m_viewWidth;
-		std::size_t m_viewHeight;
-
-		EChunkRendererStatus m_status;
-
-		std::vector<ChunkRendererMesh> m_meshes;
-	};
+void BlockRegistry::setAtlas(const std::shared_ptr<BlockTextureAtlas>& atlas)
+{
+	m_textureAtlas = atlas;
 }

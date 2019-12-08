@@ -30,21 +30,16 @@
 
 #include <Quartz2/Chunk.hpp>
 #include <Quartz2/Mesh.hpp>
+#include <Quartz2/BlocksRegistry.hpp>
 
 #include <cstddef>
 #include <memory>
 
 namespace q2
 {
-	enum EChunkBlockType
-	{
-		CHUNK_BLOCK_TYPE_AIR,
-		CHUNK_BLOCK_TYPE_DIRT
-	};
-
 	struct ChunkBlock
 	{
-		EChunkBlockType type;
+		BlockType* type;
 	};
 
 	class Chunk
@@ -56,12 +51,12 @@ namespace q2
 
 		std::shared_ptr<Mesh> generateMesh();
 
-		EChunkBlockType getBlockTypeToLeft(std::size_t x, std::size_t y, std::size_t z);
-		EChunkBlockType getBlockTypeToRight(std::size_t x, std::size_t y, std::size_t z);
-		EChunkBlockType getBlockTypeToTop(std::size_t x, std::size_t y, std::size_t z);
-		EChunkBlockType getBlockTypeToBottom(std::size_t x, std::size_t y, std::size_t z);
-		EChunkBlockType getBlockTypeToFront(std::size_t x, std::size_t y, std::size_t z);
-		EChunkBlockType getBlockTypeToBack(std::size_t x, std::size_t y, std::size_t z);
+		EBlockCategory getCategoryOfBlockToLeft(std::size_t x, std::size_t y, std::size_t z);
+		EBlockCategory getCategoryOfBlockToRight(std::size_t x, std::size_t y, std::size_t z);
+		EBlockCategory getCategoryOfBlockToTop(std::size_t x, std::size_t y, std::size_t z);
+		EBlockCategory getCategoryOfBlockToBottom(std::size_t x, std::size_t y, std::size_t z);
+		EBlockCategory getCategoryOfBlockToFront(std::size_t x, std::size_t y, std::size_t z);
+		EBlockCategory getCategoryOfBlockToBack(std::size_t x, std::size_t y, std::size_t z);
 
 	private:
 		std::vector<ChunkBlock> m_blocks;

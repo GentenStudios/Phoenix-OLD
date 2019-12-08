@@ -28,60 +28,16 @@
 
 #pragma once
 
-#include <Quartz2/OpenGL32.hpp>
-#include <Quartz2/Camera.hpp>
-
-#include <memory>
-#include <Quartz2/Mesh.hpp>
-
 namespace q2
 {
-	enum EChunkRendererStatus
-	{
-		CHUNK_RENDERER_STATUS_READY,
-		CHUNK_RENDERER_STATUS_BAD_SHADERS
-	};
-
-	namespace enums
-	{
-		const char* toString(EChunkRendererStatus status);
-	}
-
-	struct ChunkRendererMesh
-	{
-		GLuint vbo;
-		GLuint vao;
-
-		std::shared_ptr<Mesh> mesh;
-	};
-
-	class ChunkRenderer
+	template <typename T>
+	class Singleton
 	{
 	public:
-		void setup(std::size_t viewWidth, std::size_t viewHeight);
-		void teardown();
-
-		void render(Camera* camera);
-
-		EChunkRendererStatus status() const
-			{ return m_status; }
-
-		bool isReady() const
-			{ return m_status == CHUNK_RENDERER_STATUS_READY; }
-
-		void addMesh(const std::shared_ptr<Mesh>& mesh);
-
-		void setTexture(unsigned char* data, std::size_t w, std::size_t h);
-
-	private:
-		GLuint m_terrainShader;
-		GLuint m_texture;
-
-		std::size_t m_viewWidth;
-		std::size_t m_viewHeight;
-
-		EChunkRendererStatus m_status;
-
-		std::vector<ChunkRendererMesh> m_meshes;
+		static T* get()
+		{
+			static T instance;
+			return &instance;
+		}
 	};
-}
+} // namespace q2

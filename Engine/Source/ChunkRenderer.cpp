@@ -61,10 +61,27 @@ void ChunkRenderer::addMesh(const std::shared_ptr<Mesh>& mesh)
 	glBindBuffer(GL_ARRAY_BUFFER, rendererMesh.vbo);
 	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), vertices.data(), GL_STATIC_DRAW);
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, position));
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texCoord));
+
 	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
 
 	m_meshes.push_back(rendererMesh);
+}
+
+void ChunkRenderer::setTexture(unsigned char* data, std::size_t w, std::size_t h)
+{
+	glGenTextures(1, &m_texture);
+	glBindTexture(GL_TEXTURE_2D, m_texture);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+	glGenerateMipmap(GL_TEXTURE_2D);
 }
 
 void ChunkRenderer::setup(std::size_t viewWidth, std::size_t viewHeight)
@@ -83,7 +100,8 @@ void ChunkRenderer::setup(std::size_t viewWidth, std::size_t viewHeight)
 		m_status = CHUNK_RENDERER_STATUS_BAD_SHADERS;
 
 	glEnable(GL_DEPTH_TEST);
-
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glDepthFunc(GL_LESS);
 
 	glUseProgram(m_terrainShader);
@@ -122,7 +140,10 @@ void ChunkRenderer::render(Camera* camera)
 	const Mat4 view = camera->calculateViewMatrix();
 
 	glUseProgram(m_terrainShader);
-	
+
+	glBindTexture(GL_TEXTURE_2D, m_texture);
+	glActiveTexture(GL_TEXTURE0);
+
 	glUniformMatrix4fv(glGetUniformLocation(m_terrainShader, "u_view"), 1, GL_FALSE, &view.elements[0]);
 	glUniformMatrix4fv(glGetUniformLocation(m_terrainShader, "u_projection"), 1, GL_FALSE, &projection.elements[0]);
 

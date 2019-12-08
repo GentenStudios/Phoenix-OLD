@@ -49,6 +49,30 @@ protected:
 		m_camera = std::make_unique<Camera>();
 		SDL_ShowCursor(0);
 
+		std::shared_ptr<BlockTextureAtlas>atlas = std::make_shared<BlockTextureAtlas>(16, 16);
+		atlas->addTextureFile("Assets/grass_top.png");
+		atlas->addTextureFile("Assets/dirt.png");
+		atlas->addTextureFile("Assets/grass_side.png");
+		atlas->patch();
+
+		BlockRegistry* blocksRegistery = BlockRegistry::get();
+		blocksRegistery->setAtlas(atlas);
+
+		blocksRegistery->registerBlock({ "Air", "core:air", BLOCK_CATEGORY_AIR, {} });
+
+		BlockType* dirtBlockType = blocksRegistery->registerBlock({ "Dirt", "core:dirt", BLOCK_CATEGORY_SOLID, {} });
+		BlockType* grassBlockType = blocksRegistery->registerBlock({ "Grass", "core:grass", BLOCK_CATEGORY_SOLID, {} });
+
+		dirtBlockType->textures.setAll(atlas->getSpriteIDFromFilepath("Assets/dirt.png"));
+
+		grassBlockType->textures.top = atlas->getSpriteIDFromFilepath("Assets/grass_top.png");
+		grassBlockType->textures.bottom = atlas->getSpriteIDFromFilepath("Assets/dirt.png");
+		grassBlockType->textures.front = grassBlockType->textures.back
+			= grassBlockType->textures.left = grassBlockType->textures.right =
+				atlas->getSpriteIDFromFilepath("Assets/grass_side.png");
+		
+		m_chunkRenderer->setTexture(atlas->getPatchedTextureData(), atlas->getPatchedTextureWidth(), atlas->getPatchedTextureHeight());
+
 		Chunk a;
 		m_chunkRenderer->addMesh(a.generateMesh());
 	}

@@ -28,60 +28,54 @@
 
 #pragma once
 
-#include <Quartz2/OpenGL32.hpp>
-#include <Quartz2/Camera.hpp>
-
-#include <memory>
-#include <Quartz2/Mesh.hpp>
+#include <Quartz2/BlocksTextureAtlas.hpp>
+#include <Quartz2/Singleton.hpp>
 
 namespace q2
 {
-	enum EChunkRendererStatus
+	enum EBlockCategory
 	{
-		CHUNK_RENDERER_STATUS_READY,
-		CHUNK_RENDERER_STATUS_BAD_SHADERS
+		BLOCK_CATEGORY_AIR,
+		BLOCK_CATEGORY_SOLID,
+		BLOCK_CATEGORY_LIQUID
 	};
 
-	namespace enums
+	struct BlockType
 	{
-		const char* toString(EChunkRendererStatus status);
-	}
+		const char* displayName;
+		const char* id;
 
-	struct ChunkRendererMesh
-	{
-		GLuint vbo;
-		GLuint vao;
+		EBlockCategory category;
 
-		std::shared_ptr<Mesh> mesh;
+		struct
+		{
+			BlockTextureAtlas::SpriteID top, bottom, left, right, front,
+				back;
+
+			void setAll(BlockTextureAtlas::SpriteID sprite)
+			{
+				top = bottom = left = right = front = back = sprite;
+			}
+		} textures;
 	};
 
-	class ChunkRenderer
+	class BlockRegistry : public Singleton<BlockRegistry>
 	{
 	public:
-		void setup(std::size_t viewWidth, std::size_t viewHeight);
-		void teardown();
+		BlockType* registerBlock(BlockType blockInfo);
+		BlockType* getBlockFromID(const char* id);
 
-		void render(Camera* camera);
+		void setAtlas(const std::shared_ptr<BlockTextureAtlas>& atlas);
 
-		EChunkRendererStatus status() const
-			{ return m_status; }
-
-		bool isReady() const
-			{ return m_status == CHUNK_RENDERER_STATUS_READY; }
-
-		void addMesh(const std::shared_ptr<Mesh>& mesh);
-
-		void setTexture(unsigned char* data, std::size_t w, std::size_t h);
+		BlockTextureAtlas* getAtlas() const
+			{ return m_textureAtlas.get(); }
 
 	private:
-		GLuint m_terrainShader;
-		GLuint m_texture;
+		// This is a std::list as we don't want to invalidate any pointers
+		// when resizing... #todo (bwilks): Maybe use HandleAllocator for
+		// this as well??
+		std::list<BlockType> m_blocks;
 
-		std::size_t m_viewWidth;
-		std::size_t m_viewHeight;
-
-		EChunkRendererStatus m_status;
-
-		std::vector<ChunkRendererMesh> m_meshes;
+		std::shared_ptr<BlockTextureAtlas> m_textureAtlas;
 	};
 }

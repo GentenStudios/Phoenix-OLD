@@ -35,3 +35,4 @@
 #include <Quartz2/Mesh.hpp>
 #include <Quartz2/Chunk.hpp>
 #include <Quartz2/VoxelWorld.hpp>
+#include <Quartz2/BlocksTextureAtlas.hpp>
