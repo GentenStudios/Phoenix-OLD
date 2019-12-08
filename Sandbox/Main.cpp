@@ -1,5 +1,7 @@
 #include <Quartz2/Quartz.hpp>
 
+#include <imgui.h>
+
 #include <memory>
 
 using namespace q2;
@@ -12,7 +14,7 @@ private:
 
 public:
 	PhoenixGame()
-		: Game(800, 600, "Phoenix Game!")
+		: Game(1280, 720, "Phoenix Game!")
 	{}
 
 protected:
@@ -55,7 +57,9 @@ protected:
 
 	virtual void onFrame(float dt)
 	{
-		OpenGL32::clearScreen(0.f, 0.f, 0.f, 0.f);
+		OpenGL32::clearScreen(0.2196f, 0.2196f, 0.2196f, 1.f);
+
+		ImGui::ShowDemoWindow();
 
 		m_camera->tick(dt, getSDLWindow());
 

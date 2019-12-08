@@ -31,6 +31,10 @@
 
 #include <SDL_opengl.h>
 
+#include <imgui.h>
+#include <imgui_impl_opengl3.h>
+#include <imgui_impl_sdl.h>
+
 using namespace q2;
 
 Game::Game(std::size_t windowWidth, std::size_t windowHeight, const std::string& windowTitle)
@@ -52,7 +56,7 @@ void Game::exitGame()
 void Game::start()
 {
 	SDL_Init(SDL_INIT_EVERYTHING);
-	m_sdlWindow = SDL_CreateWindow(m_windowTitle.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+	m_sdlWindow = SDL_CreateWindow(m_windowTitle.c_str(), (int)SDL_WINDOWPOS_CENTERED, (int)SDL_WINDOWPOS_CENTERED,
 		m_windowWidth, m_windowHeight, SDL_WINDOW_OPENGL);
 
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
@@ -64,6 +68,14 @@ void Game::start()
 
 	gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress);
 
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& imguiIO = ImGui::GetIO();
+	imguiIO.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
+
+	ImGui_ImplSDL2_InitForOpenGL(m_sdlWindow, m_sdlGLContext);
+	ImGui_ImplOpenGL3_Init("#version 330 core");
+
 	onStart();
 
 	int lastTime = SDL_GetTicks();
@@ -74,6 +86,8 @@ void Game::start()
 		SDL_Event e;
 		while (SDL_PollEvent(&e))
 		{
+			ImGui_ImplSDL2_ProcessEvent(&e);
+
 			if (!onEvent(e))
 			{
 				switch (e.type)
@@ -85,17 +99,28 @@ void Game::start()
 			}
 		}
 
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplSDL2_NewFrame(m_sdlWindow);
+		ImGui::NewFrame();
+
 		const int currentTime = SDL_GetTicks();
 		const float dt = static_cast<float>(currentTime - lastTime);
 
 		onFrame(dt);
 
+		ImGui::Render();
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
 		SDL_GL_SwapWindow(m_sdlWindow);
-		
+
 		lastTime = currentTime;
 	}
 
 	onExit();
+	
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplSDL2_Shutdown();
+	ImGui::DestroyContext();
 
 	SDL_DestroyWindow(m_sdlWindow);
 	SDL_Quit();
