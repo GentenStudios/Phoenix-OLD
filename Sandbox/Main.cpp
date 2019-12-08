@@ -48,6 +48,9 @@ protected:
 
 		m_camera = std::make_unique<Camera>();
 		SDL_ShowCursor(0);
+
+		Chunk a;
+		m_chunkRenderer->addMesh(a.generateMesh());
 	}
 	
 	virtual void onExit()
@@ -55,13 +58,58 @@ protected:
 		m_chunkRenderer->teardown();
 	}
 
+	void showDebugStats(int fps, float dt)
+	{
+		const float DISTANCE = 10.0f;
+		const int   corner = 1;
+		static bool p_open = true;
+
+		ImGuiIO& io = ImGui::GetIO();
+
+		ImVec2 window_pos =
+			ImVec2((corner & 1) ? io.DisplaySize.x - DISTANCE : DISTANCE,
+			(corner & 2) ? io.DisplaySize.y - DISTANCE * 2.5f : DISTANCE * 2.5f);
+		ImVec2 window_pos_pivot =
+			ImVec2((corner & 1) ? 1.0f : 0.0f, (corner & 2) ? 1.0f : 0.0f);
+		ImGui::SetNextWindowPos(window_pos, ImGuiCond_Always, window_pos_pivot);
+
+		ImGui::SetNextWindowBgAlpha(0.3f);
+
+		ImGui::Begin(
+			"Debug Overlay Hint", &p_open,
+			(corner != -1 ? ImGuiWindowFlags_NoMove : 0) |
+			ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
+			ImGuiWindowFlags_AlwaysAutoResize |
+			ImGuiWindowFlags_NoSavedSettings |
+			ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav
+		);
+
+		ImGui::Text("FPS %i\n", (int)fps);
+		ImGui::Text("Delta time: %f\n", dt);
+
+		ImGui::End();
+	}
+
 	virtual void onFrame(float dt)
 	{
-		OpenGL32::clearScreen(0.2196f, 0.2196f, 0.2196f, 1.f);
-
-		ImGui::ShowDemoWindow();
+		static bool wireframe = false;
 
 		m_camera->tick(dt, getSDLWindow());
+
+		OpenGL32::clearScreen(0.2196f, 0.2196f, 0.2196f, 1.f);
+
+		showDebugStats(getFPS(), dt);
+
+		ImGui::Begin("Debug View");
+		if (ImGui::Checkbox("Wireframe", &wireframe))
+		{
+			if (wireframe)
+				OpenGL32::enableWireframe();
+			else
+				OpenGL32::disableWireframe();
+		}
+		ImGui::Text("OpenGL Error %i\n", glGetError());
+		ImGui::End();
 
 		m_chunkRenderer->render(m_camera.get());
 	}

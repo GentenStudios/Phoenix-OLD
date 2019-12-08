@@ -39,7 +39,7 @@ using namespace q2;
 
 Game::Game(std::size_t windowWidth, std::size_t windowHeight, const std::string& windowTitle)
 	: m_windowWidth(windowWidth), m_windowHeight(windowHeight), m_windowTitle(windowTitle),
-	m_sdlWindow(NULL), m_sdlGLContext()
+	m_sdlWindow(NULL), m_sdlGLContext(), m_fps(0)
 {
 }
 
@@ -79,10 +79,22 @@ void Game::start()
 	onStart();
 
 	int lastTime = SDL_GetTicks();
+	
+	std::size_t fpsLastTime = SDL_GetTicks();
+	int         fpsFrames = 0;
 
 	bool running = true;
 	while (running)
 	{
+		fpsFrames++;
+
+		if (fpsLastTime < SDL_GetTicks() - 1000)
+		{
+			fpsLastTime = SDL_GetTicks();
+			m_fps = fpsFrames;
+			fpsFrames = 0;
+		}
+
 		SDL_Event e;
 		while (SDL_PollEvent(&e))
 		{

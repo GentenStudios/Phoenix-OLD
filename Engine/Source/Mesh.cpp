@@ -26,57 +26,11 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#pragma once
+#include <Quartz2/Mesh.hpp>
 
-#include <cstddef>
-#include <string>
+using namespace q2;
 
-#include <SDL.h>
-
-namespace q2
+void Mesh::addVertex(const Vertex& vertex)
 {
-	// We do this here to avoid having to include SDL_opengl.h in the header.
-	// This is because SDL_opengl.h defines __gl_h_ which glad doesn't like
-	// and so complains & fails the build ("OpenGL header already incldued...." etc...)
-	// So to avoid having to include glad.h/OpenGL32.hpp in this header above SDL_opengl.h
-	// since the only thing we need is the SDL_GLContext symbol, just declare it as so here.
-	typedef void* SDL_GLContext;
-
-	class Game
-	{
-	public:
-		Game (std::size_t windowWidth, std::size_t windowHeight, const std::string& windowTitle);
-
-		void start();
-
-		std::size_t getWindowWidth() const
-			{ return m_windowWidth; }
-
-		std::size_t getWindowHeight() const
-			{ return m_windowHeight; }
-
-		SDL_Window* getSDLWindow() const
-			{ return m_sdlWindow; }
-
-		int getFPS() const
-			{ return m_fps; }
-
-	protected:
-		virtual void onStart() {}
-		virtual void onExit() {}
-		virtual void onFrame(float dt) {}
-		virtual bool onEvent(SDL_Event e) { return false; }
-
-		void exitGame();
-
-	private:
-		SDL_Window* m_sdlWindow;
-		SDL_GLContext m_sdlGLContext;
-
-		std::size_t m_windowWidth;
-		std::size_t m_windowHeight;
-		std::string m_windowTitle;
-
-		int m_fps;
-	};
+	m_vertices.push_back(vertex);
 }

@@ -35,5 +35,8 @@ namespace q2
 	struct OpenGL32
 	{
 		static void clearScreen(float r, float g, float b, float a);
+
+		static void enableWireframe();
+		static void disableWireframe();
 	};
 }

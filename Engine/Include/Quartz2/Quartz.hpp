@@ -32,3 +32,6 @@
 #include <Quartz2/ChunkRenderer.hpp>
 #include <Quartz2/Game.hpp>
 #include <Quartz2/Camera.hpp>
+#include <Quartz2/Mesh.hpp>
+#include <Quartz2/Chunk.hpp>
+#include <Quartz2/VoxelWorld.hpp>

@@ -44,6 +44,29 @@ const char* enums::toString(EChunkRendererStatus status)
 	}
 }
 
+void ChunkRenderer::addMesh(const std::shared_ptr<Mesh>& mesh)
+{
+	ChunkRendererMesh rendererMesh;
+	rendererMesh.mesh = mesh;
+
+
+	std::vector<Vertex>& vertices = mesh->getVertices();
+
+	glGenVertexArrays(1, &rendererMesh.vao);
+	glBindVertexArray(rendererMesh.vao);
+
+	glBindVertexArray(rendererMesh.vao);
+
+	glGenBuffers(1, &rendererMesh.vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, rendererMesh.vbo);
+	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), vertices.data(), GL_STATIC_DRAW);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+
+	m_meshes.push_back(rendererMesh);
+}
+
 void ChunkRenderer::setup(std::size_t viewWidth, std::size_t viewHeight)
 {
 	m_viewWidth = viewWidth;
@@ -60,61 +83,11 @@ void ChunkRenderer::setup(std::size_t viewWidth, std::size_t viewHeight)
 		m_status = CHUNK_RENDERER_STATUS_BAD_SHADERS;
 
 	glEnable(GL_DEPTH_TEST);
+
 	glDepthFunc(GL_LESS);
 
-	float vertices[] = {
-		-1.0f,-1.0f,-1.0f, // triangle 1 : begin
-		-1.0f,-1.0f, 1.0f,
-		-1.0f, 1.0f, 1.0f, // triangle 1 : end
-		1.0f, 1.0f,-1.0f, // triangle 2 : begin
-		-1.0f,-1.0f,-1.0f,
-		-1.0f, 1.0f,-1.0f, // triangle 2 : end
-		1.0f,-1.0f, 1.0f,
-		-1.0f,-1.0f,-1.0f,
-		1.0f,-1.0f,-1.0f,
-		1.0f, 1.0f,-1.0f,
-		1.0f,-1.0f,-1.0f,
-		-1.0f,-1.0f,-1.0f,
-		-1.0f,-1.0f,-1.0f,
-		-1.0f, 1.0f, 1.0f,
-		-1.0f, 1.0f,-1.0f,
-		1.0f,-1.0f, 1.0f,
-		-1.0f,-1.0f, 1.0f,
-		-1.0f,-1.0f,-1.0f,
-		-1.0f, 1.0f, 1.0f,
-		-1.0f,-1.0f, 1.0f,
-		1.0f,-1.0f, 1.0f,
-		1.0f, 1.0f, 1.0f,
-		1.0f,-1.0f,-1.0f,
-		1.0f, 1.0f,-1.0f,
-		1.0f,-1.0f,-1.0f,
-		1.0f, 1.0f, 1.0f,
-		1.0f,-1.0f, 1.0f,
-		1.0f, 1.0f, 1.0f,
-		1.0f, 1.0f,-1.0f,
-		-1.0f, 1.0f,-1.0f,
-		1.0f, 1.0f, 1.0f,
-		-1.0f, 1.0f,-1.0f,
-		-1.0f, 1.0f, 1.0f,
-		1.0f, 1.0f, 1.0f,
-		-1.0f, 1.0f, 1.0f,
-		1.0f,-1.0f, 1.0f
-	};
-
 	glUseProgram(m_terrainShader);
-	
 	glBindAttribLocation(m_terrainShader, 0, "in_Position");
-
-	glGenVertexArrays(1, &m_vao);
-	glBindVertexArray(m_vao);
-
-	glGenBuffers(1, &m_vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
-
 }
 
 void ChunkRenderer::teardown()
@@ -124,8 +97,12 @@ void ChunkRenderer::teardown()
 	if (isReady())
 	{
 		glDeleteProgram(m_terrainShader);
-		glDeleteVertexArrays(1, &m_vao);
-		glDeleteBuffers(1, &m_vbo);
+		
+		for (ChunkRendererMesh& mesh : m_meshes)
+		{
+			glDeleteVertexArrays(1, &mesh.vao);
+			glDeleteBuffers(1, &mesh.vbo);
+		}
 	}
 }
 
@@ -149,7 +126,9 @@ void ChunkRenderer::render(Camera* camera)
 	glUniformMatrix4fv(glGetUniformLocation(m_terrainShader, "u_view"), 1, GL_FALSE, &view.elements[0]);
 	glUniformMatrix4fv(glGetUniformLocation(m_terrainShader, "u_projection"), 1, GL_FALSE, &projection.elements[0]);
 
-	glBindVertexArray(m_vao);
-
-	glDrawArrays(GL_TRIANGLES, 0, 12*3);
+	for (ChunkRendererMesh& mesh : m_meshes)
+	{
+		glBindVertexArray(mesh.vao);
+		glDrawArrays(GL_TRIANGLES, 0, mesh.mesh->getVertices().size());
+	}
 }

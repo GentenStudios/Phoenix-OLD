@@ -31,6 +31,9 @@
 #include <Quartz2/OpenGL32.hpp>
 #include <Quartz2/Camera.hpp>
 
+#include <memory>
+#include <Quartz2/Mesh.hpp>
+
 namespace q2
 {
 	enum EChunkRendererStatus
@@ -43,6 +46,14 @@ namespace q2
 	{
 		const char* toString(EChunkRendererStatus status);
 	}
+
+	struct ChunkRendererMesh
+	{
+		GLuint vbo;
+		GLuint vao;
+
+		std::shared_ptr<Mesh> mesh;
+	};
 
 	class ChunkRenderer
 	{
@@ -58,14 +69,16 @@ namespace q2
 		bool isReady() const
 			{ return m_status == CHUNK_RENDERER_STATUS_READY; }
 
+		void addMesh(const std::shared_ptr<Mesh>& mesh);
+
 	private:
 		GLuint m_terrainShader;
-		GLuint m_vao;
-		GLuint m_vbo;
 
 		std::size_t m_viewWidth;
 		std::size_t m_viewHeight;
 
 		EChunkRendererStatus m_status;
+
+		std::vector<ChunkRendererMesh> m_meshes;
 	};
 }
