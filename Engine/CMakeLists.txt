@@ -18,6 +18,7 @@ add_library(${PROJECT_NAME}
 	${Headers}/ShaderCompiler.hpp
 	${Headers}/Game.hpp
 	${Headers}/OpenGL32.hpp
+        ${Headers}/Camera.hpp
 
 	${Source}/Matrix4x4.cpp
 	${Source}/Ray.cpp
@@ -25,6 +26,7 @@ add_library(${PROJECT_NAME}
 	${Source}/ShaderCompiler.cpp
 	${Source}/Game.cpp
 	${Source}/OpenGL32.cpp
+        ${Source}/Camera.cpp
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${Headers}/../)

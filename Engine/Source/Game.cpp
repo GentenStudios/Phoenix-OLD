@@ -66,23 +66,33 @@ void Game::start()
 
 	onStart();
 
+	int lastTime = SDL_GetTicks();
+
 	bool running = true;
 	while (running)
 	{
 		SDL_Event e;
 		while (SDL_PollEvent(&e))
 		{
-			switch (e.type)
+			if (!onEvent(e))
 			{
-			case SDL_QUIT:
-				running = false;
-				break;
+				switch (e.type)
+				{
+				case SDL_QUIT:
+					running = false;
+					break;
+				}
 			}
 		}
 
-		onFrame();
+		const int currentTime = SDL_GetTicks();
+		const float dt = static_cast<float>(currentTime - lastTime);
+
+		onFrame(dt);
 
 		SDL_GL_SwapWindow(m_sdlWindow);
+		
+		lastTime = currentTime;
 	}
 
 	onExit();

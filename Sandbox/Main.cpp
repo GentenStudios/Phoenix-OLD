@@ -1,5 +1,4 @@
-#include <Quartz2/Game.hpp>
-#include <Quartz2/ChunkRenderer.hpp>
+#include <Quartz2/Quartz.hpp>
 
 #include <memory>
 
@@ -9,6 +8,7 @@ class PhoenixGame : public Game
 {
 private:
 	std::unique_ptr<ChunkRenderer> m_chunkRenderer;
+	std::unique_ptr<Camera> m_camera;
 
 public:
 	PhoenixGame()
@@ -16,6 +16,21 @@ public:
 	{}
 
 protected:
+	virtual bool onEvent(SDL_Event e)
+	{
+		if (e.type == SDL_KEYUP)
+		{
+			if (e.key.keysym.scancode == SDL_SCANCODE_ESCAPE)
+			{
+				m_camera->toggleEnabled();
+				SDL_ShowCursor(!m_camera->isEnabled());
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	virtual void onStart()
 	{
 		m_chunkRenderer = std::make_unique<ChunkRenderer>();
@@ -28,6 +43,9 @@ protected:
 
 			exitGame();
 		}
+
+		m_camera = std::make_unique<Camera>();
+		SDL_ShowCursor(0);
 	}
 	
 	virtual void onExit()
@@ -35,11 +53,13 @@ protected:
 		m_chunkRenderer->teardown();
 	}
 
-	virtual void onFrame()
+	virtual void onFrame(float dt)
 	{
 		OpenGL32::clearScreen(0.f, 0.f, 0.f, 0.f);
 
-		m_chunkRenderer->render();
+		m_camera->update(dt, getSDLWindow());
+
+		m_chunkRenderer->render(m_camera.get());
 	}
 };
 

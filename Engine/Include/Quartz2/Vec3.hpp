@@ -173,20 +173,20 @@ namespace q2
 		{
 			return (x <= rhs.x && y <= rhs.y && z <= rhs.z);
 		}
-
-		TVec3 operator+(const TVec3& rhs)
+		
+		TVec3 operator+(const TVec3& rhs) const
 		{
 			return TVec3(x + rhs.x, y + rhs.y, z + rhs.z);
 		}
-		TVec3 operator-(const TVec3& rhs)
+		TVec3 operator-(const TVec3& rhs) const
 		{
 			return TVec3(x - rhs.x, y - rhs.y, z - rhs.z);
 		}
-		TVec3 operator*(const TVec3& rhs)
+		TVec3 operator*(const TVec3& rhs) const
 		{
 			return TVec3(x * rhs.x, y * rhs.y, z * rhs.z);
 		}
-		TVec3 operator/(const TVec3& rhs)
+		TVec3 operator/(const TVec3& rhs) const
 		{
 			return TVec3(x / rhs.x, y / rhs.y, z / rhs.z);
 		}
@@ -211,19 +211,19 @@ namespace q2
 			z /= rhs.z;
 		}
 
-		TVec3 operator+(const T& rhs)
+		TVec3 operator+(const T& rhs) const
 		{
 			return TVec3(x + rhs, y + rhs, z + rhs);
 		}
-		TVec3 operator-(const T& rhs)
+		TVec3 operator-(const T& rhs) const
 		{
 			return TVec3(x - rhs, y - rhs, z - rhs);
 		}
-		TVec3 operator*(const T& rhs)
+		TVec3 operator*(const T& rhs) const
 		{
 			return TVec3(x * rhs, y * rhs, z * rhs);
 		}
-		TVec3 operator/(const T& rhs)
+		TVec3 operator/(const T& rhs) const
 		{
 			return TVec3(x / rhs, y / rhs, z / rhs);
 		}

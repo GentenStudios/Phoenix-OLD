@@ -29,6 +29,7 @@
 #pragma once
 
 #include <Quartz2/OpenGL32.hpp>
+#include <Quartz2/Camera.hpp>
 
 namespace q2
 {
@@ -49,7 +50,7 @@ namespace q2
 		void setup();
 		void teardown();
 
-		void render();
+		void render(Camera* camera);
 
 		EChunkRendererStatus status() const
 			{ return m_status; }

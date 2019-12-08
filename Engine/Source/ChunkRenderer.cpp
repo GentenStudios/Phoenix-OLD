@@ -57,14 +57,14 @@ void ChunkRenderer::setup()
 		m_status = CHUNK_RENDERER_STATUS_BAD_SHADERS;
 
 	float vertices[] = {
-		-0.5f, -0.5f, 0.0f,
-		 0.5f, -0.5f, 0.0f,
-		 0.0f,  0.5f, 0.0f
+		-1.f, -1.f, 1.0f,
+		 1.f, -1.f, 1.0f,
+		 0.0f,  1.f, 1.0f
 	};
 
 	glUseProgram(m_terrainShader);
 	
-	glBindAttribLocation(m_terrainShader, 0, "aPos");
+	glBindAttribLocation(m_terrainShader, 0, "in_Position");
 
 	glGenVertexArrays(1, &m_vao);
 	glBindVertexArray(m_vao);
@@ -75,6 +75,7 @@ void ChunkRenderer::setup()
 
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
+
 }
 
 void ChunkRenderer::teardown()
@@ -89,9 +90,15 @@ void ChunkRenderer::teardown()
 	}
 }
 
-void ChunkRenderer::render()
+void ChunkRenderer::render(Camera* camera)
 {
+	const Mat4 projection = Mat4::perspective(800.f / 600.f, 60.f, 100.f, 0.1f);
+	const Mat4 mvp = projection * camera->calculateViewMatrix();
+
 	glUseProgram(m_terrainShader);
+	
+	glUniformMatrix4fv(glGetUniformLocation(m_terrainShader, "u_Mvp"), 1, GL_FALSE, &mvp.elements[0]);
+	
 	glBindVertexArray(m_vao);
 
 	glDrawArrays(GL_TRIANGLES, 0, 3);

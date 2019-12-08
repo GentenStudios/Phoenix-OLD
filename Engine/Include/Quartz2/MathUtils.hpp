@@ -37,6 +37,9 @@ namespace q2
 	 */
 	static constexpr float PI = 3.14159265359f;
 
+	static constexpr float PIDIV2 = 1.5707963268;
+
+
 	/**
 	 * @brief Converts degrees to radians.
 	 * @param degrees The number of degrees waiting to be converted.

@@ -55,10 +55,14 @@ namespace q2
 		std::size_t getWindowHeight() const
 			{ return m_windowHeight; }
 
+		SDL_Window* getSDLWindow() const
+			{ return m_sdlWindow; }
+
 	protected:
 		virtual void onStart() {}
 		virtual void onExit() {}
-		virtual void onFrame() {}
+		virtual void onFrame(float dt) {}
+		virtual bool onEvent(SDL_Event e) { return false; }
 
 		void exitGame();
 

@@ -28,48 +28,30 @@
 
 #pragma once
 
+#include <Quartz2/Matrix4x4.hpp>
 #include <Quartz2/Vec3.hpp>
+
+#include <SDL.h>
 
 namespace q2
 {
-	struct Matrix4x4
+	class Camera
 	{
-		float elements[16];
+	public:
+		Camera();
 
-		Matrix4x4();
+		void update(float dt, SDL_Window* window);
+		void toggleEnabled();
+		Mat4 calculateViewMatrix();
+		bool isEnabled() const;
+		void setPosition(Vec3 newPosition);
 
-		Matrix4x4(float m00, float m10, float m20, float m30, float m01,
-			float m11, float m21, float m31, float m02, float m12,
-			float m22, float m32, float m03, float m13, float m23,
-			float m33);
+	private:
+		Vec3 m_rotation;
+		Vec3 m_up;
+		Vec3 m_direction;
+		Vec3 m_position;
 
-		void setIdentity();
-
-		~Matrix4x4() = default;
-
-		static Matrix4x4 perspective(const float& aspectRatio,
-			const float& fieldOfView,
-			const float& farPlane,
-			const float& nearPlane);
-
-		static Matrix4x4 ortho(float left, float right, float top,
-			float bottom, float farPlane,
-			float nearPlane);
-
-		static Matrix4x4 lookAt(const Vec3& eyePos,
-			const Vec3& centre,
-			const Vec3& up);
-
-		void operator*=(const Matrix4x4& other);
-
-		Matrix4x4 operator*(const Matrix4x4& other) const;
-
-		void operator*=(const float& other);
-
-		Matrix4x4 operator*(const float& other);
-
-		Vec3 operator*(const Vec3& other);
+		bool m_enabled;
 	};
-
-	using Mat4 = Matrix4x4;
-} // namespace q2
+}; // namespace q2
