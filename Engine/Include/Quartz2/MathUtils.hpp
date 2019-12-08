@@ -32,13 +32,9 @@
 
 namespace q2
 {
-	/**
-	 * @brief A Utility providing PI to 11 decimal places.
-	 */
-	static constexpr float PI = 3.14159265359f;
-
-	static constexpr float PIDIV2 = 1.5707963268;
-
+	static constexpr float PI = 3.141592654f;
+	static constexpr float PIDIV2 = 1.570796327f;
+	static constexpr float PIDIV4 = 0.785398163f;
 
 	/**
 	 * @brief Converts degrees to radians.

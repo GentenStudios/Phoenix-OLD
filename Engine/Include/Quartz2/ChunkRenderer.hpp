@@ -47,7 +47,7 @@ namespace q2
 	class ChunkRenderer
 	{
 	public:
-		void setup();
+		void setup(std::size_t viewWidth, std::size_t viewHeight);
 		void teardown();
 
 		void render(Camera* camera);
@@ -62,6 +62,9 @@ namespace q2
 		GLuint m_terrainShader;
 		GLuint m_vao;
 		GLuint m_vbo;
+
+		std::size_t m_viewWidth;
+		std::size_t m_viewHeight;
 
 		EChunkRendererStatus m_status;
 	};

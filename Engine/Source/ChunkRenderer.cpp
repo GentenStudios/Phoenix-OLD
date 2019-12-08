@@ -44,8 +44,11 @@ const char* enums::toString(EChunkRendererStatus status)
 	}
 }
 
-void ChunkRenderer::setup()
+void ChunkRenderer::setup(std::size_t viewWidth, std::size_t viewHeight)
 {
+	m_viewWidth = viewWidth;
+	m_viewHeight = viewHeight;
+
 	// Optimism :D (this will get changed later if anything does fail).
 	m_status = CHUNK_RENDERER_STATUS_READY;
 
@@ -92,13 +95,24 @@ void ChunkRenderer::teardown()
 
 void ChunkRenderer::render(Camera* camera)
 {
-	const Mat4 projection = Mat4::perspective(800.f / 600.f, 60.f, 100.f, 0.1f);
-	const Mat4 mvp = projection * camera->calculateViewMatrix();
+	const float FOV = 60.f;
+	const float NEAR_DRAW = 0.1f;
+	const float FAR_DRAW = 1000.f;
+
+	const Mat4 projection = Mat4::perspective(
+		static_cast<float>(m_viewWidth) / static_cast<float>(m_viewHeight),
+		FOV,
+		FAR_DRAW,
+		NEAR_DRAW	
+	);
+	
+	const Mat4 view = camera->calculateViewMatrix();
 
 	glUseProgram(m_terrainShader);
 	
-	glUniformMatrix4fv(glGetUniformLocation(m_terrainShader, "u_Mvp"), 1, GL_FALSE, &mvp.elements[0]);
-	
+	glUniformMatrix4fv(glGetUniformLocation(m_terrainShader, "u_view"), 1, GL_FALSE, &view.elements[0]);
+	glUniformMatrix4fv(glGetUniformLocation(m_terrainShader, "u_projection"), 1, GL_FALSE, &projection.elements[0]);
+
 	glBindVertexArray(m_vao);
 
 	glDrawArrays(GL_TRIANGLES, 0, 3);

@@ -29,30 +29,33 @@
 #include <Quartz2/Camera.hpp>
 #include <Quartz2/MathUtils.hpp>
 
+#include <cmath>
+
+const float MOVE_SPEED = 0.01f;
+const float SENSITIVITY = 0.00005f;
+
 using namespace q2;
 
-Camera::Camera()
-	: m_enabled(true)
-{
-}
+Camera::Camera() 
+{ }
 
-Mat4 Camera::calculateViewMatrix()
+Vec3 Camera::getPosition() const { return m_position; }
+
+Vec3 Camera::getDirection() const { return m_direction; }
+
+Mat4 Camera::calculateViewMatrix() const
 {
 	const Vec3 centre = m_position + m_direction;
-
-	return Mat4::lookAt(m_position, centre, m_up);
+	return Matrix4x4::lookAt(m_position, centre, m_up);
 }
 
-bool Camera::isEnabled() const
+void Camera::enable(bool enabled)
 {
-	return m_enabled;
+	m_enabled = enabled;
 }
 
-void Camera::update(float dt, SDL_Window* window)
+void Camera::tick(float dt, SDL_Window* window)
 {
-	printf("%f\n", dt);
-	const float SENSITIVITY = 0.00005f;
-
 	if (!m_enabled)
 		return;
 
@@ -67,50 +70,50 @@ void Camera::update(float dt, SDL_Window* window)
 
 	SDL_WarpMouseInWindow(window, halfWindowWidth, halfWindowHeight);
 
-	int dtX = (mouseX - halfWindowWidth);
-	int dtY = (mouseY - halfWindowHeight);
+	const float sensitivity = SENSITIVITY;
 
-	m_rotation.x += SENSITIVITY * dt * dtX;
-	m_rotation.y += SENSITIVITY * dt * dtY;
+	m_rotation.x += sensitivity * dt * (halfWindowWidth - mouseX);
+	m_rotation.y += sensitivity * dt * (halfWindowHeight - mouseY);
 
-	if (m_rotation.y > q2::PIDIV2)
-		m_rotation.y = q2::PIDIV2;
-	else if (m_rotation.y < -q2::PIDIV2)
-		m_rotation.y = -q2::PIDIV2;
+	m_rotation.y = q2::clamp(m_rotation.y, -q2::PIDIV2, q2::PIDIV2);
 
-	m_direction.x = std::cosf(m_rotation.y) * std::sinf(m_rotation.x);
-	m_direction.y = std::sinf(m_rotation.y);
-	m_direction.z = std::cosf(m_rotation.y) * std::cosf(m_rotation.x);
+	m_direction.x = std::cos(m_rotation.y) * std::sin(m_rotation.x);
+	m_direction.y = std::sin(m_rotation.y);
+	m_direction.z = std::cos(m_rotation.y) * std::cos(m_rotation.x);
 
-	const Vec3 right = Vec3(
-		std::sinf(m_rotation.x - q2::PIDIV2),
-		0.f,
-		std::cosf(m_rotation.x - q2::PIDIV2)
-	);
+	const Vec3 right = { std::sin(m_rotation.x - q2::PIDIV2), 0.f,
+						   std::cos(m_rotation.x - q2::PIDIV2) };
 
 	m_up = Vec3::cross(right, m_direction);
 
+	const float moveSpeed = MOVE_SPEED;
+	
 	const Uint8* keys = SDL_GetKeyboardState(NULL);
 
-	static const float BASE_MOVE_SPEED = 0.1f;
-	
 	if (keys[SDL_SCANCODE_W])
-		m_position += m_direction * dt * BASE_MOVE_SPEED;
+	{
+		m_position += m_direction * dt * moveSpeed;
+	}
 	else if (keys[SDL_SCANCODE_S])
-		m_position -= m_direction * dt * BASE_MOVE_SPEED;
+	{
+		m_position -= m_direction * dt * moveSpeed;
+	}
 
 	if (keys[SDL_SCANCODE_A])
-		m_position -= right * dt * BASE_MOVE_SPEED;
+	{
+		m_position -= right * dt * moveSpeed;
+	}
 	else if (keys[SDL_SCANCODE_D])
-		m_position += right * dt * BASE_MOVE_SPEED;
-}
+	{
+		m_position += right * dt * moveSpeed;
+	}
 
-void Camera::setPosition(Vec3 newPosition)
-{
-	m_position = newPosition;
-}
-
-void Camera::toggleEnabled()
-{
-	m_enabled = !m_enabled;
+	if (keys[SDL_SCANCODE_SPACE])
+	{
+		m_position.y += dt * moveSpeed;
+	}
+	else if (keys[SDL_SCANCODE_LSHIFT])
+	{
+		m_position.y -= dt * moveSpeed;
+	}
 }

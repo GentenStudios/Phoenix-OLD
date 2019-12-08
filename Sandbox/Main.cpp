@@ -22,7 +22,7 @@ protected:
 		{
 			if (e.key.keysym.scancode == SDL_SCANCODE_ESCAPE)
 			{
-				m_camera->toggleEnabled();
+				m_camera->enable(!m_camera->isEnabled());
 				SDL_ShowCursor(!m_camera->isEnabled());
 				return true;
 			}
@@ -34,7 +34,7 @@ protected:
 	virtual void onStart()
 	{
 		m_chunkRenderer = std::make_unique<ChunkRenderer>();
-		m_chunkRenderer->setup();
+		m_chunkRenderer->setup(getWindowWidth(), getWindowHeight());
 	
 		if (!m_chunkRenderer->isReady())
 		{
@@ -57,7 +57,7 @@ protected:
 	{
 		OpenGL32::clearScreen(0.f, 0.f, 0.f, 0.f);
 
-		m_camera->update(dt, getSDLWindow());
+		m_camera->tick(dt, getSDLWindow());
 
 		m_chunkRenderer->render(m_camera.get());
 	}

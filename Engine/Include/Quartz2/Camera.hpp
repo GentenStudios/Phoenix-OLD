@@ -33,25 +33,83 @@
 
 #include <SDL.h>
 
+#include <cmath>
+
 namespace q2
 {
+	/**
+	 * @brief Base Camera class following basic FPS Cam principles.
+	 *
+	 * The camera functions as a basic tool for moving around in a 3D
+	 * rendered world. This uses the "tick" function on every iteration of
+	 * the main game loop to determine movement from the user.
+	 */
 	class Camera
 	{
 	public:
 		Camera();
 
-		void update(float dt, SDL_Window* window);
-		void toggleEnabled();
-		Mat4 calculateViewMatrix();
-		bool isEnabled() const;
-		void setPosition(Vec3 newPosition);
+		/**
+		 * @brief Gets the position of the camera, in world space
+		 * @return A 3 component vector containing the position of the
+		 * camera.
+		 */
+		Vec3 getPosition() const;
+
+		/**
+		 * @brief Gets the direction of the camera, in world space
+		 * @return A 3 component vector containing the direction of the
+		 * camera.
+		 */
+		Vec3 getDirection() const;
+
+		/**
+		 * @brief Calculates the view matrix for use in the graphics
+		 * shaders.
+		 * @return A 4x4 Matrix containing the required information to send
+		 * into shaders.
+		 */
+		Mat4 calculateViewMatrix() const;
+
+		/**
+		 * @brief Updates things like position and direction dependent on
+		 * whether the mouse has moved, or a key has been pressed.
+		 *
+		 * @param dt The Delta Time, the time between each frame, so the
+		 * player moves at the same speed regardless of if they're playing
+		 * at 100fps or 10fps.
+		 */
+		void tick(float dt, SDL_Window* window);
+
+		/**
+		 * @brief Sets the camera's state of being enabled or not being
+		 * enabled.
+		 * @param enabled A boolean stating whether the camera should be set
+		 * to enabled or not.
+		 */
+		void enable(bool enabled);
+
+		/**
+		 * @brief Checks whether the camera is enabled or not.
+		 * @return True if the camera is enabled, false if not.
+		 */
+		bool isEnabled() const { return m_enabled; }
 
 	private:
+		/// @brief The rotation of the camera.
 		Vec3 m_rotation;
-		Vec3 m_up;
-		Vec3 m_direction;
+
+		/// @brief The position of the camera.
 		Vec3 m_position;
 
-		bool m_enabled;
+		/// @brief The UP vector of the camera.
+		Vec3 m_up;
+
+		/// @brief The direction of the camera.
+		Vec3 m_direction;
+
+		/// @brief The current status of the camera, whether it's enabled or
+		/// not.
+		bool m_enabled = true;
 	};
-}; // namespace q2
+} // namespace q2
