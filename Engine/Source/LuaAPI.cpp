@@ -26,15 +26,26 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#pragma once
-
-#include <Quartz2/Math.hpp>
-#include <Quartz2/ChunkRenderer.hpp>
-#include <Quartz2/Game.hpp>
-#include <Quartz2/Camera.hpp>
-#include <Quartz2/Mesh.hpp>
-#include <Quartz2/Chunk.hpp>
-#include <Quartz2/VoxelWorld.hpp>
-#include <Quartz2/BlocksTextureAtlas.hpp>
 #include <Quartz2/LuaAPI.hpp>
-#include <Quartz2/ContentLoader.hpp>
+
+using namespace q2;
+
+void luaapi::registerBlock(std::string displayName, std::string uniqueName, std::string textures){
+    textures = "Modules/" + textures;
+    std::shared_ptr<BlockTextureAtlas>atlas = std::make_shared<BlockTextureAtlas>(16, 16);
+    atlas->addTextureFile(textures.c_str());
+    atlas->patch();
+
+    BlockRegistry* blocksRegistery = BlockRegistry::get();
+    blocksRegistery->setAtlas(atlas);
+
+    BlockType* dirtBlockType = blocksRegistery->registerBlock({ displayName.c_str(), uniqueName.c_str(), BLOCK_CATEGORY_SOLID, {} });
+
+    dirtBlockType->textures.setAll(atlas->getSpriteIDFromFilepath(textures.c_str()));
+}
+
+void luaapi::loadAPI(sol::state& lua){
+    lua["voxel"] = lua.create_table();
+    lua["voxel"]["block"] = lua.create_table();
+    lua["voxel"]["block"]["register"] = luaapi::registerBlock;
+};

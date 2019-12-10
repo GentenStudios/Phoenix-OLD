@@ -1,3 +1,5 @@
 add_subdirectory (SDL2)
 add_subdirectory (Glad)
 add_subdirectory (ImGui)
+add_subdirectory (lua)
+add_subdirectory (sol2)

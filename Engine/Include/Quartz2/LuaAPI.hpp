@@ -28,13 +28,13 @@
 
 #pragma once
 
-#include <Quartz2/Math.hpp>
-#include <Quartz2/ChunkRenderer.hpp>
-#include <Quartz2/Game.hpp>
-#include <Quartz2/Camera.hpp>
-#include <Quartz2/Mesh.hpp>
-#include <Quartz2/Chunk.hpp>
-#include <Quartz2/VoxelWorld.hpp>
-#include <Quartz2/BlocksTextureAtlas.hpp>
-#include <Quartz2/LuaAPI.hpp>
-#include <Quartz2/ContentLoader.hpp>
+#include <Quartz2/BlocksRegistry.hpp>
+#include <sol/sol.hpp>
+
+namespace q2{
+    struct luaapi{
+        static void registerBlock(std::string displayName, std::string uniqueName, std::string textures);
+
+        static void loadAPI(sol::state& lua);
+    };
+};

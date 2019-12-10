@@ -60,10 +60,10 @@ protected:
 
 		blocksRegistery->registerBlock({ "Air", "core:air", BLOCK_CATEGORY_AIR, {} });
 
-		BlockType* dirtBlockType = blocksRegistery->registerBlock({ "Dirt", "core:dirt", BLOCK_CATEGORY_SOLID, {} });
+		//BlockType* dirtBlockType = blocksRegistery->registerBlock({ "Dirt", "core:dirt", BLOCK_CATEGORY_SOLID, {} });
 		BlockType* grassBlockType = blocksRegistery->registerBlock({ "Grass", "core:grass", BLOCK_CATEGORY_SOLID, {} });
 
-		dirtBlockType->textures.setAll(atlas->getSpriteIDFromFilepath("Assets/dirt.png"));
+		//dirtBlockType->textures.setAll(atlas->getSpriteIDFromFilepath("Assets/dirt.png"));
 
 		grassBlockType->textures.top = atlas->getSpriteIDFromFilepath("Assets/grass_top.png");
 		grassBlockType->textures.bottom = atlas->getSpriteIDFromFilepath("Assets/dirt.png");
@@ -141,6 +141,21 @@ protected:
 
 int main(int argc, char** argv)
 {
+	// ===== Load Lua =====
+    sol::state lua;
+	lua.open_libraries(sol::lib::base);
+	luaapi::loadAPI(lua);
+
+	bool check = q2::modules::loadModules("save1", lua);
+    std::cout << "\n\n";
+	if(check){
+		std::cout << "Lua modules loaded\n";
+	}else{
+		std::cout << "Lua modules failed to load\n";
+	}
+
+	// ===== Launch Main Game Loop =====
+
 	Game* game = new PhoenixGame();
 	game->start();
 
