@@ -28,6 +28,7 @@
 
 #include <Quartz2/Camera.hpp>
 #include <Quartz2/MathUtils.hpp>
+#include <Quartz2/Settings.hpp>
 
 #include <cmath>
 
@@ -37,7 +38,7 @@ const float SENSITIVITY = 0.00005f;
 using namespace q2;
 
 Camera::Camera() 
-{ }
+{m_settingSensitivity = Settings::get()->add("Sensitivity", "camera:sensitivity", 5);}
 
 Vec3 Camera::getPosition() const { return m_position; }
 
@@ -70,7 +71,7 @@ void Camera::tick(float dt, SDL_Window* window)
 
 	SDL_WarpMouseInWindow(window, halfWindowWidth, halfWindowHeight);
 
-	const float sensitivity = SENSITIVITY;
+	const float sensitivity = 0.00001 * Settings::get()->value(m_settingSensitivity);
 
 	m_rotation.x += sensitivity * dt * (halfWindowWidth - mouseX);
 	m_rotation.y += sensitivity * dt * (halfWindowHeight - mouseY);
@@ -115,5 +116,14 @@ void Camera::tick(float dt, SDL_Window* window)
 	else if (keys[SDL_SCANCODE_LSHIFT])
 	{
 		m_position.y -= dt * moveSpeed;
+	}
+
+	if (keys[SDL_SCANCODE_P])
+	{
+		Settings::get()->set(m_settingSensitivity, Settings::get()->value(m_settingSensitivity) + 1);
+	}
+	else if (keys[SDL_SCANCODE_O])
+	{
+		Settings::get()->set(m_settingSensitivity, Settings::get()->value(m_settingSensitivity) - 1);
 	}
 }

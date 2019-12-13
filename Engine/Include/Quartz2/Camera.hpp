@@ -111,5 +111,7 @@ namespace q2
 		/// @brief The current status of the camera, whether it's enabled or
 		/// not.
 		bool m_enabled = true;
+
+		std::size_t m_settingSensitivity;
 	};
 } // namespace q2

@@ -28,24 +28,28 @@
 
 #pragma once
 
+#include <Quartz2/Singleton.hpp>
+
 #include <string>
 #include <vector>
 
 namespace q2{
 
-    struct Setting{
+    struct Setting
+    {
         /// @brief Human readable name for setting
         std::string name;
         /// @brief Unique name for key ex: core:volume
         std::string key;
         /// @brief Value of setting
-        int value;
+        std::size_t value;
     };
 
-    class Settings{
+    class Settings : public Singleton<Settings>
+    {
         std::vector<Setting> m_setting;
 
-        public:
+    public:
         /**
          * @brief Adds a new setting
          * 
@@ -63,7 +67,7 @@ namespace q2{
          * @return true if the setting was set
          * @return false if the setting does not exist
          */
-        bool set(std::size_t value, std::string key);
+        bool set(std::size_t key, std::size_t value);
         /**
          * @brief Sets the value of an already existing setting
          * 
@@ -72,20 +76,20 @@ namespace q2{
          * @return true if the setting was set
          * @return false if the setting does not exist
          */
-        bool set(std::size_t value, std::size_t key);
+        bool set(std::string key, std::size_t value);
         /**
          * @brief Gets the value of a setting
          * 
          * @param key The unique name for key ex: core:volume
          * @return std::size_t The value of the setting
          */
-        std::size_t get(std::string key);
+        std::size_t value(std::string key);
         /**
          * @brief Gets the value of a setting
          * 
          * @param key The numerical key the setting is stored at
          * @return std::size_t The value of the setting
          */
-        std::size_t get(std::size_t key);
+        std::size_t value(std::size_t key);
     };
 };

@@ -35,7 +35,7 @@ std::size_t Settings::add(std::string name, std::string key, std::size_t default
     return m_setting.size() - 1;
 };
 
-bool Settings::set(std::size_t value, std::string key){
+bool Settings::set(std::string key, std::size_t value){
     for(std::size_t i = 0; i < m_setting.size(); i++){
         if(m_setting[i].key == key){
             m_setting[i].value = value;
@@ -44,14 +44,14 @@ bool Settings::set(std::size_t value, std::string key){
     }
     return false;
 }
-bool Settings::set(std::size_t value, std::size_t key){
+bool Settings::set(std::size_t key, std::size_t value){
     if (m_setting.size() > key){
         m_setting[key].value = value;
         return true;
     }
     return false;
 };
-std::size_t Settings::get(std::string key){
+std::size_t Settings::value(std::string key){
     for(std::size_t i = 0; i < m_setting.size(); i++){
         if(m_setting[i].key == key){
             return m_setting[i].value;
@@ -59,7 +59,7 @@ std::size_t Settings::get(std::string key){
     }
     return -1;
 };
-std::size_t Settings::get(std::size_t key){
+std::size_t Settings::value(std::size_t key){
     if (m_setting.size() > key){
         return m_setting[key].value;
     }
