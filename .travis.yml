@@ -10,5 +10,5 @@ compiler:
     - clang
 
 script:
-    - cmake -H. -Bbuild
+    - cmake -S. -Bbuild
     - cmake --build build
