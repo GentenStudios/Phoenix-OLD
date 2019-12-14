@@ -3,5 +3,5 @@ matrix:
     fast_finish: true
 
 build_script:
-    - cmake -S. -Bbuild
+    - cmake -H. -Bbuild
     - cmake --build build
