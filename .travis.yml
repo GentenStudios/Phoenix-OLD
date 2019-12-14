@@ -1,0 +1,14 @@
+language: cpp
+dist: trusty
+sudo: required
+os:
+    - linux
+    - osx
+
+compiler:
+    - gcc
+    - clang
+
+script:
+    - cmake -S. -Bbuild
+    - cmake --build build
