@@ -42,7 +42,7 @@ namespace q2
         std::string m_name;
         std::string m_version;
         std::vector<std::string> m_dependencies;
-        Mod(std::string name);
+        explicit Mod(std::string name);
         ~Mod();
         bool exists();
     };

@@ -31,7 +31,7 @@
 using namespace q2;
 
 Mod::Mod(std::string name)
-    : m_name(name)
+    : m_name(std::move(name))
 {
     std::fstream fileStream;
     fileStream.open("Modules/" + name + "/dependencies.txt");
