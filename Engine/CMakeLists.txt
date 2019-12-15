@@ -58,4 +58,10 @@ if(WIN32)
 	target_link_libraries(${PROJECT_NAME} PRIVATE opengl32.lib)
 endif()
 
+if(UNIX AND NOT APPLE)
+	find_package(X11 REQUIRED)
+	find_package(Threads REQUIRED)
+	target_link_libraries(${PROJECT_NAME} PRIVATE ${X11_LIBRARIES} GL)
+endif()
+
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 17)
