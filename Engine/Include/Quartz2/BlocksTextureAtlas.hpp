@@ -32,6 +32,7 @@
 
 #include <cstddef>
 #include <unordered_map>
+#include <cstring> //apparently memcpy is in this?
 
 namespace q2
 {

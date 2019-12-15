@@ -45,7 +45,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE ${Headers}/../)
 
 target_include_directories(${PROJECT_NAME} PUBLIC
 	${CMAKE_CURRENT_LIST_DIR}/ThirdParty/SDL2/include
-	${CMAKE_CURRENT_LIST_DIR}/ThirdParty/glad/include
+	${CMAKE_CURRENT_LIST_DIR}/ThirdParty/Glad/include
 	${CMAKE_CURRENT_LIST_DIR}/ThirdParty/ImGui
 	${CMAKE_CURRENT_LIST_DIR}/ThirdParty/stb_image
 	${CMAKE_CURRENT_LIST_DIR}/ThirdParty/stb_rectpack
@@ -63,5 +63,3 @@ if(UNIX AND NOT APPLE)
 	find_package(Threads REQUIRED)
 	target_link_libraries(${PROJECT_NAME} PRIVATE ${X11_LIBRARIES} GL)
 endif()
-
-set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 17)
