@@ -36,9 +36,10 @@ const float SENSITIVITY = 0.00005f;
 
 using namespace q2;
 
-Camera::Camera() 
-{m_settingSensitivity = Settings::get()->getSetting(
-	Settings::get()->add("Sensitivity", "camera:sensitivity", 5));
+Camera::Camera() :
+	m_settingSensitivity(Setting("Sensitivity", "camera:sensitivity", 5))
+{
+	Settings::get()->add(&m_settingSensitivity);
 }
 
 Vec3 Camera::getPosition() const { return m_position; }
@@ -72,7 +73,7 @@ void Camera::tick(float dt, SDL_Window* window)
 
 	SDL_WarpMouseInWindow(window, halfWindowWidth, halfWindowHeight);
 
-	const float sensitivity = 0.00001 * m_settingSensitivity->value;
+	const float sensitivity = 0.00001 * (float)m_settingSensitivity.value();
 
 	m_rotation.x += sensitivity * dt * (halfWindowWidth - mouseX);
 	m_rotation.y += sensitivity * dt * (halfWindowHeight - mouseY);
@@ -121,10 +122,10 @@ void Camera::tick(float dt, SDL_Window* window)
 
 	if (keys[SDL_SCANCODE_P])
 	{
-		m_settingSensitivity->value = m_settingSensitivity->value + 1;
+		m_settingSensitivity.set(m_settingSensitivity.value() + 1);
 	}
 	else if (keys[SDL_SCANCODE_O])
 	{
-		m_settingSensitivity->value = m_settingSensitivity->value - 1;
+		m_settingSensitivity.set(m_settingSensitivity.value() - 1);
 	}
 }
