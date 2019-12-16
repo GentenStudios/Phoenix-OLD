@@ -40,6 +40,8 @@ Camera::Camera() :
 	m_settingSensitivity(Setting("Sensitivity", "camera:sensitivity", 5))
 {
 	Settings::get()->add(&m_settingSensitivity);
+	m_settingSensitivity.setMax(100);
+	m_settingSensitivity.setMin(1);
 }
 
 Vec3 Camera::getPosition() const { return m_position; }

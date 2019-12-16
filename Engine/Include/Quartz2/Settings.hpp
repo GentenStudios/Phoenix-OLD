@@ -57,6 +57,18 @@ namespace q2 {
          */
         bool set(int value);
         /**
+         * @brief Set the maximum value for the setting
+         * 
+         * @param value The maximum value the setting can be
+         */
+        void setMax(int value);
+        /**
+         * @brief Set the minimum value for the setting
+         * 
+         * @param value The minimum value the setting can be
+         */
+        void setMin(int value);
+        /**
          * @brief Gets the value of a setting
          *
          * @param key The unique name for key ex: core:volume

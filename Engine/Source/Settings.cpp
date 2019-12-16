@@ -42,6 +42,14 @@ bool Setting::set(int value) {
     return false;
 }
 
+void Setting::setMax(int value){
+    m_maxValue = value;
+}
+
+void Setting::setMin(int value){
+    m_minValue = value;
+}
+
 int Setting::value() {
     return m_value;
 };
