@@ -28,32 +28,33 @@
 
 #pragma once
 
-#include <string>
 #include <array>
-#include <fstream>
-#include <queue>
 #include <filesystem>
-#include <sol/sol.hpp>
+#include <fstream>
 #include <iostream>
+#include <queue>
+#include <sol/sol.hpp>
+#include <string>
 
 namespace q2
 {
-    struct Mod{
-        std::string m_name;
-        std::string m_version;
-        std::vector<std::string> m_dependencies;
-        explicit Mod(std::string name);
-        ~Mod();
-        bool exists();
-    };
+	struct Mod
+	{
+		std::string              m_name;
+		std::string              m_version;
+		std::vector<std::string> m_dependencies;
+		explicit Mod(std::string name);
+		~Mod();
+		bool exists();
+	};
 
-    // clang-format off
+	// clang-format off
     // modules needs to stay lowercase as it's just to namespace.
     // apparently we can't have a namespaced function prototype in a header
     // (beep + sonos 08/12/2019)
     struct modules
-    // clang-format on
-    {
-        static bool loadModules(std::string save, sol::state& lua);
-    };
-};
+	// clang-format on
+	{
+		static bool loadModules(std::string save, sol::state& lua);
+	};
+}; // namespace q2
