@@ -26,6 +26,12 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+
+#include <filesystem>
+#include <fstream>
+#include <iostream>
+#include <queue>
+
 #include <Quartz2/ContentLoader.hpp>
 
 using namespace q2;

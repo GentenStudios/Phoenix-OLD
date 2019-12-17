@@ -28,11 +28,7 @@
 
 #pragma once
 
-#include <array>
-#include <filesystem>
-#include <fstream>
-#include <iostream>
-#include <queue>
+#include <vector>
 #include <sol/sol.hpp>
 #include <string>
 
