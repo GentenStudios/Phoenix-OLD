@@ -38,11 +38,19 @@
 
 namespace q2
 {
+	/// @brief A lightweight struct to store a module and the list of
+	/// dependencies that module has
 	struct Mod
 	{
-		std::string              name;
-		std::string              version;
+		/// @brief The name of the module, should match the folder name
+		std::string name;
+		/// @brief List of dependencies that the module needs inorder to load
 		std::vector<std::string> dependencies;
+
+		/**
+		 * @brief Constructire for mod object, folder matching mod name with a
+		 * dependencies.txt inside modules folder must exist
+		 */
 		explicit Mod(std::string name);
 		~Mod();
 	};
