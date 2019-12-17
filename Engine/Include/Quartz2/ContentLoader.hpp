@@ -40,12 +40,11 @@ namespace q2
 {
 	struct Mod
 	{
-		std::string              m_name;
-		std::string              m_version;
-		std::vector<std::string> m_dependencies;
+		std::string              name;
+		std::string              version;
+		std::vector<std::string> dependencies;
 		explicit Mod(std::string name);
 		~Mod();
-		bool exists();
 	};
 
 	// clang-format off

@@ -30,7 +30,7 @@
 
 using namespace q2;
 
-Mod::Mod(std::string name) : m_name(std::move(name))
+Mod::Mod(std::string name) : name(std::move(name))
 {
 	std::fstream fileStream;
 	fileStream.open("Modules/" + name + "/dependencies.txt");
@@ -38,16 +38,11 @@ Mod::Mod(std::string name) : m_name(std::move(name))
 	{
 		std::string input;
 		std::getline(fileStream, input);
-		m_dependencies.push_back(input);
+		dependencies.push_back(input);
 	}
 	fileStream.close();
 };
 Mod::~Mod() {};
-
-bool Mod::exists()
-{
-	return true; // TODO make this actually check for mod
-}
 
 bool modules::loadModules(std::string save, sol::state& lua)
 {
@@ -61,12 +56,6 @@ bool modules::loadModules(std::string save, sol::state& lua)
 		std::string input;
 		std::getline(fileStream, input);
 		Mod mod = Mod(input);
-		if (!mod.exists())
-		{
-			std::cout << "Mod does not exist" + mod.m_name;
-			return false;
-		}; // Should never happen if launcher does all the work but lets check
-		   // anyways
 		toLoad.push(mod);
 		if (i > 10)
 			break;
@@ -85,11 +74,11 @@ bool modules::loadModules(std::string save, sol::state& lua)
 			Mod  mod       = toLoad.front();
 			bool satisfied = true;
 			// For each dependency the mod has
-			for (int j = 0; j < mod.m_dependencies.size(); j++)
+			for (int j = 0; j < mod.dependencies.size(); j++)
 			{
 				// If dependency is not satisfied, mark satisfied as false.
 				if (std::find(loadedMods.begin(), loadedMods.end(),
-				              mod.m_dependencies[j]) == loadedMods.end())
+				              mod.dependencies[j]) == loadedMods.end())
 				{
 					satisfied = false;
 				}
@@ -98,8 +87,8 @@ bool modules::loadModules(std::string save, sol::state& lua)
 			// list Otherwise, move mod to back of load queue
 			if (satisfied)
 			{
-				lua.script_file("modules/" + mod.m_name + "/init.lua");
-				loadedMods.push_back(mod.m_name);
+				lua.script_file("modules/" + mod.name + "/init.lua");
+				loadedMods.push_back(mod.name);
 			}
 			else
 			{
@@ -116,7 +105,7 @@ bool modules::loadModules(std::string save, sol::state& lua)
 			std::cout << "Failed Mods:\n";
 			for (int i = 0; i < toLoad.size(); i++)
 			{
-				std::cout << "- " + toLoad.front().m_name + "\n";
+				std::cout << "- " + toLoad.front().name + "\n";
 				toLoad.pop();
 			}
 			std::cout << "Loaded Mods:\n";
