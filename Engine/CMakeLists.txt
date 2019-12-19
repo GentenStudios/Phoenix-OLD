@@ -52,7 +52,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 	${CMAKE_CURRENT_LIST_DIR}/ThirdParty/ImGui/examples
 )
 
-target_link_libraries(${PROJECT_NAME} SDL2-static SDL2main Glad ImGui)
+target_link_libraries(${PROJECT_NAME} PRIVATE SDL2-static SDL2main Glad ImGui)
 
 if(WIN32)
 	target_link_libraries(${PROJECT_NAME} PRIVATE opengl32.lib)
