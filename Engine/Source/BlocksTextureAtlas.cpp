@@ -34,133 +34,125 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
-#define STB_RECT_PACK_IMPLEMENTATION
-#include <stb_rect_pack.h>
-
 using namespace q2;
 
 const BlockTextureAtlas::SpriteID BlockTextureAtlas::INVALID_SPRITE;
 
-BlockTextureAtlas::BlockTextureAtlas(std::size_t spriteWidth,
-	std::size_t spriteHeight)
-	: m_spriteWidth(spriteWidth), m_spriteHeight(spriteHeight)
+BlockTextureAtlas::BlockTextureAtlas(std::size_t spriteWidth, std::size_t spriteHeight)
+	: m_spriteWidth(spriteWidth), m_spriteHeight(spriteHeight), m_textureArray(0)
+{ }
+
+BlockTextureAtlas::BlockTextureAtlas()
+	: m_spriteWidth(0), m_spriteHeight(0), m_textureArray(0)
+{ }
+
+void BlockTextureAtlas::setSpriteWidth(std::size_t w)
 {
+	m_spriteWidth = w;
 }
 
-BlockTextureAtlas::BlockTextureAtlas() : m_spriteWidth(0), m_spriteHeight(0) {}
-
-void BlockTextureAtlas::setSpriteWidth(std::size_t w) { m_spriteWidth = w; }
-
-void BlockTextureAtlas::setSpriteHeight(std::size_t h) { m_spriteHeight = h; }
+void BlockTextureAtlas::setSpriteHeight(std::size_t h)
+{
+	m_spriteHeight = h;
+}
 
 void BlockTextureAtlas::addTextureFile(const char* texturefilepath)
 {
-	m_textureIDMap.insert(std::make_pair(std::string(texturefilepath),
-		BlockTextureAtlas::INVALID_SPRITE));
+	const std::pair<std::string, SpriteID> sprite(texturefilepath, BlockTextureAtlas::INVALID_SPRITE);
+
+	m_textureIDMap.insert(sprite);
 }
 
-BlockTextureAtlas::SpriteID BlockTextureAtlas::getSpriteIDFromFilepath(
-	const char* filepath)
+BlockTextureAtlas::SpriteID BlockTextureAtlas::getSpriteIDFromFilepath(const char* filepath)
 {
-	const auto equalsTest =
-		[filepath](
-			const std::unordered_map<std::string, SpriteID>::value_type a)
-		-> bool { return a.first == filepath; };
+	const auto filepathEquality =
+		[filepath](const std::unordered_map<std::string, SpriteID>::value_type a) -> bool
+		{
+			return a.first == filepath;
+		};
 
-	if (std::find_if(m_textureIDMap.begin(), m_textureIDMap.end(),
-		equalsTest) == m_textureIDMap.end())
+	if (std::find_if(m_textureIDMap.begin(), m_textureIDMap.end(), filepathEquality) == m_textureIDMap.end())
 		return BlockTextureAtlas::INVALID_SPRITE;
 
-	return m_textureIDMap.at(filepath);
-}
-
-RectAABB BlockTextureAtlas::getSpriteFromID(
-	BlockTextureAtlas::SpriteID spriteID) const
-{
-	RectAABB uv;
-
-	const float yPx =
-		static_cast<float>(spriteID) * static_cast<float>(m_spriteHeight + 2);
-	const float xPx = 0.f;
-
-	const float yUv = (static_cast<float>(yPx) / m_patchedTextureHeight);
-	const float xUv = static_cast<float>(xPx) / m_patchedTextureWidth;
-
-	const float widthUv =
-		static_cast<float>(m_spriteWidth) / m_patchedTextureWidth;
-	const float heightUv =
-		(static_cast<float>(m_spriteHeight) / m_patchedTextureHeight);
-	
-	uv.topLeft = { xUv, yUv };
-	uv.topRight = { xUv + widthUv, yUv };
-	uv.bottomLeft = { xUv, yUv + heightUv };
-	uv.bottomRight = { xUv + widthUv, yUv + heightUv };
-	
-
-	/*uv.topLeft = { 0.f, 0.f };
-	uv.topRight = { 1.f, 0.f };
-	uv.bottomLeft = { 0.f, 1.f};
-	uv.bottomRight = { 1.f, 1.f };
-	*/
-
-	return uv;
+	return m_textureIDMap[filepath];
 }
 
 void BlockTextureAtlas::patch()
 {
+	// Cannot patch 0 textures into a array, so no point in even trying.
+	if (m_textureIDMap.empty())
+		return;
+
+	// Must have specified a non-zero sprite width and height before patching
+	// the texture into the texture array.
 	assert(m_spriteWidth != 0);
 	assert(m_spriteHeight != 0);
 
-	const std::size_t numTextures = m_textureIDMap.size();
+	glGenTextures(1, &m_textureArray);
+	glBindTexture(GL_TEXTURE_2D_ARRAY, m_textureArray);
 
-	if (numTextures == 0)
-		return;
-
-	const std::size_t textureHeight = (numTextures + 2) * m_spriteHeight;
-	const std::size_t textureWidth = m_spriteWidth;
-
-	m_patchedTextureData = new unsigned char[textureWidth * 4 * textureHeight];
+	// Create the texture array, but don't fill it in with
+	// anything - that'll be done by glTexSubImage3D calls
+	// for each texture later.
+	glTexImage3D(
+		GL_TEXTURE_2D_ARRAY,             // Texture Target.
+		0,                               // LoD number - 0 is the base image level.
+		GL_RGBA8,                        // Internal format - Number of color components.
+		(GLsizei) m_spriteWidth,         // Width of the textures in the array (pixels).
+		(GLsizei) m_spriteHeight,        // Height of the textures in the array (pixels).
+		(GLsizei) m_textureIDMap.size(), // Number of textures in the array (depth/number of layers).
+		0,                               // Border - Must be 0.
+		GL_RGBA,                         // Format of the pixel data.
+		GL_UNSIGNED_BYTE,                // Data type of the pixel data.
+		0                                // Pointer to image data (0 for us, as it'll be filled in later)
+	);
 	
-	for (std::size_t i = 0; i < textureWidth * 4 * textureHeight; i = i + 4)
-	{
-		m_patchedTextureData[i] = m_patchedTextureData[i + 1] = m_patchedTextureData[i + 2] = 255;
-		m_patchedTextureData[i + 3] = 0;
-	}
-
-	assert(m_patchedTextureData);
-
 	std::size_t spriteIndex = 0;
-
-	std::size_t gy = 0;
-
 	for (const auto& sprite : m_textureIDMap)
 	{
+		// Assign this texture an ID.
 		const std::string& textureFilepath = sprite.first;
 		m_textureIDMap[textureFilepath] = SpriteID(spriteIndex);
 
-		int            width = -1, height = -1, nbChannels = -1;
-		unsigned char* image =
-			stbi_load(textureFilepath.c_str(), &width, &height, &nbChannels, 0);
+		int width       = -1;
+		int height      = -1;
+		int numChannels = -1;
 
-		// Basic sanity checks on the loaded image
+		// Load the texture into memory (from disk). Required to be loaded in RGBA format.s
+		unsigned char* image = stbi_load(textureFilepath.c_str(), &width, &height, &numChannels, STBI_rgb_alpha);
+
+		// Basic sanity checks that the image has been loaded correctly.
 		assert(image);
-		assert(width != 0 && height != 0);
+		assert(width > 0 && height > 0);
+		assert(numChannels == 4);
 
-		// #todo (bwilks): should have a way of supporting images that don't
-		// have 4 channels (maybe support 3 and just pad the alpha with 1?)
-		assert(nbChannels == 4);
+		glTexSubImage3D(
+			GL_TEXTURE_2D_ARRAY,      // Texture target.
+			0,                        // LoD number - 0 is the base image level.
+			0,                        // Texel X offset.
+			0,                        // Texel Y offset.
+			(GLint) spriteIndex,      // Texel Z offset (or the index of this texture in the array).
+			(GLsizei) m_spriteWidth,  // Width of the (sub)image (pixels).
+			(GLsizei) m_spriteHeight, // Height of the (sub)image (pixels).
+			1,                        // Depth of the (sub)image (pixels).
+			GL_RGBA,                  // Format of the pixel data.
+			GL_UNSIGNED_BYTE,         // Data type of the pixel data.
+			image                     // Pointer to the (sub)image pixel data.
+		);
 
-		std::memcpy(m_patchedTextureData + (m_spriteWidth*nbChannels * gy),image, width * height * nbChannels);
-
-		gy += m_spriteHeight + 2;
-
+		// Release the allocated image data.
 		stbi_image_free(image);
 
 		spriteIndex++;
 	}
 
-	m_patchedTextureWidth = textureWidth;
-	m_patchedTextureHeight = textureHeight;
-}
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-BlockTextureAtlas::~BlockTextureAtlas() { delete[] m_patchedTextureData; }
+	// Unbind the texture now we're done with it (for generation).
+	// Not strictly necessary, but shouldn't have to much of a performance impact
+	// here.
+	glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
+}

@@ -29,6 +29,8 @@
 #include <Quartz2/ChunkRenderer.hpp>
 #include <Quartz2/ShaderCompiler.hpp>
 
+#include <algorithm>
+
 using namespace q2;
 
 const char* enums::toString(EChunkRendererStatus status)
@@ -62,7 +64,7 @@ void ChunkRenderer::addMesh(const std::shared_ptr<Mesh>& mesh)
 	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), vertices.data(), GL_STATIC_DRAW);
 
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, position));
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texCoord));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texCoord));
 
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
@@ -82,6 +84,11 @@ void ChunkRenderer::setTexture(unsigned char* data, std::size_t w, std::size_t h
 	
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 	glGenerateMipmap(GL_TEXTURE_2D);
+}
+
+void ChunkRenderer::setTextureArray(GLuint textureArray)
+{
+	m_textureArray = textureArray;
 }
 
 void ChunkRenderer::setup(std::size_t viewWidth, std::size_t viewHeight)
@@ -141,8 +148,8 @@ void ChunkRenderer::render(Camera* camera)
 
 	glUseProgram(m_terrainShader);
 
-	glBindTexture(GL_TEXTURE_2D, m_texture);
 	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D_ARRAY, m_textureArray);
 
 	glUniformMatrix4fv(glGetUniformLocation(m_terrainShader, "u_view"), 1, GL_FALSE, &view.elements[0]);
 	glUniformMatrix4fv(glGetUniformLocation(m_terrainShader, "u_projection"), 1, GL_FALSE, &projection.elements[0]);

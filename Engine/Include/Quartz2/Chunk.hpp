@@ -49,7 +49,8 @@ namespace q2
 
 		static constexpr std::size_t NUM_BLOCKS = 16 * 16 * 16;
 
-		std::shared_ptr<Mesh> generateMesh();
+		void generateMesh();
+		std::shared_ptr<Mesh> getMesh() const;
 
 		EBlockCategory getCategoryOfBlockToLeft(std::size_t x, std::size_t y, std::size_t z);
 		EBlockCategory getCategoryOfBlockToRight(std::size_t x, std::size_t y, std::size_t z);
@@ -60,5 +61,6 @@ namespace q2
 
 	private:
 		std::vector<ChunkBlock> m_blocks;
+		std::shared_ptr<Mesh> m_mesh;
 	};
 }

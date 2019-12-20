@@ -36,6 +36,6 @@ namespace q2
 	struct Vertex
 	{
 		Vec3 position;
-		Vec2 texCoord;
+		Vec3 texCoord;
 	};
 }

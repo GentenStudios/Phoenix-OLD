@@ -11,6 +11,7 @@ class PhoenixGame : public Game
 private:
 	std::unique_ptr<ChunkRenderer> m_chunkRenderer;
 	std::unique_ptr<Camera> m_camera;
+	std::unique_ptr<Chunk> m_chunk;
 
 public:
 	PhoenixGame()
@@ -50,9 +51,9 @@ protected:
 		SDL_ShowCursor(0);
 
 		std::shared_ptr<BlockTextureAtlas>atlas = std::make_shared<BlockTextureAtlas>(16, 16);
-		atlas->addTextureFile("Assets/grass_top.png");
 		atlas->addTextureFile("Assets/dirt.png");
 		atlas->addTextureFile("Assets/grass_side.png");
+		atlas->addTextureFile("Assets/grass_top.png");
 		atlas->patch();
 
 		BlockRegistry* blocksRegistery = BlockRegistry::get();
@@ -71,10 +72,11 @@ protected:
 			= grassBlockType->textures.left = grassBlockType->textures.right =
 				atlas->getSpriteIDFromFilepath("Assets/grass_side.png");
 		
-		m_chunkRenderer->setTexture(atlas->getPatchedTextureData(), atlas->getPatchedTextureWidth(), atlas->getPatchedTextureHeight());
+		m_chunkRenderer->setTextureArray(atlas->getTextureArrayID());
 
-		Chunk a;
-		m_chunkRenderer->addMesh(a.generateMesh());
+		m_chunk = std::make_unique<Chunk>();
+		m_chunk->generateMesh();
+		m_chunkRenderer->addMesh(m_chunk->getMesh());
 	}
 	
 	virtual void onExit()
@@ -136,6 +138,23 @@ protected:
 		ImGui::End();
 
 		m_chunkRenderer->render(m_camera.get());
+
+		ImDrawList* gui = ImGui::GetOverlayDrawList();
+
+		const std::size_t w = getWindowWidth();
+		const std::size_t h = getWindowHeight();
+
+		const float hw = w/ 2.f;
+		const float hh = h / 2.f;
+		const float size = 10.f;
+		const float centreSize = 5.f;
+		const float thickness = 3.f;
+
+		gui->AddLine({hw, hh - (size + centreSize)}, {hw, hh - centreSize}, 0xffffffff, thickness);
+		gui->AddLine({ hw, hh + (size + centreSize) }, { hw, hh + centreSize }, 0xffffffff, thickness);
+		gui->AddLine({hw - (size + centreSize), hh}, {hw - centreSize, hh}, 0xffffffff, thickness);
+		gui->AddLine({ hw + (size + centreSize), hh }, { hw + centreSize, hh }, 0xffffffff, thickness);
+		gui->AddRectFilled({hw - 1, hh - 1 }, {hw + 2, hh + 2 }, 0xffffffff);
 	}
 };
 
