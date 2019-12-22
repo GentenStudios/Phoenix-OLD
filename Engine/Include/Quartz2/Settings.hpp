@@ -101,6 +101,12 @@ namespace q2
 		 */
 		Setting* add(std::string name, std::string key, int defaultValue);
 
+        /**
+         * @brief Get the Setting object
+         * 
+         * @param key Unique Name for key ex: core:volume
+         * @return Setting* A pointer to the setting object
+         */
 		Setting* getSetting(std::string key);
 	};
 }; // namespace q2

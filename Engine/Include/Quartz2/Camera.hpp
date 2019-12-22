@@ -113,6 +113,7 @@ namespace q2
 		/// not.
 		bool m_enabled = true;
 
+		/// @brief Setting that stores the sensitivity base value
 		Setting* m_settingSensitivity;
 	};
 } // namespace q2
