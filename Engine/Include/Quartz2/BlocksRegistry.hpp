@@ -31,6 +31,7 @@
 #include <Quartz2/BlocksTextureAtlas.hpp>
 #include <Quartz2/Singleton.hpp>
 #include <list>
+#include <memory>
 
 namespace q2
 {

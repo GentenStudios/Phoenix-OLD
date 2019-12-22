@@ -32,6 +32,7 @@
 
 #include <cstddef>
 #include <unordered_map>
+#include <cstring>
 
 namespace q2
 {
