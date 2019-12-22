@@ -30,7 +30,6 @@
 #include <Quartz2/MathUtils.hpp>
 
 #include <cmath>
-#include <iostream>
 
 const float MOVE_SPEED  = 0.01f;
 const float SENSITIVITY = 0.00005f;
@@ -74,10 +73,6 @@ void Camera::tick(float dt, SDL_Window* window)
 	SDL_WarpMouseInWindow(window, halfWindowWidth, halfWindowHeight);
 
 	const float sensitivity = 0.00001 * m_settingSensitivity->value();
-	std::cout << sensitivity;
-	std::cout << "\n";
-	std::cout << m_settingSensitivity->value();
-	std::cout << "\n";
 
 	m_rotation.x += sensitivity * dt * (halfWindowWidth - mouseX);
 	m_rotation.y += sensitivity * dt * (halfWindowHeight - mouseY);
@@ -126,12 +121,12 @@ void Camera::tick(float dt, SDL_Window* window)
 
 	if (keys[SDL_SCANCODE_P])
 	{
-		std::cout << m_settingSensitivity->set(m_settingSensitivity->value() +
+		m_settingSensitivity->set(m_settingSensitivity->value() +
 		                                       1);
 	}
 	else if (keys[SDL_SCANCODE_O])
 	{
-		std::cout << m_settingSensitivity->set(m_settingSensitivity->value() -
+		m_settingSensitivity->set(m_settingSensitivity->value() -
 		                                       1);
 	}
 }

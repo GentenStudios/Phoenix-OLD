@@ -50,7 +50,7 @@ namespace q2
 		int m_minValue;
 
 	public:
-		Setting(std::string name, std::string key, int defaultValue);
+		Setting(const std::string& name, const std::string& key, int defaultValue);
 		/**
 		 * @brief Sets the value of an already existing setting
 		 *
@@ -99,7 +99,7 @@ namespace q2
 		 * @return std::size_t Reuturns the numerical key the setting is stored
 		 * at
 		 */
-		Setting* add(std::string name, std::string key, int defaultValue);
+		Setting* add(const std::string& name, const std::string& key, int defaultValue);
 
         /**
          * @brief Get the Setting object
@@ -107,6 +107,6 @@ namespace q2
          * @param key Unique Name for key ex: core:volume
          * @return Setting* A pointer to the setting object
          */
-		Setting* getSetting(std::string key);
+		Setting* getSetting(const std::string& key);
 	};
 }; // namespace q2

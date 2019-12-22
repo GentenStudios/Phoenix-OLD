@@ -31,11 +31,10 @@
 
 using namespace q2;
 
-Setting::Setting(std::string name, std::string key, int defaultValue)
-    : m_name(name), m_key(key), m_value(defaultValue), m_maxValue(SHRT_MAX),
+Setting::Setting(const std::string& name, const std::string& key, int defaultValue)
+    : m_name(std::move(name)), m_key(std::move(key)), m_value(defaultValue), m_maxValue(SHRT_MAX),
       m_minValue(SHRT_MIN)
-{
-}
+{}
 
 bool Setting::set(int value)
 {
@@ -55,13 +54,13 @@ std::string Setting::getKey() { return m_key; };
 
 int Setting::value() { return m_value; };
 
-Setting* Settings::add(std::string name, std::string key, int defaultValue)
+Setting* Settings::add(const std::string& name, const std::string& key, int defaultValue)
 {
 	m_setting.push_back(Setting(name, key, defaultValue));
 	return &m_setting.back();
 };
 
-Setting* Settings::getSetting(std::string key)
+Setting* Settings::getSetting(const std::string& key)
 {
 	for (std::list<Setting>::iterator it = m_setting.begin();
 	     it != m_setting.end(); ++it)
