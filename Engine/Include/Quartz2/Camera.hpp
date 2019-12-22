@@ -29,8 +29,8 @@
 #pragma once
 
 #include <Quartz2/Matrix4x4.hpp>
-#include <Quartz2/Vec3.hpp>
 #include <Quartz2/Settings.hpp>
+#include <Quartz2/Vec3.hpp>
 
 #include <SDL.h>
 
@@ -113,6 +113,6 @@ namespace q2
 		/// not.
 		bool m_enabled = true;
 
-		Setting *m_settingSensitivity;
+		Setting* m_settingSensitivity;
 	};
 } // namespace q2

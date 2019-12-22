@@ -30,72 +30,77 @@
 
 #include <Quartz2/Singleton.hpp>
 
-#include <string>
 #include <list>
+#include <string>
 
-namespace q2 {
+namespace q2
+{
 
-    class Setting {
-        /// @brief Human readable name for setting
-        std::string m_name;
-        /// @brief Unique name for key ex: core:volume
-        std::string m_key;
-        /// @brief Value of setting
-        int m_value;
-        /// @brief Maximim value that the setting can be set to
-        int m_maxValue;
-        /// @brief Minimum value that the setting cab be set to
-        int m_minValue;
-    public:
-        Setting(std::string name, std::string key, int defaultValue);
-        /**
-         * @brief Sets the value of an already existing setting
-         *
-         * @param value The value to be set
-         * @return true if the setting was set
-         * @return false if the value was not within the settings max/min
-         */
-        bool set(int value);
-        /**
-         * @brief Set the maximum value for the setting
-         * 
-         * @param value The maximum value the setting can be
-         */
-        void setMax(int value);
-        /**
-         * @brief Set the minimum value for the setting
-         * 
-         * @param value The minimum value the setting can be
-         */
-        void setMin(int value);
-        /**
-         * @brief Gets the value of a setting
-         *
-         * @return std::string the unique key for the setting
-         */
-        std::string getKey();
-        /**
-         * @brief Gets the value of a setting
-         *
-         * @return std::size_t The value of the setting
-         */
-        int value();
-    };
+	class Setting
+	{
+		/// @brief Human readable name for setting
+		std::string m_name;
+		/// @brief Unique name for key ex: core:volume
+		std::string m_key;
+		/// @brief Value of setting
+		int m_value;
+		/// @brief Maximim value that the setting can be set to
+		int m_maxValue;
+		/// @brief Minimum value that the setting cab be set to
+		int m_minValue;
 
-    class Settings : public Singleton<Settings> {
-        std::list<Setting> m_setting;
+	public:
+		Setting(std::string name, std::string key, int defaultValue);
+		/**
+		 * @brief Sets the value of an already existing setting
+		 *
+		 * @param value The value to be set
+		 * @return true if the setting was set
+		 * @return false if the value was not within the settings max/min
+		 */
+		bool set(int value);
+		/**
+		 * @brief Set the maximum value for the setting
+		 *
+		 * @param value The maximum value the setting can be
+		 */
+		void setMax(int value);
+		/**
+		 * @brief Set the minimum value for the setting
+		 *
+		 * @param value The minimum value the setting can be
+		 */
+		void setMin(int value);
+		/**
+		 * @brief Gets the value of a setting
+		 *
+		 * @return std::string the unique key for the setting
+		 */
+		std::string getKey();
+		/**
+		 * @brief Gets the value of a setting
+		 *
+		 * @return std::size_t The value of the setting
+		 */
+		int value();
+	};
 
-    public:
-        /**
-         * @brief Adds a new setting
-         *
-         * @param name Human readable name for setting
-         * @param key Unique Name for key ex: core:volume
-         * @param defaultValue The value the setting will be initially set to
-         * @return std::size_t Reuturns the numerical key the setting is stored at
-         */
-        Setting *add(std::string name, std::string key, int defaultValue);
+	class Settings : public Singleton<Settings>
+	{
+		std::list<Setting> m_setting;
 
-        Setting *getSetting(std::string key);
-    };
+	public:
+		/**
+		 * @brief Adds a new setting
+		 *
+		 * @param name Human readable name for setting
+		 * @param key Unique Name for key ex: core:volume
+		 * @param defaultValue The value the setting will be initially set to
+		 * @return std::size_t Reuturns the numerical key the setting is stored
+		 * at
+		 */
+		Setting* add(std::string name, std::string key, int defaultValue);
+
+		Setting* getSetting(std::string key);
+	};
 }; // namespace q2

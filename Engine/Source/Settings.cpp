@@ -26,51 +26,50 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <climits>
 #include <Quartz2/Settings.hpp>
+#include <climits>
 
 using namespace q2;
 
-Setting::Setting(std::string name, std::string key, int defaultValue) :
-    m_name(name), m_key(key), m_value(defaultValue), m_maxValue(SHRT_MAX), m_minValue(SHRT_MIN) 
-    {}
-
-bool Setting::set(int value) {
-    if (m_maxValue >= value && value >= m_minValue) {
-        m_value = value;
-        return true;
-    }
-    return false;
-};
-
-void Setting::setMax(int value){
-    m_maxValue = value;
-};
-
-void Setting::setMin(int value){
-    m_minValue = value;
-};
-
-std::string Setting::getKey(){
-    return m_key;
-};
-
-int Setting::value() {
-    return m_value;
-};
-
-Setting *Settings::add(std::string name, std::string key,
-                          int defaultValue) 
+Setting::Setting(std::string name, std::string key, int defaultValue)
+    : m_name(name), m_key(key), m_value(defaultValue), m_maxValue(SHRT_MAX),
+      m_minValue(SHRT_MIN)
 {
-    m_setting.push_back(Setting(name, key, defaultValue));
-    return &m_setting.back();
+}
+
+bool Setting::set(int value)
+{
+	if (m_maxValue >= value && value >= m_minValue)
+	{
+		m_value = value;
+		return true;
+	}
+	return false;
 };
 
-Setting *Settings::getSetting(std::string key) {
-    for(std::list<Setting>::iterator it=m_setting.begin(); it != m_setting.end(); ++it){
-        if (it->getKey() == key){
-            return &(*it);
-        }
-    }
-  return nullptr;
+void Setting::setMax(int value) { m_maxValue = value; };
+
+void Setting::setMin(int value) { m_minValue = value; };
+
+std::string Setting::getKey() { return m_key; };
+
+int Setting::value() { return m_value; };
+
+Setting* Settings::add(std::string name, std::string key, int defaultValue)
+{
+	m_setting.push_back(Setting(name, key, defaultValue));
+	return &m_setting.back();
+};
+
+Setting* Settings::getSetting(std::string key)
+{
+	for (std::list<Setting>::iterator it = m_setting.begin();
+	     it != m_setting.end(); ++it)
+	{
+		if (it->getKey() == key)
+		{
+			return &(*it);
+		}
+	}
+	return nullptr;
 };

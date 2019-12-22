@@ -32,14 +32,15 @@
 #include <cmath>
 #include <iostream>
 
-const float MOVE_SPEED = 0.01f;
+const float MOVE_SPEED  = 0.01f;
 const float SENSITIVITY = 0.00005f;
 
 using namespace q2;
 
 Camera::Camera()
 {
-	m_settingSensitivity = Settings::get()->add("Sensitivity", "camera:sensitivity", 5);
+	m_settingSensitivity =
+	    Settings::get()->add("Sensitivity", "camera:sensitivity", 5);
 	m_settingSensitivity->setMax(100);
 	m_settingSensitivity->setMin(1);
 }
@@ -54,10 +55,7 @@ Mat4 Camera::calculateViewMatrix() const
 	return Matrix4x4::lookAt(m_position, centre, m_up);
 }
 
-void Camera::enable(bool enabled)
-{
-	m_enabled = enabled;
-}
+void Camera::enable(bool enabled) { m_enabled = enabled; }
 
 void Camera::tick(float dt, SDL_Window* window)
 {
@@ -67,7 +65,7 @@ void Camera::tick(float dt, SDL_Window* window)
 	int windowWidth, windowHeight;
 	SDL_GetWindowSize(window, &windowWidth, &windowHeight);
 
-	const int halfWindowWidth = windowWidth / 2;
+	const int halfWindowWidth  = windowWidth / 2;
 	const int halfWindowHeight = windowHeight / 2;
 
 	int mouseX, mouseY;
@@ -90,13 +88,13 @@ void Camera::tick(float dt, SDL_Window* window)
 	m_direction.y = std::sin(m_rotation.y);
 	m_direction.z = std::cos(m_rotation.y) * std::cos(m_rotation.x);
 
-	const Vec3 right = { std::sin(m_rotation.x - q2::PIDIV2), 0.f,
-						   std::cos(m_rotation.x - q2::PIDIV2) };
+	const Vec3 right = {std::sin(m_rotation.x - q2::PIDIV2), 0.f,
+	                    std::cos(m_rotation.x - q2::PIDIV2)};
 
 	m_up = Vec3::cross(right, m_direction);
 
 	const float moveSpeed = MOVE_SPEED;
-	
+
 	const Uint8* keys = SDL_GetKeyboardState(NULL);
 
 	if (keys[SDL_SCANCODE_W])
@@ -128,10 +126,12 @@ void Camera::tick(float dt, SDL_Window* window)
 
 	if (keys[SDL_SCANCODE_P])
 	{
-		std::cout << m_settingSensitivity->set(m_settingSensitivity->value() + 1);
+		std::cout << m_settingSensitivity->set(m_settingSensitivity->value() +
+		                                       1);
 	}
 	else if (keys[SDL_SCANCODE_O])
 	{
-		std::cout << m_settingSensitivity->set(m_settingSensitivity->value() - 1);
+		std::cout << m_settingSensitivity->set(m_settingSensitivity->value() -
+		                                       1);
 	}
 }
