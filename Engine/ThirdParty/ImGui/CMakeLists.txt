@@ -1,5 +1,7 @@
 project (ImGui)
 
+add_definitions(-DIMGUI_IMPL_OPENGL_LOADER_GLAD)
+
 add_library(${PROJECT_NAME}
 	imconfig.h
 	imgui.h
@@ -27,4 +29,3 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 )
 
 target_link_libraries(${PROJECT_NAME} Glad SDL2-static)
-target_compile_definitions(${PROJECT_NAME} INTERFACE -DIMGUI_IMPL_OPENGL_LOADER_GLAD)
