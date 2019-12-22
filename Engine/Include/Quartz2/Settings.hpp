@@ -31,7 +31,7 @@
 #include <Quartz2/Singleton.hpp>
 
 #include <string>
-#include <vector>
+#include <list>
 
 namespace q2 {
 
@@ -71,17 +71,21 @@ namespace q2 {
         /**
          * @brief Gets the value of a setting
          *
-         * @param key The unique name for key ex: core:volume
+         * @return std::string the unique key for the setting
+         */
+        std::string getKey();
+        /**
+         * @brief Gets the value of a setting
+         *
          * @return std::size_t The value of the setting
          */
         int value();
     };
 
     class Settings : public Singleton<Settings> {
-        std::vector<const Setting *> m_setting;
+        std::list<Setting> m_setting;
 
     public:
-        std::size_t add(const Setting *setting);
         /**
          * @brief Adds a new setting
          *
@@ -90,8 +94,8 @@ namespace q2 {
          * @param defaultValue The value the setting will be initially set to
          * @return std::size_t Reuturns the numerical key the setting is stored at
          */
-        std::size_t add(std::string name, std::string key, int defaultValue);
+        Setting *add(std::string name, std::string key, int defaultValue);
 
-        const Setting *getSetting(std::size_t key);
+        Setting *getSetting(std::string key);
     };
 }; // namespace q2

@@ -113,6 +113,6 @@ namespace q2
 		/// not.
 		bool m_enabled = true;
 
-		Setting m_settingSensitivity;
+		Setting *m_settingSensitivity;
 	};
 } // namespace q2
