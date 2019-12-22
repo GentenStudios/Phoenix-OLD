@@ -31,7 +31,7 @@
 
 using namespace q2;
 
-Setting::Setting(const std::string& name, const std::string& key, int defaultValue)
+Setting::Setting(std::string name, std::string key, int defaultValue)
     : m_name(std::move(name)), m_key(std::move(key)), m_value(defaultValue), m_maxValue(SHRT_MAX),
       m_minValue(SHRT_MIN)
 {}

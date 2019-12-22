@@ -50,7 +50,7 @@ namespace q2
 		int m_minValue;
 
 	public:
-		Setting(const std::string& name, const std::string& key, int defaultValue);
+		Setting(std::string name, std::string key, int defaultValue);
 		/**
 		 * @brief Sets the value of an already existing setting
 		 *
