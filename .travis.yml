@@ -1,0 +1,15 @@
+language: cpp
+dist: trusty
+sudo: required
+os:
+    - linux
+    - osx
+
+compiler:
+    - gcc
+    - clang
+
+script:
+    - git submodule update --init --recursive
+    - cmake -H. -BBuild
+    - cmake --build Build --target Sandbox
