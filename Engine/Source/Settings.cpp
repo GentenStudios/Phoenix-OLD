@@ -38,7 +38,7 @@ Setting::Setting(std::string name, std::string key, int defaultValue)
 
 bool Setting::set(int value)
 {
-	if (m_maxValue >= value && value >= m_minValue)
+	if (value >= m_minValue && value <= m_maxValue)
 	{
 		m_value = value;
 		return true;
