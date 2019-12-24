@@ -79,8 +79,10 @@ BlockTextureAtlas::SpriteID BlockTextureAtlas::getSpriteIDFromFilepath(const cha
 
 void BlockTextureAtlas::patch()
 {
+	assert(m_textureIDMap.size() <= GL_MAX_ARRAY_TEXTURE_LAYERS);
+
 	// Cannot patch 0 textures into a array, so no point in even trying.
-	if (m_textureIDMap.empty())
+	if (m_textureIDMap.empty() || m_textureIDMap.size() > GL_MAX_ARRAY_TEXTURE_LAYERS)
 		return;
 
 	// Must have specified a non-zero sprite width and height before patching
