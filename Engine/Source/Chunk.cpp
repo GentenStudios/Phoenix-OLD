@@ -41,14 +41,10 @@ Chunk::Chunk()
 	BlockType* grassBlock = BlockRegistry::get()->getBlockFromID("core:grass");
 	BlockType* airBlock = BlockRegistry::get()->getBlockFromID("core:air");
 
-	for (std::size_t i = 0; i < NUM_BLOCKS; i++)
-	{
-		const std::size_t y = i / (16 * 16);
-		if (y < 15)
-			m_blocks[i].type = dirtBlock;
-		else
-			m_blocks[i].type = grassBlock;
-	}
+	for (std::size_t x = 0; x < 16; x++)
+		for (std::size_t y = 0; y < 16; y++)
+			for (std::size_t z = 0; z < 16; z++)
+				m_blocks[FLATTEN_XYZ(x, y, z)].type = (y < 15) ? dirtBlock : grassBlock;
 
 	m_mesh = std::make_shared<Mesh>();
 }
