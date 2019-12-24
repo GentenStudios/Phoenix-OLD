@@ -87,7 +87,7 @@ namespace q2
 
 	class Settings : public Singleton<Settings>
 	{
-		std::list<Setting> m_setting;
+		std::list<Setting> m_settings;
 
 	public:
 		/**
@@ -101,12 +101,12 @@ namespace q2
 		 */
 		Setting* add(const std::string& name, const std::string& key, int defaultValue);
 
-        /**
-         * @brief Get the Setting object
-         * 
-         * @param key Unique Name for key ex: core:volume
-         * @return Setting* A pointer to the setting object
-         */
-		Setting* getSetting(const std::string& key);
+		/**
+		 * @brief Get the Setting object
+		 * 
+		 * @param key Unique Name for key ex: core:volume
+		 * @return Setting* A pointer to the setting object
+		 */
+		const Setting* getSetting(const std::string& key);
 	};
 }; // namespace q2

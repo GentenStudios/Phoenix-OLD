@@ -44,31 +44,30 @@ bool Setting::set(int value)
 		return true;
 	}
 	return false;
-};
+}
 
-void Setting::setMax(int value) { m_maxValue = value; };
+void Setting::setMax(int value) { m_maxValue = value; }
 
-void Setting::setMin(int value) { m_minValue = value; };
+void Setting::setMin(int value) { m_minValue = value; }
 
-std::string Setting::getKey() { return m_key; };
+std::string Setting::getKey() { return m_key; }
 
-int Setting::value() { return m_value; };
+int Setting::value() { return m_value; }
 
 Setting* Settings::add(const std::string& name, const std::string& key, int defaultValue)
 {
-	m_setting.push_back(Setting(name, key, defaultValue));
-	return &m_setting.back();
-};
+	m_settings.push_back(Setting(name, key, defaultValue));
+	return &m_settings.back();
+}
 
-Setting* Settings::getSetting(const std::string& key)
+const Setting* Settings::getSetting(const std::string& key)
 {
-	for (std::list<Setting>::iterator it = m_setting.begin();
-	     it != m_setting.end(); ++it)
+	for (Setting& setting : m_settings)
 	{
-		if (it->getKey() == key)
+		if (setting.getKey() == key)
 		{
-			return &(*it);
+			return &setting;
 		}
 	}
 	return nullptr;
-};
+}
