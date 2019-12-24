@@ -70,11 +70,11 @@ namespace q2
 			{ return m_status == CHUNK_RENDERER_STATUS_READY; }
 
 		void addMesh(const std::shared_ptr<Mesh>& mesh);
-		void setTextureArray(GLuint textureArray);
+		void setTextureArray(OpenGL32::Object textureArray);
 
 	private:
 		GLuint m_terrainShader;
-		GLuint m_textureArray;
+		OpenGL32::Object m_textureArray;
 
 		std::size_t m_viewWidth;
 		std::size_t m_viewHeight;

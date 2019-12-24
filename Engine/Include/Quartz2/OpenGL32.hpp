@@ -34,6 +34,8 @@ namespace q2
 {
 	struct OpenGL32
 	{
+		using Object = GLuint;
+
 		static void clearScreen(float r, float g, float b, float a);
 
 		static void enableWireframe();

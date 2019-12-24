@@ -72,7 +72,7 @@ void ChunkRenderer::addMesh(const std::shared_ptr<Mesh>& mesh)
 	m_meshes.push_back(rendererMesh);
 }
 
-void ChunkRenderer::setTextureArray(GLuint textureArray)
+void ChunkRenderer::setTextureArray(OpenGL32::Object textureArray)
 {
 	m_textureArray = textureArray;
 }
