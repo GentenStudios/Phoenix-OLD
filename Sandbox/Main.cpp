@@ -3,6 +3,7 @@
 #include <imgui.h>
 
 #include <memory>
+#include <thread>
 
 using namespace q2;
 
@@ -75,6 +76,10 @@ protected:
 
 		Chunk a;
 		m_chunkRenderer->addMesh(a.generateMesh());
+
+		Commander kirk = Commander(std::cout, std::cin);
+		std::thread thread(&Commander::post, &kirk);
+
 	}
 	
 	virtual void onExit()
