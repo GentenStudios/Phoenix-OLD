@@ -46,17 +46,17 @@ add_library(${PROJECT_NAME}
 target_include_directories(${PROJECT_NAME} PRIVATE ${Headers}/../)
 
 target_include_directories(${PROJECT_NAME} PUBLIC
+	${CMAKE_CURRENT_LIST_DIR}/ThirdParty/SDL2/include
 	${CMAKE_CURRENT_LIST_DIR}/ThirdParty/Glad/include
 	${CMAKE_CURRENT_LIST_DIR}/ThirdParty/ImGui
 	${CMAKE_CURRENT_LIST_DIR}/ThirdParty/ImGui/examples
 	${CMAKE_CURRENT_LIST_DIR}/ThirdParty/lua
-	${CMAKE_CURRENT_LIST_DIR}/ThirdParty/SDL2/include
 	${CMAKE_CURRENT_LIST_DIR}/ThirdParty/sol2/include
 	${CMAKE_CURRENT_LIST_DIR}/ThirdParty/stb_image
 	${CMAKE_CURRENT_LIST_DIR}/ThirdParty/stb_rectpack
 )
 
-target_link_libraries(${PROJECT_NAME} SDL2-static SDL2main Glad ImGui)
+target_link_libraries(${PROJECT_NAME} PRIVATE SDL2-static SDL2main Glad ImGui)
 
 if(WIN32)
 	target_link_libraries(${PROJECT_NAME} PRIVATE opengl32.lib)
