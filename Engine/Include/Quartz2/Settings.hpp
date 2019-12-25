@@ -76,13 +76,13 @@ namespace q2
 		 *
 		 * @return std::string the unique key for the setting
 		 */
-		std::string getKey();
+		const std::string getKey();
 		/**
 		 * @brief Gets the value of a setting
 		 *
 		 * @return std::size_t The value of the setting
 		 */
-		int value();
+		const int value();
 	};
 
 	class Settings : public Singleton<Settings>
@@ -107,6 +107,6 @@ namespace q2
 		 * @param key Unique Name for key ex: core:volume
 		 * @return Setting* A pointer to the setting object
 		 */
-		const Setting* getSetting(const std::string& key);
+		Setting* getSetting(const std::string& key);
 	};
 }; // namespace q2

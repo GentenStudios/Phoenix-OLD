@@ -50,9 +50,9 @@ void Setting::setMax(int value) { m_maxValue = value; }
 
 void Setting::setMin(int value) { m_minValue = value; }
 
-std::string Setting::getKey() { return m_key; }
+const std::string Setting::getKey() { return m_key; }
 
-int Setting::value() { return m_value; }
+const int Setting::value() { return m_value; }
 
 Setting* Settings::add(const std::string& name, const std::string& key, int defaultValue)
 {
@@ -60,7 +60,7 @@ Setting* Settings::add(const std::string& name, const std::string& key, int defa
 	return &m_settings.back();
 }
 
-const Setting* Settings::getSetting(const std::string& key)
+Setting* Settings::getSetting(const std::string& key)
 {
 	for (Setting& setting : m_settings)
 	{
