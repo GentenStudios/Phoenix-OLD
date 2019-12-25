@@ -30,7 +30,7 @@
 
 #include <Quartz2/Singleton.hpp>
 
-#include <list>
+#include <unordered_map>
 #include <string>
 
 namespace q2
@@ -50,6 +50,7 @@ namespace q2
 		int m_minValue;
 
 	public:
+		Setting();
 		Setting(std::string name, std::string key, int defaultValue);
 		/**
 		 * @brief Sets the value of an already existing setting
@@ -87,7 +88,7 @@ namespace q2
 
 	class Settings : public Singleton<Settings>
 	{
-		std::list<Setting> m_settings;
+		std::unordered_map<std::string, Setting> m_settings;
 
 	public:
 		/**

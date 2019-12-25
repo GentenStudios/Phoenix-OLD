@@ -31,6 +31,8 @@
 
 using namespace q2;
 
+Setting::Setting(){};
+
 Setting::Setting(std::string name, std::string key, int defaultValue)
     : m_name(std::move(name)), m_key(std::move(key)), m_value(defaultValue), m_maxValue(SHRT_MAX),
       m_minValue(SHRT_MIN)
@@ -56,18 +58,11 @@ const int Setting::value() { return m_value; }
 
 Setting* Settings::add(const std::string& name, const std::string& key, int defaultValue)
 {
-	m_settings.push_back(Setting(name, key, defaultValue));
-	return &m_settings.back();
+	m_settings[key] = Setting(name, key, defaultValue);
+	return &m_settings[key];
 }
 
 Setting* Settings::getSetting(const std::string& key)
 {
-	for (Setting& setting : m_settings)
-	{
-		if (setting.getKey() == key)
-		{
-			return &setting;
-		}
-	}
-	return nullptr;
+	return &m_settings[key];
 }
