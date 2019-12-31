@@ -77,13 +77,13 @@ namespace q2
 		 *
 		 * @return std::string the unique key for the setting
 		 */
-		const std::string getKey();
+		std::string getKey() const;
 		/**
 		 * @brief Gets the value of a setting
 		 *
 		 * @return std::size_t The value of the setting
 		 */
-		const int value();
+		int value() const;
 	};
 
 	class Settings : public Singleton<Settings>
