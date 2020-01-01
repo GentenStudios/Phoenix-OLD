@@ -36,6 +36,7 @@ add_library(${PROJECT_NAME}
 	${Headers}/BlocksTextureAtlas.hpp
 	${Headers}/BlocksRegistry.hpp
 	${Headers}/Singleton.hpp
+	${Headers}/Settings.hpp
 
 	${Source}/Matrix4x4.cpp
 	${Source}/Ray.cpp
@@ -49,6 +50,7 @@ add_library(${PROJECT_NAME}
 	${Source}/Mesh.cpp
 	${Source}/BlocksTextureAtlas.cpp
 	${Source}/BlocksRegistry.cpp
+	${Source}/Settings.cpp
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${Headers}/../)
