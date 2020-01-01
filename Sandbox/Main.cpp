@@ -8,11 +8,14 @@
 
 using namespace q2;
 
-// @FutureRuby I know this looks weird but it works.
 UI::ChatWindow chat("Chat Window", std::string(
+	// @FutureRuby I know this looks weird but it works.
+	// constant string compile time concatenation is wierd.
 	"Welcome to the Darklight Terminal!\n"
 	"Type something and hit enter to run a command!\n"
 ));
+
+ImGuiHelpers::BasicTerminal term("Test Terminal");
 
 class PhoenixGame : public Game
 {
@@ -130,6 +133,10 @@ protected:
 	virtual void onFrame(float dt)
 	{
 		static bool wireframe = false;
+		ImVec2 viewportSize = ImVec2(
+			static_cast<float>(getWindowWidth()),
+			static_cast<float>(getWindowHeight())
+		);
 
 		m_camera->tick(dt, getSDLWindow());
 
@@ -148,7 +155,10 @@ protected:
 		ImGui::Text("OpenGL Error %i\n", glGetError());
 		ImGui::End();
 
-		chat.draw(ImVec2(400, 600));
+		// vertical height adjust the chat window.
+		ImVec2 chatSize = ImVec2(400, 600);
+		chat.draw(chatSize, ImVec2(0, viewportSize.y - chatSize.y));
+		term.draw(ImVec2(400, 600));
 
 		ImGui::ShowStyleEditor();
 		m_chunkRenderer->render(m_camera.get());

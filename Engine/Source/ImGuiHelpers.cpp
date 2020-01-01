@@ -32,7 +32,6 @@
 #include <sstream>
 
 #include <imgui.h>
-#include <imgui_internal.h>
 #include <misc/cpp/imgui_stdlib.h>
 
 using namespace q2::ImGuiHelpers;
@@ -90,7 +89,7 @@ int callback(ImGuiInputTextCallbackData *data){
 //   to the engine for any reason.
 void TerminalBase::drawInputField(){};
 void TerminalBase::drawOutputField(){};
-void TerminalBase::drawEx(ImVec2 size, bool* p_open, ImVec2* padding, ImGuiWindowFlags flags){};
+void TerminalBase::drawEx(ImVec2* size, ImVec2* pos, ImVec2* padding, bool* p_open, ImGuiWindowFlags flags){};
 void TerminalBase::onCommand(){};
 
 
@@ -115,7 +114,6 @@ void BasicTerminal::drawInputField()
 
 	  NULL // Can be a user data object but unnecessary here.
 	);
-	textboxHeight = ImGui::GetFrameHeight() * 2.0f;
 
 	if (append_line) {
 		onCommand();
@@ -134,16 +132,24 @@ void BasicTerminal::drawInputField()
 
 void BasicTerminal::drawOutputField()
 {
+	// Each non-window element uses this height as a boundary.
+	// Now we don't have to save the input box height.
+	float fwhHeight = ImGui::GetFrameHeightWithSpacing();
 	ImVec2 size = ImGui::GetWindowSize();
+
+	// When there is a title bar, we add an extra item's worth of space to
+	// the output window size because the title bar is drawn within the window.
+	if (! (currentFlags & ImGuiWindowFlags_NoTitleBar))
+		fwhHeight *= 2.0f;
 
 	// TODO:
 	//   Implement ANSI escape sequences for color because this is
 	//   supposed to be a terminal after all.
 
-	// render the text output block with accommodation for
+	// render the text output block with accommodation for input box height.
 	ImGui::BeginChild(outputName, ImVec2(
 		size.x - ( currentPadding->x * 2.0f ),
-		size.y - textboxHeight - ( currentPadding->y * 2.0f )
+		size.y - ( currentPadding->y * 2.0f ) - fwhHeight
 	));
 
 	// PushTextWrapPos(); // possibly good for something
@@ -154,11 +160,10 @@ void BasicTerminal::drawOutputField()
 }
 
 
-void BasicTerminal::drawEx(ImVec2 size, bool* p_open, ImVec2* padding, ImGuiWindowFlags extra_flags)
+void BasicTerminal::drawEx(ImVec2* size, ImVec2* pos, ImVec2* padding, bool* p_open, ImGuiWindowFlags extra_flags)
 {
 	// Window Definition (remember to use the terminal class' begin)
-	begin(p_open, padding, flags | extra_flags);
-	ImGui::SetWindowSize(size);
+	begin(size, pos, padding, p_open, extra_flags);
 	drawOutputField();
 	drawInputField();
 	end();

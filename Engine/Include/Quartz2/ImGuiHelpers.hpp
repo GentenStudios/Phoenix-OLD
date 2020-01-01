@@ -51,32 +51,36 @@ namespace q2 {
 	namespace ImGuiHelpers {
 		class TerminalBase
 		{
-			protected:
+			private:
 				const char* _name;
+			protected:
 				const char* outputName;
 				bool renderFocus; // for when the focus method is invoked
 				//std::string buffer(); // this is the input text buffer for the term
-				struct ImVec2 defaultPadding = ImVec2(5.0f, 5.0f);
+				ImVec2 defaultPadding = ImVec2(5.0f, 5.0f);
 
 				// XXX: this is a manual hack to get around the fact we have no
 				//   way to query the pre-existing window padding for responsive
 				//   design. Perhaps ImGui expects us to design something from scratch?
 				//   I say fuck that for now.
 				ImVec2* currentPadding;
-				// for responsive design because we can't access these before either def
-				float textboxHeight;
 
-				static const ImGuiWindowFlags flags = ImGuiWindowFlags(
-					ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoScrollbar |
+				ImGuiWindowFlags currentFlags = ImGuiWindowFlags(
+					ImGuiWindowFlags_NoScrollbar |
 					ImGuiWindowFlags_NoScrollWithMouse
 				);
 
 				virtual void drawInputField();
 				virtual void drawOutputField();
-				inline void begin(bool* p_open, ImVec2* padding, ImGuiWindowFlags flags)
-					{ currentPadding = ( padding != NULL ? padding : &defaultPadding );
+				inline void begin(ImVec2* size, ImVec2* pos, ImVec2* padding, bool* p_open, ImGuiWindowFlags flags)
+					{
+						currentFlags = currentFlags | flags; // save current flags;
+						currentPadding = ( padding != NULL ? padding : &defaultPadding );
 						ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, *currentPadding);
-						ImGui::Begin(_name, p_open, flags); };
+						ImGui::Begin(_name, p_open, currentFlags);
+						if (pos != NULL) ImGui::SetWindowPos(*((const ImVec2*) pos), ImGuiCond_Once);
+						if (size != NULL) ImGui::SetWindowSize(*((const ImVec2*) size), ImGuiCond_Once);
+					};
 				inline void end()
 					{ ImGui::End(); ImGui::PopStyleVar();};
 			public:
@@ -86,16 +90,22 @@ namespace q2 {
 				//   ImGui limitation; The `name` must be used for internal refference ie.
 				//   all widgets are searched via a public hash function. There no current
 				//   way to use the ImGui internal IDs which would be slightly faster.
-				TerminalBase(const char* name, std::string initial_contents)
-					{ _name = name; outputName = std::string(_name).append("_Output").c_str(); };
 				inline TerminalBase(const char* name)
-					{ TerminalBase(name, std::string("")); };
+					{ _name = name; outputName = std::string(_name).append("_Output").c_str(); };
+				inline TerminalBase(const char* name, std::string initial_contents)
+					{ _name = name; outputName = std::string(_name).append("_Output").c_str(); };
 
 				// NOTE: define overrides in base class for ease of implementation down the road.
-				virtual void drawEx(ImVec2 size, bool* p_open, ImVec2* padding, ImGuiWindowFlags flags);
-				inline void draw(ImVec2 size){ drawEx(size, NULL, NULL, (int)ImGuiWindowFlags_None); };
-				inline void draw(ImVec2 size, bool* p_open){ drawEx(size, p_open, NULL, ImGuiWindowFlags_None); };
-				inline void draw(ImVec2 size, ImGuiWindowFlags_ flags){ drawEx(size, NULL, NULL, flags); };
+				// TODO: vertical shrink with templates
+				virtual void drawEx(ImVec2* size, ImVec2* pos, ImVec2* padding, bool* p_open, ImGuiWindowFlags flags);
+				inline void draw(ImVec2 size, ImVec2 pos, ImVec2 padding, bool* p_open, ImGuiWindowFlags flags)
+					{ drawEx(&size, &pos, &padding, p_open, flags); };
+				inline void draw(ImVec2 size, ImVec2 pos)
+					{ drawEx(&size, &pos, NULL, NULL, ImGuiWindowFlags_None); };
+				inline void draw(ImVec2 size){ drawEx(&size, NULL, NULL, NULL, ImGuiWindowFlags_None); };
+				inline void draw(ImVec2 size, bool* p_open){ drawEx(&size, NULL, NULL, p_open, ImGuiWindowFlags_None); };
+				inline void draw(ImVec2 size, ImGuiWindowFlags flags){ drawEx(&size, NULL, NULL, NULL, flags); };
+				inline void draw(){ drawEx(NULL, NULL, NULL, NULL, ImGuiWindowFlags_None); };
 
 				void focus(){ renderFocus = true; };
 				virtual void onCommand();
@@ -109,7 +119,7 @@ namespace q2 {
 			public:
 				using TerminalBase::TerminalBase;
 				//BasicTerminal();
-				void drawEx(ImVec2 size, bool* p_open, ImVec2* padding, ImGuiWindowFlags extra_flags);
+				void drawEx(ImVec2* size, ImVec2* pos, ImVec2* padding, bool* p_open, ImGuiWindowFlags extra_flags);
 				void onCommand();
 		};
 	};
