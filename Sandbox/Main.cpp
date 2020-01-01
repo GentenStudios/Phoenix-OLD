@@ -1,10 +1,18 @@
 #include <Quartz2/Quartz.hpp>
+#include <UI.hpp>
 
 #include <imgui.h>
 
 #include <memory>
+#include <string>
 
 using namespace q2;
+
+// @FutureRuby I know this looks weird but it works.
+UI::ChatWindow chat("Chat Window", std::string(
+	"Welcome to the Darklight Terminal!\n"
+	"Type something and hit enter to run a command!\n"
+));
 
 class PhoenixGame : public Game
 {
@@ -28,6 +36,11 @@ protected:
 				SDL_ShowCursor(!m_camera->isEnabled());
 				return true;
 			}
+			if (e.key.keysym.scancode == SDL_SCANCODE_RETURN)
+			{
+				chat.focus();
+				return true;
+			}
 		}
 
 		return false;
@@ -37,7 +50,7 @@ protected:
 	{
 		m_chunkRenderer = std::make_unique<ChunkRenderer>();
 		m_chunkRenderer->setup(getWindowWidth(), getWindowHeight());
-	
+
 		if (!m_chunkRenderer->isReady())
 		{
 			std::fprintf(stderr, "Renderer setup failed: Status = %s\n",
@@ -70,13 +83,13 @@ protected:
 		grassBlockType->textures.front = grassBlockType->textures.back
 			= grassBlockType->textures.left = grassBlockType->textures.right =
 				atlas->getSpriteIDFromFilepath("Assets/grass_side.png");
-		
+
 		m_chunkRenderer->setTexture(atlas->getPatchedTextureData(), atlas->getPatchedTextureWidth(), atlas->getPatchedTextureHeight());
 
 		Chunk a;
 		m_chunkRenderer->addMesh(a.generateMesh());
 	}
-	
+
 	virtual void onExit()
 	{
 		m_chunkRenderer->teardown();
@@ -135,6 +148,9 @@ protected:
 		ImGui::Text("OpenGL Error %i\n", glGetError());
 		ImGui::End();
 
+		chat.draw(ImVec2(400, 600));
+
+		ImGui::ShowStyleEditor();
 		m_chunkRenderer->render(m_camera.get());
 	}
 };

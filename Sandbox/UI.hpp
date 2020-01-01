@@ -28,26 +28,16 @@
 
 #pragma once
 
-#include <vector>
-#include <string>
-#include <iostream>
-#include <sstream>
+#include <Quartz2/Quartz.hpp>
+#include <imgui.h>
 
-namespace q2 {
-	class Terminal {
-	private:
-		const char* input_field_prefix = "_Input";
-		const char* output_field_prefix = "_Output";
-		const char* _name;
-	protected:
-		std::stringstream contents;
-	public:
-		// NOTE:
-		//   ImGui limitation; The `name` must be used for internal refference ie.
-		//   all widgets are searched via a public hash function. There no current
-		//   way to use the ImGui internal IDs which would be slightly faster.
-		Terminal(const char* name){ _name = name; }
-		void draw();
-		void focus();
+namespace UI {
+	class ChatWindow : public q2::ImGuiHelpers::BasicTerminal
+	{
+		protected:
+			struct ImVec2 defaultPadding = ImVec2();
+		public:
+			using BasicTerminal::BasicTerminal;
+			void drawEx(ImVec2 size, bool* p_open, ImVec2 *padding, ImGuiWindowFlags flags);
 	};
 };
