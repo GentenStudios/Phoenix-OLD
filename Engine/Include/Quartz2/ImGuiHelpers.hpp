@@ -49,40 +49,38 @@
 
 namespace q2 {
 	namespace ImGuiHelpers {
-		class TerminalBase
-		{
-			private:
-				const char* _name;
+		class ImOOGuiWindow {
 			protected:
-				const char* outputName;
-				bool renderFocus; // for when the focus method is invoked
-				//std::string buffer(); // this is the input text buffer for the term
-				ImVec2 defaultPadding = ImVec2(5.0f, 5.0f);
+				const char* rootWindowName;
+				static const ImGuiWindowFlags defaultFlags = ImGuiWindowFlags_None;
+				inline ImOOGuiBase(const char* name){ rootWindowName = name; };
 
-				// XXX: this is a manual hack to get around the fact we have no
-				//   way to query the pre-existing window padding for responsive
-				//   design. Perhaps ImGui expects us to design something from scratch?
-				//   I say fuck that for now.
-				ImVec2* currentPadding;
+			public:
+				inline void begin(ImVec2 *size, bool* p_open, ImGuiWindowFlags flags)
+					{ ImGui::Begin(rootWindowName, *size, *p_open, flags); }
+				inline void end(){ ImGui::End(); }
+				// NOTE: define overrides in base class for ease of implementation down the road.
+				// TODO: vertical shrink with templates
+				inline void draw(ImVec2 size){ drawEx(&size, NULL, ImGuiWindowFlags_None); };
+				inline void draw(ImVec2 size, bool* p_open){ drawEx(&size, p_open, ImGuiWindowFlags_None); };
+				inline void draw(ImVec2 size, ImGuiWindowFlags flags){ drawEx(&size, NULL, flags); };
 
-				ImGuiWindowFlags currentFlags = ImGuiWindowFlags(
+
+				virtual void drawEx(ImVec2* size, bool* p_open, ImGuiWindowFlags flags);
+		};
+
+		class BasicTerminal : public ImOOGuiWindow
+		{
+			protected:
+				static const ImGuiWindowFlags defaultFlags = ImGuiWindowFlags(
 					ImGuiWindowFlags_NoScrollbar |
 					ImGuiWindowFlags_NoScrollWithMouse
 				);
+				bool renderFocus; // for when the focus method is invoked
+				//std::string buffer(); // this is the input text buffer for the term
 
 				virtual void drawInputField();
 				virtual void drawOutputField();
-				inline void begin(ImVec2* size, ImVec2* pos, ImVec2* padding, bool* p_open, ImGuiWindowFlags flags)
-					{
-						currentFlags = currentFlags | flags; // save current flags;
-						currentPadding = ( padding != NULL ? padding : &defaultPadding );
-						ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, *currentPadding);
-						ImGui::Begin(_name, p_open, currentFlags);
-						if (pos != NULL) ImGui::SetWindowPos(*((const ImVec2*) pos), ImGuiCond_Once);
-						if (size != NULL) ImGui::SetWindowSize(*((const ImVec2*) size), ImGuiCond_Once);
-					};
-				inline void end()
-					{ ImGui::End(); ImGui::PopStyleVar();};
 			public:
 				std::ostringstream output;
 
@@ -90,37 +88,16 @@ namespace q2 {
 				//   ImGui limitation; The `name` must be used for internal refference ie.
 				//   all widgets are searched via a public hash function. There no current
 				//   way to use the ImGui internal IDs which would be slightly faster.
-				inline TerminalBase(const char* name)
-					{ _name = name; outputName = std::string(_name).append("_Output").c_str(); };
-				inline TerminalBase(const char* name, std::string initial_contents)
-					{ _name = name; outputName = std::string(_name).append("_Output").c_str(); };
+				inline BasicTerminal(const char* name)
+					{ ImOOGuiWindow(name); outputWindowName = std::string(_name).append("_Output").c_str(); };
+				inline BasicTerminal(const char* name, std::string initial_contents)
+					{ ImOOGuiWindow(name); outputWindowName = std::string(_name).append("_Output").c_str(); };
 
-				// NOTE: define overrides in base class for ease of implementation down the road.
-				// TODO: vertical shrink with templates
-				virtual void drawEx(ImVec2* size, ImVec2* pos, ImVec2* padding, bool* p_open, ImGuiWindowFlags flags);
-				inline void draw(ImVec2 size, ImVec2 pos, ImVec2 padding, bool* p_open, ImGuiWindowFlags flags)
-					{ drawEx(&size, &pos, &padding, p_open, flags); };
-				inline void draw(ImVec2 size, ImVec2 pos)
-					{ drawEx(&size, &pos, NULL, NULL, ImGuiWindowFlags_None); };
-				inline void draw(ImVec2 size){ drawEx(&size, NULL, NULL, NULL, ImGuiWindowFlags_None); };
-				inline void draw(ImVec2 size, bool* p_open){ drawEx(&size, NULL, NULL, p_open, ImGuiWindowFlags_None); };
-				inline void draw(ImVec2 size, ImGuiWindowFlags flags){ drawEx(&size, NULL, NULL, NULL, flags); };
-				inline void draw(){ drawEx(NULL, NULL, NULL, NULL, ImGuiWindowFlags_None); };
 
-				void focus(){ renderFocus = true; };
+				inline void focus(){ renderFocus = true; };
+
+				virtual void drawEx(ImVec2* size, bool* p_open, ImGuiWindowFlags flags);
 				virtual void onCommand();
-		};
-
-		class BasicTerminal : public TerminalBase
-		{
-			protected:
-				void drawInputField();
-				void drawOutputField();
-			public:
-				using TerminalBase::TerminalBase;
-				//BasicTerminal();
-				void drawEx(ImVec2* size, ImVec2* pos, ImVec2* padding, bool* p_open, ImGuiWindowFlags extra_flags);
-				void onCommand();
 		};
 	};
 };

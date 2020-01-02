@@ -39,7 +39,7 @@
 using namespace UI;
 
 
-void ChatWindow::drawEx(ImVec2* size, ImVec2* pos, ImVec2* padding, bool* p_open, ImGuiWindowFlags extra_flags)
+void ChatWindow::drawEx(ImVec2* size, bool* p_open, ImGuiWindowFlags extra_flags)
 {
 	static bool focused;
 
@@ -57,7 +57,7 @@ void ChatWindow::drawEx(ImVec2* size, ImVec2* pos, ImVec2* padding, bool* p_open
 	ImGui::PushStyleColor(ImGuiCol_FrameBg, IM_COL32(90,10,90,255));
 
 	// Window Definition
-	begin(NULL, pos, padding, p_open, currentFlags | extra_flags); //just in case
+	begin(NULL, p_open, currentFlags | extra_flags); //just in case
 	focused = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows);
 
 	// embedded default size

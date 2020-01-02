@@ -84,15 +84,6 @@ int callback(ImGuiInputTextCallbackData *data){
 }
 
 
-// NOTE: Subdue vtable linker errors.
-// TODO: Throw NotImplemented Errors when these are called if this is added
-//   to the engine for any reason.
-void TerminalBase::drawInputField(){};
-void TerminalBase::drawOutputField(){};
-void TerminalBase::drawEx(ImVec2* size, ImVec2* pos, ImVec2* padding, bool* p_open, ImGuiWindowFlags flags){};
-void TerminalBase::onCommand(){};
-
-
 void BasicTerminal::drawInputField()
 {
 	// InputText is a frame object so we have to use push item width to adjust it.
@@ -160,10 +151,10 @@ void BasicTerminal::drawOutputField()
 }
 
 
-void BasicTerminal::drawEx(ImVec2* size, ImVec2* pos, ImVec2* padding, bool* p_open, ImGuiWindowFlags extra_flags)
+void BasicTerminal::drawEx(ImVec2* size, bool* p_open, ImGuiWindowFlags extra_flags)
 {
 	// Window Definition (remember to use the terminal class' begin)
-	begin(size, pos, padding, p_open, extra_flags);
+	begin(size, p_open, extra_flags);
 	drawOutputField();
 	drawInputField();
 	end();

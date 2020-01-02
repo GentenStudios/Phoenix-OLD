@@ -35,8 +35,7 @@ namespace UI {
 	class ChatWindow : public q2::ImGuiHelpers::BasicTerminal
 	{
 		protected:
-			ImVec2 defaultPadding = ImVec2();
-			ImGuiWindowFlags currentFlags = ImGuiWindowFlags(
+			static const ImGuiWindowFlags defaultFlags = ImGuiWindowFlags(
 				ImGuiWindowFlags_NoScrollbar |
 				ImGuiWindowFlags_NoScrollWithMouse |
 				ImGuiWindowFlags_NoSavedSettings |
@@ -50,6 +49,6 @@ namespace UI {
 			float unselectedTransparency = 0.3f;
 		public:
 			using BasicTerminal::BasicTerminal;
-			void drawEx(ImVec2* size, ImVec2* pos, ImVec2 *padding, bool* p_open, ImGuiWindowFlags flags);
+			void drawEx(ImVec2* size, bool* p_open, ImGuiWindowFlags flags);
 	};
 };
