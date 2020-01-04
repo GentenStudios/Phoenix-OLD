@@ -11,5 +11,5 @@ compiler:
 
 script:
     - git submodule update --init --recursive
-    - cmake -S. -BBuild
+    - cmake -H -BBuild
     - cmake --build Build
