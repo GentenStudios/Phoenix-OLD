@@ -1,5 +1,5 @@
 language: cpp
-dist: trusty
+dist: bionic
 sudo: required
 os:
     - linux
@@ -11,5 +11,5 @@ compiler:
 
 script:
     - git submodule update --init --recursive
-    - cmake -H. -BBuild
-    - cmake --build Build --target Sandbox
+    - cmake -S. -BBuild
+    - cmake --build Build
