@@ -1,5 +1,6 @@
 project (ImGui)
 
+# Tell ImGUI that we're using GLAD as our OpenGL function loader.
 add_definitions(-DIMGUI_IMPL_OPENGL_LOADER_GLAD)
 
 add_library(${PROJECT_NAME}
