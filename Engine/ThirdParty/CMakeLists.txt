@@ -1,4 +1,12 @@
 set(HAVE_LIBC TRUE)
+
+set(SDL_SHARED_ENABLED_BY_DEFAULT OFF)
+
+# stop SDL trying to control our main function.
+add_definitions(-DSDL_MAIN_HANDLED)
+
 add_subdirectory (SDL2)
 add_subdirectory (Glad)
 add_subdirectory (ImGui)
+
+set_target_properties(SDL2main SDL2-static uninstall Glad ImGui PROPERTIES FOLDER Dependencies)
