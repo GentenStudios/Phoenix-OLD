@@ -30,10 +30,11 @@
 
 //#include <vector>
 #include <sstream>
+#include <iostream>
+#include <cmath>
 
 #include <imgui.h>
 #include <imgui_internal.h> // for nav inputs
-#include <iostream>
 #include <misc/cpp/imgui_stdlib.h>
 
 using namespace q2::ImGuiHelpers;
@@ -104,10 +105,10 @@ void BasicTerminal::flush()
 	// ceiling this so we don't run into an infinite loop with extremely small
 	// targetOutputSizes although it should never happen realistically because
 	// I made sure this is alligned in kilobytes of memory.
-	int hundredthSize = std::ceil(targetOutputSize / 100);
+	int hundredthSize = static_cast<int>(std::ceil(targetOutputSize / 100));
 	// Just for backup the while loop seeks a slightly larger segment
 	// so after we clear up
-	int tenthSize = std::floor(targetOutputSize / 10);
+	int tenthSize = static_cast<int>(std::floor(targetOutputSize / 10));
 
 	// flush content from buffer into output
 	if (bufSize > 0)
