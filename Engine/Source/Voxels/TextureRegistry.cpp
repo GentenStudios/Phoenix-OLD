@@ -38,5 +38,5 @@ void TextureRegistry::addTexture(const std::string& texture)
 
 std::vector<std::string> TextureRegistry::getTextures()
 {
-	return std::vector<std::string>(m_textures.begin(), m_textures.end());
+	return {m_textures.begin(), m_textures.end()};
 }

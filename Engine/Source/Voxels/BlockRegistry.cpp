@@ -48,9 +48,12 @@ void BlockRegistry::registerBlock(BlockType blockInfo)
 		blockInfo.m_registryID = static_cast<unsigned int>(m_blocks.size());
 		m_blocks.push_back(blockInfo);
 
-		for (const std::string& tex : blockInfo.textures)
+		if (blockInfo.category != BlockCategory::AIR)
 		{
-			m_textures.addTexture(tex);
+			for (const std::string& tex : blockInfo.textures)
+			{
+				m_textures.addTexture(tex);
+			}
 		}
 	}
 }

@@ -81,25 +81,20 @@ namespace q2
 			std::string displayName;
 			std::string id;
 
-			int getRegistryID() const { return m_registryID; }
-
 			BlockCategory category = BlockCategory::AIR;
 
+			// top, left, back, right, top, bottom
 			std::array<std::string, 6> textures;
 
-			void setAllTextures(const std::string& tex)
-			{
-				for (auto texture : textures)
-				{
-					texture = tex;
-				}
-			}
+			void setAllTextures(const std::string& tex) { textures.fill(tex); }
+
+			int getRegistryID() const { return m_registryID; }
 
 			bool operator==(const BlockType& rhs) const
 			{
 				return (id == rhs.id);
 			}
-			
+
 		private:
 			unsigned int m_registryID = -1;
 			friend class BlockRegistry;
