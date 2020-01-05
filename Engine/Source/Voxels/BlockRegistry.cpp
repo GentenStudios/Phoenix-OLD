@@ -29,6 +29,7 @@
 #include <Quartz2/Voxels/BlockRegistry.hpp>
 
 #include <cstring>
+#include <algorithm>
 
 using namespace q2::voxels;
 
