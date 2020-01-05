@@ -119,7 +119,7 @@ void ChatWindow::drawEx(bool* p_open, ImGuiWindowFlags flags)
 
 
 	ImGui::PushStyleVar(ImGuiStyleVar_Alpha, 1.0f);
-	drawOutputField(ImGuiWindowFlags_None);
+	drawOutputField(ImGuiWindowFlags_NoScrollbar);
 	ImGui::PopStyleVar();
 
 
