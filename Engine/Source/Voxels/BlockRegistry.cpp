@@ -35,7 +35,8 @@ void BlockRegistry::initialise()
 	BlockType unknownBlock;
 	unknownBlock.displayName = "Unknown Block";
 	unknownBlock.id          = "core:unknown";
-	unknownBlock.category    = BlockCategory::AIR;
+	unknownBlock.category    = BlockCategory::SOLID;
+	unknownBlock.setAllTextures("pink.png");
 
 	registerBlock(unknownBlock);
 }
