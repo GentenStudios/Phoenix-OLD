@@ -39,29 +39,28 @@
 
 using namespace UI;
 
-
 // hacked from the ImGui source
 static const float WINDOWS_MOUSE_WHEEL_SCROLL_LOCK_TIMER = 2.00f;
-void ForceUpdateMouseWheel()
+void               ForceUpdateMouseWheel()
 {
-    ImGuiContext* g = ImGui::GetCurrentContext();
+	ImGuiContext* g = ImGui::GetCurrentContext();
 
-    // Reset the locked window if we move the mouse or after the timer elapses
-    if (g->WheelingWindow != NULL)
-    {
-        g->WheelingWindowTimer -= g->IO.DeltaTime;
-        if (g->WheelingWindowTimer <= 0.0f)
-        {
-            g->WheelingWindow = NULL;
-            g->WheelingWindowTimer = 0.0f;
-        }
-    }
+	// Reset the locked window if we move the mouse or after the timer elapses
+	if (g->WheelingWindow != NULL)
+	{
+		g->WheelingWindowTimer -= g->IO.DeltaTime;
+		if (g->WheelingWindowTimer <= 0.0f)
+		{
+			g->WheelingWindow      = NULL;
+			g->WheelingWindowTimer = 0.0f;
+		}
+	}
 }
 
 void ChatWindow::drawEx(bool* p_open, ImGuiWindowFlags flags)
 {
 	ImGuiContext* g = ImGui::GetCurrentContext();
-	static bool focused;
+	static bool   focused;
 
 	/***
 	 * NOTE:
@@ -70,14 +69,20 @@ void ChatWindow::drawEx(bool* p_open, ImGuiWindowFlags flags)
 	 *  "Window's" transparency to a factor of the prior existing value for one
 	 *  element. `PushStyleVar` can apply to multiple elements once.
 	 */
-	if (focused) ImGui::PushStyleVar(ImGuiStyleVar_Alpha, 1.0f);
-	else ImGui::PushStyleVar(ImGuiStyleVar_Alpha, unselectedTransparency);
+	if (focused)
+		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, 1.0f);
+	else
+		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, unselectedTransparency);
+
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
-	ImGui::PushStyleColor(ImGuiCol_Border, IM_COL32(100,100,100,255));
-	ImGui::PushStyleColor(ImGuiCol_FrameBg, IM_COL32(90,10,90,255));
+	ImGui::PushStyleColor(ImGuiCol_Border, IM_COL32(100, 100, 100, 255));
+	ImGui::PushStyleColor(ImGuiCol_FrameBg, IM_COL32(90, 10, 90, 255));
 
 	// Window Definition
-	begin(p_open, defaultFlags | flags);
+	begin(p_open,
+	      ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings |
+	          ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoMove |
+	          ImGuiWindowFlags_NoBringToFrontOnFocus | flags);
 	ImGuiWindow* window = ImGui::GetCurrentWindow();
 	focused = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows);
 
@@ -96,34 +101,39 @@ void ChatWindow::drawEx(bool* p_open, ImGuiWindowFlags flags)
 	// {
 	// 	g->WheelingWindow = window;
 	// 	g->WheelingWindowRefMousePos = g->IO.MousePos;
-  // 	g->WheelingWindowTimer = WINDOWS_MOUSE_WHEEL_SCROLL_LOCK_TIMER;
+	// 	g->WheelingWindowTimer = WINDOWS_MOUSE_WHEEL_SCROLL_LOCK_TIMER;
 	// }
 	// ForceUpdateMouseWheel();
 	// if (focused && (g->IO.MouseWheel < 0.0f))
-	// 	ImGui::SetScrollY(ImGui::GetScrollY() - ( ImGui::GetFontSize() * g->IO.MouseWheel));
-	// if (focused && (g->IO.MouseWheel > 0.0f))
-	// 	ImGui::SetScrollY(ImGui::GetScrollY() + ( ImGui::GetFontSize() * g->IO.MouseWheel));
-
+	// 	ImGui::SetScrollY(ImGui::GetScrollY() - ( ImGui::GetFontSize() *
+	// g->IO.MouseWheel)); if (focused && (g->IO.MouseWheel > 0.0f))
+	// 	ImGui::SetScrollY(ImGui::GetScrollY() + ( ImGui::GetFontSize() *
+	// g->IO.MouseWheel));
 
 	// Embedded default size
-	// Shrink from top down, by default it's reverse because windows are renderd from
-	// the top left.
-	ImVec2 size = ImVec2(400, ( focused ? 600 : 400 ));
+	// Shrink from top down, by default it's reverse because windows are renderd
+	// from the top left.
+	ImVec2 size = ImVec2(400, (focused ? 600 : 400));
 	ImGui::SetWindowSize(ImVec2(size.x, size.y), ImGuiCond_Always);
 
 	// Set to the bottom right with accommodation for size changes
 	// This only works because we don't have a title bar. Otherwise we'd have
 	// to factor that in as well.
-	ImGui::SetWindowPos(ImVec2(0, g->IO.DisplaySize.y - size.y ), ImGuiCond_Always);
-	//ImGui::SetScrollY( focused ? ImGui::GetScrollY() : (ImGui::GetScrollY() + 200.0f) );
-
+	ImGui::SetWindowPos(ImVec2(0, g->IO.DisplaySize.y - size.y),
+	                    ImGuiCond_Always);
+	// ImGui::SetScrollY( focused ? ImGui::GetScrollY() : (ImGui::GetScrollY() +
+	// 200.0f) );
 
 	ImGui::PushStyleVar(ImGuiStyleVar_Alpha, 1.0f);
 	drawOutputField(ImGuiWindowFlags_NoScrollbar);
 	ImGui::PopStyleVar();
 
+	if (renderFocus)
+	{
+		ImGui::SetKeyboardFocusHere(1);
+		renderFocus = false;
+	}
 
-	if (renderFocus) { ImGui::SetKeyboardFocusHere(1); renderFocus=false; }
 	drawInputField();
 
 	end();
