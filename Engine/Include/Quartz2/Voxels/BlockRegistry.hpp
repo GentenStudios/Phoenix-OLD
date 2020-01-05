@@ -33,7 +33,6 @@
 #include <Quartz2/Voxels/TextureRegistry.hpp>
 
 #include <vector>
-#include <unordered_map>
 
 namespace q2
 {
@@ -51,6 +50,12 @@ namespace q2
 			TextureRegistry* getTextures();
 			
 		private:
+			// NOTE: We used to use an std::list to prevent invalidating any
+			// pointers, however, since all blocks will be registered in ONE go
+			// from a Lua initialisation, these pointers will not be invalidated
+			// for their whole lifetime, until the block registry is destroyed -
+			// but that will be quite late in the destruction of the program so
+			// this *shouldn't* be an issue. - @beeperdeeper089
 			std::vector<BlockType> m_blocks;
 			TextureRegistry        m_textures;
 		};

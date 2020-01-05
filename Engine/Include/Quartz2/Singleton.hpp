@@ -34,7 +34,7 @@ namespace q2
 	class Singleton
 	{
 	public:
-		static T* get()
+		static T* instance()
 		{
 			static T instance;
 			return &instance;

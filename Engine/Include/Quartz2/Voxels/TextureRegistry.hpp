@@ -28,8 +28,8 @@
 
 #pragma once
 
-#include <unordered_set>
 #include <string>
+#include <unordered_set>
 
 namespace q2
 {
@@ -38,10 +38,23 @@ namespace q2
 		class TextureRegistry
 		{
 		public:
-			void addTexture(const std::string& texture);
-			const std::vector<std::string> getTextures();
+			void                     addTexture(const std::string& texture);
+			std::vector<std::string> getTextures();
 
 		private:
+			// NOTE: We could have used an std::vector in this case (as done in
+			// the BlockRegistry)
+			// 
+			// if (std::find(m_textures.begin(), m_textures.end(), texture) == m_textures.end())
+			// {
+			//   m_textures.push_back(texture);
+			// }
+			// 
+			// Here we are performing a search every time we insert an element,
+			// so each one by itself is upto O(N) complexity, resulting in an
+			// O(N*N) complexity overall. However, std::unordered_set has a
+			// constant time look-up, giving the overall ~O(N) complexity.
+			// - @beeperdeeper089
 			std::unordered_set<std::string> m_textures;
 		};
 	} // namespace voxels
