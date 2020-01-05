@@ -144,10 +144,6 @@ protected:
 	virtual void onFrame(float dt)
 	{
 		static bool wireframe = false;
-		ImVec2 viewportSize = ImVec2(
-			static_cast<float>(getWindowWidth()),
-			static_cast<float>(getWindowHeight())
-		);
 
 		m_camera->tick(dt, getSDLWindow());
 

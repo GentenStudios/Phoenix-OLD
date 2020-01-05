@@ -83,7 +83,6 @@ void ChatWindow::drawEx(bool* p_open, ImGuiWindowFlags flags)
 	      ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings |
 	          ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoMove |
 	          ImGuiWindowFlags_NoBringToFrontOnFocus | flags);
-	ImGuiWindow* window = ImGui::GetCurrentWindow();
 	focused = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows);
 
 	// if we're focused anywhere within the window this captures the mouse

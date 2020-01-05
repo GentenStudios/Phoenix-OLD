@@ -57,7 +57,7 @@ namespace q2
 		protected:
 			const char*            rootWindowName;
 			const ImGuiWindowFlags defaultFlags = ImGuiWindowFlags_None;
-			ImOOGuiWindow(const char* name) { rootWindowName = name; };
+			explicit ImOOGuiWindow(const char* name) { rootWindowName = name; };
 
 		public:
 			inline void begin(bool* p_open, ImGuiWindowFlags flags)
@@ -106,8 +106,8 @@ namespace q2
 			// operation. It may also remove the necessity of the flush call
 			// period.
 			int targetOutputSize;
-			std::string
-			            cache; // display cache (perhaps should rename to OutputBuffer)
+			// display cache (perhaps should rename to OutputBuffer)
+			std::string cache;
 			std::string inputBuffer;
 
 		protected:
@@ -124,7 +124,7 @@ namespace q2
 			std::ostringstream cout;
 
 			inline BasicTerminal(const char* name, int outputKiloBytes,
-			                     std::string initialContents)
+			                     const char* initialContents)
 			    : ImOOGuiWindow(name)
 			{
 				outputWindowName = std::string(name).append("_Output").c_str();
