@@ -1,5 +1,7 @@
 project(Sandbox)
 
+add_subdirectory(Assets)
+
 set(Source ${CMAKE_CURRENT_LIST_DIR})
 
 add_executable(${PROJECT_NAME}
@@ -13,5 +15,4 @@ target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_LIST_DIR}/../
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_LIST_DIR})
 target_link_libraries(${PROJECT_NAME} Engine)
 
-execute_process (COMMAND
-	${CMAKE_COMMAND} -E create_symlink ${CMAKE_CURRENT_LIST_DIR}/Assets ${PROJECT_BINARY_DIR}/Assets)
+add_dependencies(${PROJECT_NAME} SandboxAssets)
