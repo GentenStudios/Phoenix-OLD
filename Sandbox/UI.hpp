@@ -35,20 +35,35 @@ namespace UI {
 	class ChatWindow : public q2::ImGuiHelpers::BasicTerminal
 	{
 		protected:
+			// I was thinking this would be inherited and the other class
+			// would be able to grab it outright but appearently not. Besides, it's
+			// not like the code would look any better as a result. While I could
+			// use a singleton to achive this on an inheritance basis by abusing
+			// the runtime checking employed by "virtual" I doubt this is a feature
+			// anyone wants so I'm leaving it like it is for now with the
+			// variable being passed as an argument to the begin function within
+			// this classes draw function.
 			static const ImGuiWindowFlags defaultFlags = ImGuiWindowFlags(
-				ImGuiWindowFlags_NoScrollbar |
-				ImGuiWindowFlags_NoScrollWithMouse |
+				// Handled by NoDecoration
+				// ImGuiWindowFlags_NoCollapse |
+				// ImGuiWindowFlags_NoResize |
+				// ImGuiWindowFlags_NoTitleBar |
+				// ImGuiWindowFlags_NoScrollbar |
+				ImGuiWindowFlags_NoDecoration |
 				ImGuiWindowFlags_NoSavedSettings |
-				ImGuiWindowFlags_NoResize |
-				ImGuiWindowFlags_NoTitleBar |
-				ImGuiWindowFlags_NoScrollbar |
-				ImGuiWindowFlags_NoCollapse |
-				ImGuiWindowFlags_NoMove
+
+				// because we override the default behavior for these settings
+				ImGuiWindowFlags_NoScrollWithMouse |
+				ImGuiWindowFlags_NoMove |
+				ImGuiWindowFlags_NoBringToFrontOnFocus
 			);
 
 			float unselectedTransparency = 0.3f;
+			bool renderFocus = false;
 		public:
 			using BasicTerminal::BasicTerminal;
-			void drawEx(ImVec2* size, bool* p_open, ImGuiWindowFlags flags);
+			inline void focus(){renderFocus=true;}; // external focus events.
+			void drawEx(bool* p_open, ImGuiWindowFlags flags);
+
 	};
 };

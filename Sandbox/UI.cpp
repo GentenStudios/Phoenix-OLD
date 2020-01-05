@@ -28,6 +28,7 @@
 
 // Externals
 #include <imgui.h>
+#include <imgui_internal.h>
 
 // Internals
 #include <Quartz2/Quartz.hpp>
@@ -39,8 +40,27 @@
 using namespace UI;
 
 
-void ChatWindow::drawEx(ImVec2* size, bool* p_open, ImGuiWindowFlags extra_flags)
+// hacked from the ImGui source
+static const float WINDOWS_MOUSE_WHEEL_SCROLL_LOCK_TIMER = 2.00f;
+void ForceUpdateMouseWheel()
 {
+    ImGuiContext* g = ImGui::GetCurrentContext();
+
+    // Reset the locked window if we move the mouse or after the timer elapses
+    if (g->WheelingWindow != NULL)
+    {
+        g->WheelingWindowTimer -= g->IO.DeltaTime;
+        if (g->WheelingWindowTimer <= 0.0f)
+        {
+            g->WheelingWindow = NULL;
+            g->WheelingWindowTimer = 0.0f;
+        }
+    }
+}
+
+void ChatWindow::drawEx(bool* p_open, ImGuiWindowFlags flags)
+{
+	ImGuiContext* g = ImGui::GetCurrentContext();
 	static bool focused;
 
 	/***
@@ -57,22 +77,53 @@ void ChatWindow::drawEx(ImVec2* size, bool* p_open, ImGuiWindowFlags extra_flags
 	ImGui::PushStyleColor(ImGuiCol_FrameBg, IM_COL32(90,10,90,255));
 
 	// Window Definition
-	begin(NULL, p_open, currentFlags | extra_flags); //just in case
+	begin(p_open, defaultFlags | flags);
+	ImGuiWindow* window = ImGui::GetCurrentWindow();
 	focused = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows);
 
-	// embedded default size
-	ImVec2 s = (size != NULL) ? (*size) : ImVec2(400, 600);
-	ImGui::SetWindowSize(ImVec2(s.x, ( focused ? s.y : (s.y - 200.0f) )), ImGuiCond_Always);
+	// if we're focused anywhere within the window this captures the mouse
+	// wheeling / scroll feature. Without this no scrolling happens unless
+	// the mouse is hovering over the window.
+	// NOTE:
+	//   This is what I have so far, it's not working obviously.
+	//   I looked all over the ImGui source and couldn't find much else.
+	//   There has to be a way to capture the MouseWheel when it's not
+	//   hovering over the target window.
+	// TODO:
+	//   Make this work. Please lol. I'm tired of working on it.
+	//
+	// if (focused)
+	// {
+	// 	g->WheelingWindow = window;
+	// 	g->WheelingWindowRefMousePos = g->IO.MousePos;
+  // 	g->WheelingWindowTimer = WINDOWS_MOUSE_WHEEL_SCROLL_LOCK_TIMER;
+	// }
+	// ForceUpdateMouseWheel();
+	// if (focused && (g->IO.MouseWheel < 0.0f))
+	// 	ImGui::SetScrollY(ImGui::GetScrollY() - ( ImGui::GetFontSize() * g->IO.MouseWheel));
+	// if (focused && (g->IO.MouseWheel > 0.0f))
+	// 	ImGui::SetScrollY(ImGui::GetScrollY() + ( ImGui::GetFontSize() * g->IO.MouseWheel));
+
+
+	// Embedded default size
 	// Shrink from top down, by default it's reverse because windows are renderd from
 	// the top left.
-	if (pos != NULL)
-		ImGui::SetWindowPos(ImVec2(pos->x, (focused ? pos->y : (pos->y + 200.0f) )), ImGuiCond_Always);
+	ImVec2 size = ImVec2(400, ( focused ? 600 : 400 ));
+	ImGui::SetWindowSize(ImVec2(size.x, size.y), ImGuiCond_Always);
+
+	// Set to the bottom right with accommodation for size changes
+	// This only works because we don't have a title bar. Otherwise we'd have
+	// to factor that in as well.
+	ImGui::SetWindowPos(ImVec2(0, g->IO.DisplaySize.y - size.y ), ImGuiCond_Always);
+	//ImGui::SetScrollY( focused ? ImGui::GetScrollY() : (ImGui::GetScrollY() + 200.0f) );
 
 
 	ImGui::PushStyleVar(ImGuiStyleVar_Alpha, 1.0f);
-	drawOutputField();
+	drawOutputField(ImGuiWindowFlags_None);
 	ImGui::PopStyleVar();
 
+
+	if (renderFocus) { ImGui::SetKeyboardFocusHere(1); renderFocus=false; }
 	drawInputField();
 
 	end();

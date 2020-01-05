@@ -36,9 +36,11 @@
 #pragma once
 
 #include <imgui.h>
+#include <imgui_internal.h>
 
 #include <vector>
 #include <string>
+#include <iostream>
 #include <sstream>
 
 
@@ -52,52 +54,86 @@ namespace q2 {
 		class ImOOGuiWindow {
 			protected:
 				const char* rootWindowName;
-				static const ImGuiWindowFlags defaultFlags = ImGuiWindowFlags_None;
-				inline ImOOGuiBase(const char* name){ rootWindowName = name; };
+				const ImGuiWindowFlags defaultFlags = ImGuiWindowFlags_None;
+				ImOOGuiWindow(const char* name){ rootWindowName = name; };
 
 			public:
-				inline void begin(ImVec2 *size, bool* p_open, ImGuiWindowFlags flags)
-					{ ImGui::Begin(rootWindowName, *size, *p_open, flags); }
+				inline void begin(bool* p_open, ImGuiWindowFlags flags)
+					{ ImGui::Begin(rootWindowName, p_open, flags); }
 				inline void end(){ ImGui::End(); }
+
 				// NOTE: define overrides in base class for ease of implementation down the road.
+				//       WARNING: This will not work unless the drawEx funcion is virtual for runtime
+				//                inheritance checking purposes. Otherwise it will always point to
+				//                this classes unused version.
+				//
 				// TODO: vertical shrink with templates
-				inline void draw(ImVec2 size){ drawEx(&size, NULL, ImGuiWindowFlags_None); };
-				inline void draw(ImVec2 size, bool* p_open){ drawEx(&size, p_open, ImGuiWindowFlags_None); };
-				inline void draw(ImVec2 size, ImGuiWindowFlags flags){ drawEx(&size, NULL, flags); };
+				inline void draw(){ drawEx(NULL, ImGuiWindowFlags_None); };
+				inline void draw(bool* p_open){ drawEx(p_open, ImGuiWindowFlags_None); };
+				inline void draw(bool* p_open, ImGuiWindowFlags flags){ drawEx(p_open, flags); };
 
 
-				virtual void drawEx(ImVec2* size, bool* p_open, ImGuiWindowFlags flags);
+				virtual inline void drawEx(bool* p_open, ImGuiWindowFlags flags){ /*TODO: throw error must override */ };
 		};
 
 		class BasicTerminal : public ImOOGuiWindow
 		{
+			private:
+				// Because we don't currently have a C++ standard facility for
+				// piping output into a statically allocated string or string_view.
+				// May want to investigate a change here if we upgrade to C++20
+				void flush();
+				// For spliting GPU logic from CPU logic. In case no data is pushed
+				// in one frame we can avoid senseless resizes.
+				// When this is eventually made thread-safe and the renderer is set
+				// apart from the game logic, should allow for more than one
+				// buffer push to happen before the end of a frame.
+				// Also, we should investigate deriving a custom std::stringbuf
+				// to get access to the underlying string in our std::ostringstream
+				// instead of copying the damn thing and emptying it for every flush
+				// operation. It may also remove the necessity of the flush call period.
+				int targetOutputSize;
+				std::string cache; // display cache (perhaps should rename to OutputBuffer)
+				std::string inputBuffer;
 			protected:
+				const char* outputWindowName;
 				static const ImGuiWindowFlags defaultFlags = ImGuiWindowFlags(
 					ImGuiWindowFlags_NoScrollbar |
 					ImGuiWindowFlags_NoScrollWithMouse
 				);
-				bool renderFocus; // for when the focus method is invoked
-				//std::string buffer(); // this is the input text buffer for the term
 
-				virtual void drawInputField();
-				virtual void drawOutputField();
+				void drawInputField();
+				void drawOutputField(ImGuiWindowFlags flags);
 			public:
-				std::ostringstream output;
-
-				// NOTE:
-				//   ImGui limitation; The `name` must be used for internal refference ie.
-				//   all widgets are searched via a public hash function. There no current
-				//   way to use the ImGui internal IDs which would be slightly faster.
-				inline BasicTerminal(const char* name)
-					{ ImOOGuiWindow(name); outputWindowName = std::string(_name).append("_Output").c_str(); };
-				inline BasicTerminal(const char* name, std::string initial_contents)
-					{ ImOOGuiWindow(name); outputWindowName = std::string(_name).append("_Output").c_str(); };
+				// append at end mode (basically the same as stdout)
+				std::ostringstream cout;
 
 
-				inline void focus(){ renderFocus = true; };
+				inline BasicTerminal(const char* name, int outputKiloBytes,
+					std::string initialContents) : ImOOGuiWindow (name)
+				{
+					outputWindowName = std::string(name).append("_Output").c_str();
+					targetOutputSize = outputKiloBytes * 1024; // align to kilobytes
+					inputBuffer = std::string("");
+					cache = initialContents;
+					cache.reserve(targetOutputSize);
+					cout = std::ostringstream(std::ios_base::out | std::ios_base::ate);
+				}
 
-				virtual void drawEx(ImVec2* size, bool* p_open, ImGuiWindowFlags flags);
-				virtual void onCommand();
+				inline BasicTerminal(const char* name, int outputKiloBytes) : ImOOGuiWindow (name)
+				{
+					outputWindowName = std::string(name).append("_Output").c_str();
+					targetOutputSize = outputKiloBytes * 1024; // align to kilobytes
+					inputBuffer = std::string("");
+					cache = std::string("");
+					cache.reserve(targetOutputSize);
+					cout = std::ostringstream(std::ios_base::out | std::ios_base::ate);
+				}
+
+				inline ~BasicTerminal(){};
+
+				virtual void drawEx(bool* p_open, ImGuiWindowFlags flags);
+				virtual void onCommand(std::string input);
 		};
 	};
 };

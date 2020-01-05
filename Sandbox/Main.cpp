@@ -3,19 +3,20 @@
 
 #include <imgui.h>
 
+#include <iostream>
 #include <memory>
 #include <string>
 
 using namespace q2;
 
-UI::ChatWindow chat("Chat Window", std::string(
+UI::ChatWindow chat("Chat Window", 5, std::string(
 	// @FutureRuby I know this looks weird but it works.
 	// constant string compile time concatenation is wierd.
 	"Welcome to the Darklight Terminal!\n"
 	"Type something and hit enter to run a command!\n"
 ));
 
-ImGuiHelpers::BasicTerminal term("Test Terminal");
+ImGuiHelpers::BasicTerminal term("Test Terminal", 5);
 
 class PhoenixGame : public Game
 {
@@ -39,11 +40,21 @@ protected:
 				SDL_ShowCursor(!m_camera->isEnabled());
 				return true;
 			}
-			if (e.key.keysym.scancode == SDL_SCANCODE_RETURN)
-			{
-				chat.focus();
-				return true;
-			}
+			// Uncomment to have chat popup every time enter is pressed.
+			// Could probably use integration with @SonosFuer's input system.
+			// if (e.key.keysym.scancode == SDL_SCANCODE_RETURN)
+			// NOTE:
+			//   doing this encurs the wrath of cthulu and you will be cursed to
+			//   oblivion. By which I mean you won't be able to press enter without
+			//   the chat window being focused on period, regardless of other ui
+			//   elements being overlayed. I tryed to make this a non-issue by
+			//   by leaving the ImGuiWindowFlags_NoFocusOnAppearing flag with the
+			//   class definition but it can be a pain when using a second terminal.
+			//
+			// {
+			// 	chat.focus();
+			// 	return true;
+			// }
 		}
 
 		return false;
@@ -155,10 +166,12 @@ protected:
 		ImGui::Text("OpenGL Error %i\n", glGetError());
 		ImGui::End();
 
-		// vertical height adjust the chat window.
-		ImVec2 chatSize = ImVec2(400, 600);
-		chat.draw(chatSize, ImVec2(0, viewportSize.y - chatSize.y));
-		term.draw(ImVec2(400, 600));
+		// Vertical height adjust the chat window... happens in the UI
+		// segment definition because Main function management is hard enough
+		// as it is. Here's to the good time of whomever doesn't have to deal
+		// with 20 extra lines of clutter because of me :D
+		chat.draw();
+		term.draw();
 
 		ImGui::ShowStyleEditor();
 		m_chunkRenderer->render(m_camera.get());
