@@ -26,60 +26,54 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#pragma once
+#include <Quartz2/Voxels/BlockRegistry.hpp>
 
-#include <Quartz2/Vec3.hpp>
+using namespace q2::voxels;
 
-namespace q2
+void BlockRegistry::initialise()
 {
-	/**
-	 * @brief Produces a castable ray for helping find things at
-	 * positions/intervals along the ray.
-	 */
-	class Ray
+	BlockType unknownBlock;
+	unknownBlock.displayName = "Unknown Block";
+	unknownBlock.id          = "core:unknown";
+	unknownBlock.category    = BlockCategory::AIR;
+
+	registerBlock(unknownBlock);
+}
+
+void BlockRegistry::registerBlock(BlockType blockInfo)
+{
+	if (std::find(m_blocks.begin(), m_blocks.end(), blockInfo) ==
+	    m_blocks.end())
 	{
-	public:
-		/**
-		 * @brief Constructs a Ray object.
-		 * @param start The position of the start of the ray.
-		 * @param direction The direction the ray is "traveling" in.
-		 */
-		Ray(const Vec3& start,
-			const Vec3& direction);
+		blockInfo.m_registryID = static_cast<unsigned int>(m_blocks.size());
+		m_blocks.push_back(blockInfo);
 
-		Ray(const Ray& other) = default;
-		~Ray() = default;
+		for (const std::string& tex : blockInfo.textures)
+		{
+			m_textures.addTexture(tex);
+		}
+	}
+}
 
-		/**
-		 * @brief Advances along a ray.
-		 * @param scale The distance to advance along the ray
-		 * @return The new position along the ray.
-		 */
-		Vec3 advance(float scale);
+BlockType* BlockRegistry::getFromID(const std::string& id)
+{
+	auto it = std::find_if(
+	    m_blocks.begin(), m_blocks.end(), [id](const BlockType& block) {
+		    return std::strcmp(block.id.c_str(), id.c_str()) == 0;
+	    });
 
-		/**
-		 * @brief Backtracks (goes backwards) along a ray.
-		 * @param scale The distance to backtrack along the ray.
-		 * @return The new position along the ray.
-		 */
-		Vec3 backtrace(float scale);
+	return it == m_blocks.end() ? getFromRegistryID(0)
+	                            : &(*it); // 0 is always unknown.
+}
 
-		/**
-		 * @brief Gets the current length of the ray.
-		 * @return The length of the ray.
-		 */
-		float getLength() const;
+BlockType* BlockRegistry::getFromRegistryID(std::size_t registryID)
+{
+	if (registryID > m_blocks.size())
+	{
+		return &m_blocks[0];
+	}
 
-		/**
-		 * @brief Gets the current position along the ray.
-		 * @return The current position along the ray
-		 */
-		Vec3 getCurrentPosition() const;
+	return &m_blocks[registryID];
+}
 
-	private:
-		float m_length;
-		Vec3  m_start;
-		Vec3  m_direction;
-		Vec3  m_currentPosition;
-	};
-} // namespace qz
+TextureRegistry* BlockRegistry::getTextures() { return &m_textures; }

@@ -28,56 +28,21 @@
 
 #pragma once
 
-#include <Quartz2/BlocksTextureAtlas.hpp>
-#include <Quartz2/Singleton.hpp>
-#include <list>
-#include <memory>
+#include <unordered_set>
+#include <string>
 
 namespace q2
 {
-	enum EBlockCategory
+	namespace voxels
 	{
-		BLOCK_CATEGORY_AIR,
-		BLOCK_CATEGORY_SOLID,
-		BLOCK_CATEGORY_LIQUID
-	};
-
-	struct BlockType
-	{
-		const char* displayName;
-		const char* id;
-
-		EBlockCategory category;
-
-		struct
+		class TextureRegistry
 		{
-			BlockTextureAtlas::SpriteID top, bottom, left, right, front,
-				back;
+		public:
+			void addTexture(const std::string& texture);
+			const std::vector<std::string> getTextures();
 
-			void setAll(BlockTextureAtlas::SpriteID sprite)
-			{
-				top = bottom = left = right = front = back = sprite;
-			}
-		} textures;
-	};
-
-	class BlockRegistry : public Singleton<BlockRegistry>
-	{
-	public:
-		BlockType* registerBlock(BlockType blockInfo);
-		BlockType* getBlockFromID(const char* id);
-
-		void setAtlas(const std::shared_ptr<BlockTextureAtlas>& atlas);
-
-		BlockTextureAtlas* getAtlas() const
-			{ return m_textureAtlas.get(); }
-
-	private:
-		// This is a std::list as we don't want to invalidate any pointers
-		// when resizing... #todo (bwilks): Maybe use HandleAllocator for
-		// this as well??
-		std::list<BlockType> m_blocks;
-
-		std::shared_ptr<BlockTextureAtlas> m_textureAtlas;
-	};
-}
+		private:
+			std::unordered_set<std::string> m_textures;
+		};
+	} // namespace voxels
+} // namespace q2

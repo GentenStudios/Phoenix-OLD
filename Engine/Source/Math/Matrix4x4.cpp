@@ -26,12 +26,12 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Quartz2/MathUtils.hpp>
-#include <Quartz2/Matrix4x4.hpp>
+#include <Quartz2/Math/MathUtils.hpp>
+#include <Quartz2/Math/Matrix4x4.hpp>
 
 #define INDEX_2D(x, y) x + (y * 4)
 
-using namespace q2;
+using namespace q2::math;
 
 Matrix4x4::Matrix4x4() { setIdentity(); }
 
@@ -194,7 +194,7 @@ Matrix4x4 Matrix4x4::operator*(const float& other)
 	return matrix;
 }
 
-TVec3<float> Matrix4x4::operator*(const Vec3& other)
+detail::Vector3<float> Matrix4x4::operator*(const Vec3& other)
 {
 	const float x = elements[0 + 0 * 4] * other.x +
 	                elements[1 + 0 * 4] * other.y +

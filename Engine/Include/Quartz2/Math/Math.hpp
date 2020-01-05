@@ -26,36 +26,27 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Quartz2/Ray.hpp>
+#pragma once
 
-using namespace q2;
+#include <Quartz2/Math/MathUtils.hpp>
+#include <Quartz2/Math/Matrix4x4.hpp>
+#include <Quartz2/Math/Vec2.hpp>
+#include <Quartz2/Math/Vec3.hpp>
 
-Ray::Ray(const Vec3& start,
-         const Vec3& direction)
-    : m_start(start), m_direction(direction), m_currentPosition(start),
-      m_length(0.f)
+namespace q2
 {
-}
+	namespace math
+	{
+		using vec2  = detail::Vector2<float>;
+		using vec2f = detail::Vector2<float>;
+		using vec2d = detail::Vector2<double>;
+		using vec2i = detail::Vector2<int>;
+		using vec2u = detail::Vector2<unsigned int>;
 
-Vec3 Ray::advance(float scale)
-{
-	m_currentPosition += m_direction * scale;
-	m_length += scale;
-
-	return m_currentPosition;
-}
-
-Vec3 Ray::backtrace(float scale)
-{
-	m_currentPosition -= m_direction * scale;
-	m_length -= scale;
-
-	return m_currentPosition;
-}
-
-float Ray::getLength() const { return m_length; }
-
-Vec3 Ray::getCurrentPosition() const
-{
-	return m_currentPosition;
-}
+		using vec3  = detail::Vector3<float>;
+		using vec3f = detail::Vector3<float>;
+		using vec3d = detail::Vector3<double>;
+		using vec3i = detail::Vector3<int>;
+		using vec3u = detail::Vector3<unsigned int>;
+	} // namespace math
+} // namespace q2

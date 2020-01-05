@@ -28,56 +28,31 @@
 
 #pragma once
 
-#include <Quartz2/Rect.hpp>
+#include <Quartz2/Singleton.hpp>
+#include <Quartz2/Voxels/Block.hpp>
+#include <Quartz2/Voxels/TextureRegistry.hpp>
 
-#include <cstddef>
+#include <vector>
 #include <unordered_map>
-#include <cstring>
 
 namespace q2
 {
-	class BlockTextureAtlas
+	namespace voxels
 	{
-	public:
-		typedef int           SpriteID;
-		const static SpriteID INVALID_SPRITE = -1;
-
-		BlockTextureAtlas(std::size_t spriteWidth,
-			std::size_t spriteHeight);
-		BlockTextureAtlas();
-		~BlockTextureAtlas();
-
-		void addTextureFile(const char* texturefilepath);
-		void patch();
-		void setSpriteWidth(std::size_t w);
-		void setSpriteHeight(std::size_t h);
-
-		std::size_t getSpriteWidth() const { return m_spriteWidth; }
-		std::size_t getSpriteHeight() const { return m_spriteHeight; }
-		SpriteID    getSpriteIDFromFilepath(const char* filepath);
-
-		std::size_t getPatchedTextureWidth() const
+		class BlockRegistry : public Singleton<BlockRegistry>
 		{
-			return m_patchedTextureWidth;
-		}
+		public:
+			void initialise();
+			
+			void registerBlock(BlockType blockInfo);
+			BlockType* getFromID(const std::string& id);
+			BlockType* getFromRegistryID(std::size_t registryID);
 
-		std::size_t getPatchedTextureHeight() const
-		{
-			return m_patchedTextureHeight;
-		}
-
-		unsigned char* getPatchedTextureData() const
-		{
-			return m_patchedTextureData;
-		}
-
-		RectAABB getSpriteFromID(SpriteID spriteId) const;
-
-	private:
-		std::unordered_map<std::string, SpriteID> m_textureIDMap;
-		std::size_t    m_spriteWidth, m_spriteHeight;
-		unsigned char* m_patchedTextureData;
-
-		std::size_t m_patchedTextureWidth, m_patchedTextureHeight;
-	};
-}
+			TextureRegistry* getTextures();
+			
+		private:
+			std::vector<BlockType> m_blocks;
+			TextureRegistry        m_textures;
+		};
+	} // namespace voxels
+} // namespace q2

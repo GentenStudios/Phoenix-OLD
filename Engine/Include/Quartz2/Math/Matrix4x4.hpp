@@ -26,29 +26,52 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Quartz2/BlocksRegistry.hpp>
+#pragma once
 
-#include <algorithm>
+#include <Quartz2/Math/Vector3.hpp>
 
-using namespace q2;
-
-BlockType* BlockRegistry::registerBlock(BlockType blockInfo)
+namespace q2
 {
-	m_blocks.push_back(blockInfo);
-	return &m_blocks.back();
-}
+	namespace math
+	{
+		struct Matrix4x4
+		{
+			using Vec3 = detail::Vector3<float>;
 
-BlockType* BlockRegistry::getBlockFromID(const char* id)
-{
-	auto it = std::find_if(m_blocks.begin(), m_blocks.end(),
-		[id](const BlockType& block) {
-			return std::strcmp(block.id, id) == 0;
-		});
+			float elements[16];
 
-	return it == m_blocks.end() ? nullptr : &(*it);
-}
+			Matrix4x4();
 
-void BlockRegistry::setAtlas(const std::shared_ptr<BlockTextureAtlas>& atlas)
-{
-	m_textureAtlas = atlas;
-}
+			Matrix4x4(float m00, float m10, float m20, float m30, float m01,
+			          float m11, float m21, float m31, float m02, float m12,
+			          float m22, float m32, float m03, float m13, float m23,
+			          float m33);
+
+			void setIdentity();
+
+			~Matrix4x4() = default;
+
+			static Matrix4x4 perspective(const float& aspectRatio,
+			                             const float& fieldOfView,
+			                             const float& farPlane,
+			                             const float& nearPlane);
+
+			static Matrix4x4 ortho(float left, float right, float top,
+			                       float bottom, float farPlane,
+			                       float nearPlane);
+
+			static Matrix4x4 lookAt(const Vec3& eyePos, const Vec3& centre,
+			                        const Vec3& up);
+
+			void operator*=(const Matrix4x4& other);
+
+			Matrix4x4 operator*(const Matrix4x4& other) const;
+
+			void operator*=(const float& other);
+
+			Matrix4x4 operator*(const float& other);
+
+			Vec3 operator*(const Vec3& other);
+		};
+	} // namespace math
+} // namespace q2
