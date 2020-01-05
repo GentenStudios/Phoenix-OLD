@@ -56,7 +56,6 @@ namespace q2
 		{
 		protected:
 			const char*            rootWindowName;
-			const ImGuiWindowFlags defaultFlags = ImGuiWindowFlags_None;
 			explicit ImOOGuiWindow(const char* name) { rootWindowName = name; };
 
 		public:
@@ -112,6 +111,11 @@ namespace q2
 
 		protected:
 			const char*                   outputWindowName;
+			// TODO:
+			//   Maybe use a damn singleton at this point because I'm so
+			//   monumentally frustrated with Codacy. Die in a fire you
+			//   monstrosity operating under Sonos' name. why I ought ta'
+			//   smack ya up one real good! Humbug!
 			static const ImGuiWindowFlags defaultFlags =
 			    ImGuiWindowFlags(ImGuiWindowFlags_NoScrollbar |
 			                     ImGuiWindowFlags_NoScrollWithMouse);

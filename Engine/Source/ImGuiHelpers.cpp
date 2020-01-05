@@ -299,7 +299,7 @@ void BasicTerminal::drawOutputField(ImGuiWindowFlags flags)
 inline void BasicTerminal::drawEx(bool* p_open, ImGuiWindowFlags extra_flags)
 {
 	// Window Definition (remember to use the terminal class' begin)
-	begin(p_open, extra_flags);
+	begin(p_open, defaultFlags | extra_flags);
 	drawOutputField(ImGuiWindowFlags_None);
 	drawInputField();
 	end();
