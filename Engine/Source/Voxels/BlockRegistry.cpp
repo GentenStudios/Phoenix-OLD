@@ -28,6 +28,8 @@
 
 #include <Quartz2/Voxels/BlockRegistry.hpp>
 
+#include <cstring>
+
 using namespace q2::voxels;
 
 void BlockRegistry::initialise()

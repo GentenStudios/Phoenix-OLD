@@ -103,13 +103,13 @@ namespace q2
 
 				void floor()
 				{
-					std::floor(x);
-					std::floor(y);
+					x = std::floor(x);
+					y = std::floor(y);
 				}
 				void ceil()
 				{
-					std::ceil(x);
-					std::ceil(y);
+					x = std::ceil(x);
+					y = std::ceil(y);
 				}
 
 				bool operator==(const Vector2& rhs) const

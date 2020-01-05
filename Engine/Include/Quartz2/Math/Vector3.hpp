@@ -112,15 +112,15 @@ namespace q2
 
 				void floor()
 				{
-					std::floor(x);
-					std::floor(y);
-					std::floor(z);
+					x = std::floor(x);
+					y = std::floor(y);
+					z = std::floor(z);
 				}
 				void ceil()
 				{
-					std::ceil(x);
-					std::ceil(y);
-					std::ceil(z);
+					x = std::ceil(x);
+					y = std::ceil(y);
+					z = std::ceil(z);
 				}
 
 				void normalize()
