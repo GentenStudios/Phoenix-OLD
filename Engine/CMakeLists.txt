@@ -36,11 +36,8 @@ add_library(${PROJECT_NAME}
 	${Headers}/BlocksTextureAtlas.hpp
 	${Headers}/BlocksRegistry.hpp
 	${Headers}/Singleton.hpp
-<<<<<<< HEAD
 	${Headers}/ContentLoader.hpp
-=======
 	${Headers}/Settings.hpp
->>>>>>> 71c9733c610359224b080dc08ca7b6e8a21a1a05
 
 	${Source}/Matrix4x4.cpp
 	${Source}/Ray.cpp
@@ -54,11 +51,8 @@ add_library(${PROJECT_NAME}
 	${Source}/Mesh.cpp
 	${Source}/BlocksTextureAtlas.cpp
 	${Source}/BlocksRegistry.cpp
-<<<<<<< HEAD
 	${Source}/ContentLoader.cpp
-=======
 	${Source}/Settings.cpp
->>>>>>> 71c9733c610359224b080dc08ca7b6e8a21a1a05
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${Headers}/../)
