@@ -28,10 +28,14 @@
 
 #pragma once
 
+#include <Quartz2/Events/Event.hpp>
+#include <Quartz2/Events/IEventListener.hpp>
 #include <Quartz2/Math/Math.hpp>
 
 #include <SDL.h>
+
 #include <functional>
+#include <vector>
 
 namespace q2
 {
@@ -60,7 +64,6 @@ namespace q2
 			void startFrame();
 			void endFrame();
 
-
 			void show() const;
 			void hide() const;
 			void maximize() const;
@@ -68,9 +71,9 @@ namespace q2
 			void focus() const;
 			void close();
 
-			void    resize(math::vec2i size);
+			void        resize(math::vec2i size);
 			math::vec2i getSize() const;
-			void    setResizable(bool enabled);
+			void        setResizable(bool enabled);
 
 			void setVSync(bool enabled);
 			bool isVSync() const;
@@ -80,12 +83,12 @@ namespace q2
 			void setFullscreen(bool enabled);
 			bool isFullscreen() const;
 
+			void registerEventListener(events::IEventListener* listener);
+			void nullifyEventListener(events::IEventListener* listener);
+			bool isKeyDown(events::Keys key) const;
 
-			// void registerEventListener(events::IEventListener* listener);
-			//bool    isKeyDown(events::Keys key) const;
-
-			void    setCursorState(gfx::CursorState state);
-			void    setCursorPosition(math::vec2i pos);
+			void        setCursorState(gfx::CursorState state);
+			void        setCursorPosition(math::vec2i pos);
 			math::vec2i getCursorPosition() const;
 
 		private:
@@ -100,7 +103,8 @@ namespace q2
 			math::vec2i m_cachedScreenSize;
 
 		private:
-			// void dispatchToListeners(events::Event& event);
+			void dispatchToListeners(events::Event& event);
+			std::vector<events::IEventListener*> m_eventListeners;
 		};
 	} // namespace gfx
 } // namespace q2

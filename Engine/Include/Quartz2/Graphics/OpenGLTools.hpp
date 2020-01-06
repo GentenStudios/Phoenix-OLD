@@ -34,6 +34,7 @@
 
 #include <iostream>
 #include <string>
+#include <sstream>
 
 #ifdef ENGINE_DEBUG
 #	define GLCheck(x) \
@@ -50,7 +51,7 @@
 // Uncomment this in order to enable detailed OpenGL logging
 #define OPENGL_DIAGNOSTICS_ENABLED
 
-namespace qz
+namespace q2
 {
 	namespace gfx
 	{
@@ -138,32 +139,24 @@ namespace qz
 			(void) length;
 			(void) userParam;
 
-			using namespace qz::utils;
-
 			std::stringstream subCategories;
-			LogVerbosity      verb;
 
 			switch (severity)
 			{
 			case GL_DEBUG_SEVERITY_HIGH:
 				subCategories << "[HIGH SEVERITY]";
-				verb = LogVerbosity::FATAL;
 				break;
 			case GL_DEBUG_SEVERITY_MEDIUM:
 				subCategories << "[MEDIUM SEVERITY]";
-				verb = LogVerbosity::WARNING;
 				break;
 			case GL_DEBUG_SEVERITY_LOW:
 				subCategories << "[LOW SEVERITY]";
-				verb = LogVerbosity::WARNING;
 				break;
 			case GL_DEBUG_SEVERITY_NOTIFICATION:
 				subCategories << "[NOTIFICATION]";
-				verb = LogVerbosity::DEBUG;
 				break;
 			default:
 				subCategories << "[UNKNOWN]";
-				verb = LogVerbosity::FATAL;
 				break; // Something is seriously wrong.
 			}
 
