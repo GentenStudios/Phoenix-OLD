@@ -40,6 +40,8 @@ using namespace gfx;
 
 Window::Window(const std::string& title, int width, int height)
 {
+	SDL_SetMainReady(); // because we've defined SDL_MAIN_HANDLED, we want SDL
+	                    // to know our main function is perfectly capable.
 	SDL_Init(SDL_INIT_EVERYTHING);
 
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);

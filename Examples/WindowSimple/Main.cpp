@@ -49,6 +49,8 @@ private:
 	q2::gfx::Window* m_window;
 };
 
+// SDL defines main like the poopoo it is.
+#undef main
 int main(int argc, char* argv[])
 {
 	Game* app = new Game();
