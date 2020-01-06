@@ -40,7 +40,10 @@ Mod::Mod(std::string name) : name(std::move(name))
 {
 	std::fstream fileStream;
 	fileStream.open("Modules/" + name + "/dependencies.txt");
-	std::assert(!filestream.is_open());
+	if(!fileStream.is_open()){
+		std::cout << "Couldnt find dependencies file for mod: " << name;
+		return;	
+	}
 	while (fileStream.peek() != EOF)
 	{
 		std::string input;
@@ -57,7 +60,10 @@ bool modules::loadModules(std::string save, sol::state& lua)
 	std::queue<Mod> toLoad; // A queue of mods that need loaded
 
 	fileStream.open("Save/" + save + "/mods.txt");
-	std::assert(!filestream.is_open());
+	if(!fileStream.is_open()){
+		std::cout << "Error opening save file";
+		return false;	
+	}
 	int i = 0;
 	while (fileStream.peek() != EOF)
 	{
@@ -95,6 +101,7 @@ bool modules::loadModules(std::string save, sol::state& lua)
 			// list Otherwise, move mod to back of load queue
 			if (satisfied)
 			{
+				std::filesystem::exists("modules/" + mod.name + "/init.lua");
 				lua.script_file("modules/" + mod.name + "/init.lua");
 				loadedMods.push_back(mod.name);
 			}
@@ -121,9 +128,8 @@ bool modules::loadModules(std::string save, sol::state& lua)
 			{
 				std::cout << "- " + loadedMods[i] + "\n";
 			}
-			std::assert(true);
+			return false;
 		}
 	}
-
 	return true;
 }
