@@ -35,12 +35,12 @@
 
 using namespace q2;
 
-Mod::Mod(std::string name) : name(std::move(name))
+Mod::Mod(std::string modName) : name(std::move(modName))
 {
 	std::fstream fileStream;
 	fileStream.open("Modules/" + name + "/dependencies.txt");
 	if(!fileStream.is_open()){
-		std::cout << "Couldnt find dependencies file for mod: " << name;
+		std::cout << "Couldnt find dependencies file for mod: " << name << "\n";
 		return;	
 	}
 	while (fileStream.peek() != EOF)
@@ -101,7 +101,7 @@ bool modules::loadModules(std::string save, sol::state& lua)
 			if (satisfied)
 			{
 				std::filesystem::exists("modules/" + mod.name + "/init.lua");
-				//lua.script_file("modules/" + mod.name + "/init.lua");
+				lua.script_file("modules/" + mod.name + "/init.lua");
 				loadedMods.push_back(mod.name);
 			}
 			else

@@ -36,6 +36,7 @@ protected:
 	virtual void onStart()
 	{
 		sol::state lua;
+		lua.open_libraries(sol::lib::base);
 		bool loadedLua = modules::loadModules("save1", lua);
 		if (!loadedLua){
 			exitGame();
