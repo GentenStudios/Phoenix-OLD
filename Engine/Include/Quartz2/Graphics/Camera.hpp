@@ -28,57 +28,56 @@
 
 #pragma once
 
-#include <Quartz2/Math/Vector3.hpp>
+#include <Quartz2/Math/Math.hpp>
+#include <Quartz2/Graphics/Window.hpp>
+
+#include <SDL.h>
+
+#include <functional>
+#include <vector>
 
 namespace q2
 {
-	namespace math
+	namespace gfx
 	{
-		namespace detail
+		/**
+		 * @brief Base Camera class following basic FPS Cam principles.
+		 *
+		 * The camera functions as a basic tool for moving around in a 3D
+		 * rendered world. This uses the "tick" function on every iteration of
+		 * the main game loop to determine movement from the user.
+		 */
+		class FPSCamera
 		{
-			struct Matrix4x4
-			{
-				using Vec3 = detail::Vector3<float>;
+		public:
+			explicit FPSCamera(Window* window);
 
-				float elements[16];
+			math::vec3 getPosition() const;
+			math::vec3 getDirection() const;
+			void setProjection(const math::mat4& projection);
+			math::mat4 getProjection() const;
+			math::mat4 calculateViewMatrix() const;
 
-				Matrix4x4();
+			void tick(float dt);
 
-				// this is just because the matrix is 4x4 and it's so much nicer
-				// to read like this...
-				// clang-format off
-				Matrix4x4::Matrix4x4(float m00, float m10, float m20, float m30,
-									 float m01, float m11, float m21, float m31,
-									 float m02, float m12, float m22, float m32,
-									 float m03, float m13, float m23, float m33);
-				// clang-format on
+			void enable(bool enabled);
+			bool isEnabled() const { return m_enabled; }
 
-				void setIdentity();
+			void onEvent(events::Event e);
 
-				~Matrix4x4() = default;
+		private:
+			Window* m_window;
 
-				static Matrix4x4 perspective(const float& aspectRatio,
-				                             const float& fieldOfView,
-				                             const float& farPlane,
-				                             const float& nearPlane);
+			math::mat4 m_projection;
 
-				static Matrix4x4 ortho(float left, float right, float top,
-				                       float bottom, float farPlane,
-				                       float nearPlane);
+			math::vec3 m_rotation;
+			math::vec3 m_position;
+			math::vec3 m_up;
+			math::vec3 m_direction;
 
-				static Matrix4x4 lookAt(const Vec3& eyePos, const Vec3& centre,
-				                        const Vec3& up);
+			math::vec2 m_windowCentre;
 
-				void operator*=(const Matrix4x4& other);
-
-				Matrix4x4 operator*(const Matrix4x4& other) const;
-
-				void operator*=(const float& other);
-
-				Matrix4x4 operator*(const float& other);
-
-				Vec3 operator*(const Vec3& other);
-			};
-		} // namespace detail
-	}     // namespace math
+			bool m_enabled = true;
+		};
+	} // namespace gfx
 } // namespace q2

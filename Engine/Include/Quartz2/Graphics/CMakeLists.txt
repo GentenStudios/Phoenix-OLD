@@ -3,5 +3,9 @@ set(graphicsHeaders
 	${currentDir}/OpenGLTools.hpp
 	${currentDir}/Window.hpp
 
+	${currentDir}/Camera.hpp
+
+	${currentDir}/ChunkRenderer.hpp
+
 	PARENT_SCOPE
 )

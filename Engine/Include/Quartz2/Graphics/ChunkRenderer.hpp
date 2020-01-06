@@ -28,57 +28,53 @@
 
 #pragma once
 
-#include <Quartz2/Math/Vector3.hpp>
+#include <Quartz2/Events/Event.hpp>
+#include <Quartz2/Events/IEventListener.hpp>
+#include <Quartz2/Math/Math.hpp>
+
+#include <SDL.h>
+
+#include <functional>
+#include <vector>
 
 namespace q2
 {
-	namespace math
+	namespace gfx
 	{
-		namespace detail
+		struct ChunkMesh
+		{		
+			std::vector<math::vec3> vertices;
+			std::vector<math::vec3> normals;
+			std::vector<math::vec2> uvs;
+			std::vector<int>        tex;
+		};
+
+		// NOTE: (mainly to self - @beeperdeeper089)
+		// All blocks must be loaded in before the texture array is generated.
+		// Once the texture array is generated, no new blocks should be loaded
+		// AT ALL. This will require a rebuild of the array and I'm not going to
+		// build that functionality in until we need it, since we're using
+		// OpenGL 3.3 which only supports a *minimum of 256*, giving us not that
+		// much space to work with as of right now. Currently we will impose a
+		// hard limit of 256 textures, and once we overcome that issue, we can
+		// revise this documentation.
+		class ChunkRenderer
 		{
-			struct Matrix4x4
-			{
-				using Vec3 = detail::Vector3<float>;
+		public:
+			ChunkRenderer();
+			~ChunkRenderer();
 
-				float elements[16];
+			void buildTextureArray();
 
-				Matrix4x4();
+			// returns unique chunk mesh id. Used to set the render list.
+			int submitChunkMesh();
 
-				// this is just because the matrix is 4x4 and it's so much nicer
-				// to read like this...
-				// clang-format off
-				Matrix4x4::Matrix4x4(float m00, float m10, float m20, float m30,
-									 float m01, float m11, float m21, float m31,
-									 float m02, float m12, float m22, float m32,
-									 float m03, float m13, float m23, float m33);
-				// clang-format on
+			void setRenderList();
 
-				void setIdentity();
+			void render();
 
-				~Matrix4x4() = default;
-
-				static Matrix4x4 perspective(const float& aspectRatio,
-				                             const float& fieldOfView,
-				                             const float& farPlane,
-				                             const float& nearPlane);
-
-				static Matrix4x4 ortho(float left, float right, float top,
-				                       float bottom, float farPlane,
-				                       float nearPlane);
-
-				static Matrix4x4 lookAt(const Vec3& eyePos, const Vec3& centre,
-				                        const Vec3& up);
-
-				void operator*=(const Matrix4x4& other);
-
-				Matrix4x4 operator*(const Matrix4x4& other) const;
-
-				void operator*=(const float& other);
-
-				Matrix4x4 operator*(const float& other);
-
-				Vec3 operator*(const Vec3& other);
-			};
-		} // namespace detail
-	}     // namespace math
+		private:
+			
+		};
+	} // namespace gfx
 } // namespace q2

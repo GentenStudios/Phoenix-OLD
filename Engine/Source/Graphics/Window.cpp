@@ -60,7 +60,7 @@ Window::Window(const std::string& title, int width, int height)
 
 	m_window = SDL_CreateWindow(title.c_str(), SDL_WINDOWPOS_CENTERED,
 	                            SDL_WINDOWPOS_CENTERED, width, height,
-	                            SDL_WINDOW_OPENGL);
+	                            SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
 	if (m_window == nullptr)
 	{
 		SDL_Quit();
@@ -101,6 +101,8 @@ Window::Window(const std::string& title, int width, int height)
 	GLCheck(glEnable(GL_MULTISAMPLE));
 
 	m_running = true;
+
+	SDL_SetRelativeMouseMode(SDL_FALSE);
 }
 
 Window::~Window()
@@ -162,11 +164,12 @@ void Window::pollEvents()
 		case SDL_WINDOWEVENT:
 			switch (event.window.event)
 			{
-			case SDL_WINDOWEVENT_RESIZED:
+//			case SDL_WINDOWEVENT_RESIZED: <- we don't want this -> https://wiki.libsdl.org/SDL_WindowEventID
 			case SDL_WINDOWEVENT_SIZE_CHANGED:
 				e.type       = EventType::WINDOW_RESIZED;
 				e.size.width = event.window.data1;
-				e.size.width = event.window.data1;
+				e.size.height = event.window.data2;
+				glViewport(0, 0, e.size.width, e.size.height);
 				dispatchToListeners(e);
 				break;
 			case SDL_WINDOWEVENT_FOCUS_GAINED:
@@ -252,6 +255,7 @@ math::vec2i Window::getSize() const
 
 void Window::setCursorPosition(math::vec2i pos)
 {
+	std::cout << SDL_GetError() << std::endl;
 	SDL_WarpMouseInWindow(m_window, pos.x, pos.y);
 }
 
