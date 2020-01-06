@@ -26,7 +26,6 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-
 #include <filesystem>
 #include <fstream>
 #include <iostream>
@@ -102,7 +101,7 @@ bool modules::loadModules(std::string save, sol::state& lua)
 			if (satisfied)
 			{
 				std::filesystem::exists("modules/" + mod.name + "/init.lua");
-				lua.script_file("modules/" + mod.name + "/init.lua");
+				//lua.script_file("modules/" + mod.name + "/init.lua");
 				loadedMods.push_back(mod.name);
 			}
 			else

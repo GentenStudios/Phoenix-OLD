@@ -36,3 +36,4 @@
 #include <Quartz2/Chunk.hpp>
 #include <Quartz2/VoxelWorld.hpp>
 #include <Quartz2/BlocksTextureAtlas.hpp>
+#include <Quartz2/ContentLoader.hpp>
