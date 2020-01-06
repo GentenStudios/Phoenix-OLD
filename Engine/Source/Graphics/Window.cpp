@@ -217,7 +217,8 @@ bool Window::isRunning() const { return m_running; }
 
 void Window::startFrame()
 {
-	// nothing right now, however there will be later on.
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 }
 
 void Window::endFrame()
