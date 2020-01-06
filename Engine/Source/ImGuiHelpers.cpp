@@ -157,57 +157,6 @@ void BasicTerminal::flush()
 	cout.str(buf);
 }
 
-// Fuck this is going to be annoying to make threadsafe
-void BasicTerminal::drawInputField()
-{
-	ImGuiWindow* window = ImGui::GetCurrentWindow();
-	// InputText is a frame object so we have to use push item width to adjust
-	// it.
-	// TODO: investigate label width changing or outright removal becaouse right
-	//   now we don't have a way to remove it, the data for it is just sitting
-	//   off screen to the right.
-	ImGui::PushItemWidth(ImGui::GetWindowWidth() -
-	                     (window->WindowPadding.x * 2.0f));
-	bool append_line = ImGui::InputText(
-	    "\0",         // make sure we don't have any trailing text to the right.
-	    &inputBuffer, // Our output buffer object.
-
-	    // * These can be used in conjunction for extra functionality *
-	    // NOTE: The Callback doesn't need to be used for line by line input.
-	    ImGuiInputTextFlags(
-	        ImGuiInputTextFlags_EnterReturnsTrue // | // makes append_line true
-	                                             // on enter
-	        // ImGuiInputTextFlags_CallbackCompletion | // callback on tab
-	        // ImGuiInputTextFlags_CallbackHistory | // callback on up/down
-	        // ImGuiInputTextFlags_CallbackAlways // workaround because the
-	        // callback isn't working.
-	        // ImGuiInputTextFlags_AllowTabInput // can't be used with
-	        // cb_completion
-	        ), // << this one I'm not sure about yet.
-	    &callback,
-
-	    NULL // Can be a user data object but unnecessary here.
-	);
-	ImGui::PopItemWidth();
-
-	if (append_line)
-	{
-		// create a copy of the input buffer string to send to our command
-		// capture.
-		onCommand(std::string(inputBuffer));
-		inputBuffer
-		    .clear(); // clear our input buffer && subsequently the text box.
-	}
-
-	// sets the kb focus to the last element drawn (in our case the input box.)
-	// we have to do this because otherwise when we press enter the text box
-	// by default loses focus.
-	if (append_line)
-	{
-		ImGui::SetKeyboardFocusHere(-1);
-	}
-}
-
 // void BasicTerminal::renderText();
 
 // inline void BasicTerminal::drawOutputField()
@@ -297,18 +246,50 @@ void BasicTerminal::drawOutputField(ImGuiWindowFlags flags)
 	ImGui::EndChild();
 }
 
-inline void BasicTerminal::drawEx(bool* p_open, ImGuiWindowFlags extra_flags)
+// Fuck this is going to be annoying to make threadsafe
+void BasicTerminal::drawInputField()
 {
-	// Window Definition (remember to use the terminal class' begin)
-	begin(p_open, defaultFlags | extra_flags);
-	drawOutputField(ImGuiWindowFlags_None);
-	drawInputField();
-	end();
-}
+	ImGuiWindow* window = ImGui::GetCurrentWindow();
+	// InputText is a frame object so we have to use push item width to adjust
+	// it.
+	// TODO: investigate label width changing or outright removal becaouse right
+	//   now we don't have a way to remove it, the data for it is just sitting
+	//   off screen to the right.
+	ImGui::PushItemWidth(ImGui::GetWindowWidth() -
+											 (window->WindowPadding.x * 2.0f));
+	bool append_line = ImGui::InputText(
+			"\0",         // make sure we don't have any trailing text to the right.
+			&inputBuffer, // Our output buffer object.
 
-inline void BasicTerminal::onCommand(std::string input)
-{
-	// raw echo interface
-	cout << inputBuffer << "\n";
-	flush();
+			// * These can be used in conjunction for extra functionality *
+			// NOTE: The Callback doesn't need to be used for line by line input.
+			ImGuiInputTextFlags(
+					// Makes the widget return true on enter.
+					ImGuiInputTextFlags_EnterReturnsTrue
+					// ImGuiInputTextFlags_CallbackCompletion | // callback on tab
+					// ImGuiInputTextFlags_CallbackHistory | // callback on up/down
+
+					// Can't be used with cb_completion
+					// ImGuiInputTextFlags_AllowTabInput
+					),
+			&callback,
+
+			NULL // Can be a user data object but unnecessary here.
+	);
+	ImGui::PopItemWidth();
+
+	if (append_line)
+	{
+		// create a copy of the input buffer string to send to our command
+		// capture.
+		onCommand(std::string(inputBuffer));
+
+		// clear our input buffer && subsequently the text box.
+		inputBuffer.clear();
+
+		// sets the kb focus to the last element drawn (in our case the input box.)
+		// we have to do this because otherwise when we press enter the text box
+		// by default loses focus.
+		ImGui::SetKeyboardFocusHere(-1);
+	}
 }

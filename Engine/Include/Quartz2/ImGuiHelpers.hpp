@@ -55,15 +55,12 @@ namespace q2
 		class ImOOGuiWindow
 		{
 		protected:
-			const char*            rootWindowName;
-			explicit ImOOGuiWindow(const char* name) { rootWindowName = name; };
+			const char* rootWindowName;
+			explicit ImOOGuiWindow(const char* name);
 
 		public:
-			inline void begin(bool* p_open, ImGuiWindowFlags flags)
-			{
-				ImGui::Begin(rootWindowName, p_open, flags);
-			}
-			inline void end() { ImGui::End(); }
+			void begin(bool* p_open, ImGuiWindowFlags flags);
+			void end();
 
 			// NOTE: define overrides in base class for ease of implementation
 			// down the road.
@@ -73,18 +70,10 @@ namespace q2
 			//                always point to this classes unused version.
 			//
 			// TODO: vertical shrink with templates
-			inline void draw() { drawEx(NULL, ImGuiWindowFlags_None); };
-			inline void draw(bool* p_open)
-			{
-				drawEx(p_open, ImGuiWindowFlags_None);
-			};
-			inline void draw(bool* p_open, ImGuiWindowFlags flags)
-			{
-				drawEx(p_open, flags);
-			};
-
-			virtual inline void drawEx(bool* p_open, ImGuiWindowFlags flags) {
-			    /*TODO: throw error must override */};
+			void draw();
+			void draw(bool* p_open);
+			void draw(bool* p_open, ImGuiWindowFlags flags);
+			virtual void drawEx(bool* p_open, ImGuiWindowFlags flags);
 		};
 
 		class BasicTerminal : public ImOOGuiWindow
@@ -110,7 +99,7 @@ namespace q2
 			std::string inputBuffer;
 
 		protected:
-			const char*                   outputWindowName;
+			const char* outputWindowName;
 			// TODO:
 			//   Maybe use a damn singleton at this point because I'm so
 			//   monumentally frustrated with Codacy. Die in a fire you
@@ -127,35 +116,16 @@ namespace q2
 			// append at end mode (basically the same as stdout)
 			std::ostringstream cout;
 
-			inline BasicTerminal(const char* name, int outputKiloBytes,
-			                     const char* initialContents)
-			    : ImOOGuiWindow(name)
-			{
-				outputWindowName = std::string(name).append("_Output").c_str();
-				targetOutputSize = outputKiloBytes * 1024; // align to kilobytes
-				inputBuffer      = std::string("");
-				cache            = initialContents;
-				cache.reserve(targetOutputSize);
-				cout =
-				    std::ostringstream(std::ios_base::out | std::ios_base::ate);
-			}
+			BasicTerminal(const char* name, int outputKiloBytes);
+			BasicTerminal(const char* name, int outputKiloBytes,
+				            const char* initialContents);
 
-			inline BasicTerminal(const char* name, int outputKiloBytes)
-			    : ImOOGuiWindow(name)
-			{
-				outputWindowName = std::string(name).append("_Output").c_str();
-				targetOutputSize = outputKiloBytes * 1024; // align to kilobytes
-				inputBuffer      = std::string("");
-				cache            = std::string("");
-				cache.reserve(targetOutputSize);
-				cout =
-				    std::ostringstream(std::ios_base::out | std::ios_base::ate);
-			}
-
-			inline ~BasicTerminal() {};
+			~BasicTerminal();
 
 			virtual void drawEx(bool* p_open, ImGuiWindowFlags flags);
 			virtual void onCommand(std::string input);
 		};
 	}; // namespace ImGuiHelpers
 };     // namespace q2
+
+#include "ImGuiHelpers.inl"
