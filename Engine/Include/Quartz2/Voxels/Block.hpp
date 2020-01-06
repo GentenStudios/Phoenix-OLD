@@ -88,7 +88,7 @@ namespace q2
 
 			void setAllTextures(const std::string& tex) { textures.fill(tex); }
 
-			int getRegistryID() const { return m_registryID; }
+			std::size_t getRegistryID() const { return m_registryID; }
 
 			bool operator==(const BlockType& rhs) const
 			{
@@ -96,8 +96,15 @@ namespace q2
 			}
 
 		private:
-			unsigned int m_registryID = -1;
+			std::size_t m_registryID = -1;
 			friend class BlockRegistry;
+		};
+
+		struct BlockMetadata
+		{
+			std::string data; // serialised data, we can decide how we wanna do
+			                  // this some other time (just an implementation
+			                  // attempt to stop pains later in life.)
 		};
 	} // namespace voxels
 } // namespace q2

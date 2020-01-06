@@ -29,70 +29,78 @@
 #pragma once
 
 #include <Quartz2/Math/Math.hpp>
-#include <Quartz2/Voxels/Block.hpp>
 
-#include <string>
-#include <vector>
+#include <SDL.h>
+#include <functional>
 
 namespace q2
 {
-	namespace voxels
+	namespace gfx
 	{
-		struct BlockInstance
+		enum class CursorState : int
 		{
-			BlockType*    blockType;
-			BlockMetadata metadata;
+			NORMAL,  /// @brief Sets the cursor back to "normal", visible &
+			         /// controllable, not locked to the window at all.
+			HIDDEN,  /// @brief Hides the cursor, but allows "normal" use.
+			DISABLED /// @brief Disables the cursor, so it isn't visible,
+			         /// currently has the same use as HIDDEN, however they mean
+			         /// different in different windowing libraries.
 		};
 
-		enum class BlockFace : int
-		{
-			FRONT  = 0,
-			LEFT   = 1,
-			BACK   = 2,
-			RIGHT  = 3,
-			TOP    = 4,
-			BOTTOM = 5,
-		};
-
-		class Chunk
+		class Window
 		{
 		public:
-			Chunk() = delete;
-			Chunk(const Chunk& other);
-			Chunk& operator=(const Chunk& other);
-			Chunk(Chunk&& other) noexcept;
-			Chunk& operator=(Chunk&& other) noexcept;
+			Window(const std::string& title, int width, int height);
+			~Window();
 
-			Chunk(math::vec3 chunkPos);
-			~Chunk() = default;
+			void pollEvents();
+			void swapBuffers() const;
 
-			void generateTerrain(unsigned int seed);
-			void buildMesh();
+			bool isRunning() const;
+			void startFrame();
+			void endFrame();
 
-			const math::vec3& getChunkPos() const;
 
-			void breakBlockAt(math::vec3 position, const BlockInstance& block);
-			void placeBlockAt(math::vec3 position, const BlockInstance& block);
+			void show() const;
+			void hide() const;
+			void maximize() const;
+			void minimize() const;
+			void focus() const;
+			void close();
 
-			BlockInstance getBlockAt(math::vec3 position) const;
-			void setBlockAt(math::vec3 position, const BlockInstance& newBlock);
+			void    resize(math::vec2i size);
+			math::vec2i getSize() const;
+			void    setResizable(bool enabled);
 
-			static constexpr int CHUNK_WIDTH  = 16;
-			static constexpr int CHUNK_HEIGHT = 16;
-			static constexpr int CHUNK_DEPTH  = 16;
+			void setVSync(bool enabled);
+			bool isVSync() const;
 
-			static std::size_t getVectorIndex(std::size_t x, std::size_t y,
-			                                  std::size_t z)
-			{
-				return x + CHUNK_WIDTH * (y + CHUNK_HEIGHT * z);
-			}
+			void setTitle(const std::string& title) const;
 
-			void renderBlocks(int* bufferCounter);
+			void setFullscreen(bool enabled);
+			bool isFullscreen() const;
+
+
+			// void registerEventListener(events::IEventListener* listener);
+			//bool    isKeyDown(events::Keys key) const;
+
+			void    setCursorState(gfx::CursorState state);
+			void    setCursorPosition(math::vec2i pos);
+			math::vec2i getCursorPosition() const;
 
 		private:
-			math::vec3                 m_chunkPos;
-			std::vector<BlockType*>    m_chunkBlocks;
-			std::vector<BlockMetadata> m_chunkBlockData;
+			SDL_Window*   m_window;
+			SDL_GLContext m_context;
+
+			bool m_running;
+
+			bool m_vsync;
+			bool m_fullscreen;
+
+			math::vec2i m_cachedScreenSize;
+
+		private:
+			// void dispatchToListeners(events::Event& event);
 		};
-	} // namespace voxels
+	} // namespace gfx
 } // namespace q2

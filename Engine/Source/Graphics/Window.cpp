@@ -26,27 +26,88 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#pragma once
+#include <Quartz2/Graphics/Window.hpp>
 
-#include <Quartz2/Math/MathUtils.hpp>
-#include <Quartz2/Math/Matrix4x4.hpp>
-#include <Quartz2/Math/Vector2.hpp>
-#include <Quartz2/Math/Vector3.hpp>
+using namespace q2;
+using namespace gfx;
 
-namespace q2
+Window::Window(const std::string& title, int width, int height)
 {
-	namespace math
-	{
-		using vec2  = detail::Vector2<float>;
-		using vec2f = detail::Vector2<float>;
-		using vec2d = detail::Vector2<double>;
-		using vec2i = detail::Vector2<int>;
-		using vec2u = detail::Vector2<unsigned int>;
+	
+}
 
-		using vec3  = detail::Vector3<float>;
-		using vec3f = detail::Vector3<float>;
-		using vec3d = detail::Vector3<double>;
-		using vec3i = detail::Vector3<int>;
-		using vec3u = detail::Vector3<unsigned int>;
-	} // namespace math
-} // namespace q2
+Window::~Window()
+{
+}
+
+void Window::pollEvents()
+{
+}
+
+void Window::swapBuffers() const
+{
+}
+
+bool Window::isRunning() const
+{
+}
+
+void Window::startFrame()
+{
+}
+
+void Window::endFrame()
+{
+}
+
+void Window::show() const
+{
+}
+
+void Window::hide() const
+{
+}
+
+void Window::maximize() const
+{
+}
+
+void Window::minimize() const
+{
+}
+
+void Window::focus() const
+{
+}
+
+void Window::close()
+{
+}
+
+void Window::setResizable(bool enabled)
+{
+}
+
+void Window::setVSync(bool enabled)
+{
+}
+
+bool Window::isVSync() const
+{
+}
+
+void Window::setTitle(const std::string& title) const
+{
+}
+
+void Window::setFullscreen(bool enabled)
+{
+}
+
+bool Window::isFullscreen() const
+{
+}
+
+void Window::setCursorState(gfx::CursorState state)
+{
+}

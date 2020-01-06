@@ -49,7 +49,7 @@ void BlockRegistry::registerBlock(BlockType blockInfo)
 	if (std::find(m_blocks.begin(), m_blocks.end(), blockInfo) ==
 	    m_blocks.end())
 	{
-		blockInfo.m_registryID = static_cast<unsigned int>(m_blocks.size());
+		blockInfo.m_registryID = m_blocks.size();
 		m_blocks.push_back(blockInfo);
 
 		if (blockInfo.category != BlockCategory::AIR)
