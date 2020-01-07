@@ -156,7 +156,7 @@ void BasicTerminal::flush()
 }
 
 // NOTE: This inline is okay because it's only used within this file.
-inline void renderText(std::string text)
+inline void renderText(std::string* text)
 {
 	// TODO:
 	//   Implement ANSI escape sequences for color because this is
@@ -234,7 +234,7 @@ void BasicTerminal::drawOutputField(ImGuiWindowFlags flags)
 	               window->TitleBarHeight() - window->MenuBarHeight()),
 	    flags);
 
-	renderText(cache);
+	renderText(*cache);
 
 	ImGui::EndChild();
 }
