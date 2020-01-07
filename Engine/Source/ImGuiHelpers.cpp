@@ -29,8 +29,6 @@
 #include <Quartz2/ImGuiHelpers.hpp>
 
 //#include <vector>
-#include <sstream>
-#include <iostream>
 #include <cmath>
 
 #include <imgui.h>
@@ -158,7 +156,8 @@ void BasicTerminal::flush()
 }
 
 // NOTE: This inline is okay because it's only used within this file.
-inline void renderText(std::string text) {
+inline void renderText(std::string text)
+{
 	// TODO:
 	//   Implement ANSI escape sequences for color because this is
 	//   supposed to be a terminal after all.
@@ -197,9 +196,9 @@ inline void renderText(std::string text) {
 	// 	{
 	// 		case '\n':
 	// 			std::string line = cache.substr(begin, current-begin-1);
-	// 			// skip newline because on each subsequent call to ImGui::Text or
-	// 			// ImGui::TextWrapped calls, it automatically puts things on the next
-	// 			// line for you.
+	// 			// skip newline because on each subsequent call to  ImGui::Text
+	// 			// or ImGui::TextWrapped, it automatically puts next
+	// 			//  things on the line for you.
 	//
 	// 			begin = current + 1;
 	//
@@ -250,25 +249,25 @@ void BasicTerminal::drawInputField()
 	//   now we don't have a way to remove it, the data for it is just sitting
 	//   off screen to the right.
 	ImGui::PushItemWidth(ImGui::GetWindowWidth() -
-											 (window->WindowPadding.x * 2.0f));
+	                     (window->WindowPadding.x * 2.0f));
 	bool append_line = ImGui::InputText(
-			"\0",         // make sure we don't have any trailing text to the right.
-			&inputBuffer, // Our output buffer object.
+	    "\0",         // make sure we don't have any trailing text to the right.
+	    &inputBuffer, // Our output buffer object.
 
-			// * These can be used in conjunction for extra functionality *
-			// NOTE: The Callback doesn't need to be used for line by line input.
-			ImGuiInputTextFlags(
-					// Makes the widget return true on enter.
-					ImGuiInputTextFlags_EnterReturnsTrue
-					// ImGuiInputTextFlags_CallbackCompletion | // callback on tab
-					// ImGuiInputTextFlags_CallbackHistory | // callback on up/down
+	    // * These can be used in conjunction for extra functionality *
+	    // NOTE: The Callback doesn't need to be used for line by line input.
+	    ImGuiInputTextFlags(
+	        // Makes the widget return true on enter.
+	        ImGuiInputTextFlags_EnterReturnsTrue
+	        // ImGuiInputTextFlags_CallbackCompletion | // callback on tab
+	        // ImGuiInputTextFlags_CallbackHistory | // callback on up/down
 
-					// Can't be used with cb_completion
-					// ImGuiInputTextFlags_AllowTabInput
-					),
-			&callback,
+	        // Can't be used with cb_completion
+	        // ImGuiInputTextFlags_AllowTabInput
+	        ),
+	    &callback,
 
-			NULL // Can be a user data object but unnecessary here.
+	    NULL // Can be a user data object but unnecessary here.
 	);
 	ImGui::PopItemWidth();
 
@@ -281,9 +280,9 @@ void BasicTerminal::drawInputField()
 		// clear our input buffer && subsequently the text box.
 		inputBuffer.clear();
 
-		// sets the kb focus to the last element drawn (in our case the input box.)
-		// we have to do this because otherwise when we press enter the text box
-		// by default loses focus.
+		// sets the kb focus to the last element drawn (in our case the input
+		// box.) we have to do this because otherwise when we press enter the
+		// text box by default loses focus.
 		ImGui::SetKeyboardFocusHere(-1);
 	}
 }
