@@ -213,7 +213,7 @@ inline void renderText(std::string* text)
 	// 	renderLine(cache.substr(begin, current));
 
 	// For now this function actually handles newlines so it's a fix.
-	ImGui::TextWrapped((*text).c_str());
+	ImGui::TextWrapped("%s", (*text).c_str());
 };
 
 void BasicTerminal::drawOutputField(ImGuiWindowFlags flags)
