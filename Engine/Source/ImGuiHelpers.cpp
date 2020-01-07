@@ -157,9 +157,66 @@ void BasicTerminal::flush()
 	cout.str(buf);
 }
 
-// void BasicTerminal::renderText();
+// NOTE: This inline is okay because it's only used within this file.
+inline void renderText(std::string text) {
+	// TODO:
+	//   Implement ANSI escape sequences for color because this is
+	//   supposed to be a terminal after all.
+	//
+	// TODO:
+	//   Implement wrapping vs Non-Wrapping text and investigate getting the
+	//   line width for characters to better implement the output cutoff /
+	//   string buffer allocator.
+	//
+	//   This may be of use for that research.
+	//   https://github.com/emoon/ProDBG/issues/304
+	//
+	//   Also, this coincides with the ANSI escape sequence rendering,
+	//   at some point I need to test and see whether each of those functions
+	//   write inline and if they automatically know how much text was
+	//   previously written to the screen.
+	//
+	// TODO:
+	//   ImDoesn't have a function for printing complete strings / unformatted
+	//   text without using a printf loop. So we should probably implement one
+	//   while we're still using ImGui and push it to ImGui so other people can
+	//   benefit from it. It would save a lot of overhead per frame on the
+	//   widget since we're printing multiple times per frame due to the newline
+	//   / ANSI escape sequence parse.
+	//
+	// // PushTextWrapPos(); // possibly good for something
 
-// inline void BasicTerminal::drawOutputField()
+	// ImGui:TextEx(start*, end*, flags);
+	// with ImGui::PushStyleCol; & pop to achieve ansi escape sequences.
+	// Pass to our render function as to not clutter the configuration here.
+	// int begin = 0, current = 0;
+	// int cacheSize = cache.length();
+	// while (current < cacheSize)
+	// {
+	// 	switch(cache[current])
+	// 	{
+	// 		case '\n':
+	// 			std::string line = cache.substr(begin, current-begin-1);
+	// 			// skip newline because on each subsequent call to ImGui::Text or
+	// 			// ImGui::TextWrapped calls, it automatically puts things on the next
+	// 			// line for you.
+	//
+	// 			begin = current + 1;
+	//
+	// 		default:
+	// 			current++;
+	// 	}
+	// }
+	//
+	// // Prints the last line if it doesn't contain a newline at the end.
+	// // Basically just edge case handling.
+	// if (begin != current && current == cache.length())
+	// 	renderLine(cache.substr(begin, current));
+
+	// For now this function actually handles newlines so it's a fix.
+	ImGui::TextWrapped(line);
+};
+
 void BasicTerminal::drawOutputField(ImGuiWindowFlags flags)
 {
 	// May need later for text scrolling implementatinos.
@@ -178,70 +235,7 @@ void BasicTerminal::drawOutputField(ImGuiWindowFlags flags)
 	               window->TitleBarHeight() - window->MenuBarHeight()),
 	    flags);
 
-	// TODO:
-	//   Implement ANSI escape sequences for color because this is
-	//   supposed to be a terminal after all.
-
-	// TODO:
-	//   Implement wrapping vs Non-Wrapping text and investigate getting the
-	//   line width for characters to better implement the output cutoff /
-	//   string buffer allocator.
-	//
-	//   This may be of use for that research.
-	//   https://github.com/emoon/ProDBG/issues/304
-	//
-	//   Also, this coincides with the ANSI escape sequence rendering,
-	//   at some point I need to test and see whether each of those functions
-	//   write inline and if they automatically know how much text was
-	//   previously written to the screen.
-
-	// PushTextWrapPos(); // possibly good for something
-	int begin      = 0;
-	int currentLoc = 0;
-	while (currentLoc < cache.length())
-	{
-		if (cache[currentLoc] == '\n')
-		{
-			ImGui::TextWrapped("%s",
-			                   cache.substr(begin, currentLoc - 1).c_str());
-			begin = ++currentLoc;
-			continue;
-		}
-
-		currentLoc++;
-	}
-	// BUG:
-	//   There seems to be an issue with ImGui rendering the trailing
-	if (begin != currentLoc && currentLoc == cache.length())
-	{
-		ImGui::Text("%s", "This is an imgui problem...");
-		ImGui::TextWrapped("%s", cache.substr(begin, currentLoc).c_str());
-	}
-
-	// TODO:
-	//   ImDoesn't have a function for printing complete strings / unformatted
-	//   text without using a printf loop. So we should probably implement one
-	//   while we're still using ImGui and push it to ImGui so other people can
-	//   benefit from it. It would save a lot of overhead per frame on the
-	//   widget since we're printing multiple times per frame due to the newline
-	//   / ANSI escape sequence parse.
-	//
-	// I was showing toby how memory works and why using printf no every
-	// string vs a straight text print is way more expensive.
-	//
-	// 01100101 // 101 // f
-	// 01101011 // 106 // j
-	// "jfjfjf" = (concatenation) => "jf" + "jf" + "jf"
-	// 01101011 | 01100101 | 01101011011001010110101101100101 // jfjfjf // char
-	// = 8 bits 000000000000000000000000000000  // int = 32 bits int stuff =
-	// 274000; -> 0000000000001101010101010101100000000; print((char*)stuff) //
-	// result == "8A?&"
-	//
-	// outstring = "";
-	// for digit in stuff: outstring += digit;
-	//
-	// outstring = "274000" instead of "8A?&"
-	// printf("%i", stuff); // output == "274000";
+	renderText(cache);
 
 	ImGui::EndChild();
 }
