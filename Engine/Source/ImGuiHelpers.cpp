@@ -213,7 +213,7 @@ inline void renderText(std::string* text)
 	// 	renderLine(cache.substr(begin, current));
 
 	// For now this function actually handles newlines so it's a fix.
-	ImGui::TextWrapped(line);
+	ImGui::TextWrapped((*text).c_str());
 };
 
 void BasicTerminal::drawOutputField(ImGuiWindowFlags flags)
@@ -234,7 +234,7 @@ void BasicTerminal::drawOutputField(ImGuiWindowFlags flags)
 	               window->TitleBarHeight() - window->MenuBarHeight()),
 	    flags);
 
-	renderText(*cache);
+	renderText(&cache);
 
 	ImGui::EndChild();
 }
