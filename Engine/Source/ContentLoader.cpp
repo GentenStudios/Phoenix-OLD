@@ -132,3 +132,27 @@ bool modules::loadModules(std::string save, sol::state& lua)
 	}
 	return true;
 }
+
+
+//TODO: replace this with an API registration system
+#include <Quartz2/Settings.hpp>
+
+void luaapi::loadAPI(sol::state& lua){
+    lua["core"] = lua.create_table();
+    lua["core"]["setting"] = lua.create_table();
+    lua["core"]["setting"]["register"] = 
+		[](std::string displayName, std::string key, int defaultValue)
+		{
+			Settings::get()->add(displayName, key, defaultValue);
+		};
+    lua["core"]["setting"]["get"] = 
+		[](std::string key)
+		{
+			return Settings::get()->getSetting(key)->value(); 
+		};
+	lua["core"]["setting"]["set"] =
+		[](std::string key, int value)
+		{
+			Settings::get()->getSetting(key)->set(value); 
+		};
+}

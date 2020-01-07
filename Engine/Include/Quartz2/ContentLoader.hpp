@@ -60,4 +60,8 @@ namespace q2
 	{
 		static bool loadModules(std::string save, sol::state& lua);
 	};
+
+	struct luaapi{
+        static void loadAPI(sol::state& lua);
+    };
 }; // namespace q2
