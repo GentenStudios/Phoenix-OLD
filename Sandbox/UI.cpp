@@ -83,6 +83,19 @@ void ChatWindow::drawEx(bool* p_open, ImGuiWindowFlags flags)
 	      ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings |
 	          ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoMove |
 	          ImGuiWindowFlags_NoBringToFrontOnFocus | flags);
+
+	// Because the focused variable is static, and we can use it as a state
+	// that's saved across function calls, we can use it's state to infer when
+	// there's a change in the window focused state and thus implement the
+	// scroll on focus feature. Currently this is focusing on the top most
+	// segment of the display that was last active.
+	if (ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) &&
+	    !focused)
+		ImGui::SetScrollY(ImGui::GetScrollY() - 200.0f);
+	else if (!ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) &&
+	         focused)
+		ImGui::SetScrollY(ImGui::GetScrollY() + 200.0f);
+
 	focused = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows);
 
 	// if we're focused anywhere within the window this captures the mouse
@@ -120,8 +133,6 @@ void ChatWindow::drawEx(bool* p_open, ImGuiWindowFlags flags)
 	// to factor that in as well.
 	ImGui::SetWindowPos(ImVec2(0, g->IO.DisplaySize.y - size.y),
 	                    ImGuiCond_Always);
-	// ImGui::SetScrollY( focused ? ImGui::GetScrollY() : (ImGui::GetScrollY() +
-	// 200.0f) );
 
 	ImGui::PushStyleVar(ImGuiStyleVar_Alpha, 1.0f);
 	drawOutputField(ImGuiWindowFlags_NoScrollbar);
