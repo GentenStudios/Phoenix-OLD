@@ -28,69 +28,26 @@
 
 #pragma once
 
-#include <Quartz2/CoreIntrinsics.hpp>
-#include <Quartz2/Math/Math.hpp>
-#include <Quartz2/Voxels/Block.hpp>
-
 #include <string>
-#include <unordered_map>
-#include <vector>
+#include <fstream>
 
 namespace q2
 {
-	namespace voxels
+	class FileIO
 	{
-		enum class BlockFace : int
+	public:
+		static std::string readAllFile(const std::string& filepath)
 		{
-			FRONT  = 0,
-			LEFT   = 1,
-			BACK   = 2,
-			RIGHT  = 3,
-			TOP    = 4,
-			BOTTOM = 5,
-		};
+			std::fstream fileHandle;
+			fileHandle.open(filepath.c_str());
 
-		class Chunk
-		{
-		public:
-			Chunk() = delete;
+			std::string fileString;
+			fileString.assign((std::istreambuf_iterator<char>(fileHandle)),
+			                  (std::istreambuf_iterator<char>()));
 
-			explicit Chunk(math::vec3 chunkPos);
-			~Chunk()                  = default;
-			Chunk(const Chunk& other) = default;
-			Chunk& operator=(const Chunk& other) = default;
-			Chunk(Chunk&& other) noexcept        = default;
-			Chunk& operator=(Chunk&& other) noexcept = default;
+			fileHandle.close();
 
-			void autoTestFill();
-
-			math::vec3               getChunkPos() const;
-			std::vector<BlockType*>& getBlocks();
-
-			BlockType* getBlockAt(math::vec3 position) const;
-			void       setBlockAt(math::vec3 position, BlockType* newBlock);
-
-			static constexpr int CHUNK_WIDTH  = 16;
-			static constexpr int CHUNK_HEIGHT = 16;
-			static constexpr int CHUNK_DEPTH  = 16;
-
-			static std::size_t getVectorIndex(std::size_t x, std::size_t y,
-			                                  std::size_t z)
-			{
-				return x + CHUNK_WIDTH * (y + CHUNK_HEIGHT * z);
-			}
-
-			ENGINE_FORCE_INLINE static std::size_t getVectorIndex(
-			    math::vec3 pos)
-			{
-				return getVectorIndex(static_cast<std::size_t>(pos.x),
-				                      static_cast<std::size_t>(pos.y),
-				                      static_cast<std::size_t>(pos.z));
-			}
-
-		private:
-			math::vec3              m_pos;
-			std::vector<BlockType*> m_blocks;
-		};
-	} // namespace voxels
+			return fileString;
+		}
+	};
 } // namespace q2

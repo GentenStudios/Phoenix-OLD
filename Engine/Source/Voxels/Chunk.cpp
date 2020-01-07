@@ -26,66 +26,45 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+#include <Quartz2/Voxels/Chunk.hpp>
 #include <Quartz2/Voxels/BlockRegistry.hpp>
 
-#include <cstring>
-#include <algorithm>
-
 using namespace q2::voxels;
+using namespace q2;
 
-void BlockRegistry::initialise()
+Chunk::Chunk(math::vec3 chunkPos) : m_pos(chunkPos)
 {
-	BlockType unknownBlock;
-	unknownBlock.displayName = "Unknown Block";
-	unknownBlock.id          = "core:unknown";
-	unknownBlock.category    = BlockCategory::SOLID;
-	unknownBlock.setAllTextures("Assets/unknown.png");
-	registerBlock(unknownBlock);
-
-	BlockType outOfBoundsBlock;
-	unknownBlock.displayName = "Out Of Bounds";
-	unknownBlock.id          = "core:out_of_bounds";
-	unknownBlock.category    = BlockCategory::AIR;
-	registerBlock(outOfBoundsBlock);
+	m_blocks.reserve(CHUNK_WIDTH * CHUNK_HEIGHT * CHUNK_DEPTH);
 }
 
-void BlockRegistry::registerBlock(BlockType blockInfo)
+void Chunk::autoTestFill()
 {
-	if (std::find(m_blocks.begin(), m_blocks.end(), blockInfo) ==
-	    m_blocks.end())
+	BlockType* grass = BlockRegistry::instance()->getFromID("core:grass");
+	for (std::size_t i = 0; i < CHUNK_WIDTH * CHUNK_HEIGHT * CHUNK_DEPTH; ++i)
 	{
-		blockInfo.m_registryID = m_blocks.size();
-		m_blocks.push_back(blockInfo);
-
-		if (blockInfo.category != BlockCategory::AIR)
-		{
-			for (const std::string& tex : blockInfo.textures)
-			{
-				m_textures.addTexture(tex);
-			}
-		}
+		m_blocks.push_back(grass);
 	}
 }
 
-BlockType* BlockRegistry::getFromID(const std::string& id)
-{
-	auto it = std::find_if(
-	    m_blocks.begin(), m_blocks.end(), [id](const BlockType& block) {
-		    return std::strcmp(block.id.c_str(), id.c_str()) == 0;
-	    });
+math::vec3 Chunk::getChunkPos() const { return m_pos; }
+std::vector<BlockType*>& Chunk::getBlocks() { return m_blocks; }
 
-	return it == m_blocks.end() ? getFromRegistryID(0)
-	                            : &(*it); // 0 is always unknown.
-}
-
-BlockType* BlockRegistry::getFromRegistryID(std::size_t registryID)
+BlockType* Chunk::getBlockAt(math::vec3 position) const
 {
-	if (registryID > m_blocks.size())
+	if (position.x < CHUNK_WIDTH && position.y < CHUNK_HEIGHT &&
+	    position.z < CHUNK_DEPTH)
 	{
-		return &m_blocks[0];
+		return m_blocks[getVectorIndex(position)];
 	}
 
-	return &m_blocks[registryID];
+	return BlockRegistry::instance()->getFromRegistryID(1); // 1 is always out of bounds
 }
 
-TextureRegistry* BlockRegistry::getTextures() { return &m_textures; }
+void Chunk::setBlockAt(math::vec3 position, BlockType* newBlock)
+{
+	if (position.x < CHUNK_WIDTH && position.y < CHUNK_HEIGHT &&
+	    position.z < CHUNK_DEPTH)
+	{
+		m_blocks[getVectorIndex(position)] = newBlock;
+	}
+}

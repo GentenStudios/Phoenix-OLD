@@ -28,69 +28,46 @@
 
 #pragma once
 
-#include <Quartz2/CoreIntrinsics.hpp>
 #include <Quartz2/Math/Math.hpp>
 #include <Quartz2/Voxels/Block.hpp>
+#include <Quartz2/Graphics/ChunkRenderer.hpp>
 
-#include <string>
-#include <unordered_map>
 #include <vector>
 
 namespace q2
 {
-	namespace voxels
+	namespace gfx
 	{
-		enum class BlockFace : int
+		enum class BlockFace : unsigned int
 		{
-			FRONT  = 0,
-			LEFT   = 1,
-			BACK   = 2,
-			RIGHT  = 3,
-			TOP    = 4,
-			BOTTOM = 5,
+			FRONT = 0,
+			LEFT,
+			BACK,
+			RIGHT,
+			TOP,
+			BOTTOM
 		};
 
-		class Chunk
+		class ChunkMesher
 		{
 		public:
-			Chunk() = delete;
-
-			explicit Chunk(math::vec3 chunkPos);
-			~Chunk()                  = default;
-			Chunk(const Chunk& other) = default;
-			Chunk& operator=(const Chunk& other) = default;
-			Chunk(Chunk&& other) noexcept        = default;
-			Chunk& operator=(Chunk&& other) noexcept = default;
-
-			void autoTestFill();
-
-			math::vec3               getChunkPos() const;
-			std::vector<BlockType*>& getBlocks();
-
-			BlockType* getBlockAt(math::vec3 position) const;
-			void       setBlockAt(math::vec3 position, BlockType* newBlock);
-
-			static constexpr int CHUNK_WIDTH  = 16;
-			static constexpr int CHUNK_HEIGHT = 16;
-			static constexpr int CHUNK_DEPTH  = 16;
-
-			static std::size_t getVectorIndex(std::size_t x, std::size_t y,
-			                                  std::size_t z)
+			ChunkMesher(math::vec3 pos, std::vector<voxels::BlockType*>& blocks, const ChunkRenderer::AssociativeTextureTable& texTable)
+			    : m_blockRef(blocks), m_pos(pos), m_texTable(texTable)
 			{
-				return x + CHUNK_WIDTH * (y + CHUNK_HEIGHT * z);
 			}
+			~ChunkMesher() = default;
 
-			ENGINE_FORCE_INLINE static std::size_t getVectorIndex(
-			    math::vec3 pos)
-			{
-				return getVectorIndex(static_cast<std::size_t>(pos.x),
-				                      static_cast<std::size_t>(pos.y),
-				                      static_cast<std::size_t>(pos.z));
-			}
+			void mesh();
+			const std::vector<float>& getMesh() { return m_mesh; }
 
 		private:
-			math::vec3              m_pos;
-			std::vector<BlockType*> m_blocks;
+			void addBlockFace(voxels::BlockType* block, BlockFace face, float x, float y, float z);
+
+		private:
+			math::vec3                      m_pos;
+			std::vector<float>              m_mesh;
+			std::vector<voxels::BlockType*> m_blockRef;
+			const ChunkRenderer::AssociativeTextureTable& m_texTable;
 		};
-	} // namespace voxels
+	} // namespace gfx
 } // namespace q2

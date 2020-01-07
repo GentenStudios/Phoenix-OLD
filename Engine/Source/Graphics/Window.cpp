@@ -255,7 +255,6 @@ math::vec2i Window::getSize() const
 
 void Window::setCursorPosition(math::vec2i pos)
 {
-	std::cout << SDL_GetError() << std::endl;
 	SDL_WarpMouseInWindow(m_window, pos.x, pos.y);
 }
 

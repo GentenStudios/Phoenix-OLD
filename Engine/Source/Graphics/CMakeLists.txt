@@ -4,5 +4,9 @@ set(graphicsSources
 
 	${currentDir}/Camera.cpp
 
+	${currentDir}/ChunkMesher.cpp
+	${currentDir}/ChunkRenderer.cpp
+	${currentDir}/ShaderPipeline.cpp
+
 	PARENT_SCOPE
 )

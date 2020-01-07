@@ -58,6 +58,8 @@
 
 #pragma once
 
+#include <Quartz2/Math/Math.hpp>
+
 #include <array>
 #include <string>
 
@@ -102,6 +104,7 @@ namespace q2
 
 		struct BlockMetadata
 		{
+			math::vec3  blockPos;
 			std::string data; // serialised data, we can decide how we wanna do
 			                  // this some other time (just an implementation
 			                  // attempt to stop pains later in life.)

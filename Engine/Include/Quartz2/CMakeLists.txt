@@ -11,8 +11,12 @@ set(Headers
 	${eventHeaders}
 
 	${currentDir}/CoreIntrinsics.hpp
+	${currentDir}/FileIO.hpp
 	${currentDir}/EnumTools.hpp
 	${currentDir}/Singleton.hpp
+
+	${currentDir}/Player.hpp
+	${currentDir}/ClientPlayer.hpp
 
 	PARENT_SCOPE
 )

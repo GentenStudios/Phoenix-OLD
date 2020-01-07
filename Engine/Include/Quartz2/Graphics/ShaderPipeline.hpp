@@ -28,69 +28,44 @@
 
 #pragma once
 
-#include <Quartz2/CoreIntrinsics.hpp>
 #include <Quartz2/Math/Math.hpp>
-#include <Quartz2/Voxels/Block.hpp>
+
+#include <glad/glad.h>
 
 #include <string>
-#include <unordered_map>
 #include <vector>
 
 namespace q2
 {
-	namespace voxels
+	namespace gfx
 	{
-		enum class BlockFace : int
+		struct ShaderLayout
 		{
-			FRONT  = 0,
-			LEFT   = 1,
-			BACK   = 2,
-			RIGHT  = 3,
-			TOP    = 4,
-			BOTTOM = 5,
+			ShaderLayout(std::string attribName, int desiredIndex)
+			    : attribName(attribName), desiredIndex(desiredIndex)
+			{}
+
+			std::string attribName;
+			int desiredIndex = -1;
 		};
 
-		class Chunk
+		class ShaderPipeline
 		{
 		public:
-			Chunk() = delete;
+			ShaderPipeline()  = default;
+			~ShaderPipeline() = default;
 
-			explicit Chunk(math::vec3 chunkPos);
-			~Chunk()                  = default;
-			Chunk(const Chunk& other) = default;
-			Chunk& operator=(const Chunk& other) = default;
-			Chunk(Chunk&& other) noexcept        = default;
-			Chunk& operator=(Chunk&& other) noexcept = default;
+			void prepare(std::string vertShader, std::string fragShader, std::vector<ShaderLayout> layout);
+			void activate();
 
-			void autoTestFill();
+			void setVector2(std::string location, math::vec2 value);
+			void setVector3(std::string location, math::vec3 value);
+			void setMatrix(std::string location, math::mat4 value);
 
-			math::vec3               getChunkPos() const;
-			std::vector<BlockType*>& getBlocks();
-
-			BlockType* getBlockAt(math::vec3 position) const;
-			void       setBlockAt(math::vec3 position, BlockType* newBlock);
-
-			static constexpr int CHUNK_WIDTH  = 16;
-			static constexpr int CHUNK_HEIGHT = 16;
-			static constexpr int CHUNK_DEPTH  = 16;
-
-			static std::size_t getVectorIndex(std::size_t x, std::size_t y,
-			                                  std::size_t z)
-			{
-				return x + CHUNK_WIDTH * (y + CHUNK_HEIGHT * z);
-			}
-
-			ENGINE_FORCE_INLINE static std::size_t getVectorIndex(
-			    math::vec3 pos)
-			{
-				return getVectorIndex(static_cast<std::size_t>(pos.x),
-				                      static_cast<std::size_t>(pos.y),
-				                      static_cast<std::size_t>(pos.z));
-			}
+			int queryLayoutOfAttribute(std::string attr);
 
 		private:
-			math::vec3              m_pos;
-			std::vector<BlockType*> m_blocks;
+			unsigned int m_program;
 		};
-	} // namespace voxels
+	} // namespace gfx
 } // namespace q2

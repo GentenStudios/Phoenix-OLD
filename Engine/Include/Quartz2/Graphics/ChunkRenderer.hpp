@@ -28,26 +28,16 @@
 
 #pragma once
 
-#include <Quartz2/Events/Event.hpp>
-#include <Quartz2/Events/IEventListener.hpp>
-#include <Quartz2/Math/Math.hpp>
+#include <Quartz2/Graphics/ShaderPipeline.hpp>
 
-#include <SDL.h>
-
-#include <functional>
+#include <unordered_map>
 #include <vector>
 
 namespace q2
 {
 	namespace gfx
 	{
-		struct ChunkMesh
-		{		
-			std::vector<math::vec3> vertices;
-			std::vector<math::vec3> normals;
-			std::vector<math::vec2> uvs;
-			std::vector<int>        tex;
-		};
+		class ShaderPipeline;
 
 		// NOTE: (mainly to self - @beeperdeeper089)
 		// All blocks must be loaded in before the texture array is generated.
@@ -61,20 +51,40 @@ namespace q2
 		class ChunkRenderer
 		{
 		public:
-			ChunkRenderer();
+			using MeshIdentifier = int;
+			using AssociativeTextureTable =
+			    std::unordered_map<std::string, std::size_t>;
+
+			ChunkRenderer(std::size_t visibleChunks);
 			~ChunkRenderer();
 
-			void buildTextureArray();
+			std::vector<ShaderLayout> getRequiredShaderLayout();
+
+			void                           buildTextureArray();
+			const AssociativeTextureTable& getTextureTable() const;
 
 			// returns unique chunk mesh id. Used to set the render list.
-			int submitChunkMesh();
-
-			void setRenderList();
+			MeshIdentifier submitChunkMesh(const std::vector<float>& mesh,
+			                               MeshIdentifier            slot);
 
 			void render();
 
 		private:
-			
+			std::size_t m_visibleChunks;
+
+			unsigned int m_vao;
+			unsigned int m_buffer;
+			unsigned int m_textureArray;
+
+			const int m_vertexAttributeLocation   = 0;
+			const int m_uvAttributeLocation       = 1;
+			const int m_texLayerAttributeLocation = 2;
+
+			AssociativeTextureTable m_textureTable;
+
+			std::vector<int>     m_multiDrawStarts;
+			std::vector<GLsizei> m_multiDrawCounts;
+			std::vector<int>     m_bigBufferLocations;
 		};
 	} // namespace gfx
 } // namespace q2

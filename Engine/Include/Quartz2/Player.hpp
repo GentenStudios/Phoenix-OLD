@@ -28,69 +28,21 @@
 
 #pragma once
 
-#include <Quartz2/CoreIntrinsics.hpp>
 #include <Quartz2/Math/Math.hpp>
-#include <Quartz2/Voxels/Block.hpp>
-
-#include <string>
-#include <unordered_map>
-#include <vector>
 
 namespace q2
 {
-	namespace voxels
+	class Player
 	{
-		enum class BlockFace : int
-		{
-			FRONT  = 0,
-			LEFT   = 1,
-			BACK   = 2,
-			RIGHT  = 3,
-			TOP    = 4,
-			BOTTOM = 5,
-		};
+	public:
+		Player();
+		~Player();
 
-		class Chunk
-		{
-		public:
-			Chunk() = delete;
+		virtual math::vec3 getPosition() = 0;
+		virtual math::vec3 getDirection() = 0;
 
-			explicit Chunk(math::vec3 chunkPos);
-			~Chunk()                  = default;
-			Chunk(const Chunk& other) = default;
-			Chunk& operator=(const Chunk& other) = default;
-			Chunk(Chunk&& other) noexcept        = default;
-			Chunk& operator=(Chunk&& other) noexcept = default;
+		virtual void getPosition(math::vec3 pos) = 0;
+		virtual void getDirection(math::vec3 dir) = 0;
 
-			void autoTestFill();
-
-			math::vec3               getChunkPos() const;
-			std::vector<BlockType*>& getBlocks();
-
-			BlockType* getBlockAt(math::vec3 position) const;
-			void       setBlockAt(math::vec3 position, BlockType* newBlock);
-
-			static constexpr int CHUNK_WIDTH  = 16;
-			static constexpr int CHUNK_HEIGHT = 16;
-			static constexpr int CHUNK_DEPTH  = 16;
-
-			static std::size_t getVectorIndex(std::size_t x, std::size_t y,
-			                                  std::size_t z)
-			{
-				return x + CHUNK_WIDTH * (y + CHUNK_HEIGHT * z);
-			}
-
-			ENGINE_FORCE_INLINE static std::size_t getVectorIndex(
-			    math::vec3 pos)
-			{
-				return getVectorIndex(static_cast<std::size_t>(pos.x),
-				                      static_cast<std::size_t>(pos.y),
-				                      static_cast<std::size_t>(pos.z));
-			}
-
-		private:
-			math::vec3              m_pos;
-			std::vector<BlockType*> m_blocks;
-		};
-	} // namespace voxels
+	};
 } // namespace q2

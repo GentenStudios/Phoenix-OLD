@@ -5,7 +5,9 @@ set(graphicsHeaders
 
 	${currentDir}/Camera.hpp
 
+	${currentDir}/ChunkMesher.hpp
 	${currentDir}/ChunkRenderer.hpp
+	${currentDir}/ShaderPipeline.hpp
 
 	PARENT_SCOPE
 )
