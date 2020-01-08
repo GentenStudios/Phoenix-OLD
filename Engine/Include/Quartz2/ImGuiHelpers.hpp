@@ -76,6 +76,8 @@ namespace q2
 			virtual void drawEx(bool* p_open, ImGuiWindowFlags flags);
 		};
 
+		typedef void (*TerminalCallback)(const char* content, std::ostringstream &cout);
+
 		class BasicTerminal : public ImOOGuiWindow
 		{
 		private:
@@ -89,7 +91,7 @@ namespace q2
 			// apart from the game logic, should allow for more than one
 			// buffer push to happen before the end of a frame.
 			// Also, we should investigate deriving a custom std::stringbuf
-			// to get access to the underlying string in our std::ostringstream
+			// to get access to the underlying string in our std::stringstream
 			// instead of copying the damn thing and emptying it for every flush
 			// operation. It may also remove the necessity of the flush call
 			// period.
@@ -97,6 +99,7 @@ namespace q2
 			// display cache (perhaps should rename to OutputBuffer)
 			std::string cache;
 			std::string inputBuffer;
+			std::vector<TerminalCallback> callbackRegistry;
 
 		protected:
 			const char* outputWindowName;
@@ -123,7 +126,7 @@ namespace q2
 			~BasicTerminal();
 
 			virtual void drawEx(bool* p_open, ImGuiWindowFlags flags);
-			virtual void onCommand(std::string input);
+			void registerCallback(TerminalCallback callback);
 		};
 	}; // namespace ImGuiHelpers
 };     // namespace q2

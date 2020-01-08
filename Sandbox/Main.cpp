@@ -4,10 +4,19 @@
 #include <imgui.h>
 
 #include <iostream>
+#include <sstream>
 #include <memory>
 #include <string>
 
 using namespace q2;
+
+
+void rawEcho(const char* input, std::ostringstream &cout)
+{
+	// easter egg commission for the tobster.
+	if (input == "buh-buh-bum-bah-bum") cout << "I'll be back\n";
+	cout << input << "\n";
+}
 
 UI::ChatWindow chat("Chat Window", 5,
 	// @FutureRuby I know this looks weird but it works.
@@ -27,7 +36,11 @@ private:
 public:
 	PhoenixGame()
 		: Game(1280, 720, "Phoenix Game!")
-	{}
+	{
+
+		chat.registerCallback(&rawEcho);
+		term.registerCallback(&rawEcho);
+	}
 
 protected:
 	virtual bool onEvent(SDL_Event e)

@@ -274,8 +274,18 @@ void BasicTerminal::drawInputField()
 	if (append_line)
 	{
 		// create a copy of the input buffer string to send to our command
-		// capture.
-		onCommand(std::string(inputBuffer));
+		// capture for safety.
+		for (auto cb = callbackRegistry.cbegin(); cb != callbackRegistry.cend(); cb++)
+		{
+			(*cb)(inputBuffer.c_str(), cout);
+			// TODO:
+			//   Possibly implement a custom ostringstream for asynchonous data
+			//   transport between the calling functions and our flush method.
+			//   Might also be a good idea to combine the output streams of
+			//   all our child functions (which will probs be async eventually)
+			//   here.
+			flush();
+		}
 
 		// clear our input buffer && subsequently the text box.
 		inputBuffer.clear();
