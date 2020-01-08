@@ -100,7 +100,6 @@ bool modules::loadModules(std::string save, sol::state& lua)
 			// list Otherwise, move mod to back of load queue
 			if (satisfied)
 			{
-				std::filesystem::exists("modules/" + mod.name + "/init.lua");
 				lua.script_file("modules/" + mod.name + "/init.lua");
 				loadedMods.push_back(mod.name);
 			}
