@@ -39,7 +39,7 @@ using namespace q2::ImGuiHelpers;
 
 // This is a ImGuiInputTextCallback
 // TODO: add terminal history & hook for autocomplete.
-int callback(ImGuiInputTextCallbackData* data)
+static int callback(ImGuiInputTextCallbackData* data)
 {
 	// switch(data->EventFlag){
 	//   case ImGuiInputTextFlags_CallbackAlways:
@@ -128,7 +128,7 @@ void BasicTerminal::flush()
 }
 
 // NOTE: This inline is okay because it's only used within this file.
-inline void renderText(std::string* text)
+static inline void renderText(std::string* text)
 {
 	// TODO:
 	//   Implement ANSI escape sequences for color because this is

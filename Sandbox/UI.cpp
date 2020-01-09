@@ -41,7 +41,7 @@ using namespace UI;
 
 // hacked from the ImGui source
 static const float WINDOWS_MOUSE_WHEEL_SCROLL_LOCK_TIMER = 2.00f;
-void               ForceUpdateMouseWheel()
+static void        ForceUpdateMouseWheel()
 {
 	ImGuiContext* g = ImGui::GetCurrentContext();
 
