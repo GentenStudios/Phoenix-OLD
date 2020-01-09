@@ -37,7 +37,7 @@
 // Standards
 //...
 
-using namespace UI;
+using namespace ui;
 
 // hacked from the ImGui source
 static const float WINDOWS_MOUSE_WHEEL_SCROLL_LOCK_TIMER = 2.00f;

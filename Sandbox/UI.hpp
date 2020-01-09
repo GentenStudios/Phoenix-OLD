@@ -32,7 +32,7 @@
 #include <imgui.h>
 
 /// @brief Contains all UI elements specifically designed for Phoenix.
-namespace UI
+namespace ui
 {
 	// @brief A restyle of the standard BasicTerminal for Phoenix
 	class ChatWindow : public q2::ImGuiHelpers::BasicTerminal

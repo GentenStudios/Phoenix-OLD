@@ -20,7 +20,7 @@ static void rawEcho(const char* input, std::ostringstream &cout)
 	cout << input << "\n";
 }
 
-UI::ChatWindow chat("Chat Window", 5,
+ui::ChatWindow chat("Chat Window", 5,
 	// @FutureRuby I know this looks weird but it works.
 	// constant string compile time concatenation is wierd.
 	"Welcome to the Darklight Terminal!\n"
