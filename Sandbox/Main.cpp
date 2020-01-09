@@ -14,7 +14,7 @@ using namespace q2;
 void rawEcho(const char* input, std::ostringstream &cout)
 {
 	// easter egg commission for the tobster.
-	if (input == "buh-buh-bum-bah-bum") cout << "I'll be back\n";
+	if (input.compare("buh-buh-bum-bah-bum") == 0) cout << "I'll be back\n";
 	cout << input << "\n";
 }
 
