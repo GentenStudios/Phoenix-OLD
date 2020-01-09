@@ -56,6 +56,6 @@ namespace ui
 		///   get focus regardless of player ingame state.
 		inline void focus() { m_renderFocus = true; };
 
-		void drawEx(bool* p_open, ImGuiWindowFlags flags);
+		void draw(bool* p_open = NULL, ImGuiWindowFlags flags = ImGuiWindowFlags_None);
 	};
 }; // namespace UI

@@ -45,22 +45,7 @@ namespace ImGui
 	{
 		ImGui::End();
 	};
-
-	inline void BaseImWindow::draw()
-	{
-		drawEx(NULL, ImGuiWindowFlags_None);
-	};
-	inline void BaseImWindow::draw(bool* p_open)
-	{
-		drawEx(p_open, ImGuiWindowFlags_None);
-	};
 	inline void BaseImWindow::draw(bool* p_open, ImGuiWindowFlags flags)
-	{
-		drawEx(p_open, flags);
-	};
-
-	// NOTE: this must at least be defined otherwise the linker freaks.
-	inline void BaseImWindow::drawEx(bool* p_open, ImGuiWindowFlags flags)
 	{
 			/*TODO: throw error must override */
 	};
@@ -78,24 +63,13 @@ namespace ImGui
 		m_outputBuffer.reserve(m_targetOutputSize);
 		cout = std::ostringstream(std::ios_base::out | std::ios_base::ate);
 	};
-	inline BasicTerminal::BasicTerminal(const char* name, int outputKiloBytes)
-			: BaseImWindow(name)
-	{
-		m_outputWindowName = std::string(name).append("_Output").c_str();
-		m_targetOutputSize = outputKiloBytes * 1024; // align to kilobytes
-		m_inputBuffer      = std::string("");
-		m_outputBuffer     = std::string("");
-		m_outputBuffer.reserve(m_targetOutputSize);
-		cout =
-				std::ostringstream(std::ios_base::out | std::ios_base::ate);
-	};
 
 	inline BasicTerminal::~BasicTerminal()
 	{
 		// TODO: Possibly deconstruct the strings, I know I'm missing something.
 	};
 
-	inline void BasicTerminal::drawEx(bool* p_open, ImGuiWindowFlags extra_flags)
+	inline void BasicTerminal::draw(bool* p_open, ImGuiWindowFlags extra_flags)
 	{
 		// Window Definition (remember to use the terminal class' begin)
 		begin(p_open, defaultFlags | extra_flags);

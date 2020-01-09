@@ -48,7 +48,6 @@
 //   benefit from being standalone.
 #define ANSI_RED IM_COL32(255, 0, 0, 255)
 
-
 // NOTE:
 //   Directly adding content into the ImGui namespace because as discussed
 //   in github: It's far easier to remember and since all of these features
@@ -123,7 +122,7 @@ namespace ImGui
 	 *   public:
 	 *     using BaseImWindow::BaseImWindow;
 	 *
-	 *     virtual inline void drawEx(bool* p_open, ImGuiWindowFlags flags){
+	 *     inline void draw(bool* p_open, ImGuiWindowFlags flags){
 	 *       begin(p_open, flags);
 	 *       firstChild(ImGuiWindowFlags_None);
 	 *       secondChild(ImGuiWindowFlags_None);
@@ -159,8 +158,7 @@ namespace ImGui
 	class BaseImWindow
 	{
 
-
-	/// @protectedsection
+		/// @protectedsection
 	protected:
 		/// @brief
 		/// Stores the root window's name when the class is initialized
@@ -171,7 +169,7 @@ namespace ImGui
 		/// @brief Initializes the root window name variable.
 		explicit BaseImWindow(const char* name);
 
-	/// @publicsection
+		/// @publicsection
 	public:
 		/**
 		 * @param[in,out] p_open
@@ -189,7 +187,7 @@ namespace ImGui
 		 *   simplification.
 		 *
 		 * @note
-		 *   This method is intended only to be called within `drawEx`
+		 *   This method is intended only to be called within `draw`
 		 *   to start the root window definition for the graphical element.
 		 */
 		void begin(bool* p_open, ImGuiWindowFlags flags);
@@ -204,35 +202,6 @@ namespace ImGui
 		 *   to end the root window definition for the graphical element.
 		 */
 		void end();
-
-
-		// NOTE: define overrides in base class for ease of implementation
-		// down the road.
-		//       WARNING: This will not work unless the drawEx funcion is
-		//       virtual for runtime
-		//                inheritance checking purposes. Otherwise it will
-		//                always point to this class' unused version.
-		//
-		// TODO: vertical shrink with templates
-		//
-		/**
-		 *  @param[in,out] p_open Denote: same as `BaseImWindow::begin`.
-		 *  @param[in] flags Denote: same as `BaseImWindow::begin`.
-		 *
-		 *  @brief
-		 *    The public rendering interface for subclasses.
-		 *
-		 *  @detailed
-		 *    Provides an interface for accessing drawEx that doesn't require
-		 *    the override cases be redefined in later classes. Be aware that
-		 *    if no drawEx funcion is defined in an inheriting class, this
-		 *    function will not work.
-		 */
-		void draw(bool* p_open, ImGuiWindowFlags flags);
-		/// @overload
-		void draw(bool* p_open);
-		/// @overload
-		void draw();
 
 		/**
 		 *  @param[in,out] p_open
@@ -255,13 +224,10 @@ namespace ImGui
 		 *   This function implements the inherited classes' rendering. It's
 		 *   responsible for mapping the base input parameters `p_open` and
 		 *   `flags` to the `begin` function for standards compliance and
-		 *   should be subclassed to specify non-standard styling. This is
-		 *   not intended to be called directly, but instead it is called
-		 *   by the inline `draw` functions to abstract away the need to
-		 *   redefine the function overrides in inherited classes.
+		 *   should be subclassed to specify non-standard styling.
 		 *
 		 *   ###Usage Example:
-		 *   Overriding the `drawEx` function to implement a widget:
+		 *   Overriding the `draw` function to implement a widget:
 		 *
 		 *   @code
 		 *   // Our custom style impelementation.
@@ -270,10 +236,10 @@ namespace ImGui
 		 *     inline void thingy(){
 		 *       ImGui::Text("Does a thingy!");
 		 *       //...
-	 	 *     }
+		 *     }
 		 *   public:
 		 *     //...
-		 *     inline void drawEx(bool* p_open, ImGuiWindowFlags flags){
+		 *     inline void draw(bool* p_open, ImGuiWindowFlags flags){
 		 *       begin(p_open, flags);
 		 *       thingy();
 		 *       end();
@@ -281,7 +247,8 @@ namespace ImGui
 		 *   };
 		 *   @endcode
 		 */
-		virtual void drawEx(bool* p_open, ImGuiWindowFlags flags);
+		void draw(bool*            p_open = NULL,
+		          ImGuiWindowFlags flags  = ImGuiWindowFlags_None);
 	};
 
 	/**
@@ -291,7 +258,8 @@ namespace ImGui
 	 *   Specifically, this is defined as an ease-of-use feature for definitions
 	 *   pertaining to the function callbacks within the `BasicTerminal` class.
 	 */
-	typedef void (*TerminalCallback)(const char* content, std::ostringstream &cout);
+	typedef void (*TerminalCallback)(const char*         content,
+	                                 std::ostringstream& cout);
 
 	// TODO: More comprehensive example here, I'm too tired to write it atm.
 	/**
@@ -347,7 +315,7 @@ namespace ImGui
 		/// @brief The input content from our input box.
 		std::string m_inputBuffer;
 
-		/// @brief All the callback function pointers registered with this class.
+		/// @brief All the callback function pointers registered with the class.
 		std::vector<TerminalCallback> m_callbackRegistry;
 
 		/// @brief The output window name.
@@ -362,9 +330,8 @@ namespace ImGui
 		//   smack ya up one real good! Humbug!
 		//
 		/// @brief The required flags for this window.
-		static const ImGuiWindowFlags defaultFlags =
-		    ImGuiWindowFlags(ImGuiWindowFlags_NoScrollbar |
-		                     ImGuiWindowFlags_NoScrollWithMouse);
+		static const ImGuiWindowFlags defaultFlags = ImGuiWindowFlags(
+		    ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
 
 		/// @brief Draws the terminal input field.
 		void drawInputField();
@@ -409,7 +376,6 @@ namespace ImGui
 		 */
 		std::ostringstream cout;
 
-
 		/**
 		 * @param[in] name Same use as `BaseImWindow`, the root window name.
 		 * @param[in] outputKiloBytes The target size of the output cache.
@@ -420,11 +386,8 @@ namespace ImGui
 		 *   into the output cache, name is uesd to construct outputWindowName,
 		 *   and initialContents is saved for later recall by the flush method.
 		 */
-		BasicTerminal(const char* name, int outputKiloBytes,
-				            const char* initialContents);
-		///@overload
-		BasicTerminal(const char* name, int outputKiloBytes);
-
+		BasicTerminal(const char* name, int outputKiloBytes = 5,
+		              const char* initialContents = "");
 
 		///@brief Does nothing for now; this is a todo feature.
 		~BasicTerminal();
@@ -454,8 +417,9 @@ namespace ImGui
 		 */
 		void registerCallback(TerminalCallback callback);
 
-		virtual void drawEx(bool* p_open, ImGuiWindowFlags flags);
+		void draw(bool*            p_open = NULL,
+		          ImGuiWindowFlags flags  = ImGuiWindowFlags_None);
 	};
-};
+}; // namespace ImGui
 
 #include "ImGuiHelpers.inl"

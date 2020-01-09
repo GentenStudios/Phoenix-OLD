@@ -57,7 +57,7 @@ static void        ForceUpdateMouseWheel()
 	}
 }
 
-void ChatWindow::drawEx(bool* p_open, ImGuiWindowFlags flags)
+void ChatWindow::draw(bool* p_open, ImGuiWindowFlags flags)
 {
 	ImGuiContext* g = ImGui::GetCurrentContext();
 	static bool   focused;
