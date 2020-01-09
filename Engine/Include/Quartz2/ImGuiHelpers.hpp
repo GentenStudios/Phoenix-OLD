@@ -63,7 +63,7 @@ namespace ImGui
 	 *   This ImGui helper class is meant to be a base used to build Object
 	 *   Oriented ImGui graphical elements. This is particularly useful when
 	 *   trying to create alternatively styleable UI elements. All of the
-	 *   classes functions as per ImGui standard are defined inline by
+	 *   classes' functions as per ImGui standard are defined inline by
 	 *   default for performance. Initially this was actually made as a
 	 *   workaround for ImGui's styling limitations given it's architecture:
 	 *   ImGui can only use inline styling.
@@ -211,7 +211,7 @@ namespace ImGui
 		//       WARNING: This will not work unless the drawEx funcion is
 		//       virtual for runtime
 		//                inheritance checking purposes. Otherwise it will
-		//                always point to this classes unused version.
+		//                always point to this class' unused version.
 		//
 		// TODO: vertical shrink with templates
 		//
@@ -252,7 +252,7 @@ namespace ImGui
 		 *   at the very least.
 		 *
 		 * @detailed
-		 *   This function implements the inherited classes rendering. It's
+		 *   This function implements the inherited classes' rendering. It's
 		 *   responsible for mapping the base input parameters `p_open` and
 		 *   `flags` to the `begin` function for standards compliance and
 		 *   should be subclassed to specify non-standard styling. This is
