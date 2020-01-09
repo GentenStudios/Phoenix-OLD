@@ -37,30 +37,6 @@
 
 using namespace q2::ImGuiHelpers;
 
-// Usefull code snippits:
-// ======================
-//
-// // ImGuiWindow* TitleBarHeight() and MenuBarHeight() return 0 when their
-// // respective ui elements aren't rendered.
-// const float decoration_up_height = window->TitleBarHeight() +
-// window->MenuBarHeight();
-//
-// ImGuiWindow* window = FindWindowByName(name); // Find or create (also has
-// ByID)
-
-/*
- * Extenious Notes On ImGui Function:
- *  All root (and child) window delcarations are rendered after the `End`
- *  or respective API call, and thus any variable defined before those points
- *  even if left uninitialized before the `Begin` call. This information is
- *	particularly handy when considering that most window size setters rely on
- *  data that may not yet available such as accomidations for inner elements
- *  in the case of responsive styling.
- */
-
-// const char* inputFieldPrefix = "_Input";
-// const char* outputFieldPrefix = "_Output";
-
 // This is a ImGuiInputTextCallback
 // TODO: add terminal history & hook for autocomplete.
 int callback(ImGuiInputTextCallbackData* data)

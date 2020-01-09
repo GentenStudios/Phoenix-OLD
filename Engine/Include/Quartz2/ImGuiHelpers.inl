@@ -110,13 +110,5 @@ namespace q2
 		{
 			callbackRegistry.push_back(callback);
 		}
-
-		// inline void BasicTerminal::onCommand(std::string input)
-		// {
-		// 	// raw echo interface
-		// 	cout << inputBuffer << "\n";
-		// 	flush();
-		// }
-
 	};
 };
