@@ -53,8 +53,8 @@ namespace q2
 	/**
 	 * @namespace ImGuiHelpers
 	 * @brief
-	 *   This namespace serves as a ntainer for all ImGui extension materials
-	 *   maintained within Quartz/Phoenix including including but not limited to
+	 *   This namespace serves as a container for all ImGui extension materials
+	 *   maintained within Quartz/Phoenix including but not limited to
 	 *   classes, functions, enums, etc.
 	 */
 	namespace ImGuiHelpers
@@ -72,18 +72,18 @@ namespace q2
 		 *   workaround for ImGui's styling limitations given it's architecture:
 		 *   ImGui can only use inline styling.
 		 *
-		 * @code
+		 *   @code
 		 *   //This is what I mean; this is the only way to restyle / recolor
 		 *   //elements in ImGui outside modifying the global style.
 		 *   ImGui::PushStyleColor(ImGuiCol_XXXX, IM_COL32(r,g,b,a));
 		 *   //draw a widget or window...
 		 *   ImGui::PopStyleColor( none or num of color edits to undo );
-		 * @endcode
+		 *   @endcode
 		 *
 		 *   Although there are other uses for this outside styling such as
 		 *   event processing.
 		 *
-		 * @note
+		 *   @note
 		 *   This isn't absolutely necessary for styling, but I find separating
 		 *   the style logic from the operational logic good for code readability.
 		 *
@@ -97,13 +97,13 @@ namespace q2
 		 *   type checker to direct the draw methods to their correct inherited
 		 *   functions, but this is negligible in comparison.
 		 *
-		 * @note
+		 *   @note
 		 *   The above statement regarding inline optimizations may not be
 		 *   correct with all compilers because it's up to the compiler how
 		 *   inlining is handled. Thus the performance gains while safe to
 		 *   assume true in most scenarios, will not be true in all.
 		 *
-		 * @code
+		 *   @code
 		 *   // Basic def for the Object Oriented window we'll be augmenting.
 		 *   class ComplexWidget : public ImOOGuiWindow {
 		 *   protected:
@@ -158,7 +158,7 @@ namespace q2
 		 *     cw.draw();
 		 *     //...
 		 *   }
-		 * @endcode
+		 *   @endcode
 		 */
 		class ImOOGuiWindow
 		{
@@ -378,7 +378,7 @@ namespace q2
 			/// @param[in] flags
 			///   Specifies what ImGui flags to send to the output window.
 			///
-			/// @brief Drwas the terminal output field.
+			/// @brief Draws the terminal output field.
 			void drawOutputField(ImGuiWindowFlags flags);
 
 		///@publicsection
@@ -386,7 +386,7 @@ namespace q2
 			/**
 			 * @brief
 			 *   The cout for the terminal. Piping into this will result in the
-		   *   contents being put on the screen.
+			 *   contents being put on the screen.
 			 *
 			 * @detailed
 			 *   This is basically the same as std::cout, but for the ingame
