@@ -117,9 +117,12 @@ void BasicTerminal::flush()
 
 				// leave cache unchanged if l < cache.length() triggers first.
 				if (l < cacheSize)
+				{
 					cache = cache.substr(l, cacheSize);
+				}
 			}
-		} while (cacheSize > targetOutputSize - hundredthSize);
+		}
+		while (cacheSize > targetOutputSize - hundredthSize);
 	}
 
 	// clear the output buffer and reset the cout internal object.

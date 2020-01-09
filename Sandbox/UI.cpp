@@ -70,9 +70,13 @@ void ChatWindow::drawEx(bool* p_open, ImGuiWindowFlags flags)
 	 *  element. `PushStyleVar` can apply to multiple elements once.
 	 */
 	if (focused)
+	{
 		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, 1.0f);
+	}
 	else
+	{
 		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, unselectedTransparency);
+	}
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
 	ImGui::PushStyleColor(ImGuiCol_Border, IM_COL32(100, 100, 100, 255));
@@ -91,10 +95,14 @@ void ChatWindow::drawEx(bool* p_open, ImGuiWindowFlags flags)
 	// segment of the display that was last active.
 	if (ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) &&
 	    !focused)
+	{
 		ImGui::SetScrollY(ImGui::GetScrollY() - 200.0f);
+	}
 	else if (!ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) &&
 	         focused)
+	{
 		ImGui::SetScrollY(ImGui::GetScrollY() + 200.0f);
+	}
 
 	focused = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows);
 
