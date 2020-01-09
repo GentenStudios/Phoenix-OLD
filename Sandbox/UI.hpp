@@ -40,7 +40,7 @@ namespace ui
 		/// @privatesection
 	private:
 		/// @brief The current external focus event state.
-		bool renderFocus = false;
+		bool m_renderFocus = false;
 
 		/// @protectedsection
 	protected:

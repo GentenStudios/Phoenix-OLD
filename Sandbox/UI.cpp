@@ -146,7 +146,7 @@ void ChatWindow::drawEx(bool* p_open, ImGuiWindowFlags flags)
 	drawOutputField(ImGuiWindowFlags_NoScrollbar);
 	ImGui::PopStyleVar();
 
-	if (renderFocus)
+	if (m_renderFocus)
 	{
 		ImGui::SetKeyboardFocusHere(1);
 		renderFocus = false;

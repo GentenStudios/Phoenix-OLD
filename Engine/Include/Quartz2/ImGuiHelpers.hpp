@@ -336,24 +336,24 @@ namespace ImGui
 		///   the `std::string cache` display stream. Truncates the input
 		///   when too large, and manages the contents of our display stream
 		///   to keep it within the desired size.
-		void flush();
+		void m_flush();
 
 		/// @brief Stores the target output display cache size in bytes.
-		int targetOutputSize;
+		int m_targetOutputSize;
 
 		// NOTE: (perhaps should rename to OutputBuffer)
 		//
 		/// @brief Stores the text for our display between updates.
-		std::string cache;
+		std::string m_cache;
 
 		/// @brief The input content from our input box.
-		std::string inputBuffer;
+		std::string m_inputBuffer;
 
 		/// @brief All the callback function pointers registered with this class.
-		std::vector<TerminalCallback> callbackRegistry;
+		std::vector<TerminalCallback> m_callbackRegistry;
 
 		/// @brief The output window name.
-		const char* outputWindowName;
+		const char* m_outputWindowName;
 
 	///@protectedsection
 	protected:

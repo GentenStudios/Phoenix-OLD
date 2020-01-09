@@ -71,21 +71,21 @@ namespace ImGui
 	                                    const char* initialContents)
 			: BaseImWindow(name)
 	{
-		outputWindowName = std::string(name).append("_Output").c_str();
-		targetOutputSize = outputKiloBytes * 1024; // align to kilobytes
-		inputBuffer      = std::string("");
-		cache            = initialContents;
-		cache.reserve(targetOutputSize);
+		m_outputWindowName = std::string(name).append("_Output").c_str();
+		m_targetOutputSize = outputKiloBytes * 1024; // align to kilobytes
+		m_inputBuffer      = std::string("");
+		m_cache            = initialContents;
+		m_cache.reserve(m_targetOutputSize);
 		cout = std::ostringstream(std::ios_base::out | std::ios_base::ate);
 	};
 	inline BasicTerminal::BasicTerminal(const char* name, int outputKiloBytes)
 			: BaseImWindow(name)
 	{
-		outputWindowName = std::string(name).append("_Output").c_str();
-		targetOutputSize = outputKiloBytes * 1024; // align to kilobytes
-		inputBuffer      = std::string("");
-		cache            = std::string("");
-		cache.reserve(targetOutputSize);
+		m_outputWindowName = std::string(name).append("_Output").c_str();
+		m_targetOutputSize = outputKiloBytes * 1024; // align to kilobytes
+		m_inputBuffer      = std::string("");
+		m_cache            = std::string("");
+		m_cache.reserve(m_targetOutputSize);
 		cout =
 				std::ostringstream(std::ios_base::out | std::ios_base::ate);
 	};

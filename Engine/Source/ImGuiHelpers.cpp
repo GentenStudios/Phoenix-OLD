@@ -70,19 +70,19 @@ static int callback(ImGuiInputTextCallbackData* data)
 	return 1;
 }
 
-void BasicTerminal::flush()
+void BasicTerminal::m_flush()
 {
 	std::string buf       = cout.str();
 	std::size_t bufSize   = buf.length();
-	std::size_t cacheSize = cache.length();
+	std::size_t m_cacheSize = m_cache.length();
 
 	// ceiling this so we don't run into an infinite loop with extremely small
-	// targetOutputSizes although it should never happen realistically because
-	// I made sure this is alligned in kilobytes of memory.
-	const int hundredthSize = static_cast<const int>(std::ceil(targetOutputSize / 100));
+	// m_targetOutputSizes although it should never happen realistically
+	// because I made sure this is alligned in kilobytes of memory.
+	const int hundredthSize = static_cast<const int>(std::ceil(m_targetOutputSize / 100));
 	// Just for backup the while loop seeks a slightly larger segment
 	// so after we clear up
-	const int tenthSize = static_cast<const int>(std::floor(targetOutputSize / 10));
+	const int tenthSize = static_cast<const int>(std::floor(m_targetOutputSize / 10));
 
 	// flush content from buffer into output
 	if (bufSize > 0)
@@ -90,14 +90,14 @@ void BasicTerminal::flush()
 		// When our input buffer is larger than our output cache just replace
 		// the output cache with a clip of the input buffer's content that
 		// is the correct size.
-		if (bufSize > targetOutputSize)
-			cache = buf.substr(bufSize - targetOutputSize, bufSize);
+		if (bufSize > m_targetOutputSize)
+			m_cache = buf.substr(bufSize - m_targetOutputSize, bufSize);
 
 		// otherwise just append to the end.
-		cache.append(buf);
+		m_cache.append(buf);
 	}
 
-	if (cacheSize > targetOutputSize)
+	if (cacheSize > m_targetOutputSize)
 	{
 		// then ensure the output content fits with our bounds
 		do
@@ -105,11 +105,11 @@ void BasicTerminal::flush()
 			// IDK if this is done programatically or not, best practice to do
 			// once, reuse return value since this is up to system
 			// implementation I believe.
-			cacheSize = cache.length();
+			cacheSize = m_cache.length();
 
 			// Auto cut at one hundredth the targetSize or newline, which ever
 			// it hits first.
-			for (int l = tenthSize; (l > 0) && cache[l] != '\n'; l++)
+			for (int l = tenthSize; (l > 0) && m_cache[l] != '\n'; l++)
 			{
 				// NOTE:
 				//   may be faster to use more memory and hope fewer malloc calls
@@ -118,11 +118,11 @@ void BasicTerminal::flush()
 				// leave cache unchanged if l < cache.length() triggers first.
 				if (l < cacheSize)
 				{
-					cache = cache.substr(l, cacheSize);
+					m_cache = m_cache.substr(l, cacheSize);
 				}
 			}
 		}
-		while (cacheSize > targetOutputSize - hundredthSize);
+		while (cacheSize > m_targetOutputSize - hundredthSize);
 	}
 
 	// clear the output buffer and reset the cout internal object.
@@ -164,13 +164,13 @@ static inline void renderText(std::string* text)
 	// with ImGui::PushStyleCol; & pop to achieve ansi escape sequences.
 	// Pass to our render function as to not clutter the configuration here.
 	// int begin = 0, current = 0;
-	// int cacheSize = cache.length();
+	// int cacheSize = m_cache.length();
 	// while (current < cacheSize)
 	// {
-	// 	switch(cache[current])
+	// 	switch(m_cache[current])
 	// 	{
 	// 		case '\n':
-	// 			std::string line = cache.substr(begin, current-begin-1);
+	// 			std::string line = m_cache.substr(begin, current-begin-1);
 	// 			// skip newline because on each subsequent call to  ImGui::Text
 	// 			// or ImGui::TextWrapped, it automatically puts next
 	// 			//  things on the line for you.
@@ -184,8 +184,8 @@ static inline void renderText(std::string* text)
 	//
 	// // Prints the last line if it doesn't contain a newline at the end.
 	// // Basically just edge case handling.
-	// if (begin != current && current == cache.length())
-	// 	renderLine(cache.substr(begin, current));
+	// if (begin != current && current == m_cache.length())
+	// 	renderLine(m_cache.substr(begin, current));
 
 	// For now this function actually handles newlines so it's a fix.
 	ImGui::TextWrapped("%s", (*text).c_str());
@@ -193,13 +193,10 @@ static inline void renderText(std::string* text)
 
 void BasicTerminal::drawOutputField(ImGuiWindowFlags flags)
 {
-	// May need later for text scrolling implementatinos.
-	// ImGuiContext* g = ImGui::GetCurrentContext();
 	ImGuiWindow* window = ImGui::GetCurrentWindow();
-
 	// render the text output block with accommodation for input box height.
 	ImGui::BeginChild(
-	    outputWindowName,
+	    m_outputWindowName,
 	    ImVec2(window->SizeFull.x - (window->WindowPadding.x * 2.0f),
 	           window->SizeFull.y - (window->WindowPadding.y * 2.0f) -
 	               ImGui::GetFrameHeightWithSpacing() - // accomodate for input
@@ -208,8 +205,7 @@ void BasicTerminal::drawOutputField(ImGuiWindowFlags flags)
 	               window->TitleBarHeight() - window->MenuBarHeight()),
 	    flags);
 
-	renderText(&cache);
-
+	renderText(&m_cache);
 	ImGui::EndChild();
 }
 
@@ -225,7 +221,7 @@ void BasicTerminal::drawInputField()
 	                     (window->WindowPadding.x * 2.0f));
 	bool appendLine = ImGui::InputText(
 	    "\0",         // make sure we don't have any trailing text to the right.
-	    &inputBuffer, // Our output buffer object.
+	    &m_inputBuffer, // Our output buffer object.
 
 	    // * These can be used in conjunction for extra functionality *
 	    // NOTE: The Callback doesn't need to be used for line by line input.
@@ -249,7 +245,7 @@ void BasicTerminal::drawInputField()
 		//for (auto cb = callbackRegistry.cbegin(); cb != callbackRegistry.cend(); cb++)
 		for (const TerminalCallback& cb : callbackRegistry)
 		{
-			(*cb)(inputBuffer.c_str(), cout);
+			(*cb)(m_inputBuffer.c_str(), cout);
 			// TODO:
 			//   Possibly implement a custom ostringstream for asynchonous data
 			//   transport between the calling functions and our flush method.
@@ -260,7 +256,7 @@ void BasicTerminal::drawInputField()
 		}
 
 		// clear our input buffer && subsequently the text box.
-		inputBuffer.clear();
+		m_inputBuffer.clear();
 
 		// sets the kb focus to the last element drawn (in our case the input
 		// box.) we have to do this because otherwise when we press enter the
