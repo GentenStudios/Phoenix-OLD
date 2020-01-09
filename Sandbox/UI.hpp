@@ -54,7 +54,7 @@ namespace ui
 		/// @brief Sets the external focus event flag for the current
 		///   terminal / the chat window. Upon call, chat's input window will
 		///   get focus regardless of player ingame state.
-		inline void focus() { renderFocus = true; };
+		inline void focus() { m_renderFocus = true; };
 
 		void drawEx(bool* p_open, ImGuiWindowFlags flags);
 	};

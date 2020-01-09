@@ -70,19 +70,19 @@ static int callback(ImGuiInputTextCallbackData* data)
 	return 1;
 }
 
-void BasicTerminal::m_flush()
+void BasicTerminal::flush()
 {
 	std::string buf       = cout.str();
 	std::size_t bufSize   = buf.length();
-	std::size_t m_cacheSize = m_cache.length();
+	std::size_t outputSize = m_outputBuffer.length();
 
 	// ceiling this so we don't run into an infinite loop with extremely small
 	// m_targetOutputSizes although it should never happen realistically
 	// because I made sure this is alligned in kilobytes of memory.
-	const int hundredthSize = static_cast<const int>(std::ceil(m_targetOutputSize / 100));
+	const int hundredthOutputSize = static_cast<const int>(std::ceil(m_targetOutputSize / 100));
 	// Just for backup the while loop seeks a slightly larger segment
 	// so after we clear up
-	const int tenthSize = static_cast<const int>(std::floor(m_targetOutputSize / 10));
+	const int tenthOutputSize = static_cast<const int>(std::floor(m_targetOutputSize / 10));
 
 	// flush content from buffer into output
 	if (bufSize > 0)
@@ -91,13 +91,13 @@ void BasicTerminal::m_flush()
 		// the output cache with a clip of the input buffer's content that
 		// is the correct size.
 		if (bufSize > m_targetOutputSize)
-			m_cache = buf.substr(bufSize - m_targetOutputSize, bufSize);
+			m_outputBuffer = buf.substr(bufSize - m_targetOutputSize, bufSize);
 
 		// otherwise just append to the end.
-		m_cache.append(buf);
+		m_outputBuffer.append(buf);
 	}
 
-	if (cacheSize > m_targetOutputSize)
+	if (outputSize > m_targetOutputSize)
 	{
 		// then ensure the output content fits with our bounds
 		do
@@ -105,24 +105,24 @@ void BasicTerminal::m_flush()
 			// IDK if this is done programatically or not, best practice to do
 			// once, reuse return value since this is up to system
 			// implementation I believe.
-			cacheSize = m_cache.length();
+			outputSize = m_outputBuffer.length();
 
 			// Auto cut at one hundredth the targetSize or newline, which ever
 			// it hits first.
-			for (int l = tenthSize; (l > 0) && m_cache[l] != '\n'; l++)
+			for (int l = tenthOutputSize; (l > 0) && m_outputBuffer[l] != '\n'; l++)
 			{
 				// NOTE:
 				//   may be faster to use more memory and hope fewer malloc calls
 				//   to the kernel results in a faster over-all experience.
 
-				// leave cache unchanged if l < cache.length() triggers first.
-				if (l < cacheSize)
+				// leave output unchanged if l < outputSize triggers first.
+				if (l < outputSize)
 				{
-					m_cache = m_cache.substr(l, cacheSize);
+					m_outputBuffer = m_outputBuffer.substr(l, outputSize);
 				}
 			}
 		}
-		while (cacheSize > m_targetOutputSize - hundredthSize);
+		while (outputSize > m_targetOutputSize - hundredthOutputSize);
 	}
 
 	// clear the output buffer and reset the cout internal object.
@@ -164,13 +164,13 @@ static inline void renderText(std::string* text)
 	// with ImGui::PushStyleCol; & pop to achieve ansi escape sequences.
 	// Pass to our render function as to not clutter the configuration here.
 	// int begin = 0, current = 0;
-	// int cacheSize = m_cache.length();
-	// while (current < cacheSize)
+	// int outputSize = m_outputBuffer.length();
+	// while (current < outputBuffer)
 	// {
-	// 	switch(m_cache[current])
+	// 	switch(m_outputBuffer[current])
 	// 	{
 	// 		case '\n':
-	// 			std::string line = m_cache.substr(begin, current-begin-1);
+	// 			std::string line = m_outputBuffer.substr(begin, current-begin-1);
 	// 			// skip newline because on each subsequent call to  ImGui::Text
 	// 			// or ImGui::TextWrapped, it automatically puts next
 	// 			//  things on the line for you.
@@ -184,8 +184,8 @@ static inline void renderText(std::string* text)
 	//
 	// // Prints the last line if it doesn't contain a newline at the end.
 	// // Basically just edge case handling.
-	// if (begin != current && current == m_cache.length())
-	// 	renderLine(m_cache.substr(begin, current));
+	// if (begin != current && current == m_outputBuffer.length())
+	// 	renderLine(m_outputBuffer.substr(begin, current));
 
 	// For now this function actually handles newlines so it's a fix.
 	ImGui::TextWrapped("%s", (*text).c_str());
@@ -205,7 +205,7 @@ void BasicTerminal::drawOutputField(ImGuiWindowFlags flags)
 	               window->TitleBarHeight() - window->MenuBarHeight()),
 	    flags);
 
-	renderText(&m_cache);
+	renderText(&m_outputBuffer);
 	ImGui::EndChild();
 }
 
@@ -243,9 +243,9 @@ void BasicTerminal::drawInputField()
 	if (appendLine)
 	{
 		//for (auto cb = callbackRegistry.cbegin(); cb != callbackRegistry.cend(); cb++)
-		for (const TerminalCallback& cb : callbackRegistry)
+		for (const TerminalCallback& p_cb : m_callbackRegistry)
 		{
-			(*cb)(m_inputBuffer.c_str(), cout);
+			(*p_cb)(m_inputBuffer.c_str(), cout);
 			// TODO:
 			//   Possibly implement a custom ostringstream for asynchonous data
 			//   transport between the calling functions and our flush method.

@@ -336,15 +336,13 @@ namespace ImGui
 		///   the `std::string cache` display stream. Truncates the input
 		///   when too large, and manages the contents of our display stream
 		///   to keep it within the desired size.
-		void m_flush();
+		void flush();
 
 		/// @brief Stores the target output display cache size in bytes.
 		int m_targetOutputSize;
 
-		// NOTE: (perhaps should rename to OutputBuffer)
-		//
 		/// @brief Stores the text for our display between updates.
-		std::string m_cache;
+		std::string m_outputBuffer;
 
 		/// @brief The input content from our input box.
 		std::string m_inputBuffer;

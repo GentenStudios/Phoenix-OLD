@@ -149,7 +149,7 @@ void ChatWindow::drawEx(bool* p_open, ImGuiWindowFlags flags)
 	if (m_renderFocus)
 	{
 		ImGui::SetKeyboardFocusHere(1);
-		renderFocus = false;
+		m_renderFocus = false;
 	}
 
 	drawInputField();
