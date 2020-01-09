@@ -391,8 +391,8 @@ namespace ImGui
 		 *   into the output cache, name is uesd to construct outputWindowName,
 		 *   and initialContents is saved for later recall by the flush method.
 		 */
-		BasicTerminal(const char* name, int outputKiloBytes = 5,
-		              const char* initialContents = "");
+		explicit BasicTerminal(const char* name, int outputKiloBytes = 5,
+		                       const char* initialContents = "");
 
 		///@brief Does nothing for now; this is a todo feature.
 		~BasicTerminal();
