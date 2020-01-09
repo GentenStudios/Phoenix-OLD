@@ -38,6 +38,11 @@ namespace sandbox
 			{
 				if (e.keyboard.key == Keys::KEY_ESCAPE)
 				{
+					m_camera->enable(!m_camera->isEnabled());
+				}
+
+				if (e.keyboard.key == Keys::KEY_0)
+				{
 					m_window->close();
 				}
 			}
@@ -65,28 +70,30 @@ namespace sandbox
 
 					// top, left, back, right, top, bottom
 					grassBlock.textures = {
-					    "Assets/grass_side.png", "Assets/grass_side.png",
-					    "Assets/grass_side.png", "Assets/grass_side.png",
-					    "Assets/grass_top.png",  "Assets/dirt.png",
+					    "Assets/grass_side.png", "Assets/grass_side.png", "Assets/grass_side.png",
+					    "Assets/grass_side.png", "Assets/grass_top.png", "Assets/dirt.png",
 					};
 				}
 
 				BlockRegistry::instance()->registerBlock(grassBlock);
 			}
 
-			q2::gfx::ChunkRenderer renderer(50);
+			q2::gfx::ChunkRenderer renderer(100);
 			renderer.buildTextureArray();
 
+			for (int j = 0; j < 10; ++j)
+			{
 				for (int i = 0; i < 10; ++i)
 				{
-					q2::voxels::Chunk chunk({i * 32, 0, 0});
+					q2::voxels::Chunk chunk({i * 16, 0, j * 16});
 					chunk.autoTestFill();
 					q2::gfx::ChunkMesher mesher(chunk.getChunkPos(),
 					                            chunk.getBlocks(),
 					                            renderer.getTextureTable());
 					mesher.mesh();
-					renderer.submitChunkMesh(mesher.getMesh(), i);
+					renderer.submitChunkMesh(mesher.getMesh(), i + (j * 10));
 				}
+			}
 
 			q2::gfx::ShaderPipeline shaderPipeline;
 			shaderPipeline.prepare("Assets/SimpleWorld.vert",

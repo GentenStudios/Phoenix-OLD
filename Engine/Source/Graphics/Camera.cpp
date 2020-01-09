@@ -30,7 +30,7 @@
 #include <iostream>
 
 const float MOVE_SPEED  = 0.01f;
-const float SENSITIVITY = 0.0005f;
+const float SENSITIVITY = 0.00005f;
 
 using namespace q2;
 using namespace gfx;

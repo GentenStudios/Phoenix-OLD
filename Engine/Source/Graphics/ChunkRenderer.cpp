@@ -44,7 +44,7 @@ using namespace gfx;
 struct Vertex
 {
 	math::vec3 verts;
-	math::vec3 uv;
+	math::vec3 uv; // includes tex layer
 };
 
 ChunkRenderer::ChunkRenderer(std::size_t visibleChunks)
@@ -144,6 +144,7 @@ const ChunkRenderer::AssociativeTextureTable& ChunkRenderer::getTextureTable()
 ChunkRenderer::MeshIdentifier ChunkRenderer::submitChunkMesh(
     const std::vector<float>& mesh, MeshIdentifier slot)
 {
+	
 	glBindVertexArray(m_vao);
 	glBindBuffer(GL_ARRAY_BUFFER, m_buffer);
 	glBufferSubData(GL_ARRAY_BUFFER, sizeof(Vertex) * 36 * 16 * 16 * 16 * slot,
