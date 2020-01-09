@@ -1,4 +1,4 @@
-// Copyright 2019 Genten Studios
+// Copyright 2020 Genten Studios
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -26,6 +26,14 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+/**
+ * @file ContentLoader.hpp
+ * @brief Implements Lua module loading system.
+ * 
+ * @copyright Copyright (c) 2020 Genten Studios
+ * 
+ */
+
 #pragma once
 
 #include <vector>
@@ -44,7 +52,7 @@ namespace q2
 		std::vector<std::string> dependencies;
 
 		/**
-		 * @brief Constructire for mod object, folder matching mod name with a
+		 * @brief Constructor for mod object, folder matching mod name with a
 		 * dependencies.txt inside modules folder must exist
 		 */
 		explicit Mod(std::string name);
@@ -58,10 +66,26 @@ namespace q2
     struct modules
 	// clang-format on
 	{
+		/**
+		 * @brief Loads nessecary lua modules required to load a save file
+		 * 
+		 * @param save The save file to be loaded
+		 * @param lua The sol state used during runtime
+		 * @return true If the function successfully loaded all modules
+		 * @return false If the function failed to load modules, details will
+		 *         be outputted to the terminal
+		 * 
+		 */
 		static bool loadModules(std::string save, sol::state& lua);
+		//TODO : Add proper error handling instead of returning a boolean
 	};
 
 	struct luaapi{
+		/**
+		 * @brief Loads the Lua API for use in modules
+		 * 
+		 * @param lua The sol state used during runtime
+		 */
         static void loadAPI(sol::state& lua);
     };
 }; // namespace q2
