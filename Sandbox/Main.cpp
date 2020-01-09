@@ -14,7 +14,7 @@ private:
 
 public:
 	PhoenixGame()
-		: Game(1280, 720, "Phoenix Game!")
+		: Game(1280, 720, "Project Phoenix!")
 	{}
 
 protected:
