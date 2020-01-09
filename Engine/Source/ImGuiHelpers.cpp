@@ -246,7 +246,8 @@ void BasicTerminal::drawInputField()
 
 	if (appendLine)
 	{
-		for (auto cb = callbackRegistry.cbegin(); cb != callbackRegistry.cend(); cb++)
+		//for (auto cb = callbackRegistry.cbegin(); cb != callbackRegistry.cend(); cb++)
+		for (const TerminalCallback& cb : callbackRegistry)
 		{
 			(*cb)(inputBuffer.c_str(), cout);
 			// TODO:
