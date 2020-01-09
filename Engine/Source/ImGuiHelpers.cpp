@@ -110,14 +110,10 @@ void BasicTerminal::flush()
 			// Auto cut at one hundredth the targetSize or newline, which ever
 			// it hits first.
 			for (int l = tenthSize; (l > 0) && cache[l] != '\n'; l++)
-			// for (auto l=0; (l < hundredthSize && cache[l] != "\n" && l <
-			// cacheSize; l++)
 			{
-				// move the buffer back
-				// for(auto l2=0; l2 <= bufSize-l+1; l2++)
-				// 	cache[l2] = cache[l2+l]
-				// may be faster to use more memory and hope fewer malloc calls
-				// to the kernel results in a faster over-all experience.
+				// NOTE:
+				//   may be faster to use more memory and hope fewer malloc calls
+				//   to the kernel results in a faster over-all experience.
 
 				// leave cache unchanged if l < cache.length() triggers first.
 				if (l < cacheSize)
@@ -204,7 +200,6 @@ void BasicTerminal::drawOutputField(ImGuiWindowFlags flags)
 	    ImVec2(window->SizeFull.x - (window->WindowPadding.x * 2.0f),
 	           window->SizeFull.y - (window->WindowPadding.y * 2.0f) -
 	               ImGui::GetFrameHeightWithSpacing() - // accomodate for input
-	                                                    // field
 	               // TitleBarHeight() and MenuBarHeight() return 0 when their
 	               // respective ui elements aren't rendered.
 	               window->TitleBarHeight() - window->MenuBarHeight()),
@@ -219,14 +214,13 @@ void BasicTerminal::drawOutputField(ImGuiWindowFlags flags)
 void BasicTerminal::drawInputField()
 {
 	ImGuiWindow* window = ImGui::GetCurrentWindow();
-	// InputText is a frame object so we have to use push item width to adjust
-	// it.
+	// InputText is a frame object, we have to use push item width to adjust it.
 	// TODO: investigate label width changing or outright removal becaouse right
 	//   now we don't have a way to remove it, the data for it is just sitting
 	//   off screen to the right.
 	ImGui::PushItemWidth(ImGui::GetWindowWidth() -
 	                     (window->WindowPadding.x * 2.0f));
-	bool append_line = ImGui::InputText(
+	bool appendLine = ImGui::InputText(
 	    "\0",         // make sure we don't have any trailing text to the right.
 	    &inputBuffer, // Our output buffer object.
 
@@ -247,10 +241,8 @@ void BasicTerminal::drawInputField()
 	);
 	ImGui::PopItemWidth();
 
-	if (append_line)
+	if (appendLine)
 	{
-		// create a copy of the input buffer string to send to our command
-		// capture for safety.
 		for (auto cb = callbackRegistry.cbegin(); cb != callbackRegistry.cend(); cb++)
 		{
 			(*cb)(inputBuffer.c_str(), cout);

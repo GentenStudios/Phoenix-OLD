@@ -85,8 +85,8 @@ void ChatWindow::drawEx(bool* p_open, ImGuiWindowFlags flags)
 	          ImGuiWindowFlags_NoBringToFrontOnFocus | flags);
 
 	// Because the focused variable is static, and we can use it as a state
-	// that's saved across function calls, we can use it's state to infer when
-	// there's a change in the window focused state and thus implement the
+	// that's saved across function calls, we can infer when
+	// there's a change in the ImGui focused state and thus implement the
 	// scroll on focus feature. Currently this is focusing on the top most
 	// segment of the display that was last active.
 	if (ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) &&
