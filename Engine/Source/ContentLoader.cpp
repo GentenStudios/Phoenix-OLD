@@ -37,7 +37,7 @@ using namespace q2;
 Mod::Mod(std::string modName) : name(std::move(modName))
 {
 	std::fstream fileStream;
-	fileStream.open("Modules/" + name + "/dependencies.txt");
+	fileStream.open("Modules/" + name + "/Dependencies.txt");
 	if(!fileStream.is_open()){
 		std::cout << "Couldnt find dependencies file for mod: " << name << "\n";
 		return;	
@@ -57,7 +57,7 @@ bool modules::loadModules(std::string save, sol::state& lua)
 	std::fstream fileStream;
 	std::queue<Mod> toLoad; // A queue of mods that need loaded
 
-	fileStream.open("Save/" + save + "/mods.txt");
+	fileStream.open("Save/" + save + "/Mods.txt");
 	if(!fileStream.is_open()){
 		std::cout << "Error opening save file";
 		return false;	
@@ -99,7 +99,7 @@ bool modules::loadModules(std::string save, sol::state& lua)
 			// list Otherwise, move mod to back of load queue
 			if (satisfied)
 			{
-				lua.script_file("modules/" + mod.name + "/init.lua");
+				lua.script_file("Modules/" + mod.name + "/Init.lua");
 				loadedMods.push_back(mod.name);
 			}
 			else
