@@ -31,17 +31,31 @@
 #include <Quartz2/Quartz.hpp>
 #include <imgui.h>
 
+/// @brief Contains all UI elements specifically designed for Phoenix.
 namespace UI
 {
+	// @brief A restyle of the standard BasicTerminal for Phoenix
 	class ChatWindow : public q2::ImGuiHelpers::BasicTerminal
 	{
-	protected:
-		float unselectedTransparency = 0.3f;
-		bool  renderFocus            = false;
+		/// @privatesection
+	private:
+		/// @brief The current external focus event state.
+		bool renderFocus = false;
 
+		/// @protectedsection
+	protected:
+		/// @brief used when setting the unselected chat terminal transparency.
+		float unselectedTransparency = 0.3f;
+
+		/// @publicsection
 	public:
 		using BasicTerminal::BasicTerminal;
-		inline void focus() { renderFocus = true; }; // external focus events.
-		void        drawEx(bool* p_open, ImGuiWindowFlags flags);
+
+		/// @brief Sets the external focus event flag for the current
+		///   terminal / the chat window. Upon call, chat's input window will
+		///   get focus regardless of player ingame state.
+		inline void focus() { renderFocus = true; };
+
+		void drawEx(bool* p_open, ImGuiWindowFlags flags);
 	};
 }; // namespace UI
