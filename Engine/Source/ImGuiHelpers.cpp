@@ -73,16 +73,16 @@ static int callback(ImGuiInputTextCallbackData* data)
 void BasicTerminal::flush()
 {
 	std::string buf       = cout.str();
-	int         bufSize   = buf.length();
-	int         cacheSize = cache.length();
+	std::size_t bufSize   = buf.length();
+	std::size_t cacheSize = cache.length();
 
 	// ceiling this so we don't run into an infinite loop with extremely small
 	// targetOutputSizes although it should never happen realistically because
 	// I made sure this is alligned in kilobytes of memory.
-	int hundredthSize = static_cast<int>(std::ceil(targetOutputSize / 100));
+	const int hundredthSize = static_cast<const int>(std::ceil(targetOutputSize / 100));
 	// Just for backup the while loop seeks a slightly larger segment
 	// so after we clear up
-	int tenthSize = static_cast<int>(std::floor(targetOutputSize / 10));
+	const int tenthSize = static_cast<const int>(std::floor(targetOutputSize / 10));
 
 	// flush content from buffer into output
 	if (bufSize > 0)
