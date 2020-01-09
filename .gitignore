@@ -6,3 +6,5 @@ Build/
 [._]sw[a-p]
 
 .vs/
+html/
+latex/
