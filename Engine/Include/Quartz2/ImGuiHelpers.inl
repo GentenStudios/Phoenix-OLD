@@ -68,11 +68,19 @@ namespace ImGui
 	{
 		// TODO: Possibly deconstruct the strings, I know I'm missing something.
 	};
+	inline void BasicTerminal::begin(bool* p_open, ImGuiWindowFlags flags)
+	{
+		BaseImWindow::begin(
+		    p_open, ImGuiWindowFlags(ImGuiWindowFlags_NoScrollbar |
+		                             ImGuiWindowFlags_NoScrollWithMouse) |
+		                flags);
+
+	}
 
 	inline void BasicTerminal::draw(bool* p_open, ImGuiWindowFlags extra_flags)
 	{
 		// Window Definition (remember to use the terminal class' begin)
-		begin(p_open, defaultFlags | extra_flags);
+		begin(p_open, extra_flags);
 		drawOutputField(ImGuiWindowFlags_None);
 		drawInputField();
 		end();

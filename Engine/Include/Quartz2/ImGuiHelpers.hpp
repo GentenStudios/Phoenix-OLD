@@ -272,6 +272,18 @@ namespace ImGui
 	 *   text box, and a single output text box. Such could be a chat, or
 	 *   a foux terminal / command line hud element or even a debug terminal.
 	 *
+	 *   Be aware that the window for this Object Oriented widget is imbued
+	 *   with the
+	 *
+	 *   @code
+	 *   ImGuiWindowFlags_NoScrollbar
+	 *   // and
+	 *   ImGuiWindowFlags_NoScrollWithMouse
+	 *   @endcode
+	 *
+	 *   ImGui window flags which direct the scrolling features to the child
+	 *   window containing the terminal output.
+	 *
 	 *   ###Usage Example:
 	 *
 	 *   @code
@@ -323,18 +335,11 @@ namespace ImGui
 
 	///@protectedsection
 	protected:
-		// TODO:
-		//   Maybe use a damn singleton at this point because I'm so
-		//   monumentally frustrated with Codacy. Die in a fire you
-		//   monstrosity operating under Sonos' name. why I ought ta'
-		//   smack ya up one real good! Humbug!
-		//
-		/// @brief The required flags for this window.
-		static const ImGuiWindowFlags defaultFlags = ImGuiWindowFlags(
-		    ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
-
 		/// @brief Draws the terminal input field.
 		void drawInputField();
+
+		/// @brief Enforces the required ImGuiWindowFlags for this class.
+		void begin(bool* p_open, ImGuiWindowFlags flags);
 
 		/// @param[in] flags
 		///   Specifies what ImGui flags to send to the output window.
