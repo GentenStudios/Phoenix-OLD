@@ -216,8 +216,8 @@ namespace ImGui
 		// TODO: vertical shrink with templates
 		//
 		/**
-			 *  @param[in,out] p_open Denote: same as `BaseImWindow::begin`.
-			 *  @param[in] flags Denote: same as `BaseImWindow::begin`.
+		 *  @param[in,out] p_open Denote: same as `BaseImWindow::begin`.
+		 *  @param[in] flags Denote: same as `BaseImWindow::begin`.
 		 *
 		 *  @brief
 		 *    The public rendering interface for subclasses.
