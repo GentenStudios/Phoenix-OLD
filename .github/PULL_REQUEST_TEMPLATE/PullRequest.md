@@ -1,12 +1,12 @@
-Addresses #
+Addresses: #
 Authors:
 @author1
 
-## Summary of changes
+## Summary of changes:
 - Change 1
 - Change 2
   
-## Caveats
+## Caveats:
 Does this introduce any new bugs?
 - Caveat1
 - Caveat2
