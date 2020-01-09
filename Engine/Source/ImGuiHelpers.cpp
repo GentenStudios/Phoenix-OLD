@@ -35,7 +35,7 @@
 #include <imgui_internal.h> // for nav inputs
 #include <misc/cpp/imgui_stdlib.h>
 
-using namespace q2::ImGuiHelpers;
+using namespace ImGui;
 
 // This is a ImGuiInputTextCallback
 // TODO: add terminal history & hook for autocomplete.

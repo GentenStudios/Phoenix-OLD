@@ -27,7 +27,7 @@ ui::ChatWindow chat("Chat Window", 5,
 	"Type something and hit enter to run a command!\n"
 );
 
-ImGuiHelpers::BasicTerminal term("Test Terminal", 5);
+ImGui::BasicTerminal term("Test Terminal", 5);
 
 class PhoenixGame : public Game
 {

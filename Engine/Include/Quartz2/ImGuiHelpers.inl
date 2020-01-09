@@ -30,85 +30,82 @@
 
 // The headers are defined in ImGuiHelpers.hpp
 
-namespace q2
+namespace ImGui
 {
-	namespace ImGuiHelpers
+	inline BaseImWindow::BaseImWindow(const char* name)
 	{
-		inline ImOOGuiWindow::ImOOGuiWindow(const char* name)
-		{
-			rootWindowName = name;
-		};
-
-		inline void ImOOGuiWindow::begin(bool* p_open, ImGuiWindowFlags flags)
-		{
-			ImGui::Begin(rootWindowName, p_open, flags);
-		}
-		inline void ImOOGuiWindow::end()
-		{
-			ImGui::End();
-		};
-
-		inline void ImOOGuiWindow::draw()
-		{
-			drawEx(NULL, ImGuiWindowFlags_None);
-		};
-		inline void ImOOGuiWindow::draw(bool* p_open)
-		{
-			drawEx(p_open, ImGuiWindowFlags_None);
-		};
-		inline void ImOOGuiWindow::draw(bool* p_open, ImGuiWindowFlags flags)
-		{
-			drawEx(p_open, flags);
-		};
-
-		// NOTE: this must at least be defined otherwise the linker freaks.
-		inline void ImOOGuiWindow::drawEx(bool* p_open, ImGuiWindowFlags flags)
-		{
-				/*TODO: throw error must override */
-		};
-
-
-
-		inline BasicTerminal::BasicTerminal(const char* name, int outputKiloBytes,
-		                                    const char* initialContents)
-				: ImOOGuiWindow(name)
-		{
-			outputWindowName = std::string(name).append("_Output").c_str();
-			targetOutputSize = outputKiloBytes * 1024; // align to kilobytes
-			inputBuffer      = std::string("");
-			cache            = initialContents;
-			cache.reserve(targetOutputSize);
-			cout = std::ostringstream(std::ios_base::out | std::ios_base::ate);
-		};
-		inline BasicTerminal::BasicTerminal(const char* name, int outputKiloBytes)
-				: ImOOGuiWindow(name)
-		{
-			outputWindowName = std::string(name).append("_Output").c_str();
-			targetOutputSize = outputKiloBytes * 1024; // align to kilobytes
-			inputBuffer      = std::string("");
-			cache            = std::string("");
-			cache.reserve(targetOutputSize);
-			cout =
-					std::ostringstream(std::ios_base::out | std::ios_base::ate);
-		};
-
-		inline BasicTerminal::~BasicTerminal()
-		{
-			// TODO: Possibly deconstruct the strings, I know I'm missing something.
-		};
-
-		inline void BasicTerminal::drawEx(bool* p_open, ImGuiWindowFlags extra_flags)
-		{
-			// Window Definition (remember to use the terminal class' begin)
-			begin(p_open, defaultFlags | extra_flags);
-			drawOutputField(ImGuiWindowFlags_None);
-			drawInputField();
-			end();
-		}
-
-		inline void BasicTerminal::registerCallback(TerminalCallback callback)
-		{
-			callbackRegistry.push_back(callback);
-		}
+		rootWindowName = name;
 	};
+
+	inline void BaseImWindow::begin(bool* p_open, ImGuiWindowFlags flags)
+	{
+		ImGui::Begin(rootWindowName, p_open, flags);
+	}
+	inline void BaseImWindow::end()
+	{
+		ImGui::End();
+	};
+
+	inline void BaseImWindow::draw()
+	{
+		drawEx(NULL, ImGuiWindowFlags_None);
+	};
+	inline void BaseImWindow::draw(bool* p_open)
+	{
+		drawEx(p_open, ImGuiWindowFlags_None);
+	};
+	inline void BaseImWindow::draw(bool* p_open, ImGuiWindowFlags flags)
+	{
+		drawEx(p_open, flags);
+	};
+
+	// NOTE: this must at least be defined otherwise the linker freaks.
+	inline void BaseImWindow::drawEx(bool* p_open, ImGuiWindowFlags flags)
+	{
+			/*TODO: throw error must override */
+	};
+
+
+
+	inline BasicTerminal::BasicTerminal(const char* name, int outputKiloBytes,
+	                                    const char* initialContents)
+			: BaseImWindow(name)
+	{
+		outputWindowName = std::string(name).append("_Output").c_str();
+		targetOutputSize = outputKiloBytes * 1024; // align to kilobytes
+		inputBuffer      = std::string("");
+		cache            = initialContents;
+		cache.reserve(targetOutputSize);
+		cout = std::ostringstream(std::ios_base::out | std::ios_base::ate);
+	};
+	inline BasicTerminal::BasicTerminal(const char* name, int outputKiloBytes)
+			: BaseImWindow(name)
+	{
+		outputWindowName = std::string(name).append("_Output").c_str();
+		targetOutputSize = outputKiloBytes * 1024; // align to kilobytes
+		inputBuffer      = std::string("");
+		cache            = std::string("");
+		cache.reserve(targetOutputSize);
+		cout =
+				std::ostringstream(std::ios_base::out | std::ios_base::ate);
+	};
+
+	inline BasicTerminal::~BasicTerminal()
+	{
+		// TODO: Possibly deconstruct the strings, I know I'm missing something.
+	};
+
+	inline void BasicTerminal::drawEx(bool* p_open, ImGuiWindowFlags extra_flags)
+	{
+		// Window Definition (remember to use the terminal class' begin)
+		begin(p_open, defaultFlags | extra_flags);
+		drawOutputField(ImGuiWindowFlags_None);
+		drawInputField();
+		end();
+	}
+
+	inline void BasicTerminal::registerCallback(TerminalCallback callback)
+	{
+		callbackRegistry.push_back(callback);
+	}
 };

@@ -35,7 +35,7 @@
 namespace ui
 {
 	// @brief A restyle of the standard BasicTerminal for Phoenix
-	class ChatWindow : public q2::ImGuiHelpers::BasicTerminal
+	class ChatWindow : public ImGui::BasicTerminal
 	{
 		/// @privatesection
 	private:
