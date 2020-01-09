@@ -50,6 +50,7 @@ Mod::Mod(std::string modName) : name(std::move(modName))
 	}
 	fileStream.close();
 };
+
 Mod::~Mod() {};
 
 bool modules::loadModules(std::string save, sol::state& lua)
@@ -80,11 +81,13 @@ bool modules::loadModules(std::string save, sol::state& lua)
 	while (toLoad.size() > 0)
 	{
 		int lastPass = toLoad.size();
+
 		// For each mod that needs loaded
 		for (int i = 0; i < toLoad.size(); i++)
 		{
 			Mod  mod       = toLoad.front();
 			bool satisfied = true;
+
 			// For each dependency the mod has
 			for (int j = 0; j < mod.dependencies.size(); j++)
 			{
@@ -95,6 +98,7 @@ bool modules::loadModules(std::string save, sol::state& lua)
 					satisfied = false;
 				}
 			}
+
 			// If all dependencies were met, run lua and add mod to satisfied
 			// list Otherwise, move mod to back of load queue
 			if (satisfied)
@@ -108,12 +112,13 @@ bool modules::loadModules(std::string save, sol::state& lua)
 			}
 			toLoad.pop();
 		}
+
 		// If we haven't loaded any new mods, throw error
 		if (lastPass == toLoad.size())
 		{
 			// TODO: Replace this with actuall error handling/ logging
 			std::cout
-			    << "One or more mods are missing required dependencies \n";
+			    << "One or more mods are missing required dependencies. \n";
 			std::cout << "Failed Mods:\n";
 			for (int i = 0; i < toLoad.size(); i++)
 			{
@@ -130,7 +135,6 @@ bool modules::loadModules(std::string save, sol::state& lua)
 	}
 	return true;
 }
-
 
 //TODO: replace this with an API registration system
 #include <Quartz2/Settings.hpp>
