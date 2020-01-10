@@ -54,14 +54,11 @@ namespace ImGui
 
 	inline BasicTerminal::BasicTerminal(const char* name, int outputKiloBytes,
 	                                    const char* initialContents)
-			: BaseImWindow(name), m_inputBuffer(), m_outputBuffer(initialContents)
+			: BaseImWindow(name), m_inputBuffer(), m_outputBuffer(initialContents),
+			m_targetOutputSize(outputKiloBytes * 1024),
+			cout(std::ios_base::out | std::ios_base::ate)
 	{
-		m_outputWindowName = std::string(name).append("_Output").c_str();
-
-		// align to kilobytes
-		m_targetOutputSize = outputKiloBytes * 1024;
 		m_outputBuffer.reserve(m_targetOutputSize);
-		cout = std::ostringstream(std::ios_base::out | std::ios_base::ate);
 	};
 
 	inline BasicTerminal::~BasicTerminal()

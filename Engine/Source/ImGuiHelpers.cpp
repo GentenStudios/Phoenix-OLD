@@ -196,7 +196,7 @@ void BasicTerminal::drawOutputField(ImGuiWindowFlags flags)
 	const ImGuiWindow* window = ImGui::GetCurrentWindow();
 	// render the text output block with accommodation for input box height.
 	ImGui::BeginChild(
-	    m_outputWindowName,
+	    "cout",
 	    ImVec2(window->SizeFull.x - (window->WindowPadding.x * 2.0f),
 	           window->SizeFull.y - (window->WindowPadding.y * 2.0f) -
 	               ImGui::GetFrameHeightWithSpacing() - // accomodate for input
@@ -245,7 +245,7 @@ void BasicTerminal::drawInputField()
 		//for (auto cb = callbackRegistry.cbegin(); cb != callbackRegistry.cend(); cb++)
 		for (const TerminalCallback& p_cb : m_callbackRegistry)
 		{
-			(*p_cb)(m_inputBuffer.c_str(), cout);
+			(*p_cb)(m_inputBuffer, cout);
 			// TODO:
 			//   Possibly implement a custom ostringstream for asynchonous data
 			//   transport between the calling functions and our flush method.

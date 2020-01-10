@@ -258,7 +258,7 @@ namespace ImGui
 	 *   Specifically, this is defined as an ease-of-use feature for definitions
 	 *   pertaining to the function callbacks within the `BasicTerminal` class.
 	 */
-	typedef void (*TerminalCallback)(const char*         content,
+	typedef void (*TerminalCallback)(const std::string&  content,
 	                                 std::ostringstream& cout);
 
 	// TODO: More comprehensive example here, I'm too tired to write it atm.
@@ -319,7 +319,7 @@ namespace ImGui
 		void flush();
 
 		/// @brief Stores the target output display cache size in bytes.
-		int m_targetOutputSize;
+		const int m_targetOutputSize;
 
 		/// @brief Stores the text for our display between updates.
 		std::string m_outputBuffer;
@@ -329,9 +329,6 @@ namespace ImGui
 
 		/// @brief All the callback function pointers registered with the class.
 		std::vector<TerminalCallback> m_callbackRegistry;
-
-		/// @brief The output window name.
-		const char* m_outputWindowName;
 
 	///@protectedsection
 	protected:
