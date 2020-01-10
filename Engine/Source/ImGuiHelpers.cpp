@@ -72,9 +72,9 @@ static int callback(ImGuiInputTextCallbackData* data)
 
 void BasicTerminal::flush()
 {
-	std::string buf       = cout.str();
-	std::size_t bufSize   = buf.length();
-	std::size_t outputSize = m_outputBuffer.length();
+	std::string       buf        = cout.str();
+	const std::size_t bufSize    = buf.length();
+	std::size_t       outputSize = m_outputBuffer.length();
 
 	// ceiling this so we don't run into an infinite loop with extremely small
 	// m_targetOutputSizes although it should never happen realistically
@@ -131,7 +131,7 @@ void BasicTerminal::flush()
 }
 
 // NOTE: This inline is okay because it's only used within this file.
-static inline void renderText(std::string* text)
+static inline void renderText(const std::string& text)
 {
 	// TODO:
 	//   Implement ANSI escape sequences for color because this is
@@ -188,12 +188,12 @@ static inline void renderText(std::string* text)
 	// 	renderLine(m_outputBuffer.substr(begin, current));
 
 	// For now this function actually handles newlines so it's a fix.
-	ImGui::TextWrapped("%s", (*text).c_str());
+	ImGui::TextWrapped("%s", text.c_str());
 };
 
 void BasicTerminal::drawOutputField(ImGuiWindowFlags flags)
 {
-	ImGuiWindow* window = ImGui::GetCurrentWindow();
+	const ImGuiWindow* window = ImGui::GetCurrentWindow();
 	// render the text output block with accommodation for input box height.
 	ImGui::BeginChild(
 	    m_outputWindowName,
@@ -205,21 +205,21 @@ void BasicTerminal::drawOutputField(ImGuiWindowFlags flags)
 	               window->TitleBarHeight() - window->MenuBarHeight()),
 	    flags);
 
-	renderText(&m_outputBuffer);
+	renderText(m_outputBuffer);
 	ImGui::EndChild();
 }
 
 // Fuck this is going to be annoying to make threadsafe
 void BasicTerminal::drawInputField()
 {
-	ImGuiWindow* window = ImGui::GetCurrentWindow();
+	const ImGuiWindow* window = ImGui::GetCurrentWindow();
 	// InputText is a frame object, we have to use push item width to adjust it.
 	// TODO: investigate label width changing or outright removal becaouse right
 	//   now we don't have a way to remove it, the data for it is just sitting
 	//   off screen to the right.
 	ImGui::PushItemWidth(ImGui::GetWindowWidth() -
 	                     (window->WindowPadding.x * 2.0f));
-	bool appendLine = ImGui::InputText(
+	const bool appendLine = ImGui::InputText(
 	    "\0",         // make sure we don't have any trailing text to the right.
 	    &m_inputBuffer, // Our output buffer object.
 
@@ -236,7 +236,7 @@ void BasicTerminal::drawInputField()
 	        ),
 	    &callback,
 
-	    NULL // Can be a user data object but unnecessary here.
+	    nullptr // Can be a user data object but unnecessary here.
 	);
 	ImGui::PopItemWidth();
 

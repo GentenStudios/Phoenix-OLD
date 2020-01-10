@@ -46,12 +46,12 @@ static void        ForceUpdateMouseWheel()
 	ImGuiContext* g = ImGui::GetCurrentContext();
 
 	// Reset the locked window if we move the mouse or after the timer elapses
-	if (g->WheelingWindow != NULL)
+	if (g->WheelingWindow != nullptr)
 	{
 		g->WheelingWindowTimer -= g->IO.DeltaTime;
 		if (g->WheelingWindowTimer <= 0.0f)
 		{
-			g->WheelingWindow      = NULL;
+			g->WheelingWindow      = nullptr;
 			g->WheelingWindowTimer = 0.0f;
 		}
 	}
@@ -59,8 +59,8 @@ static void        ForceUpdateMouseWheel()
 
 void ChatWindow::draw(bool* p_open, ImGuiWindowFlags flags)
 {
-	ImGuiContext* g = ImGui::GetCurrentContext();
-	static bool   focused;
+	const ImGuiContext* g = ImGui::GetCurrentContext();
+	static bool         focused;
 
 	/***
 	 * NOTE:
@@ -133,7 +133,7 @@ void ChatWindow::draw(bool* p_open, ImGuiWindowFlags flags)
 	// Embedded default size
 	// Shrink from top down, by default it's reverse because windows are renderd
 	// from the top left.
-	ImVec2 size = ImVec2(400, (focused ? 600 : 400));
+	const ImVec2 size = ImVec2(400, (focused ? 600 : 400));
 	ImGui::SetWindowSize(ImVec2(size.x, size.y), ImGuiCond_Always);
 
 	// Set to the bottom right with accommodation for size changes

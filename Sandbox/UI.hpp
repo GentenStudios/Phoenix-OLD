@@ -45,7 +45,7 @@ namespace ui
 		/// @protectedsection
 	protected:
 		/// @brief used when setting the unselected chat terminal transparency.
-		float unselectedTransparency = 0.3f;
+		const float unselectedTransparency = 0.3f;
 
 		/// @publicsection
 	public:
@@ -56,6 +56,6 @@ namespace ui
 		///   get focus regardless of player ingame state.
 		inline void focus() { m_renderFocus = true; };
 
-		void draw(bool* p_open = NULL, ImGuiWindowFlags flags = ImGuiWindowFlags_None);
+		void draw(bool* p_open = nullptr, ImGuiWindowFlags flags = ImGuiWindowFlags_None);
 	};
 }; // namespace UI

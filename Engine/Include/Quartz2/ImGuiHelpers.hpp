@@ -174,7 +174,7 @@ namespace ImGui
 		/**
 		 * @param[in,out] p_open
 		 *   A boolean pointer that when specified communicates whether
-		 *   the root window is in the closed or open state. When NULL
+		 *   the root window is in the closed or open state. When null
 		 *   no window close button is rendered and the window may not be
 		 *   closed by ImGui.
 		 *
@@ -247,7 +247,7 @@ namespace ImGui
 		 *   };
 		 *   @endcode
 		 */
-		void draw(bool*            p_open = NULL,
+		void draw(bool*            p_open = nullptr,
 		          ImGuiWindowFlags flags  = ImGuiWindowFlags_None);
 	};
 
@@ -422,7 +422,7 @@ namespace ImGui
 		 */
 		void registerCallback(TerminalCallback callback);
 
-		void draw(bool*            p_open = NULL,
+		void draw(bool*            p_open = nullptr,
 		          ImGuiWindowFlags flags  = ImGuiWindowFlags_None);
 	};
 }; // namespace ImGui
