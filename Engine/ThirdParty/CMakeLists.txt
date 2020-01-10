@@ -9,5 +9,7 @@ add_definitions(-DSDL_MAIN_HANDLED)
 add_subdirectory (SDL2)
 add_subdirectory (Glad)
 add_subdirectory (ImGui)
+add_subdirectory (sol2)
+add_subdirectory (lua)
 
 set_target_properties(SDL2main SDL2-static uninstall Glad ImGui PROPERTIES FOLDER Dependencies)
