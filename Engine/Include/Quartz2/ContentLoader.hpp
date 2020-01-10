@@ -67,7 +67,7 @@ namespace q2
 	// clang-format on
 	{
 		/**
-		 * @brief Loads nessecary lua modules required to load a save file
+		 * @brief Loads necessary lua modules required to load a save file
 		 * 
 		 * @param save The save file to be loaded
 		 * @param lua The sol state used during runtime
@@ -80,7 +80,8 @@ namespace q2
 		//TODO : Add proper error handling instead of returning a boolean
 	};
 
-	struct luaapi{
+	struct luaapi
+	{
 		/**
 		 * @brief Loads the Lua API for use in modules
 		 * 
