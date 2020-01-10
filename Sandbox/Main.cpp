@@ -1,10 +1,32 @@
 #include <Quartz2/Quartz.hpp>
+#include <UI.hpp>
 
 #include <imgui.h>
 
+#include <iostream>
+#include <sstream>
 #include <memory>
+#include <string>
 
 using namespace q2;
+
+
+static void rawEcho(const std::string &input, std::ostringstream &cout)
+{
+	// easter egg commission for the tobster.
+	if (input.compare("buh-buh-bum-bah-bum") == 0) cout << "I'll be back\n";
+
+	cout << input << "\n";
+}
+
+static ui::ChatWindow chat("Chat Window", 5,
+	// @FutureRuby I know this looks weird but it works.
+	// constant string compile time concatenation is wierd.
+	"Welcome to the Darklight Terminal!\n"
+	"Type something and hit enter to run a command!\n"
+);
+
+static ImGui::BasicTerminal term("Test Terminal", 5);
 
 class PhoenixGame : public Game
 {
@@ -15,7 +37,11 @@ private:
 public:
 	PhoenixGame()
 		: Game(1280, 720, "Project Phoenix!")
-	{}
+	{
+
+		chat.registerCallback(&rawEcho);
+		term.registerCallback(&rawEcho);
+	}
 
 protected:
 	virtual bool onEvent(SDL_Event e)
@@ -28,6 +54,21 @@ protected:
 				SDL_ShowCursor(!m_camera->isEnabled());
 				return true;
 			}
+			// Uncomment to have chat popup every time enter is pressed.
+			// Could probably use integration with @SonosFuer's input system.
+			// if (e.key.keysym.scancode == SDL_SCANCODE_RETURN)
+			// NOTE:
+			//   doing this encurs the wrath of cthulu and you will be cursed to
+			//   oblivion. By which I mean you won't be able to press enter without
+			//   the chat window being focused on period, regardless of other ui
+			//   elements being overlayed. I tryed to make this a non-issue by
+			//   by leaving the ImGuiWindowFlags_NoFocusOnAppearing flag with the
+			//   class definition but it can be a pain when using a second terminal.
+			//
+			// {
+			// 	chat.focus();
+			// 	return true;
+			// }
 		}
 
 		return false;
@@ -45,7 +86,7 @@ protected:
 
 		m_chunkRenderer = std::make_unique<ChunkRenderer>();
 		m_chunkRenderer->setup(getWindowWidth(), getWindowHeight());
-	
+
 		if (!m_chunkRenderer->isReady())
 		{
 			std::fprintf(stderr, "Renderer setup failed: Status = %s\n",
@@ -78,13 +119,13 @@ protected:
 		grassBlockType->textures.front = grassBlockType->textures.back
 			= grassBlockType->textures.left = grassBlockType->textures.right =
 				atlas->getSpriteIDFromFilepath("Assets/grass_side.png");
-		
+
 		m_chunkRenderer->setTexture(atlas->getPatchedTextureData(), atlas->getPatchedTextureWidth(), atlas->getPatchedTextureHeight());
 
 		Chunk a;
 		m_chunkRenderer->addMesh(a.generateMesh());
 	}
-	
+
 	virtual void onExit()
 	{
 		m_chunkRenderer->teardown();
@@ -143,6 +184,14 @@ protected:
 		ImGui::Text("OpenGL Error %i\n", glGetError());
 		ImGui::End();
 
+		// Vertical height adjust the chat window... happens in the UI
+		// segment definition because Main function management is hard enough
+		// as it is. Here's to the good time of whomever doesn't have to deal
+		// with 20 extra lines of clutter because of me :D
+		chat.draw();
+		term.draw();
+
+		ImGui::ShowStyleEditor();
 		m_chunkRenderer->render(m_camera.get());
 	}
 };

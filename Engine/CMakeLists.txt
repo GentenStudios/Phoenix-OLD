@@ -36,6 +36,7 @@ add_library(${PROJECT_NAME}
 	${Headers}/BlocksTextureAtlas.hpp
 	${Headers}/BlocksRegistry.hpp
 	${Headers}/Singleton.hpp
+	${Headers}/ImGuiHelpers.hpp
 	${Headers}/ContentLoader.hpp
 	${Headers}/Settings.hpp
 
@@ -53,6 +54,7 @@ add_library(${PROJECT_NAME}
 	${Source}/BlocksRegistry.cpp
 	${Source}/ContentLoader.cpp
 	${Source}/Settings.cpp
+	${Source}/ImGuiHelpers.cpp
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${Headers}/../)
@@ -74,3 +76,4 @@ if(WIN32)
 	target_link_libraries(${PROJECT_NAME} PRIVATE opengl32.lib)
 endif()
 
+set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 17)

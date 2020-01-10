@@ -1,4 +1,4 @@
-// Copyright 2019-20 Genten Studios
+// Copyright 2019 Genten Studios
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -28,13 +28,34 @@
 
 #pragma once
 
-#include <Quartz2/Math.hpp>
-#include <Quartz2/ChunkRenderer.hpp>
-#include <Quartz2/Game.hpp>
-#include <Quartz2/Camera.hpp>
-#include <Quartz2/Mesh.hpp>
-#include <Quartz2/Chunk.hpp>
-#include <Quartz2/VoxelWorld.hpp>
-#include <Quartz2/BlocksTextureAtlas.hpp>
-#include <Quartz2/ImGuiHelpers.hpp>
-#include <Quartz2/ContentLoader.hpp>
+#include <Quartz2/Quartz.hpp>
+#include <imgui.h>
+
+/// @brief Contains all UI elements specifically designed for Phoenix.
+namespace ui
+{
+	// @brief A restyle of the standard BasicTerminal for Phoenix
+	class ChatWindow : public ImGui::BasicTerminal
+	{
+		/// @privatesection
+	private:
+		/// @brief The current external focus event state.
+		bool m_renderFocus = false;
+
+		/// @protectedsection
+	protected:
+		/// @brief used when setting the unselected chat terminal transparency.
+		const float unselectedTransparency = 0.3f;
+
+		/// @publicsection
+	public:
+		using BasicTerminal::BasicTerminal;
+
+		/// @brief Sets the external focus event flag for the current
+		///   terminal / the chat window. Upon call, chat's input window will
+		///   get focus regardless of player ingame state.
+		inline void focus() { m_renderFocus = true; };
+
+		void draw(bool* p_open = nullptr, ImGuiWindowFlags flags = ImGuiWindowFlags_None);
+	};
+}; // namespace UI
