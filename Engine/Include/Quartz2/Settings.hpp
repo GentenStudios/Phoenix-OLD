@@ -1,4 +1,4 @@
-// Copyright 2020 Genten Studios
+// Copyright 2019-20 Genten Studios
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -30,7 +30,7 @@
  * @file Settings.hpp
  * @brief Implements a settings management system
  * 
- * @copyright Copyright (c) 2020 Genten Studios
+ * @copyright Copyright (c) 2019-20 Genten Studios
  * 
  */
 
