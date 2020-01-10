@@ -35,6 +35,14 @@ protected:
 
 	virtual void onStart()
 	{
+		sol::state lua;
+		lua.open_libraries(sol::lib::base);
+		luaapi::loadAPI(lua);
+		bool loadedLua = modules::loadModules("save1", lua);
+		if (!loadedLua){
+			exitGame();
+		}
+
 		m_chunkRenderer = std::make_unique<ChunkRenderer>();
 		m_chunkRenderer->setup(getWindowWidth(), getWindowHeight());
 	

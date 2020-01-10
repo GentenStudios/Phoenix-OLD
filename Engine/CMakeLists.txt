@@ -36,6 +36,7 @@ add_library(${PROJECT_NAME}
 	${Headers}/BlocksTextureAtlas.hpp
 	${Headers}/BlocksRegistry.hpp
 	${Headers}/Singleton.hpp
+	${Headers}/ContentLoader.hpp
 	${Headers}/Settings.hpp
 
 	${Source}/Matrix4x4.cpp
@@ -50,6 +51,7 @@ add_library(${PROJECT_NAME}
 	${Source}/Mesh.cpp
 	${Source}/BlocksTextureAtlas.cpp
 	${Source}/BlocksRegistry.cpp
+	${Source}/ContentLoader.cpp
 	${Source}/Settings.cpp
 )
 
@@ -59,12 +61,14 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 	${CMAKE_CURRENT_LIST_DIR}/ThirdParty/SDL2/include
 	${CMAKE_CURRENT_LIST_DIR}/ThirdParty/Glad/include
 	${CMAKE_CURRENT_LIST_DIR}/ThirdParty/ImGui
+	${CMAKE_CURRENT_LIST_DIR}/ThirdParty/ImGui/examples
+	${CMAKE_CURRENT_LIST_DIR}/ThirdParty/lua
+	${CMAKE_CURRENT_LIST_DIR}/ThirdParty/sol2/include
 	${CMAKE_CURRENT_LIST_DIR}/ThirdParty/stb_image
 	${CMAKE_CURRENT_LIST_DIR}/ThirdParty/stb_rectpack
-	${CMAKE_CURRENT_LIST_DIR}/ThirdParty/ImGui/examples
 )
 
-target_link_libraries(${PROJECT_NAME} PRIVATE SDL2-static SDL2main Glad ImGui)
+target_link_libraries(${PROJECT_NAME} PRIVATE SDL2-static SDL2main Glad ImGui sol2 liblua)
 
 if(WIN32)
 	target_link_libraries(${PROJECT_NAME} PRIVATE opengl32.lib)
