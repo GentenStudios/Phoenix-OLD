@@ -1,11 +1,11 @@
 add_subdirectory(Math)
+#add_subdirectory(Graphics)
 
 set(currentDir ${CMAKE_CURRENT_LIST_DIR})
 set(Sources
 	${mathSources}
+	#${graphicsSources}
 
-	${currentDir}/Matrix4x4.cpp
-	${currentDir}/Ray.cpp
 	${currentDir}/ChunkRenderer.cpp
 	${currentDir}/ShaderCompiler.cpp
 	${currentDir}/Game.cpp

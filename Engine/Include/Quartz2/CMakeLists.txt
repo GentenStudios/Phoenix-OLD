@@ -6,17 +6,9 @@ set(currentDir ${CMAKE_CURRENT_LIST_DIR})
 set(Headers
 	${mathHeaders}
 	${eventHeaders}
-
 	${currentDir}/EnumTools.hpp
 
-	${currentDir}/Math.hpp
-	${currentDir}/MathUtils.hpp
-	${currentDir}/Matrix4x4.hpp
 	${currentDir}/Quartz.hpp
-	${currentDir}/Ray.hpp
-	${currentDir}/Rect.hpp
-	${currentDir}/Vec2.hpp
-	${currentDir}/Vec3.hpp
 	${currentDir}/ChunkRenderer.hpp
 	${currentDir}/ShaderCompiler.hpp
 	${currentDir}/Game.hpp

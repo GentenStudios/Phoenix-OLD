@@ -130,14 +130,14 @@ void ChunkRenderer::render(Camera* camera)
 	const float NEAR_DRAW = 0.1f;
 	const float FAR_DRAW = 1000.f;
 
-	const Mat4 projection = Mat4::perspective(
+	const math::mat4 projection = math::mat4::perspective(
 		static_cast<float>(m_viewWidth) / static_cast<float>(m_viewHeight),
 		FOV,
 		FAR_DRAW,
 		NEAR_DRAW	
 	);
 	
-	const Mat4 view = camera->calculateViewMatrix();
+	const math::mat4 view = camera->calculateViewMatrix();
 
 	glUseProgram(m_terrainShader);
 

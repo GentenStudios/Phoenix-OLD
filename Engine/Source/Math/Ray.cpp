@@ -26,50 +26,36 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#pragma once
+#include <Quartz2/Math/Ray.hpp>
 
-#include <Quartz2/Vec3.hpp>
+using namespace q2;
 
-namespace q2
+Ray::Ray(const math::vec3& start,
+         const math::vec3& direction)
+    : m_start(start), m_direction(direction), m_currentPosition(start),
+      m_length(0.f)
 {
-	struct Matrix4x4
-	{
-		float elements[16];
+}
 
-		Matrix4x4();
+math::vec3 Ray::advance(float scale)
+{
+	m_currentPosition += m_direction * scale;
+	m_length += scale;
 
-		Matrix4x4(float m00, float m10, float m20, float m30, float m01,
-			float m11, float m21, float m31, float m02, float m12,
-			float m22, float m32, float m03, float m13, float m23,
-			float m33);
+	return m_currentPosition;
+}
 
-		void setIdentity();
+math::vec3 Ray::backtrace(float scale)
+{
+	m_currentPosition -= m_direction * scale;
+	m_length -= scale;
 
-		~Matrix4x4() = default;
+	return m_currentPosition;
+}
 
-		static Matrix4x4 perspective(const float& aspectRatio,
-			const float& fieldOfView,
-			const float& farPlane,
-			const float& nearPlane);
+float Ray::getLength() const { return m_length; }
 
-		static Matrix4x4 ortho(float left, float right, float top,
-			float bottom, float farPlane,
-			float nearPlane);
-
-		static Matrix4x4 lookAt(const Vec3& eyePos,
-			const Vec3& centre,
-			const Vec3& up);
-
-		void operator*=(const Matrix4x4& other);
-
-		Matrix4x4 operator*(const Matrix4x4& other) const;
-
-		void operator*=(const float& other);
-
-		Matrix4x4 operator*(const float& other);
-
-		Vec3 operator*(const Vec3& other);
-	};
-
-	using Mat4 = Matrix4x4;
-} // namespace q2
+math::vec3 Ray::getCurrentPosition() const
+{
+	return m_currentPosition;
+}
