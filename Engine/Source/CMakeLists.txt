@@ -1,8 +1,9 @@
-#add_subdirectory(Events)
-#add_subdirectory(Graphics)
+add_subdirectory(Math)
 
 set(currentDir ${CMAKE_CURRENT_LIST_DIR})
 set(Sources
+	${mathSources}
+
 	${currentDir}/Matrix4x4.cpp
 	${currentDir}/Ray.cpp
 	${currentDir}/ChunkRenderer.cpp
