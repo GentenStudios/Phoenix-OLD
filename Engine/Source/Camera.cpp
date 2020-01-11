@@ -39,7 +39,7 @@ using namespace q2;
 Camera::Camera()
 {
 	m_settingSensitivity =
-	    Settings::get()->add("Sensitivity", "camera:sensitivity", 5);
+	    Settings::get()->add("Sensitivity", "camera:sensitivity", 50);
 	m_settingSensitivity->setMax(100);
 	m_settingSensitivity->setMin(1);
 }
