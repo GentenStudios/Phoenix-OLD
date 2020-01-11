@@ -18,19 +18,24 @@ static void rawEcho(const std::string &input, std::ostringstream &cout)
 	// easter egg commission for the tobster.
 	if (input.compare("buh-buh-bum-bah-bum") == 0) cout << "I'll be back\n";
 
-	std::string 			 s = input;
-	std::vector<std::string> args;
+	cout << "->" << input << "\n";
 
-	size_t pos = s.find(" ");
-	std::string command = s.substr(0, pos);
-	s.erase(0, pos + 1);
-	std::string token;
-	while ((pos = s.find(" ")) != std::string::npos) {
-		token = s.substr(0, pos);
-		args.push_back(token);
+	std::string 			 s = input;
+
+	if (s.substr(0,1) == "/") {
+		std::vector<std::string> args;
+
+		size_t pos = s.find(" ");
+		std::string command = s.substr(1, pos);
 		s.erase(0, pos + 1);
+		std::string token;
+		while ((pos = s.find(" ")) != std::string::npos) {
+			token = s.substr(0, pos);
+			args.push_back(token);
+			s.erase(0, pos + 1);
+		}
+		kirk.run(command, std::move(args), cout);
 	}
-	kirk.run(command, std::move(args), cout);
 }
 
 static ui::ChatWindow chat("Chat Window", 5,
