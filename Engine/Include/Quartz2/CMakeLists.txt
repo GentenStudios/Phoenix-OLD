@@ -1,8 +1,12 @@
-#add_subdirectory(Events)
+add_subdirectory(Events)
 #add_subdirectory(Graphics)
 
 set(currentDir ${CMAKE_CURRENT_LIST_DIR})
 set(Headers
+	${eventHeaders}
+
+	${currentDir}/EnumTools.hpp
+
 	${currentDir}/Math.hpp
 	${currentDir}/MathUtils.hpp
 	${currentDir}/Matrix4x4.hpp
