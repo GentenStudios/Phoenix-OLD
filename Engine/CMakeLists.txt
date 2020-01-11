@@ -24,12 +24,6 @@ if(WIN32)
 	target_link_libraries(${PROJECT_NAME} PRIVATE opengl32.lib)
 endif()
 
-if(UNIX AND NOT APPLE)
-	find_package(X11 REQUIRED)
-	find_package(Threads REQUIRED)
-	target_link_libraries(${PROJECT_NAME} PRIVATE ${X11_LIBRARIES} GL)
-endif()
-
 foreach(FILE ${Sources}) 
     get_filename_component(PARENT_DIR "${FILE}" DIRECTORY)
     string(REPLACE "${CMAKE_CURRENT_SOURCE_DIR}" "" GROUP "${PARENT_DIR}")
