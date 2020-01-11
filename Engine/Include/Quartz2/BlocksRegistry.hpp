@@ -1,4 +1,4 @@
-// Copyright 2019 Genten Studios
+// Copyright 2019-20 Genten Studios
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -31,6 +31,7 @@
 #include <Quartz2/BlocksTextureAtlas.hpp>
 #include <Quartz2/Singleton.hpp>
 #include <list>
+#include <memory>
 
 namespace q2
 {

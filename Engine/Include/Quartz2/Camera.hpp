@@ -1,4 +1,4 @@
-// Copyright 2019 Genten Studios
+// Copyright 2019-20 Genten Studios
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -29,6 +29,7 @@
 #pragma once
 
 #include <Quartz2/Matrix4x4.hpp>
+#include <Quartz2/Settings.hpp>
 #include <Quartz2/Vec3.hpp>
 
 #include <SDL.h>
@@ -111,5 +112,8 @@ namespace q2
 		/// @brief The current status of the camera, whether it's enabled or
 		/// not.
 		bool m_enabled = true;
+
+		/// @brief Setting that stores the sensitivity base value
+		Setting* m_settingSensitivity;
 	};
 } // namespace q2

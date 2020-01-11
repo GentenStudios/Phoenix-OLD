@@ -1,5 +1,8 @@
 project (ImGui)
 
+# Tell ImGUI that we're using GLAD as our OpenGL function loader.
+add_definitions(-DIMGUI_IMPL_OPENGL_LOADER_GLAD)
+
 add_library(${PROJECT_NAME}
 	imconfig.h
 	imgui.h
@@ -18,6 +21,9 @@ add_library(${PROJECT_NAME}
 
 	examples/imgui_impl_sdl.h
 	examples/imgui_impl_sdl.cpp
+
+	misc/cpp/imgui_stdlib.h
+	misc/cpp/imgui_stdlib.cpp
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE
