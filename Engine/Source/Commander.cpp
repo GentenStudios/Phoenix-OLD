@@ -32,8 +32,8 @@
 
 using namespace q2;
 
-Commander::Commander(std::ostream& out)
-    : m_book(CommandBook::get()), m_out(out)
+Commander::Commander()
+    : m_book(CommandBook::get())
 {
 }
 
@@ -69,55 +69,57 @@ void CommandBook::add(const std::string& command, const std::string& help,
 
 int CommandBook::getPage() { return m_page; }
 
-bool Commander::help(const std::vector<std::string>&& args)
+bool Commander::help(const std::vector<std::string>&& args,
+                     std::ostream&                    out)
 {
 	if (args.size() < 1)
 	{
-		m_out << "Type /help [command] to learn more about a command \nType "
+		out << "Type /help [command] to learn more about a command \nType "
 		         "/list for a list of available commands\n";
 		return true;
 	}
 	else if (args[0] == "help")
 	{
-		m_out << "Type /help [command] to learn more about a command \n";
+		out << "Type /help [command] to learn more about a command \n";
 		return true;
 	}
 	else if (args[0] == "list")
 	{
-		m_out << "Lists available commands\n";
+		out << "Lists available commands\n";
 		return true;
 	}
 	const int j = m_book->find(args[0]);
 	if (j == 0)
 	{
-		m_out << "Command \"" + args[0] + "\" not found \n";
+		out << "Command \"" + args[0] + "\" not found \n";
 		return false;
 	}
 	else
 	{
-		m_out << m_book->m_help[j];
+		out << m_book->m_help[j];
 		return true;
 	}
 }
 
 bool Commander::run(const std::string&               command,
-                    const std::vector<std::string>&& args)
+                    const std::vector<std::string>&& args,
+                    std::ostream&                    out)
 {
 	// Check for built in functions
 	if (command == "help")
 	{
-		return this->help(std::move(args));
+		return this->help(std::move(args), out);
 	}
 	else if (command == "list")
 	{
-		this->list();
+		this->list(out);
 		return true;
 	}
 	// If no built in functions match, search library
 	const int j = m_book->find(command);
 	if (j == -1)
 	{
-		m_out << "Command \"" + command + "\" not found \n";
+		out << "Command \"" + command + "\" not found \n";
 		return false;
 	}
 	else
@@ -127,21 +129,21 @@ bool Commander::run(const std::string&               command,
 	}
 }
 
-void Commander::list()
+void Commander::list(std::ostream& out)
 {
-	m_out << "Available commands\n";
+	out << "Available commands\n";
 	for (int j = 0; j < m_book->getPage(); j++)
 	{
-		m_out << "-" + m_book->m_command[j] + "\n";
+		out << "-" + m_book->m_command[j] + "\n";
 	}
 }
 
-void Commander::post(std::istream& in)
+void Commander::post(std::istream& in, std::ostream& out)
 {
 	std::string input;
 	while (true)
 	{
-		m_out << "\n->";
+		out << "\n->";
 		int                      i = 0;
 		std::vector<std::string> args;
 		std::string              command = "";
@@ -157,6 +159,6 @@ void Commander::post(std::istream& in)
 		{
 			break;
 		}
-		run(command, std::move(args));
+		run(command, std::move(args), out);
 	}
 }

@@ -11,13 +11,26 @@
 
 using namespace q2;
 
+static Commander kirk = Commander();
 
 static void rawEcho(const std::string &input, std::ostringstream &cout)
 {
 	// easter egg commission for the tobster.
 	if (input.compare("buh-buh-bum-bah-bum") == 0) cout << "I'll be back\n";
 
-	cout << input << "\n";
+	std::string 			 s = input;
+	std::vector<std::string> args;
+
+	size_t pos = s.find(" ");
+	std::string command = s.substr(0, pos);
+	s.erase(0, pos + 1);
+	std::string token;
+	while ((pos = s.find(" ")) != std::string::npos) {
+		token = s.substr(0, pos);
+		args.push_back(token);
+		s.erase(0, pos + 1);
+	}
+	kirk.run(command, std::move(args), cout);
 }
 
 static ui::ChatWindow chat("Chat Window", 5,
@@ -125,9 +138,6 @@ protected:
 
 		Chunk a;
 		m_chunkRenderer->addMesh(a.generateMesh());
-
-		Commander kirk = Commander(std::cout, std::cin);
-		std::thread thread(&Commander::post, &kirk);
 
 	}
 

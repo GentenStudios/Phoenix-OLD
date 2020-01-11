@@ -94,7 +94,6 @@ namespace q2
     {
     private:
         CommandBook*  m_book;
-        std::ostream& m_out;
 
     public:
         /**
@@ -105,7 +104,7 @@ namespace q2
          * @param out An output stream the commander outputs results to
          * @param in An input stream the commander accepts input to
          */
-        Commander(std::ostream& out);
+        Commander();
         ~Commander();
 
         /**
@@ -116,7 +115,8 @@ namespace q2
          * function could not be found
          */
         bool run(const std::string&               command,
-                    const std::vector<std::string>&& args);
+                 const std::vector<std::string>&& args,
+                 std::ostream&                    out);
 
         /**
          * @brief Returns helpstring for command
@@ -126,16 +126,17 @@ namespace q2
          * @return Returns True if successful and False if it could not find
          * the innputted command
          */
-        bool help(const std::vector<std::string>&& args);
+        bool help(const std::vector<std::string>&& args,
+                         std::ostream&                    out);
 
         /**
          * @brief Returns string listing available commands
          */
-        void list();
+        void list(std::ostream& out);
 
         /**
          * @brief Listens for commands.
          */
-        void post(std::istream& in);
+        void post(std::istream& in, std::ostream& out);
     };
 } // namespace qz
