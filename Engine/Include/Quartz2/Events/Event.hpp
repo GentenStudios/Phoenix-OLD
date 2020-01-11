@@ -40,34 +40,34 @@ namespace q2
 	{
 		struct Position
 		{
-			int x;
-			int y;
+			int x = {};
+			int y = {};
 		};
 
 		struct Size
 		{
-			int width;
-			int height;
+			int width  = {};
+			int height = {};
 		};
 
 		struct Scroll
 		{
-			double x;
-			double y;
+			double x = {};
+			double y = {};
 		};
 
 		struct Keyboard
 		{
-			Keys key;
-			Mods mods;
+			Keys key  = {};
+			Mods mods = {};
 		};
 
 		struct Mouse
 		{
-			MouseButtons button;
-			Mods         mods;
-			int          x;
-			int          y;
+			MouseButtons button = {};
+			Mods         mods   = {};
+			int          x      = {};
+			int          y      = {};
 		};
 
 		enum class EventType : int
