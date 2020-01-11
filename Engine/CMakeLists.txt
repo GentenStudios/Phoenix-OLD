@@ -24,6 +24,11 @@ if(WIN32)
 	target_link_libraries(${PROJECT_NAME} PRIVATE opengl32.lib)
 endif()
 
+
+###########################################################
+## THIS SORTS THE FILES FOR VISUAL STUDIO SOURCE GROUPS. ##
+###########################################################
+
 foreach(FILE ${Sources}) 
     get_filename_component(PARENT_DIR "${FILE}" DIRECTORY)
     string(REPLACE "${CMAKE_CURRENT_SOURCE_DIR}" "" GROUP "${PARENT_DIR}")

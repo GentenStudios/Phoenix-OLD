@@ -1,7 +1,7 @@
 project(Sandbox)
 
 add_subdirectory(Assets)
-add_subdirectory(Include)
+add_subdirectory(Include/Sandbox)
 add_subdirectory(Source)
 
 add_executable(${PROJECT_NAME} ${Headers} ${Sources})
@@ -10,6 +10,10 @@ target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_LIST_DIR}/Inc
 target_link_libraries(${PROJECT_NAME} Engine)
 
 add_dependencies(${PROJECT_NAME} SandboxAssets)
+
+###########################################################
+## THIS SORTS THE FILES FOR VISUAL STUDIO SOURCE GROUPS. ##
+###########################################################
 
 foreach(FILE ${Sources}) 
     get_filename_component(PARENT_DIR "${FILE}" DIRECTORY)
