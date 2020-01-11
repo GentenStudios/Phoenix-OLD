@@ -40,39 +40,39 @@ namespace q2
 	{
 		struct Position
 		{
-			int x;
-			int y;
+			int x = {};
+			int y = {};
 		};
 
 		struct Size
 		{
-			int width;
-			int height;
+			int width  = {};
+			int height = {};
 		};
 
 		struct Scroll
 		{
-			double x;
-			double y;
+			double x = {};
+			double y = {};
 		};
 
 		struct Keyboard
 		{
-			Keys key;
-			Mods mods;
+			Keys key  = {};
+			Mods mods = {};
 		};
 
 		struct Mouse
 		{
-			MouseButtons button;
-			Mods         mods;
-			int          x;
-			int          y;
+			MouseButtons button = {};
+			Mods         mods   = {};
+			int          x      = {};
+			int          y      = {};
 		};
 
 		enum class EventType : int
 		{
-			NONE,
+			NONE                  = 0,
 			WINDOW_MOVED          = SDL_WINDOWEVENT_MOVED,
 			WINDOW_RESIZED        = SDL_WINDOWEVENT_SIZE_CHANGED,
 			WINDOW_CLOSED         = SDL_QUIT,
