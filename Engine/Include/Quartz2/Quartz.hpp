@@ -28,7 +28,7 @@
 
 #pragma once
 
-#include <Quartz2/Math.hpp>
+#include <Quartz2/Math/Math.hpp>
 #include <Quartz2/ChunkRenderer.hpp>
 #include <Quartz2/Game.hpp>
 #include <Quartz2/Camera.hpp>

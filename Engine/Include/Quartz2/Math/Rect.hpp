@@ -28,20 +28,17 @@
 
 #pragma once
 
-#include <Quartz2/Vec2.hpp>
+#include <Quartz2/Math/Math.hpp>
 
 namespace q2
 {
 	struct RectAABB
 	{
-		Vec2 topLeft, topRight;
-		Vec2 bottomLeft, bottomRight;
+		math::vec2 topLeft, topRight;
+		math::vec2 bottomLeft, bottomRight;
 
-		RectAABB(Vec2 tl,
-			Vec2 tr,
-			Vec2 bl,
-			Vec2 br)
-			: topLeft(tl), topRight(tr), bottomLeft(bl), bottomRight(br)
+		RectAABB(math::vec2 tl, math::vec2 tr, math::vec2 bl, math::vec2 br)
+		    : topLeft(tl), topRight(tr), bottomLeft(bl), bottomRight(br)
 		{
 		}
 

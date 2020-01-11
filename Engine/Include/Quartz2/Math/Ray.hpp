@@ -26,36 +26,60 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Quartz2/Ray.hpp>
+#pragma once
 
-using namespace q2;
+#include <Quartz2/Math/Math.hpp>
 
-Ray::Ray(const Vec3& start,
-         const Vec3& direction)
-    : m_start(start), m_direction(direction), m_currentPosition(start),
-      m_length(0.f)
+namespace q2
 {
-}
+	/**
+	 * @brief Produces a castable ray for helping find things at
+	 * positions/intervals along the ray.
+	 */
+	class Ray
+	{
+	public:
+		/**
+		 * @brief Constructs a Ray object.
+		 * @param start The position of the start of the ray.
+		 * @param direction The direction the ray is "traveling" in.
+		 */
+		Ray(const math::vec3& start,
+			const math::vec3& direction);
 
-Vec3 Ray::advance(float scale)
-{
-	m_currentPosition += m_direction * scale;
-	m_length += scale;
+		Ray(const Ray& other) = default;
+		~Ray() = default;
 
-	return m_currentPosition;
-}
+		/**
+		 * @brief Advances along a ray.
+		 * @param scale The distance to advance along the ray
+		 * @return The new position along the ray.
+		 */
+		math::vec3 advance(float scale);
 
-Vec3 Ray::backtrace(float scale)
-{
-	m_currentPosition -= m_direction * scale;
-	m_length -= scale;
+		/**
+		 * @brief Backtracks (goes backwards) along a ray.
+		 * @param scale The distance to backtrack along the ray.
+		 * @return The new position along the ray.
+		 */
+		math::vec3 backtrace(float scale);
 
-	return m_currentPosition;
-}
+		/**
+		 * @brief Gets the current length of the ray.
+		 * @return The length of the ray.
+		 */
+		float getLength() const;
 
-float Ray::getLength() const { return m_length; }
+		/**
+		 * @brief Gets the current position along the ray.
+		 * @return The current position along the ray
+		 */
+		math::vec3 getCurrentPosition() const;
 
-Vec3 Ray::getCurrentPosition() const
-{
-	return m_currentPosition;
-}
+	private:
+		float m_length;
+		math::vec3  m_start;
+		math::vec3  m_direction;
+		math::vec3  m_currentPosition;
+	};
+} // namespace qz

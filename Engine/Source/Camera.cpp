@@ -27,7 +27,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <Quartz2/Camera.hpp>
-#include <Quartz2/MathUtils.hpp>
+#include <Quartz2/Math/MathUtils.hpp>
 
 #include <cmath>
 
@@ -44,14 +44,14 @@ Camera::Camera()
 	m_settingSensitivity->setMin(1);
 }
 
-Vec3 Camera::getPosition() const { return m_position; }
+math::vec3 Camera::getPosition() const { return m_position; }
 
-Vec3 Camera::getDirection() const { return m_direction; }
+math::vec3 Camera::getDirection() const { return m_direction; }
 
-Mat4 Camera::calculateViewMatrix() const
+math::mat4 Camera::calculateViewMatrix() const
 {
-	const Vec3 centre = m_position + m_direction;
-	return Matrix4x4::lookAt(m_position, centre, m_up);
+	const math::vec3 centre = m_position + m_direction;
+	return math::mat4::lookAt(m_position, centre, m_up);
 }
 
 void Camera::enable(bool enabled) { m_enabled = enabled; }
@@ -77,16 +77,16 @@ void Camera::tick(float dt, SDL_Window* window)
 	m_rotation.x += sensitivity * dt * (halfWindowWidth - mouseX);
 	m_rotation.y += sensitivity * dt * (halfWindowHeight - mouseY);
 
-	m_rotation.y = q2::clamp(m_rotation.y, -q2::PIDIV2, q2::PIDIV2);
+	m_rotation.y = math::clamp(m_rotation.y, -math::PIDIV2, math::PIDIV2);
 
 	m_direction.x = std::cos(m_rotation.y) * std::sin(m_rotation.x);
 	m_direction.y = std::sin(m_rotation.y);
 	m_direction.z = std::cos(m_rotation.y) * std::cos(m_rotation.x);
 
-	const Vec3 right = {std::sin(m_rotation.x - q2::PIDIV2), 0.f,
-	                    std::cos(m_rotation.x - q2::PIDIV2)};
+	const math::vec3 right = {std::sin(m_rotation.x - math::PIDIV2), 0.f,
+	                    std::cos(m_rotation.x - math::PIDIV2)};
 
-	m_up = Vec3::cross(right, m_direction);
+	m_up = math::vec3::cross(right, m_direction);
 
 	const float moveSpeed = MOVE_SPEED;
 

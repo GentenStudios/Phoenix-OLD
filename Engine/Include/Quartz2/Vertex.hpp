@@ -28,14 +28,13 @@
 
 #pragma once
 
-#include <Quartz2/Vec3.hpp>
-#include <Quartz2/Vec2.hpp>
+#include <Quartz2/Math/Math.hpp>
 
 namespace q2
 {
 	struct Vertex
 	{
-		Vec3 position;
-		Vec2 texCoord;
+		math::vec3 position;
+		math::vec2 texCoord;
 	};
 }
