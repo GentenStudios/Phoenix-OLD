@@ -95,7 +95,6 @@ namespace q2
     private:
         CommandBook*  m_book;
         std::ostream& m_out;
-        std::istream& m_in;
 
     public:
         /**
@@ -106,7 +105,7 @@ namespace q2
          * @param out An output stream the commander outputs results to
          * @param in An input stream the commander accepts input to
          */
-        Commander(std::ostream& out, std::istream& in);
+        Commander(std::ostream& out);
         ~Commander();
 
         /**
@@ -137,6 +136,6 @@ namespace q2
         /**
          * @brief Listens for commands.
          */
-        void post();
+        void post(std::istream& in);
     };
 } // namespace qz

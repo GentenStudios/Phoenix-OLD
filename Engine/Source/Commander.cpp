@@ -32,8 +32,8 @@
 
 using namespace q2;
 
-Commander::Commander(std::ostream& out, std::istream& in)
-    : m_book(CommandBook::get()), m_out(out), m_in(in)
+Commander::Commander(std::ostream& out)
+    : m_book(CommandBook::get()), m_out(out)
 {
 }
 
@@ -136,7 +136,7 @@ void Commander::list()
 	}
 }
 
-void Commander::post()
+void Commander::post(std::istream& in)
 {
 	std::string input;
 	while (true)
@@ -146,10 +146,10 @@ void Commander::post()
 		std::vector<std::string> args;
 		std::string              command = "";
 		std::string              buffer;
-		m_in >> command;
-		while (m_in.peek() != '\n')
+		in >> command;
+		while (in.peek() != '\n')
 		{
-			m_in >> buffer;
+			in >> buffer;
 			args.push_back(buffer);
 			i++;
 		}
