@@ -67,7 +67,7 @@ namespace q2
 				constexpr Vector3() : x(), y(), z() {}
 
 				template <typename X>
-				explicit constexpr Vector3(X val)
+				constexpr explicit Vector3(X val)
 				    : x(static_cast<T>(val)), y(static_cast<T>(val)),
 				      z(static_cast<T>(val))
 				{
