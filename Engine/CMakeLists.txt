@@ -2,7 +2,7 @@ project(Engine)
 
 add_subdirectory(ThirdParty)
 
-add_subdirectory(Include)
+add_subdirectory(Include/Quartz2)
 add_subdirectory(Source)
 
 add_library(${PROJECT_NAME} STATIC ${Headers} ${Sources})
