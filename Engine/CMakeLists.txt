@@ -2,7 +2,7 @@ project(Engine)
 
 add_subdirectory(ThirdParty)
 
-add_subdirectory(Include)
+add_subdirectory(Include/Quartz2)
 add_subdirectory(Source)
 
 add_library(${PROJECT_NAME} STATIC ${Headers} ${Sources})
@@ -23,6 +23,11 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 if(WIN32)
 	target_link_libraries(${PROJECT_NAME} PRIVATE opengl32.lib)
 endif()
+
+
+###########################################################
+## THIS SORTS THE FILES FOR VISUAL STUDIO SOURCE GROUPS. ##
+###########################################################
 
 foreach(FILE ${Sources}) 
     get_filename_component(PARENT_DIR "${FILE}" DIRECTORY)
