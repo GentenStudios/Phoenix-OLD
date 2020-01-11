@@ -72,7 +72,7 @@ namespace q2
 
 		enum class EventType : int
 		{
-			NONE,
+			NONE                  = 0,
 			WINDOW_MOVED          = SDL_WINDOWEVENT_MOVED,
 			WINDOW_RESIZED        = SDL_WINDOWEVENT_SIZE_CHANGED,
 			WINDOW_CLOSED         = SDL_QUIT,
