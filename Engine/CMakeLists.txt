@@ -6,7 +6,7 @@ add_subdirectory(Include)
 add_subdirectory(Source)
 
 add_library(${PROJECT_NAME} STATIC ${Headers} ${Sources})
-target_link_libraries(${PROJECT_NAME} PRIVATE SDL2-static Glad ImGui liblua)
+target_link_libraries(${PROJECT_NAME} PRIVATE SDL2-static SDL2main Glad ImGui sol2 liblua)
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_LIST_DIR}/Include)
 target_include_directories(${PROJECT_NAME} PUBLIC
@@ -22,12 +22,6 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 
 if(WIN32)
 	target_link_libraries(${PROJECT_NAME} PRIVATE opengl32.lib)
-endif()
-
-if(UNIX AND NOT APPLE)
-	find_package(X11 REQUIRED)
-	find_package(Threads REQUIRED)
-	target_link_libraries(${PROJECT_NAME} PRIVATE ${X11_LIBRARIES} GL)
 endif()
 
 foreach(FILE ${Sources}) 
