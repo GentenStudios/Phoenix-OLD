@@ -128,9 +128,12 @@ void ChunkRenderer::render(gfx::FPSCamera* camera)
 	glBindTexture(GL_TEXTURE_2D, m_texture);
 	glActiveTexture(GL_TEXTURE0);
 
+	const math::mat4 view = camera->calculateViewMatrix()
+	const math::mat4 proj = camera->getProjection()
+
 	glUniformMatrix4fv(glGetUniformLocation(m_terrainShader, "u_view"), 1,
-	                   GL_FALSE, &camera->calculateViewMatrix().elements[0]);
-	glUniformMatrix4fv(glGetUniformLocation(m_terrainShader, "u_projection"), 1, GL_FALSE, &camera->getProjection().elements[0]);
+	                   GL_FALSE, &view[0]);
+	glUniformMatrix4fv(glGetUniformLocation(m_terrainShader, "u_projection"), 1, GL_FALSE, &proj[0]);
 
 	for (ChunkRendererMesh& mesh : m_meshes)
 	{
