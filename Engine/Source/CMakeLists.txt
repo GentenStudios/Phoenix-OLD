@@ -18,6 +18,6 @@ set(Sources
 	${currentDir}/ContentLoader.cpp
 	${currentDir}/Settings.cpp
 	${currentDir}/ImGuiHelpers.cpp
-
+	${currentDir}/Commander.cpp
 	PARENT_SCOPE
 )
