@@ -1,5 +1,5 @@
 #include <Quartz2/Quartz.hpp>
-#include <UI.hpp>
+#include <Sandbox/UI.hpp>
 
 #include <imgui.h>
 
@@ -22,6 +22,7 @@ static void rawEcho(const std::string &input, std::ostringstream &cout)
 static ui::ChatWindow chat("Chat Window", 5,
 	// @FutureRuby I know this looks weird but it works.
 	// constant string compile time concatenation is wierd.
+	"Welcome to the Darklight Terminal!\n"
 	"Type something and hit enter to run a command!\n"
 );
 
@@ -195,6 +196,7 @@ protected:
 	}
 };
 
+#undef main
 int main(int argc, char** argv)
 {
 	Game* game = new PhoenixGame();
