@@ -1,12 +1,12 @@
 
 /**
  * @brief std::filesystem feature support for old systems
- * 
+ *
  * This checks if the compiler supports std::filesystem and if not,
  * sets std::filesystem to equal std::experimental::filesystem
  * 
  * This file is just copied from a stack overflow post
- * https://stackoverflow.com/questions/53365538/how-to-determine-whether-to-use-filesystem-or-experimental-filesystem
+ * https://stackoverflow.com/a/53365539/8279989
  */
 
 // We haven't checked which filesystem to include yet
