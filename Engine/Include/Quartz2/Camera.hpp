@@ -28,9 +28,8 @@
 
 #pragma once
 
-#include <Quartz2/Matrix4x4.hpp>
+#include <Quartz2/Math/Math.hpp>
 #include <Quartz2/Settings.hpp>
-#include <Quartz2/Vec3.hpp>
 
 #include <SDL.h>
 
@@ -55,14 +54,14 @@ namespace q2
 		 * @return A 3 component vector containing the position of the
 		 * camera.
 		 */
-		Vec3 getPosition() const;
+		math::vec3 getPosition() const;
 
 		/**
 		 * @brief Gets the direction of the camera, in world space
 		 * @return A 3 component vector containing the direction of the
 		 * camera.
 		 */
-		Vec3 getDirection() const;
+		math::vec3 getDirection() const;
 
 		/**
 		 * @brief Calculates the view matrix for use in the graphics
@@ -70,7 +69,7 @@ namespace q2
 		 * @return A 4x4 Matrix containing the required information to send
 		 * into shaders.
 		 */
-		Mat4 calculateViewMatrix() const;
+		math::mat4 calculateViewMatrix() const;
 
 		/**
 		 * @brief Updates things like position and direction dependent on
@@ -98,16 +97,16 @@ namespace q2
 
 	private:
 		/// @brief The rotation of the camera.
-		Vec3 m_rotation;
+		math::vec3 m_rotation;
 
 		/// @brief The position of the camera.
-		Vec3 m_position;
+		math::vec3 m_position;
 
 		/// @brief The UP vector of the camera.
-		Vec3 m_up;
+		math::vec3 m_up;
 
 		/// @brief The direction of the camera.
-		Vec3 m_direction;
+		math::vec3 m_direction;
 
 		/// @brief The current status of the camera, whether it's enabled or
 		/// not.

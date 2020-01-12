@@ -1,4 +1,4 @@
-// Copyright 2019-20 Genten Studios
+// Copyright 2019 Genten Studios
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -26,12 +26,13 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Quartz2/MathUtils.hpp>
-#include <Quartz2/Matrix4x4.hpp>
+#include <Quartz2/Math/Math.hpp>
+#include <Quartz2/Math/MathUtils.hpp>
+#include <Quartz2/Math/Matrix4x4.hpp>
 
 #define INDEX_2D(x, y) x + (y * 4)
 
-using namespace q2;
+using namespace q2::math::detail;
 
 Matrix4x4::Matrix4x4() { setIdentity(); }
 
@@ -47,10 +48,16 @@ void Matrix4x4::setIdentity()
 	elements[INDEX_2D(3, 3)] = 1.f;
 }
 
-Matrix4x4::Matrix4x4(float m00, float m10, float m20, float m30, float m01,
-                     float m11, float m21, float m31, float m02, float m12,
-                     float m22, float m32, float m03, float m13, float m23,
-                     float m33)
+// this is just because the matrix is 4x4 and it's so much nicer to read like
+// this....
+// clang-format off
+Matrix4x4::Matrix4x4(
+	float m00, float m10, float m20, float m30,
+	float m01, float m11, float m21, float m31,
+	float m02, float m12, float m22, float m32,
+	float m03, float m13, float m23, float m33
+)
+// clang-format on
 {
 	elements[0 + 0 * 4] = m00;
 	elements[1 + 0 * 4] = m10;
@@ -78,12 +85,12 @@ Matrix4x4 Matrix4x4::perspective(const float& aspectRatio,
                                  const float& farPlane, const float& nearPlane)
 {
 	Matrix4x4 perspectMatrix;
-
 	for (float& element : perspectMatrix.elements)
 		element = 0.f;
 
 	const float fieldOfViewRadians = degreeToRadians(fieldOfView);
-	const float tangentFoVHalf     = std::tan(fieldOfViewRadians / 2.f);
+
+	const float tangentFoVHalf = std::tan(fieldOfViewRadians / 2.f);
 
 	perspectMatrix.elements[0] = 1.f / (aspectRatio * tangentFoVHalf);
 	perspectMatrix.elements[INDEX_2D(1, 1)] = 1.f / tangentFoVHalf;
@@ -100,7 +107,6 @@ Matrix4x4 Matrix4x4::ortho(float left, float right, float top, float bottom,
                            float farPlane, float nearPlane)
 {
 	Matrix4x4 out;
-
 	for (float& element : out.elements)
 		element = 0.f;
 
@@ -119,18 +125,18 @@ Matrix4x4 Matrix4x4::ortho(float left, float right, float top, float bottom,
 Matrix4x4 Matrix4x4::lookAt(const Vec3& eyePos, const Vec3& centre,
                             const Vec3& up)
 {
-	Vec3 f = centre - eyePos;
+	math::vec3 f = centre - eyePos;
 	f.normalize();
 
-	Vec3 s = Vec3::cross(f, up);
+	math::vec3 s = math::vec3::cross(f, up);
 	s.normalize();
 
-	const Vec3 u = Vec3::cross(s, f);
+	const math::vec3 u = math::vec3::cross(s, f);
 
-	const Matrix4x4 lookAtMatrix(
-	    s.x, u.x, -f.x, 0.f, s.y, u.y, -f.y, 0.f, s.z, u.z, -f.z, 0.f,
-	    -Vec3::dotProduct(s, eyePos), -Vec3::dotProduct(u, eyePos),
-		Vec3::dotProduct(f, eyePos), 1.f);
+	Matrix4x4 lookAtMatrix(s.x, u.x, -f.x, 0.f, s.y, u.y, -f.y, 0.f, s.z, u.z,
+	                       -f.z, 0.f, -math::vec3::dotProduct(s, eyePos),
+	                       -math::vec3::dotProduct(u, eyePos),
+	                       math::vec3::dotProduct(f, eyePos), 1.f);
 
 	return lookAtMatrix;
 }
@@ -194,7 +200,7 @@ Matrix4x4 Matrix4x4::operator*(const float& other)
 	return matrix;
 }
 
-TVec3<float> Matrix4x4::operator*(const Vec3& other)
+Vector3<float> Matrix4x4::operator*(const Vec3& other)
 {
 	const float x = elements[0 + 0 * 4] * other.x +
 	                elements[1 + 0 * 4] * other.y +

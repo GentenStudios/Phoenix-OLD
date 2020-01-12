@@ -28,7 +28,7 @@
 
 #pragma once
 
-#include <Quartz2/Vec3.hpp>
+#include <Quartz2/Math/Math.hpp>
 
 namespace q2
 {
@@ -44,8 +44,8 @@ namespace q2
 		 * @param start The position of the start of the ray.
 		 * @param direction The direction the ray is "traveling" in.
 		 */
-		Ray(const Vec3& start,
-			const Vec3& direction);
+		Ray(const math::vec3& start,
+			const math::vec3& direction);
 
 		Ray(const Ray& other) = default;
 		~Ray() = default;
@@ -55,14 +55,14 @@ namespace q2
 		 * @param scale The distance to advance along the ray
 		 * @return The new position along the ray.
 		 */
-		Vec3 advance(float scale);
+		math::vec3 advance(float scale);
 
 		/**
 		 * @brief Backtracks (goes backwards) along a ray.
 		 * @param scale The distance to backtrack along the ray.
 		 * @return The new position along the ray.
 		 */
-		Vec3 backtrace(float scale);
+		math::vec3 backtrace(float scale);
 
 		/**
 		 * @brief Gets the current length of the ray.
@@ -74,12 +74,12 @@ namespace q2
 		 * @brief Gets the current position along the ray.
 		 * @return The current position along the ray
 		 */
-		Vec3 getCurrentPosition() const;
+		math::vec3 getCurrentPosition() const;
 
 	private:
 		float m_length;
-		Vec3  m_start;
-		Vec3  m_direction;
-		Vec3  m_currentPosition;
+		math::vec3  m_start;
+		math::vec3  m_direction;
+		math::vec3  m_currentPosition;
 	};
 } // namespace qz
