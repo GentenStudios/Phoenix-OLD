@@ -1,6 +1,3 @@
-#add_subdirectory(Events)
-#add_subdirectory(Graphics)
-
 set(currentDir ${CMAKE_CURRENT_LIST_DIR})
 set(Sources
 	${currentDir}/Matrix4x4.cpp
