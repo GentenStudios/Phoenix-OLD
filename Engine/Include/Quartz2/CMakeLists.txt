@@ -15,7 +15,6 @@ set(Headers
 	${currentDir}/ShaderCompiler.hpp
 	${currentDir}/Game.hpp
 	${currentDir}/OpenGL32.hpp
-	${currentDir}/Camera.hpp
 	${currentDir}/Chunk.hpp
 	${currentDir}/VoxelWorld.hpp
 	${currentDir}/Mesh.hpp

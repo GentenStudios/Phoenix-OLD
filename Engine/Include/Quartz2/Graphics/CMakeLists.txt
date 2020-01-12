@@ -3,6 +3,7 @@ set(graphicsHeaders
 	${currentDir}/OpenGLTools.hpp
 
 	${currentDir}/Window.hpp
+	${currentDir}/Camera.hpp
 
 	PARENT_SCOPE
 )

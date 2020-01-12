@@ -10,7 +10,6 @@ set(Sources
 	${currentDir}/ShaderCompiler.cpp
 	${currentDir}/Game.cpp
 	${currentDir}/OpenGL32.cpp
-	${currentDir}/Camera.cpp
 	${currentDir}/Chunk.cpp
 	${currentDir}/VoxelWorld.cpp
 	${currentDir}/Mesh.cpp

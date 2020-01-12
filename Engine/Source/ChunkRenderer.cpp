@@ -84,11 +84,8 @@ void ChunkRenderer::setTexture(unsigned char* data, std::size_t w, std::size_t h
 	glGenerateMipmap(GL_TEXTURE_2D);
 }
 
-void ChunkRenderer::setup(std::size_t viewWidth, std::size_t viewHeight)
+void ChunkRenderer::setup()
 {
-	m_viewWidth = viewWidth;
-	m_viewHeight = viewHeight;
-
 	// Optimism :D (this will get changed later if anything does fail).
 	m_status = CHUNK_RENDERER_STATUS_READY;
 
@@ -124,28 +121,16 @@ void ChunkRenderer::teardown()
 	}
 }
 
-void ChunkRenderer::render(Camera* camera)
+void ChunkRenderer::render(gfx::FPSCamera* camera)
 {
-	const float FOV = 60.f;
-	const float NEAR_DRAW = 0.1f;
-	const float FAR_DRAW = 1000.f;
-
-	const math::mat4 projection = math::mat4::perspective(
-		static_cast<float>(m_viewWidth) / static_cast<float>(m_viewHeight),
-		FOV,
-		FAR_DRAW,
-		NEAR_DRAW	
-	);
-	
-	const math::mat4 view = camera->calculateViewMatrix();
-
 	glUseProgram(m_terrainShader);
 
 	glBindTexture(GL_TEXTURE_2D, m_texture);
 	glActiveTexture(GL_TEXTURE0);
 
-	glUniformMatrix4fv(glGetUniformLocation(m_terrainShader, "u_view"), 1, GL_FALSE, &view.elements[0]);
-	glUniformMatrix4fv(glGetUniformLocation(m_terrainShader, "u_projection"), 1, GL_FALSE, &projection.elements[0]);
+	glUniformMatrix4fv(glGetUniformLocation(m_terrainShader, "u_view"), 1,
+	                   GL_FALSE, &camera->calculateViewMatrix().elements[0]);
+	glUniformMatrix4fv(glGetUniformLocation(m_terrainShader, "u_projection"), 1, GL_FALSE, &camera->getProjection().elements[0]);
 
 	for (ChunkRendererMesh& mesh : m_meshes)
 	{
