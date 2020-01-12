@@ -132,8 +132,8 @@ void ChunkRenderer::render(gfx::FPSCamera* camera)
 	const math::mat4 proj = camera->getProjection()
 
 	glUniformMatrix4fv(glGetUniformLocation(m_terrainShader, "u_view"), 1,
-	                   GL_FALSE, &view[0]);
-	glUniformMatrix4fv(glGetUniformLocation(m_terrainShader, "u_projection"), 1, GL_FALSE, &proj[0]);
+	                   GL_FALSE, &view.elements[0]);
+	glUniformMatrix4fv(glGetUniformLocation(m_terrainShader, "u_projection"), 1, GL_FALSE, &proj.elements[0]);
 
 	for (ChunkRendererMesh& mesh : m_meshes)
 	{
