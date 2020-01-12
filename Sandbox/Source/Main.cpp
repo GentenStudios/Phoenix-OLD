@@ -1,5 +1,5 @@
 #include <Quartz2/Quartz.hpp>
-#include <UI.hpp>
+#include <Sandbox/UI.hpp>
 
 #include <imgui.h>
 
@@ -247,6 +247,7 @@ protected:
 	}
 };
 
+#undef main
 int main(int argc, char** argv)
 {
 	Game* game = new PhoenixGame();
