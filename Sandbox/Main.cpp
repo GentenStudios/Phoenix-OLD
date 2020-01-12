@@ -20,7 +20,7 @@ static void rawEcho(const std::string &input, std::ostringstream &cout)
 
 	cout << "->" << input << "\n";
 
-	std::string 			 s = input;
+	std::string s = input;
 
 	if (s.substr(0,1) == "/") {
 		std::vector<std::string> args;
