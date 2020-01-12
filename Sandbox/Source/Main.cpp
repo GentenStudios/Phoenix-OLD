@@ -77,19 +77,6 @@ protected:
 
 	virtual void onStart()
 	{
-		events::Position pos = { 12, 12 };
-		events::Size     size   = {pos.x, pos.y};
-		events::Scroll   scroll = {static_cast<float>(size.width),
-                                 static_cast<float>(size.height)};
-		events::Keyboard key    = {events::Keys::KEY_0, events::Mods::MOD_CAPS};
-
-		if (scroll.x == 0)
-		{
-			std::cout
-			    << "fun times, i am literally trying to make codacy pass...";
-			std::cout << static_cast<int>(key.key) << static_cast<int>(key.mods);
-		}
-
 		sol::state lua;
 		lua.open_libraries(sol::lib::base);
 		luaapi::loadAPI(lua);
