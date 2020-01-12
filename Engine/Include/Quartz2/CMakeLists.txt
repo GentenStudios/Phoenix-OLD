@@ -24,6 +24,7 @@ set(Headers
 	${currentDir}/ImGuiHelpers.hpp
 	${currentDir}/ContentLoader.hpp
 	${currentDir}/Settings.hpp
+	${currentDir}/FileSystem.hpp
 
 	PARENT_SCOPE
 )
