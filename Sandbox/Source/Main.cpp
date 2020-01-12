@@ -1,10 +1,12 @@
 #include <Quartz2/Events/Event.hpp>
 #include <Quartz2/Quartz.hpp>
 #include <Sandbox/UI.hpp>
+#include <Quartz2/Filesystem.hpp>
 
 #include <imgui.h>
 
 #include <iostream>
+#include <fstream>
 #include <memory>
 #include <sstream>
 #include <string>
@@ -77,6 +79,18 @@ protected:
 
 	virtual void onStart()
 	{
+		// TODO: Replace this with an official save manager.
+		// Currently, this just allows us to not worry about selecting a save
+		// when testing code
+		if (!std::filesystem::exists("Save")){
+			std::filesystem::create_directory("Save");
+		}
+		if (!std::filesystem::exists("Save/save1")){
+			std::filesystem::create_directory("Save/save1");
+			std::ofstream mods("Save/save1/Mods.txt");
+			mods.close();
+		}
+
 		sol::state lua;
 		lua.open_libraries(sol::lib::base);
 		luaapi::loadAPI(lua);
