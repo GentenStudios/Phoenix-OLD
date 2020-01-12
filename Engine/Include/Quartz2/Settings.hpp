@@ -26,6 +26,14 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+/**
+ * @file Settings.hpp
+ * @brief Implements a settings management system
+ * 
+ * @copyright Copyright (c) 2019-20 Genten Studios
+ * 
+ */
+
 #pragma once
 
 #include <Quartz2/Singleton.hpp>
@@ -35,7 +43,14 @@
 
 namespace q2
 {
-
+	/**
+	 * @brief A settings object to store a single setting
+	 * 
+	 * @description The settings object stores an integer that can be mapped to
+	 * other data. Maximum and minimum values can be set so a settings cant be 
+	 * adjusted outside its limits.
+	 * 
+	 */
 	class Setting
 	{
 		/// @brief Human readable name for setting
@@ -51,6 +66,13 @@ namespace q2
 
 	public:
 		Setting();
+		/**
+		 * @brief Construct a new Setting object
+		 * 
+		 * @param name The human readable name for the setting
+		 * @param key The unique name for the setting in the format core:volume
+		 * @param defaultValue The default value for the setting upon creation
+		 */
 		Setting(std::string name, std::string key, int defaultValue);
 		/**
 		 * @brief Sets the value of an already existing setting
@@ -86,6 +108,14 @@ namespace q2
 		int value() const;
 	};
 
+	/**
+	 * @brief A setting registry to store settings for universal access
+	 * 
+	 * @description This registry allows us to access any registered setting
+	 * from anywhere in the program just using the settings unique key in the 
+	 * format core:volume
+	 * 
+	 */
 	class Settings : public Singleton<Settings>
 	{
 		std::unordered_map<std::string, Setting> m_settings;
