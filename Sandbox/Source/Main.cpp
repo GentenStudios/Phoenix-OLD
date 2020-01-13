@@ -1,5 +1,7 @@
 #include <Quartz2/Events/Event.hpp>
+#include <Quartz2/Graphics/Window.hpp>
 #include <Quartz2/Quartz.hpp>
+
 #include <Sandbox/UI.hpp>
 
 #include <imgui.h>
@@ -40,76 +42,61 @@ static void rawEcho(const std::string &input, std::ostringstream &cout)
 	}
 }
 
-static ui::ChatWindow chat(
-    "Chat Window", 5,
-    // @FutureRuby I know this looks weird but it works.
-    // constant string compile time concatenation is wierd.
-    "Welcome to the Darklight Terminal!\n"
-    "Type something and hit enter to run a command!\n");
+static ui::ChatWindow chat("Chat Window", 5,
+                           "Type something and hit enter to run a command!\n");
 
-static ImGui::BasicTerminal term("Test Terminal", 5);
-
-class PhoenixGame : public Game
+class Phoenix : public events::IEventListener
 {
-private:
-	std::unique_ptr<ChunkRenderer> m_chunkRenderer;
-	std::unique_ptr<Camera>        m_camera;
-
 public:
-	PhoenixGame() : Game(1280, 720, "Project Phoenix!")
+	Phoenix()
 	{
+		m_window = new gfx::Window("Phoenix Game!", 1280, 720);
+		m_window->registerEventListener(this);
+
+		m_camera = new gfx::FPSCamera(m_window);
 
 		chat.registerCallback(&rawEcho);
-		term.registerCallback(&rawEcho);
 	}
 
-protected:
-	virtual bool onEvent(SDL_Event e)
+	~Phoenix() { delete m_window; }
+
+	void onEvent(const events::Event& e) override
 	{
-		if (e.type == SDL_KEYUP)
+		switch (e.type)
 		{
-			if (e.key.keysym.scancode == SDL_SCANCODE_ESCAPE)
+		case events::EventType::KEY_PRESSED:
+			switch (e.keyboard.key)
 			{
+			case events::Keys::KEY_ESCAPE:
 				m_camera->enable(!m_camera->isEnabled());
-				SDL_ShowCursor(!m_camera->isEnabled());
-				return true;
-			}
-			// Uncomment to have chat popup every time enter is pressed.
-			// Could probably use integration with @SonosFuer's input system.
-			// if (e.key.keysym.scancode == SDL_SCANCODE_RETURN)
-			// NOTE:
-			//   doing this encurs the wrath of cthulu and you will be cursed to
-			//   oblivion. By which I mean you won't be able to press enter
-			//   without the chat window being focused on period, regardless of
-			//   other ui elements being overlayed. I tryed to make this a
-			//   non-issue by by leaving the ImGuiWindowFlags_NoFocusOnAppearing
-			//   flag with the class definition but it can be a pain when using
-			//   a second terminal.
-			//
-			// {
-			// 	chat.focus();
-			// 	return true;
-			// }
-		}
+				break;
 
-		return false;
+			case events::Keys::KEY_Q:
+				m_window->close();
+				break;
+
+			default:
+				break;
+			}
+			break;
+
+		default:
+			break;
+		}
 	}
 
-	virtual void onStart()
+	void run()
 	{
 		m_chunkRenderer = std::make_unique<ChunkRenderer>();
-		m_chunkRenderer->setup(getWindowWidth(), getWindowHeight());
+		m_chunkRenderer->setup();
 
 		if (!m_chunkRenderer->isReady())
 		{
 			std::fprintf(stderr, "Renderer setup failed: Status = %s\n",
 			             enums::toString(m_chunkRenderer->status()));
 
-			exitGame();
+			m_window->close();
 		}
-
-		m_camera = std::make_unique<Camera>();
-		SDL_ShowCursor(0);
 
 		std::shared_ptr<BlockTextureAtlas> atlas =
 		    std::make_shared<BlockTextureAtlas>(16, 16);
@@ -147,80 +134,82 @@ protected:
 		Chunk a;
 		m_chunkRenderer->addMesh(a.generateMesh());
 
-	}
-
-	virtual void onExit() { m_chunkRenderer->teardown(); }
-
-	void showDebugStats(int fps, float dt)
-	{
-		const float DISTANCE = 10.0f;
-		const int   corner   = 1;
-		static bool p_open   = true;
-
-		ImGuiIO& io = ImGui::GetIO();
-
-		ImVec2 window_pos =
-		    ImVec2((corner & 1) ? io.DisplaySize.x - DISTANCE : DISTANCE,
-		           (corner & 2) ? io.DisplaySize.y - DISTANCE * 2.5f
-		                        : DISTANCE * 2.5f);
-		ImVec2 window_pos_pivot =
-		    ImVec2((corner & 1) ? 1.0f : 0.0f, (corner & 2) ? 1.0f : 0.0f);
-		ImGui::SetNextWindowPos(window_pos, ImGuiCond_Always, window_pos_pivot);
-
-		ImGui::SetNextWindowBgAlpha(0.3f);
-
-		ImGui::Begin(
-		    "Debug Overlay Hint", &p_open,
-		    (corner != -1 ? ImGuiWindowFlags_NoMove : 0) |
-		        ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
-		        ImGuiWindowFlags_AlwaysAutoResize |
-		        ImGuiWindowFlags_NoSavedSettings |
-		        ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav);
-
-		ImGui::Text("FPS %i\n", static_cast<int>(fps));
-		ImGui::Text("Delta time: %f\n", dt);
-
-		ImGui::End();
-	}
-
-	virtual void onFrame(float dt)
-	{
 		static bool wireframe = false;
+		static int  prevSens;
 
-		m_camera->tick(dt, getSDLWindow());
-
-		OpenGL32::clearScreen(0.2196f, 0.2196f, 0.2196f, 1.f);
-
-		showDebugStats(getFPS(), dt);
-
-		ImGui::Begin("Debug View");
-		if (ImGui::Checkbox("Wireframe", &wireframe))
+		float last = static_cast<float>(SDL_GetTicks());
+		while (m_window->isRunning())
 		{
-			if (wireframe)
-				OpenGL32::enableWireframe();
-			else
-				OpenGL32::disableWireframe();
+			const float now = static_cast<float>(SDL_GetTicks());
+			const float dt  = now - last;
+			last            = now;
+
+			m_window->startFrame();
+
+			m_camera->tick(dt);
+
+			{
+				ImGuiIO& io = ImGui::GetIO();
+				ImVec2 window_pos = ImVec2(io.DisplaySize.x - 10.f, 10.f);
+				ImVec2 window_pos_pivot = ImVec2(1.0f, 0.0f);
+				ImGui::SetNextWindowPos(window_pos, ImGuiCond_Always, window_pos_pivot);
+				ImGui::SetNextWindowBgAlpha(0.3f);
+
+				if (ImGui::Begin("Debug Overlay Hint", reinterpret_cast<bool*>(1),
+				                 ImGuiWindowFlags_NoMove |
+				                     ImGuiWindowFlags_NoTitleBar |
+				                     ImGuiWindowFlags_NoResize |
+				                     ImGuiWindowFlags_AlwaysAutoResize |
+				                     ImGuiWindowFlags_NoSavedSettings |
+				                     ImGuiWindowFlags_NoFocusOnAppearing |
+				                     ImGuiWindowFlags_NoNav))
+				{
+					ImGui::Text("Press Q to exit");
+				}
+
+				ImGui::End();
+			}
+
+			ImGui::Begin("Debug View");
+			if (ImGui::Checkbox("Wireframe", &wireframe))
+			{
+				if (wireframe)
+					glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+				else
+					glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+			}
+
+			static Setting* sensSetting =
+			    Settings::get()->getSetting("camera:sensitivity");
+			static int      sens = sensSetting->value();
+			ImGui::SliderInt("cam sensitivity", &sens, 0, 100);
+			if (sens != prevSens)
+			{
+				prevSens = sens;
+				sensSetting->set(sens);
+			}
+			ImGui::End();
+
+			chat.draw();
+
+			m_chunkRenderer->render(m_camera);
+
+			m_window->endFrame();
 		}
-		ImGui::Text("OpenGL Error %i\n", glGetError());
-		ImGui::End();
-
-		// Vertical height adjust the chat window... happens in the UI
-		// segment definition because Main function management is hard enough
-		// as it is. Here's to the good time of whomever doesn't have to deal
-		// with 20 extra lines of clutter because of me :D
-		chat.draw();
-		term.draw();
-
-		ImGui::ShowStyleEditor();
-		m_chunkRenderer->render(m_camera.get());
 	}
+
+private:
+	gfx::Window* m_window;
+
+	std::unique_ptr<ChunkRenderer> m_chunkRenderer;
+	gfx::FPSCamera*                m_camera;
 };
 
 #undef main
 int main(int argc, char** argv)
 {
-	Game* game = new PhoenixGame();
-	game->start();
+	Phoenix* game = new Phoenix();
+	game->run();
 
 	return 0;
 }

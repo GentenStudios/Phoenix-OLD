@@ -1,4 +1,4 @@
-// Copyright 2019-20 Genten Studios
+// Copyright 2019 Genten Studios
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -29,12 +29,58 @@
 #pragma once
 
 #include <Quartz2/Math/Math.hpp>
-#include <Quartz2/ChunkRenderer.hpp>
-#include <Quartz2/Game.hpp>
-#include <Quartz2/Graphics/Camera.hpp>
-#include <Quartz2/Mesh.hpp>
-#include <Quartz2/Chunk.hpp>
-#include <Quartz2/VoxelWorld.hpp>
-#include <Quartz2/BlocksTextureAtlas.hpp>
-#include <Quartz2/Commander.hpp>
-#include <Quartz2/ImGuiHelpers.hpp>
+#include <Quartz2/Graphics/Window.hpp>
+#include <Quartz2/Settings.hpp>
+
+#include <SDL.h>
+
+#include <functional>
+#include <vector>
+
+namespace q2
+{
+	namespace gfx
+	{
+		/**
+		 * @brief Base Camera class following basic FPS Cam principles.
+		 *
+		 * The camera functions as a basic tool for moving around in a 3D
+		 * rendered world. This uses the "tick" function on every iteration of
+		 * the main game loop to determine movement from the user.
+		 */
+		class FPSCamera
+		{
+		public:
+			explicit FPSCamera(Window* window);
+
+			math::vec3 getPosition() const;
+			math::vec3 getDirection() const;
+			void setProjection(const math::mat4& projection);
+			math::mat4 getProjection() const;
+			math::mat4 calculateViewMatrix() const;
+
+			void tick(float dt);
+
+			void enable(bool enabled);
+			bool isEnabled() const { return m_enabled; }
+
+			void onWindowResize(events::Event e);
+
+		private:
+			Window* m_window;
+
+			math::mat4 m_projection;
+
+			math::vec3 m_rotation;
+			math::vec3 m_position;
+			math::vec3 m_up;
+			math::vec3 m_direction;
+
+			math::vec2 m_windowCentre;
+
+			bool m_enabled = true;
+
+			Setting* m_settingSensitivity;
+		};
+	} // namespace gfx
+} // namespace q2

@@ -29,7 +29,7 @@
 #pragma once
 
 #include <Quartz2/OpenGL32.hpp>
-#include <Quartz2/Camera.hpp>
+#include <Quartz2/Graphics/Camera.hpp>
 
 #include <memory>
 #include <Quartz2/Mesh.hpp>
@@ -58,10 +58,10 @@ namespace q2
 	class ChunkRenderer
 	{
 	public:
-		void setup(std::size_t viewWidth, std::size_t viewHeight);
+		void setup();
 		void teardown();
 
-		void render(Camera* camera);
+		void render(gfx::FPSCamera* camera);
 
 		EChunkRendererStatus status() const
 			{ return m_status; }
@@ -76,9 +76,6 @@ namespace q2
 	private:
 		GLuint m_terrainShader;
 		GLuint m_texture;
-
-		std::size_t m_viewWidth;
-		std::size_t m_viewHeight;
 
 		EChunkRendererStatus m_status;
 
