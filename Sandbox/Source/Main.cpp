@@ -1,13 +1,45 @@
-#include <Quartz2/Events/Event.hpp>
+// Copyright 2020 Genten Studios
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are met:
+//
+// 1. Redistributions of source code must retain the above copyright notice,
+// this list of conditions and the following disclaimer.
+//
+// 2. Redistributions in binary form must reproduce the above copyright notice,
+// this list of conditions and the following disclaimer in the documentation
+// and/or other materials provided with the distribution.
+//
+// 3. Neither the name of the copyright holder nor the names of its contributors
+// may be used to endorse or promote products derived from this software without
+// specific prior written permission.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+// LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+// SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+// CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
 #include <Quartz2/Graphics/Window.hpp>
-#include <Quartz2/Quartz.hpp>
+#include <Quartz2/Graphics/Camera.hpp>
+#include <Quartz2/Voxels/BlockRegistry.hpp>
+#include <Quartz2/Voxels/Chunk.hpp>
+#include <Quartz2/Graphics/ChunkMesher.hpp>
+#include <Quartz2/Graphics/ChunkRenderer.hpp>
+#include <Quartz2/ImGuiHelpers.hpp>
+#include <Quartz2/Settings.hpp>
+#include <Quartz2/ContentLoader.hpp>
 
 #include <Sandbox/UI.hpp>
 
 #include <imgui.h>
 
-#include <iostream>
-#include <memory>
 #include <sstream>
 #include <string>
 
@@ -63,62 +95,64 @@ public:
 
 	void run()
 	{
-		sol::state lua;
-		lua.open_libraries(sol::lib::base);
-		luaapi::loadAPI(lua);
-		bool loadedLua = modules::loadModules("save1", lua);
-		if (!loadedLua)
-		{
-			m_window->close();
+		// skip this until filesystem stuff works or it gets annoying.
+		//sol::state lua;
+		//lua.open_libraries(sol::lib::base);
+		//luaapi::loadAPI(lua);
+		//bool loadedLua = modules::loadModules("save1", lua);
+		//if (!loadedLua)
+		//{
+		//	m_window->close();
+		//}
+
+					{
+			using namespace q2::voxels;
+			BlockRegistry::get()->initialise();
+
+			BlockType grassBlock;
+			{
+				grassBlock.displayName = "Grass";
+				grassBlock.id          = "core:grass";
+				grassBlock.category    = BlockCategory::SOLID;
+
+				// top, left, back, right, top, bottom
+				grassBlock.textures = {
+				    "Assets/grass_side.png", "Assets/grass_side.png",
+				    "Assets/grass_side.png", "Assets/grass_side.png",
+				    "Assets/grass_top.png",  "Assets/dirt.png",
+				};
+			}
+
+			BlockRegistry::get()->registerBlock(grassBlock);
 		}
 
-		m_chunkRenderer = std::make_unique<ChunkRenderer>();
-		m_chunkRenderer->setup();
+		q2::gfx::ChunkRenderer renderer(100);
+		renderer.buildTextureArray();
 
-		if (!m_chunkRenderer->isReady())
+		for (int j = 0; j < 10; ++j)
 		{
-			std::fprintf(stderr, "Renderer setup failed: Status = %s\n",
-			             enums::toString(m_chunkRenderer->status()));
-
-			m_window->close();
+			for (int i = 0; i < 10; ++i)
+			{
+				q2::voxels::Chunk chunk({i * 16, 0, j * 16});
+				chunk.autoTestFill();
+				q2::gfx::ChunkMesher mesher(chunk.getChunkPos(),
+				                            chunk.getBlocks(),
+				                            renderer.getTextureTable());
+				mesher.mesh();
+				renderer.submitChunkMesh(mesher.getMesh(), i + (j * 10));
+			}
 		}
 
-		std::shared_ptr<BlockTextureAtlas> atlas =
-		    std::make_shared<BlockTextureAtlas>(16, 16);
-		atlas->addTextureFile("Assets/grass_top.png");
-		atlas->addTextureFile("Assets/dirt.png");
-		atlas->addTextureFile("Assets/grass_side.png");
-		atlas->patch();
+		q2::gfx::ShaderPipeline shaderPipeline;
+		shaderPipeline.prepare("Assets/SimpleWorld.vert",
+		                       "Assets/SimpleWorld.frag",
+		                       renderer.getRequiredShaderLayout());
 
-		BlockRegistry* blocksRegistery = BlockRegistry::get();
-		blocksRegistery->setAtlas(atlas);
+		shaderPipeline.activate();
 
-		blocksRegistery->registerBlock(
-		    {"Air", "core:air", BLOCK_CATEGORY_AIR, {}});
-
-		BlockType* dirtBlockType = blocksRegistery->registerBlock(
-		    {"Dirt", "core:dirt", BLOCK_CATEGORY_SOLID, {}});
-		BlockType* grassBlockType = blocksRegistery->registerBlock(
-		    {"Grass", "core:grass", BLOCK_CATEGORY_SOLID, {}});
-
-		dirtBlockType->textures.setAll(
-		    atlas->getSpriteIDFromFilepath("Assets/dirt.png"));
-
-		grassBlockType->textures.top =
-		    atlas->getSpriteIDFromFilepath("Assets/grass_top.png");
-		grassBlockType->textures.bottom =
-		    atlas->getSpriteIDFromFilepath("Assets/dirt.png");
-		grassBlockType->textures.front    = grassBlockType->textures.back =
-		    grassBlockType->textures.left = grassBlockType->textures.right =
-		        atlas->getSpriteIDFromFilepath("Assets/grass_side.png");
-
-		m_chunkRenderer->setTexture(atlas->getPatchedTextureData(),
-		                            atlas->getPatchedTextureWidth(),
-		                            atlas->getPatchedTextureHeight());
-
-		Chunk a;
-		m_chunkRenderer->addMesh(a.generateMesh());
-
+		q2::math::mat4 model;
+		shaderPipeline.setMatrix("u_model", model);
+		
 		static bool wireframe = false;
 		static int  prevSens;
 
@@ -134,20 +168,21 @@ public:
 			m_camera->tick(dt);
 
 			{
-				ImGuiIO& io = ImGui::GetIO();
-				ImVec2 window_pos = ImVec2(io.DisplaySize.x - 10.f, 10.f);
-				ImVec2 window_pos_pivot = ImVec2(1.0f, 0.0f);
-				ImGui::SetNextWindowPos(window_pos, ImGuiCond_Always, window_pos_pivot);
+				ImGuiIO& io         = ImGui::GetIO();
+				ImVec2   window_pos = ImVec2(io.DisplaySize.x - 10.f, 10.f);
+				ImVec2   window_pos_pivot = ImVec2(1.0f, 0.0f);
+				ImGui::SetNextWindowPos(window_pos, ImGuiCond_Always,
+				                        window_pos_pivot);
 				ImGui::SetNextWindowBgAlpha(0.3f);
 
-				if (ImGui::Begin("Debug Overlay Hint", reinterpret_cast<bool*>(1),
-				                 ImGuiWindowFlags_NoMove |
-				                     ImGuiWindowFlags_NoTitleBar |
-				                     ImGuiWindowFlags_NoResize |
-				                     ImGuiWindowFlags_AlwaysAutoResize |
-				                     ImGuiWindowFlags_NoSavedSettings |
-				                     ImGuiWindowFlags_NoFocusOnAppearing |
-				                     ImGuiWindowFlags_NoNav))
+				if (ImGui::Begin(
+				        "Debug Overlay Hint", reinterpret_cast<bool*>(1),
+				        ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar |
+				            ImGuiWindowFlags_NoResize |
+				            ImGuiWindowFlags_AlwaysAutoResize |
+				            ImGuiWindowFlags_NoSavedSettings |
+				            ImGuiWindowFlags_NoFocusOnAppearing |
+				            ImGuiWindowFlags_NoNav))
 				{
 					ImGui::Text("Press Q to exit");
 				}
@@ -166,7 +201,7 @@ public:
 
 			static Setting* sensSetting =
 			    Settings::get()->getSetting("camera:sensitivity");
-			static int      sens = sensSetting->value();
+			static int sens = sensSetting->value();
 			ImGui::SliderInt("cam sensitivity", &sens, 0, 100);
 			if (sens != prevSens)
 			{
@@ -177,17 +212,18 @@ public:
 
 			chat.draw();
 
-			m_chunkRenderer->render(m_camera);
+			shaderPipeline.setMatrix("u_view", m_camera->calculateViewMatrix());
+			shaderPipeline.setMatrix("u_projection", m_camera->getProjection());
+			
+			renderer.render();
 
 			m_window->endFrame();
 		}
 	}
 
 private:
-	gfx::Window* m_window;
-
-	std::unique_ptr<ChunkRenderer> m_chunkRenderer;
-	gfx::FPSCamera*                m_camera;
+	gfx::Window*    m_window;
+	gfx::FPSCamera* m_camera;
 };
 
 #undef main

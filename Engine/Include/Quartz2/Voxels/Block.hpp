@@ -55,7 +55,7 @@ namespace q2
 
 			BlockCategory category = BlockCategory::AIR;
 
-			// top, left, back, right, top, bottom
+			// front, left, back, right, top, bottom
 			std::array<std::string, 6> textures;
 
 			void setAllTextures(const std::string& tex) { textures.fill(tex); }
