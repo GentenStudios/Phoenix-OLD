@@ -50,7 +50,7 @@ Chunk::Chunk()
 	}
 }
 
-static void addBlockTopFace(Vec3 pos, Mesh* mesh, BlockType* type)
+static void addBlockTopFace(math::vec3 pos, Mesh* mesh, BlockType* type)
 {
 	const RectAABB uvs = BlockRegistry::get()->getAtlas()->getSpriteFromID(type->textures.top);
 
@@ -63,7 +63,7 @@ static void addBlockTopFace(Vec3 pos, Mesh* mesh, BlockType* type)
 	mesh->addVertex({ pos , uvs.topLeft });
 }
 
-static void addBlockBottomFace(Vec3 pos, Mesh* mesh, BlockType* type)
+static void addBlockBottomFace(math::vec3 pos, Mesh* mesh, BlockType* type)
 {
 	const RectAABB uvs = BlockRegistry::get()->getAtlas()->getSpriteFromID(type->textures.bottom);
 
@@ -76,7 +76,7 @@ static void addBlockBottomFace(Vec3 pos, Mesh* mesh, BlockType* type)
 	mesh->addVertex({ { pos.x, pos.y - 1.f, pos.z }, uvs.topLeft });
 }
 
-static void addBlockBackFace(Vec3 pos, Mesh* mesh, BlockType* type)
+static void addBlockBackFace(math::vec3 pos, Mesh* mesh, BlockType* type)
 {
 	const RectAABB uvs = BlockRegistry::get()->getAtlas()->getSpriteFromID(type->textures.back);
 
@@ -89,7 +89,7 @@ static void addBlockBackFace(Vec3 pos, Mesh* mesh, BlockType* type)
 	mesh->addVertex({ { pos.x, pos.y, pos.z + 1.f }, uvs.topLeft });
 }
 
-static void addBlockFrontFace(Vec3 pos, Mesh* mesh, BlockType* type)
+static void addBlockFrontFace(math::vec3 pos, Mesh* mesh, BlockType* type)
 {
 	const RectAABB uvs = BlockRegistry::get()->getAtlas()->getSpriteFromID(type->textures.front);
 
@@ -102,7 +102,7 @@ static void addBlockFrontFace(Vec3 pos, Mesh* mesh, BlockType* type)
 	mesh->addVertex({ { pos.x, pos.y, pos.z }, uvs.topLeft });
 }
 
-static void addBlockRightFace(Vec3 pos, Mesh* mesh, BlockType* type)
+static void addBlockRightFace(math::vec3 pos, Mesh* mesh, BlockType* type)
 {
 	const RectAABB uvs = BlockRegistry::get()->getAtlas()->getSpriteFromID(type->textures.right);
 	
@@ -115,7 +115,7 @@ static void addBlockRightFace(Vec3 pos, Mesh* mesh, BlockType* type)
 	mesh->addVertex({ { pos.x + 1.f, pos.y, pos.z }, uvs.topLeft });
 }
 
-static void addBlockLeftFace(Vec3 pos, Mesh* mesh, BlockType* type)
+static void addBlockLeftFace(math::vec3 pos, Mesh* mesh, BlockType* type)
 {
 	const RectAABB uvs = BlockRegistry::get()->getAtlas()->getSpriteFromID(type->textures.left);
 
@@ -141,7 +141,7 @@ std::shared_ptr<Mesh> Chunk::generateMesh()
 		if (m_blocks[FLATTEN_XYZ(x, y, z)].type->category == BLOCK_CATEGORY_AIR)
 			continue;
 
-		const Vec3 blockPos(x, y, z);
+		const math::vec3 blockPos(x, y, z);
 
 		BlockType* type = m_blocks[i].type;
 

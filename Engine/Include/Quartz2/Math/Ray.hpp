@@ -28,56 +28,58 @@
 
 #pragma once
 
-#include <Quartz2/Math/Rect.hpp>
-
-#include <cstddef>
-#include <unordered_map>
-#include <cstring>
+#include <Quartz2/Math/Math.hpp>
 
 namespace q2
 {
-	class BlockTextureAtlas
+	/**
+	 * @brief Produces a castable ray for helping find things at
+	 * positions/intervals along the ray.
+	 */
+	class Ray
 	{
 	public:
-		typedef int           SpriteID;
-		const static SpriteID INVALID_SPRITE = -1;
+		/**
+		 * @brief Constructs a Ray object.
+		 * @param start The position of the start of the ray.
+		 * @param direction The direction the ray is "traveling" in.
+		 */
+		Ray(const math::vec3& start,
+			const math::vec3& direction);
 
-		BlockTextureAtlas(std::size_t spriteWidth,
-			std::size_t spriteHeight);
-		BlockTextureAtlas();
-		~BlockTextureAtlas();
+		Ray(const Ray& other) = default;
+		~Ray() = default;
 
-		void addTextureFile(const char* texturefilepath);
-		void patch();
-		void setSpriteWidth(std::size_t w);
-		void setSpriteHeight(std::size_t h);
+		/**
+		 * @brief Advances along a ray.
+		 * @param scale The distance to advance along the ray
+		 * @return The new position along the ray.
+		 */
+		math::vec3 advance(float scale);
 
-		std::size_t getSpriteWidth() const { return m_spriteWidth; }
-		std::size_t getSpriteHeight() const { return m_spriteHeight; }
-		SpriteID    getSpriteIDFromFilepath(const char* filepath);
+		/**
+		 * @brief Backtracks (goes backwards) along a ray.
+		 * @param scale The distance to backtrack along the ray.
+		 * @return The new position along the ray.
+		 */
+		math::vec3 backtrace(float scale);
 
-		std::size_t getPatchedTextureWidth() const
-		{
-			return m_patchedTextureWidth;
-		}
+		/**
+		 * @brief Gets the current length of the ray.
+		 * @return The length of the ray.
+		 */
+		float getLength() const;
 
-		std::size_t getPatchedTextureHeight() const
-		{
-			return m_patchedTextureHeight;
-		}
-
-		unsigned char* getPatchedTextureData() const
-		{
-			return m_patchedTextureData;
-		}
-
-		RectAABB getSpriteFromID(SpriteID spriteId) const;
+		/**
+		 * @brief Gets the current position along the ray.
+		 * @return The current position along the ray
+		 */
+		math::vec3 getCurrentPosition() const;
 
 	private:
-		std::unordered_map<std::string, SpriteID> m_textureIDMap;
-		std::size_t    m_spriteWidth, m_spriteHeight;
-		unsigned char* m_patchedTextureData;
-
-		std::size_t m_patchedTextureWidth, m_patchedTextureHeight;
+		float m_length;
+		math::vec3  m_start;
+		math::vec3  m_direction;
+		math::vec3  m_currentPosition;
 	};
-}
+} // namespace qz

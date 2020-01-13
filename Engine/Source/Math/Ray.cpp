@@ -26,25 +26,36 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#pragma once
+#include <Quartz2/Math/Ray.hpp>
 
-#include <Quartz2/Vec2.hpp>
+using namespace q2;
 
-namespace q2
+Ray::Ray(const math::vec3& start,
+         const math::vec3& direction)
+    : m_start(start), m_direction(direction), m_currentPosition(start),
+      m_length(0.f)
 {
-	struct RectAABB
-	{
-		Vec2 topLeft, topRight;
-		Vec2 bottomLeft, bottomRight;
+}
 
-		RectAABB(Vec2 tl,
-			Vec2 tr,
-			Vec2 bl,
-			Vec2 br)
-			: topLeft(tl), topRight(tr), bottomLeft(bl), bottomRight(br)
-		{
-		}
+math::vec3 Ray::advance(float scale)
+{
+	m_currentPosition += m_direction * scale;
+	m_length += scale;
 
-		RectAABB() = default;
-	};
-} // namespace q2
+	return m_currentPosition;
+}
+
+math::vec3 Ray::backtrace(float scale)
+{
+	m_currentPosition -= m_direction * scale;
+	m_length -= scale;
+
+	return m_currentPosition;
+}
+
+float Ray::getLength() const { return m_length; }
+
+math::vec3 Ray::getCurrentPosition() const
+{
+	return m_currentPosition;
+}
