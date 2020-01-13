@@ -6,7 +6,7 @@ add_subdirectory(Include/Quartz2)
 add_subdirectory(Source)
 
 add_library(${PROJECT_NAME} STATIC ${Headers} ${Sources})
-target_link_libraries(${PROJECT_NAME} PRIVATE SDL2-static SDL2main Glad ImGui sol2 liblua -lc++experimental)
+target_link_libraries(${PROJECT_NAME} PRIVATE SDL2-static SDL2main Glad ImGui sol2 liblua stdc++fs)
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_LIST_DIR}/Include)
 target_include_directories(${PROJECT_NAME} PUBLIC
