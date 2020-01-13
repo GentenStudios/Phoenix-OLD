@@ -1,4 +1,5 @@
 [![Build status](https://ci.appveyor.com/api/projects/status/ks7mwo62678xjq3m?svg=true)](https://ci.appveyor.com/project/GentenStudios/phoenix)
+[![Build Status](https://travis-ci.org/GentenStudios/Phoenix.svg?branch=develop)](https://travis-ci.org/GentenStudios/Phoenix)
 # GENTEN STUDIOS: PROJECT PHOENIX
 ## Introduction
 Project Phoenix is a open world sandbox style voxel game with a twist. The game itself does not provide any content but gets that content entirely from modules written in Lua. An easy to use Lua API provides the capability to define all of the games content in addition to some functional features. This allows content to be quickly created by someone with little to no programming experience while still retaining the power of C++. 
