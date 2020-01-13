@@ -1,4 +1,9 @@
 language: cpp
+
+cache:
+    directories:
+        - ${TRAVIS_BUILD_DIRECTORY}/Build/Engine/ThirdParty
+
 dist: bionic
 osx_image: xcode11.3
 os:
