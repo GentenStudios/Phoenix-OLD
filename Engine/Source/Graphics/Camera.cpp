@@ -1,4 +1,4 @@
-// Copyright 2019-20 Genten Studios
+// Copyright 2019 Genten Studios
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -26,56 +26,62 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Quartz2/Camera.hpp>
-#include <Quartz2/Math/MathUtils.hpp>
+#include <Quartz2/Graphics/Camera.hpp>
+#include <iostream>
 
-#include <cmath>
-
-const float MOVE_SPEED  = 0.01f;
-const float SENSITIVITY = 0.00005f;
+const float MOVE_SPEED = 0.01f;
 
 using namespace q2;
+using namespace gfx;
 
-Camera::Camera()
+FPSCamera::FPSCamera(Window* window)
 {
+	m_window = window;
+	m_window->setCursorState(CursorState::DISABLED);
+
+	const math::vec2f windowSize = static_cast<math::vec2f>(window->getSize());
+	m_projection = math::mat4::perspective(windowSize.x / windowSize.y, 45.f,
+	                                       1000.f, 0.1f);
+
+	m_windowCentre = {std::floor(windowSize.x / 2.f),
+	                  std::floor(windowSize.y / 2.f)};
+
 	m_settingSensitivity =
 	    Settings::get()->add("Sensitivity", "camera:sensitivity", 5);
 	m_settingSensitivity->setMax(100);
 	m_settingSensitivity->setMin(1);
 }
 
-math::vec3 Camera::getPosition() const { return m_position; }
+math::vec3 FPSCamera::getPosition() const { return m_position; }
 
-math::vec3 Camera::getDirection() const { return m_direction; }
+math::vec3 FPSCamera::getDirection() const { return m_direction; }
 
-math::mat4 Camera::calculateViewMatrix() const
+void FPSCamera::setProjection(const math::mat4& projection)
+{
+	m_projection = projection;
+}
+
+math::mat4 FPSCamera::getProjection() const { return m_projection; }
+
+math::mat4 FPSCamera::calculateViewMatrix() const
 {
 	const math::vec3 centre = m_position + m_direction;
 	return math::mat4::lookAt(m_position, centre, m_up);
 }
 
-void Camera::enable(bool enabled) { m_enabled = enabled; }
-
-void Camera::tick(float dt, SDL_Window* window)
+void FPSCamera::tick(float dt)
 {
 	if (!m_enabled)
 		return;
 
-	int windowWidth, windowHeight;
-	SDL_GetWindowSize(window, &windowWidth, &windowHeight);
+	const math::vec2 mousePos = m_window->getCursorPosition();
 
-	const int halfWindowWidth  = windowWidth / 2;
-	const int halfWindowHeight = windowHeight / 2;
+	m_window->setCursorPosition(m_windowCentre);
 
-	int mouseX, mouseY;
-	SDL_GetMouseState(&mouseX, &mouseY);
+	const float sensitivity = m_settingSensitivity->value() * 0.00001;
 
-	SDL_WarpMouseInWindow(window, halfWindowWidth, halfWindowHeight);
-
-	const float sensitivity = 0.00001 * m_settingSensitivity->value();
-
-	m_rotation.x += sensitivity * dt * (halfWindowWidth - mouseX);
-	m_rotation.y += sensitivity * dt * (halfWindowHeight - mouseY);
+	m_rotation.x += sensitivity * dt * (m_windowCentre.x - mousePos.x);
+	m_rotation.y += sensitivity * dt * (m_windowCentre.y - mousePos.y);
 
 	m_rotation.y = math::clamp(m_rotation.y, -math::PIDIV2, math::PIDIV2);
 
@@ -84,49 +90,62 @@ void Camera::tick(float dt, SDL_Window* window)
 	m_direction.z = std::cos(m_rotation.y) * std::cos(m_rotation.x);
 
 	const math::vec3 right = {std::sin(m_rotation.x - math::PIDIV2), 0.f,
-	                    std::cos(m_rotation.x - math::PIDIV2)};
+	                          std::cos(m_rotation.x - math::PIDIV2)};
 
 	m_up = math::vec3::cross(right, m_direction);
 
 	const float moveSpeed = MOVE_SPEED;
 
-	const Uint8* keys = SDL_GetKeyboardState(NULL);
-
-	if (keys[SDL_SCANCODE_W])
+	if (m_window->isKeyDown(events::Keys::KEY_W))
 	{
 		m_position += m_direction * dt * moveSpeed;
 	}
-	else if (keys[SDL_SCANCODE_S])
+	else if (m_window->isKeyDown(events::Keys::KEY_S))
 	{
 		m_position -= m_direction * dt * moveSpeed;
 	}
 
-	if (keys[SDL_SCANCODE_A])
+	if (m_window->isKeyDown(events::Keys::KEY_A))
 	{
 		m_position -= right * dt * moveSpeed;
 	}
-	else if (keys[SDL_SCANCODE_D])
+	else if (m_window->isKeyDown(events::Keys::KEY_D))
 	{
 		m_position += right * dt * moveSpeed;
 	}
 
-	if (keys[SDL_SCANCODE_SPACE])
+	if (m_window->isKeyDown(events::Keys::KEY_SPACE))
 	{
 		m_position.y += dt * moveSpeed;
 	}
-	else if (keys[SDL_SCANCODE_LSHIFT])
+	else if (m_window->isKeyDown(events::Keys::KEY_LEFT_SHIFT))
 	{
 		m_position.y -= dt * moveSpeed;
 	}
+}
 
-	if (keys[SDL_SCANCODE_P])
+void FPSCamera::enable(bool enabled)
+{
+	if (enabled)
 	{
-		m_settingSensitivity->set(m_settingSensitivity->value() +
-		                                       1);
+		m_window->setCursorState(gfx::CursorState::DISABLED);
+		m_window->setCursorPosition(m_windowCentre);
 	}
-	else if (keys[SDL_SCANCODE_O])
+	else
 	{
-		m_settingSensitivity->set(m_settingSensitivity->value() -
-		                                       1);
+		m_window->setCursorState(gfx::CursorState::NORMAL);
 	}
+
+	m_enabled = enabled;
+}
+
+void FPSCamera::onWindowResize(events::Event e)
+{
+	const math::vec2i windowSize = m_window->getSize();
+	m_projection = math::mat4::perspective(static_cast<float>(windowSize.x) /
+	                                           static_cast<float>(windowSize.y),
+	                                       45.f, 1000.f, 0.1f);
+
+	m_windowCentre = {static_cast<float>(static_cast<int>(windowSize.x / 2)),
+	                  static_cast<float>(static_cast<int>(windowSize.y / 2))};
 }

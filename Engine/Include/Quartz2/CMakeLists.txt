@@ -1,11 +1,13 @@
 add_subdirectory(Math)
 add_subdirectory(Events)
-#add_subdirectory(Graphics)
+add_subdirectory(Graphics)
 
 set(currentDir ${CMAKE_CURRENT_LIST_DIR})
 set(Headers
 	${mathHeaders}
 	${eventHeaders}
+	${graphicsHeaders}
+
 	${currentDir}/EnumTools.hpp
 
 	${currentDir}/Quartz.hpp
@@ -13,7 +15,6 @@ set(Headers
 	${currentDir}/ShaderCompiler.hpp
 	${currentDir}/Game.hpp
 	${currentDir}/OpenGL32.hpp
-	${currentDir}/Camera.hpp
 	${currentDir}/Chunk.hpp
 	${currentDir}/VoxelWorld.hpp
 	${currentDir}/Mesh.hpp
