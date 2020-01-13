@@ -1,4 +1,4 @@
-// Copyright 2019-20 Genten Studios
+// Copyright 2019 Genten Studios
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -28,55 +28,26 @@
 
 #pragma once
 
-#include <cstddef>
 #include <string>
-
-#include <SDL.h>
+#include <fstream>
 
 namespace q2
 {
-	// We do this here to avoid having to include SDL_opengl.h in the header.
-	// This is because SDL_opengl.h defines __gl_h_ which glad doesn't like
-	// and so complains & fails the build ("OpenGL header already incldued...." etc...)
-	// So to avoid having to include glad.h/OpenGL32.hpp in this header above SDL_opengl.h
-	// since the only thing we need is the SDL_GLContext symbol, just declare it as so here.
-	typedef void* SDL_GLContext;
-
-	class Game
+	class FileIO
 	{
 	public:
-		Game (std::size_t windowWidth, std::size_t windowHeight, const std::string& windowTitle);
+		static std::string readAllFile(const std::string& filepath)
+		{
+			std::fstream fileHandle;
+			fileHandle.open(filepath.c_str());
 
-		void start();
+			std::string fileString;
+			fileString.assign((std::istreambuf_iterator<char>(fileHandle)),
+			                  (std::istreambuf_iterator<char>()));
 
-		std::size_t getWindowWidth() const
-			{ return m_windowWidth; }
+			fileHandle.close();
 
-		std::size_t getWindowHeight() const
-			{ return m_windowHeight; }
-
-		SDL_Window* getSDLWindow() const
-			{ return m_sdlWindow; }
-
-		int getFPS() const
-			{ return m_fps; }
-
-	protected:
-		virtual void onStart() {}
-		virtual void onExit() {}
-		virtual void onFrame(float dt) {}
-		virtual bool onEvent(SDL_Event e) { return false; }
-
-		void exitGame();
-
-	private:
-		SDL_Window* m_sdlWindow;
-		SDL_GLContext m_sdlGLContext;
-
-		std::size_t m_windowWidth;
-		std::size_t m_windowHeight;
-		std::string m_windowTitle;
-
-		int m_fps;
+			return fileString;
+		}
 	};
-}
+} // namespace q2

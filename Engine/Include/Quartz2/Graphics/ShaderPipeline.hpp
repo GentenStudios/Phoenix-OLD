@@ -1,4 +1,4 @@
-// Copyright 2019-20 Genten Studios
+// Copyright 2019 Genten Studios
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -28,20 +28,45 @@
 
 #pragma once
 
-#include <vector>
+#include <Quartz2/Math/Math.hpp>
 
-#include <Quartz2/Vertex.hpp>
+#include <glad/glad.h>
+
+#include <string>
+#include <vector>
 
 namespace q2
 {
-	class Mesh
+	namespace gfx
 	{
-	public:
-		void addVertex(const Vertex& vertex);
+		struct ShaderLayout
+		{
+			ShaderLayout(std::string attribName, int desiredIndex)
+			    : attribName(attribName), desiredIndex(desiredIndex)
+			{}
 
-		std::vector<Vertex>& getVertices()
-			{ return m_vertices; }
-	private:
-		std::vector<Vertex> m_vertices;
-	};
-}
+			std::string attribName;
+			int desiredIndex = -1;
+		};
+
+		class ShaderPipeline
+		{
+		public:
+			ShaderPipeline()  = default;
+			~ShaderPipeline() = default;
+
+			void prepare(std::string vertShaderPath, std::string fragShaderPath,
+			             std::vector<ShaderLayout> layout);
+			void activate();
+
+			void setVector2(std::string location, math::vec2 value);
+			void setVector3(std::string location, math::vec3 value);
+			void setMatrix(std::string location, math::mat4 value);
+
+			int queryLayoutOfAttribute(std::string attr);
+
+		private:
+			unsigned int m_program;
+		};
+	} // namespace gfx
+} // namespace q2

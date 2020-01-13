@@ -31,7 +31,7 @@
 #include <imgui_internal.h>
 
 // Internals
-#include <Quartz2/Quartz.hpp>
+#include <Quartz2/ImGuiHelpers.hpp>
 #include <Sandbox/UI.hpp>
 
 // Standards

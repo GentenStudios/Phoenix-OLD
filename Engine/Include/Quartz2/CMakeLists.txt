@@ -11,19 +11,8 @@ set(Headers
 	${voxelHeaders}
 
 	${currentDir}/EnumTools.hpp
+	${currentDir}/FileIO.hpp
 
-	${currentDir}/Quartz.hpp
-	${currentDir}/ChunkRenderer.hpp
-	${currentDir}/ShaderCompiler.hpp
-	${currentDir}/Game.hpp
-	${currentDir}/OpenGL32.hpp
-	${currentDir}/Chunk.hpp
-	${currentDir}/VoxelWorld.hpp
-	${currentDir}/Mesh.hpp
-	${currentDir}/Vertex.hpp
-	${currentDir}/BlocksTextureAtlas.hpp
-	${currentDir}/BlocksRegistry.hpp
-	${currentDir}/Singleton.hpp
 	${currentDir}/ImGuiHelpers.hpp
 	${currentDir}/ContentLoader.hpp
 	${currentDir}/Settings.hpp

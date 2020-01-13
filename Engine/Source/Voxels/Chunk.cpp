@@ -1,4 +1,4 @@
-// Copyright 2019-20 Genten Studios
+// Copyright 2019 Genten Studios
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -26,4 +26,46 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#pragma once
+#include <Quartz2/Voxels/BlockRegistry.hpp>
+#include <Quartz2/Voxels/Chunk.hpp>
+
+using namespace q2::voxels;
+using namespace q2;
+
+Chunk::Chunk(math::vec3 chunkPos) : m_pos(chunkPos)
+{
+	m_blocks.reserve(CHUNK_WIDTH * CHUNK_HEIGHT * CHUNK_DEPTH);
+}
+
+void Chunk::autoTestFill()
+{
+	BlockType* grass = BlockRegistry::get()->getFromID("core:grass");
+	for (std::size_t i = 0; i < CHUNK_WIDTH * CHUNK_HEIGHT * CHUNK_DEPTH; ++i)
+	{
+		m_blocks.push_back(grass);
+	}
+}
+
+math::vec3               Chunk::getChunkPos() const { return m_pos; }
+std::vector<BlockType*>& Chunk::getBlocks() { return m_blocks; }
+
+BlockType* Chunk::getBlockAt(math::vec3 position) const
+{
+	if (position.x < CHUNK_WIDTH && position.y < CHUNK_HEIGHT &&
+	    position.z < CHUNK_DEPTH)
+	{
+		return m_blocks[getVectorIndex(position)];
+	}
+
+	return BlockRegistry::get()->getFromRegistryID(
+	    1); // 1 is always out of bounds
+}
+
+void Chunk::setBlockAt(math::vec3 position, BlockType* newBlock)
+{
+	if (position.x < CHUNK_WIDTH && position.y < CHUNK_HEIGHT &&
+	    position.z < CHUNK_DEPTH)
+	{
+		m_blocks[getVectorIndex(position)] = newBlock;
+	}
+}

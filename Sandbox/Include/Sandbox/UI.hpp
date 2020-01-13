@@ -28,7 +28,6 @@
 
 #pragma once
 
-#include <Quartz2/Quartz.hpp>
 #include <imgui.h>
 
 /// @brief Contains all UI elements specifically designed for Phoenix.

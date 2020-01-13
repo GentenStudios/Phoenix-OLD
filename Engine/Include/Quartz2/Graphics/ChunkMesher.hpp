@@ -1,4 +1,4 @@
-// Copyright 2019-20 Genten Studios
+// Copyright 2019 Genten Studios
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -28,56 +28,46 @@
 
 #pragma once
 
-#include <Quartz2/BlocksTextureAtlas.hpp>
-#include <Quartz2/Singleton.hpp>
-#include <list>
-#include <memory>
+#include <Quartz2/Math/Math.hpp>
+#include <Quartz2/Voxels/Block.hpp>
+#include <Quartz2/Graphics/ChunkRenderer.hpp>
+
+#include <vector>
 
 namespace q2
 {
-	enum EBlockCategory
+	namespace gfx
 	{
-		BLOCK_CATEGORY_AIR,
-		BLOCK_CATEGORY_SOLID,
-		BLOCK_CATEGORY_LIQUID
-	};
-
-	struct BlockType
-	{
-		const char* displayName;
-		const char* id;
-
-		EBlockCategory category;
-
-		struct
+		enum class BlockFace : unsigned int
 		{
-			BlockTextureAtlas::SpriteID top, bottom, left, right, front,
-				back;
+			FRONT = 0,
+			LEFT,
+			BACK,
+			RIGHT,
+			TOP,
+			BOTTOM
+		};
 
-			void setAll(BlockTextureAtlas::SpriteID sprite)
+		class ChunkMesher
+		{
+		public:
+			ChunkMesher(math::vec3 pos, std::vector<voxels::BlockType*>& blocks, const ChunkRenderer::AssociativeTextureTable& texTable)
+			    : m_blockRef(blocks), m_pos(pos), m_texTable(texTable)
 			{
-				top = bottom = left = right = front = back = sprite;
 			}
-		} textures;
-	};
+			~ChunkMesher() = default;
 
-	class BlockRegistry : public Singleton<BlockRegistry>
-	{
-	public:
-		BlockType* registerBlock(BlockType blockInfo);
-		BlockType* getBlockFromID(const char* id);
+			void mesh();
+			const std::vector<float>& getMesh() { return m_mesh; }
 
-		void setAtlas(const std::shared_ptr<BlockTextureAtlas>& atlas);
+		private:
+			void addBlockFace(voxels::BlockType* block, BlockFace face, float x, float y, float z);
 
-		BlockTextureAtlas* getAtlas() const
-			{ return m_textureAtlas.get(); }
-
-	private:
-		// This is a std::list as we don't want to invalidate any pointers
-		// when resizing... #todo (bwilks): Maybe use HandleAllocator for
-		// this as well??
-		std::list<BlockType> m_blocks;
-
-		std::shared_ptr<BlockTextureAtlas> m_textureAtlas;
-	};
-}
+		private:
+			math::vec3                      m_pos;
+			std::vector<float>              m_mesh;
+			std::vector<voxels::BlockType*> m_blockRef;
+			const ChunkRenderer::AssociativeTextureTable& m_texTable;
+		};
+	} // namespace gfx
+} // namespace q2
