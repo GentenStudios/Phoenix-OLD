@@ -11,6 +11,10 @@ set(Sources
 	${currentDir}/ContentLoader.cpp
 	${currentDir}/Settings.cpp
 	${currentDir}/ImGuiHelpers.cpp
+	${currentDir}/UI.cpp
+
+	${currentDir}/Main.cpp
+
 
 	PARENT_SCOPE
 )

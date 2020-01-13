@@ -16,6 +16,7 @@ set(Headers
 	${currentDir}/ImGuiHelpers.hpp
 	${currentDir}/ContentLoader.hpp
 	${currentDir}/Settings.hpp
+	${currentDir}/UI.hpp
 
 	PARENT_SCOPE
 )

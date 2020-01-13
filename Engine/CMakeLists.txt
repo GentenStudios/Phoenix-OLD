@@ -4,8 +4,9 @@ add_subdirectory(ThirdParty)
 
 add_subdirectory(Include/Quartz2)
 add_subdirectory(Source)
+add_subdirectory(Assets)
 
-add_library(${PROJECT_NAME} STATIC ${Headers} ${Sources})
+add_executable(${PROJECT_NAME} ${Headers} ${Sources})
 target_link_libraries(${PROJECT_NAME} PRIVATE SDL2-static SDL2main Glad ImGui sol2 liblua)
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_LIST_DIR}/Include)
