@@ -29,13 +29,57 @@
 #pragma once
 
 #include <Quartz2/Math/Math.hpp>
-#include <Quartz2/ChunkRenderer.hpp>
-#include <Quartz2/Game.hpp>
-#include <Quartz2/Graphics/Camera.hpp>
-#include <Quartz2/Mesh.hpp>
-#include <Quartz2/Chunk.hpp>
-#include <Quartz2/VoxelWorld.hpp>
-#include <Quartz2/BlocksTextureAtlas.hpp>
-#include <Quartz2/Commander.hpp>
-#include <Quartz2/ImGuiHelpers.hpp>
-#include <Quartz2/ContentLoader.hpp>
+
+namespace q2
+{
+	/**
+	 * @brief Produces a castable ray for helping find things at
+	 * positions/intervals along the ray.
+	 */
+	class Ray
+	{
+	public:
+		/**
+		 * @brief Constructs a Ray object.
+		 * @param start The position of the start of the ray.
+		 * @param direction The direction the ray is "traveling" in.
+		 */
+		Ray(const math::vec3& start,
+			const math::vec3& direction);
+
+		Ray(const Ray& other) = default;
+		~Ray() = default;
+
+		/**
+		 * @brief Advances along a ray.
+		 * @param scale The distance to advance along the ray
+		 * @return The new position along the ray.
+		 */
+		math::vec3 advance(float scale);
+
+		/**
+		 * @brief Backtracks (goes backwards) along a ray.
+		 * @param scale The distance to backtrack along the ray.
+		 * @return The new position along the ray.
+		 */
+		math::vec3 backtrace(float scale);
+
+		/**
+		 * @brief Gets the current length of the ray.
+		 * @return The length of the ray.
+		 */
+		float getLength() const;
+
+		/**
+		 * @brief Gets the current position along the ray.
+		 * @return The current position along the ray
+		 */
+		math::vec3 getCurrentPosition() const;
+
+	private:
+		float m_length;
+		math::vec3  m_start;
+		math::vec3  m_direction;
+		math::vec3  m_currentPosition;
+	};
+} // namespace qz

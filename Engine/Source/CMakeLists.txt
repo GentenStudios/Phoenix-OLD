@@ -1,15 +1,15 @@
-#add_subdirectory(Events)
-#add_subdirectory(Graphics)
+add_subdirectory(Math)
+add_subdirectory(Graphics)
 
 set(currentDir ${CMAKE_CURRENT_LIST_DIR})
 set(Sources
-	${currentDir}/Matrix4x4.cpp
-	${currentDir}/Ray.cpp
+	${mathSources}
+	${graphicsSources}
+
 	${currentDir}/ChunkRenderer.cpp
 	${currentDir}/ShaderCompiler.cpp
 	${currentDir}/Game.cpp
 	${currentDir}/OpenGL32.cpp
-	${currentDir}/Camera.cpp
 	${currentDir}/Chunk.cpp
 	${currentDir}/VoxelWorld.cpp
 	${currentDir}/Mesh.cpp

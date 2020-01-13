@@ -1,4 +1,4 @@
-// Copyright 2019-20 Genten Studios
+// Copyright 2019 Genten Studios
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -28,58 +28,27 @@
 
 #pragma once
 
-#include <Quartz2/Vec3.hpp>
+#include <Quartz2/Math/MathUtils.hpp>
+#include <Quartz2/Math/Matrix4x4.hpp>
+#include <Quartz2/Math/Vector2.hpp>
+#include <Quartz2/Math/Vector3.hpp>
 
 namespace q2
 {
-	/**
-	 * @brief Produces a castable ray for helping find things at
-	 * positions/intervals along the ray.
-	 */
-	class Ray
+	namespace math
 	{
-	public:
-		/**
-		 * @brief Constructs a Ray object.
-		 * @param start The position of the start of the ray.
-		 * @param direction The direction the ray is "traveling" in.
-		 */
-		Ray(const Vec3& start,
-			const Vec3& direction);
+		using vec2  = detail::Vector2<float>;
+		using vec2f = detail::Vector2<float>;
+		using vec2d = detail::Vector2<double>;
+		using vec2i = detail::Vector2<int>;
+		using vec2u = detail::Vector2<unsigned int>;
 
-		Ray(const Ray& other) = default;
-		~Ray() = default;
+		using vec3  = detail::Vector3<float>;
+		using vec3f = detail::Vector3<float>;
+		using vec3d = detail::Vector3<double>;
+		using vec3i = detail::Vector3<int>;
+		using vec3u = detail::Vector3<unsigned int>;
 
-		/**
-		 * @brief Advances along a ray.
-		 * @param scale The distance to advance along the ray
-		 * @return The new position along the ray.
-		 */
-		Vec3 advance(float scale);
-
-		/**
-		 * @brief Backtracks (goes backwards) along a ray.
-		 * @param scale The distance to backtrack along the ray.
-		 * @return The new position along the ray.
-		 */
-		Vec3 backtrace(float scale);
-
-		/**
-		 * @brief Gets the current length of the ray.
-		 * @return The length of the ray.
-		 */
-		float getLength() const;
-
-		/**
-		 * @brief Gets the current position along the ray.
-		 * @return The current position along the ray
-		 */
-		Vec3 getCurrentPosition() const;
-
-	private:
-		float m_length;
-		Vec3  m_start;
-		Vec3  m_direction;
-		Vec3  m_currentPosition;
-	};
-} // namespace qz
+		using mat4 = detail::Matrix4x4;
+	} // namespace math
+} // namespace q2

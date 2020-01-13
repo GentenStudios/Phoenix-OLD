@@ -1,4 +1,4 @@
-// Copyright 2019-20 Genten Studios
+// Copyright 2019 Genten Studios
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -28,48 +28,50 @@
 
 #pragma once
 
-#include <Quartz2/Vec3.hpp>
+#include <algorithm>
 
 namespace q2
 {
-	struct Matrix4x4
-	{
-		float elements[16];
+	namespace math
+	{		
+		static constexpr float PI = 3.141592654f;
+		static constexpr float PIDIV2 = 1.570796327f;
+		static constexpr float PIDIV4 = 0.785398163f;
 
-		Matrix4x4();
+		/**
+		 * @brief Converts degrees to radians.
+		 * @param degrees The number of degrees waiting to be converted.
+		 * @return The converted value, in radians.
+		 */
+		static float degreeToRadians(const float& degrees)
+		{
+			return degrees * PI / 180.f;
+		}
 
-		Matrix4x4(float m00, float m10, float m20, float m30, float m01,
-			float m11, float m21, float m31, float m02, float m12,
-			float m22, float m32, float m03, float m13, float m23,
-			float m33);
+		/**
+		 * @brief Converts radians to degrees.
+		 * @param radians The number of radians waiting to be converted.
+		 * @return The converted value, in degrees.
+		 */
+		static float radianToDegrees(const float& radians)
+		{
+			return radians * 180.f / PI;
+		}
 
-		void setIdentity();
-
-		~Matrix4x4() = default;
-
-		static Matrix4x4 perspective(const float& aspectRatio,
-			const float& fieldOfView,
-			const float& farPlane,
-			const float& nearPlane);
-
-		static Matrix4x4 ortho(float left, float right, float top,
-			float bottom, float farPlane,
-			float nearPlane);
-
-		static Matrix4x4 lookAt(const Vec3& eyePos,
-			const Vec3& centre,
-			const Vec3& up);
-
-		void operator*=(const Matrix4x4& other);
-
-		Matrix4x4 operator*(const Matrix4x4& other) const;
-
-		void operator*=(const float& other);
-
-		Matrix4x4 operator*(const float& other);
-
-		Vec3 operator*(const Vec3& other);
-	};
-
-	using Mat4 = Matrix4x4;
+		/**
+		 * @brief
+		 * @tparam T The data type that needs to be clamped.
+		 * @param n The actual value needing to be clamped.
+		 * @param lower The lowest value the result should be allowed to be.
+		 * @param upper The highest value the results should be allowed to be.
+		 * @return Either the original number if the value is between the lower
+		 *         and upper bounds, OR the upper/lower bounds dependant
+		 *         on the value.
+		 */
+		template <typename T>
+		T clamp(const T& n, const T& lower, const T& upper)
+		{
+			return std::max(lower, std::min(n, upper));
+		}
+	}
 } // namespace q2

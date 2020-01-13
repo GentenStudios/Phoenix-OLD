@@ -1,4 +1,4 @@
-// Copyright 2019-20 Genten Studios
+// Copyright 2019 Genten Studios
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -26,36 +26,59 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Quartz2/Ray.hpp>
+#pragma once
 
-using namespace q2;
+#include <Quartz2/Math/Vector3.hpp>
 
-Ray::Ray(const Vec3& start,
-         const Vec3& direction)
-    : m_start(start), m_direction(direction), m_currentPosition(start),
-      m_length(0.f)
+namespace q2
 {
-}
+	namespace math
+	{
+		namespace detail
+		{
+			struct Matrix4x4
+			{
+				using Vec3 = detail::Vector3<float>;
 
-Vec3 Ray::advance(float scale)
-{
-	m_currentPosition += m_direction * scale;
-	m_length += scale;
+				float elements[16];
 
-	return m_currentPosition;
-}
+				Matrix4x4();
 
-Vec3 Ray::backtrace(float scale)
-{
-	m_currentPosition -= m_direction * scale;
-	m_length -= scale;
+				// this is just because the matrix is 4x4 and it's so much nicer
+				// to read like this...
+				// clang-format off
+				Matrix4x4(float m00, float m10, float m20, float m30,
+						 float m01, float m11, float m21, float m31,
+						 float m02, float m12, float m22, float m32,
+						 float m03, float m13, float m23, float m33);
+				// clang-format on
 
-	return m_currentPosition;
-}
+				void setIdentity();
 
-float Ray::getLength() const { return m_length; }
+				~Matrix4x4() = default;
 
-Vec3 Ray::getCurrentPosition() const
-{
-	return m_currentPosition;
-}
+				static Matrix4x4 perspective(const float& aspectRatio,
+				                             const float& fieldOfView,
+				                             const float& farPlane,
+				                             const float& nearPlane);
+
+				static Matrix4x4 ortho(float left, float right, float top,
+				                       float bottom, float farPlane,
+				                       float nearPlane);
+
+				static Matrix4x4 lookAt(const Vec3& eyePos, const Vec3& centre,
+				                        const Vec3& up);
+
+				void operator*=(const Matrix4x4& other);
+
+				Matrix4x4 operator*(const Matrix4x4& other) const;
+
+				void operator*=(const float& other);
+
+				Matrix4x4 operator*(const float& other);
+
+				Vec3 operator*(const Vec3& other);
+			};
+		} // namespace detail
+	}     // namespace math
+} // namespace q2

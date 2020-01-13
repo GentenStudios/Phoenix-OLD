@@ -28,7 +28,7 @@
 
 #pragma once
 
-#include <Quartz2/Rect.hpp>
+#include <Quartz2/Math/Rect.hpp>
 
 #include <cstddef>
 #include <unordered_map>

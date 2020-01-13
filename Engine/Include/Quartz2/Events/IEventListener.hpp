@@ -1,4 +1,4 @@
-// Copyright 2019-20 Genten Studios
+// Copyright 2019 Genten Studios
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -28,14 +28,19 @@
 
 #pragma once
 
-#include <Quartz2/Math/Math.hpp>
-#include <Quartz2/ChunkRenderer.hpp>
-#include <Quartz2/Game.hpp>
-#include <Quartz2/Graphics/Camera.hpp>
-#include <Quartz2/Mesh.hpp>
-#include <Quartz2/Chunk.hpp>
-#include <Quartz2/VoxelWorld.hpp>
-#include <Quartz2/BlocksTextureAtlas.hpp>
-#include <Quartz2/Commander.hpp>
-#include <Quartz2/ImGuiHelpers.hpp>
-#include <Quartz2/ContentLoader.hpp>
+#include <Quartz2/Events/Event.hpp>
+
+namespace q2
+{
+	namespace events
+	{
+		class IEventListener
+		{
+		public:
+			IEventListener()          = default;
+			virtual ~IEventListener() = default;
+
+			virtual void onEvent(const Event& e) = 0;
+		};
+	} // namespace events
+} // namespace q2
