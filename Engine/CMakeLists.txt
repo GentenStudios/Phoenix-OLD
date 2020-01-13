@@ -2,11 +2,15 @@ project(Engine)
 
 add_subdirectory(ThirdParty)
 
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_LIST_DIR}/Tools/CMake")
+
+find_package(Filesystem REQUIRED)
+
 add_subdirectory(Include/Quartz2)
 add_subdirectory(Source)
 
 add_library(${PROJECT_NAME} STATIC ${Headers} ${Sources})
-target_link_libraries(${PROJECT_NAME} PRIVATE SDL2-static SDL2main Glad ImGui sol2 liblua)
+target_link_libraries(${PROJECT_NAME} PRIVATE SDL2-static SDL2main Glad ImGui sol2 liblua std::filesystem)
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_LIST_DIR}/Include)
 target_include_directories(${PROJECT_NAME} PUBLIC
@@ -19,12 +23,6 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 	${CMAKE_CURRENT_LIST_DIR}/ThirdParty/stb_image
 	${CMAKE_CURRENT_LIST_DIR}/ThirdParty/stb_rectpack
 )
-
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-	target_link_libraries(${PROJECT_NAME} c++experimental)
-elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-	target_link_libraries(${PROJECT_NAME} stdc++fs)
-endif()
 
 if(WIN32)
 	target_link_libraries(${PROJECT_NAME} PRIVATE opengl32.lib)
