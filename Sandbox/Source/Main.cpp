@@ -82,7 +82,7 @@ public:
 
 		m_camera = new gfx::FPSCamera(m_window);
 
-		chat.registerCallback(&rawEcho);
+		chat.registerCallback(&commandCenter);
 	}
 
 	~Phoenix() { delete m_window; }
