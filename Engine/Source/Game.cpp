@@ -28,6 +28,7 @@
 
 #include <Quartz2/Game.hpp>
 #include <Quartz2/OpenGL32.hpp>
+#include <Quartz2/ContentLoader.hpp>
 
 #include <SDL_opengl.h>
 
@@ -76,6 +77,15 @@ void Game::start()
 
 	ImGui_ImplSDL2_InitForOpenGL(m_sdlWindow, m_sdlGLContext);
 	ImGui_ImplOpenGL3_Init("#version 330 core");
+
+	sol::state lua;
+	lua.open_libraries(sol::lib::base);
+	luaapi::loadAPI(lua);
+	bool loadedLua = modules::loadModules("save1", lua);
+	if (!loadedLua)
+	{
+		exitGame();
+	}
 
 	onStart();
 

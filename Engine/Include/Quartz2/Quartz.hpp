@@ -38,4 +38,3 @@
 #include <Quartz2/BlocksTextureAtlas.hpp>
 #include <Quartz2/Commander.hpp>
 #include <Quartz2/ImGuiHelpers.hpp>
-#include <Quartz2/ContentLoader.hpp>

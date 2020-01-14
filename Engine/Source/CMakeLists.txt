@@ -19,5 +19,7 @@ set(Sources
 	${currentDir}/Settings.cpp
 	${currentDir}/ImGuiHelpers.cpp
 	${currentDir}/Commander.cpp
+
+
 	PARENT_SCOPE
 )

@@ -138,6 +138,8 @@ bool modules::loadModules(std::string save, sol::state& lua)
 
 //TODO: replace this with an API registration system
 #include <Quartz2/Settings.hpp>
+#include <Quartz2/Commander.hpp>
+#include <list>
 
 void luaapi::loadAPI(sol::state& lua){
     lua["core"] = lua.create_table();
@@ -156,5 +158,28 @@ void luaapi::loadAPI(sol::state& lua){
 		[](std::string key, int value)
 		{
 			Settings::get()->getSetting(key)->set(value); 
+		};
+	CommandBook::get()->add("test", "fml", "all", 
+		[](std::vector<std::string> args){std::cout << "worked";});
+	lua.set_function("addcommand",
+		[](std::string command, std::string help, sol::function f)
+		{
+			/*static std::list<sol::function> functions;
+			functions.push_back(f);
+			CommandBook::get()->add(command, help, "all", 
+				[f = functions.back()](std::vector<std::string> args) 
+				{
+					f(sol::as_table(args));
+				}
+			);*/
+			static function fx = f;
+			std::vector<std::string> args;
+			fx(args);
+			CommandBook::get()->add(command, help, "all", fx);
+		});
+	lua["core"]["print"] =
+		[](std::string string)
+		{
+			std::cout << string << "\n";
 		};
 }
