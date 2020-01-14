@@ -8,5 +8,5 @@ install:
 
 build_script:
     - cmake -H. -Bbuild
-    - cmake --build build --target Sandbox
+    - cmake --build build --target Phoenix
 
