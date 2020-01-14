@@ -26,7 +26,7 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Quartz2/Voxels/TextureRegistry.hpp>
+#include <Phoenix/Voxels/TextureRegistry.hpp>
 
 using namespace q2::voxels;
 

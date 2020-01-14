@@ -28,7 +28,7 @@
 
 #pragma once
 
-#include <Quartz2/Math/Vector3.hpp>
+#include <Phoenix/Math/Vector3.hpp>
 
 namespace q2
 {

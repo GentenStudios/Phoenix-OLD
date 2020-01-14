@@ -28,7 +28,7 @@
 
 #pragma once
 
-#include <Quartz2/Math/Math.hpp>
+#include <Phoenix/Math/Math.hpp>
 
 #include <glad/glad.h>
 

@@ -28,9 +28,9 @@
 
 #pragma once
 
-#include <Quartz2/Events/Event.hpp>
-#include <Quartz2/Events/IEventListener.hpp>
-#include <Quartz2/Math/Math.hpp>
+#include <Phoenix/Events/Event.hpp>
+#include <Phoenix/Events/IEventListener.hpp>
+#include <Phoenix/Math/Math.hpp>
 
 #include <SDL.h>
 

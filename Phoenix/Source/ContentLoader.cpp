@@ -30,7 +30,7 @@
 #include <iostream>
 #include <queue>
 
-#include <Quartz2/ContentLoader.hpp>
+#include <Phoenix/ContentLoader.hpp>
 
 using namespace q2;
 
@@ -137,7 +137,7 @@ bool modules::loadModules(std::string save, sol::state& lua)
 }
 
 //TODO: replace this with an API registration system
-#include <Quartz2/Settings.hpp>
+#include <Phoenix/Settings.hpp>
 
 void luaapi::loadAPI(sol::state& lua){
     lua["core"] = lua.create_table();

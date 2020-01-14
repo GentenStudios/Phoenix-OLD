@@ -26,17 +26,17 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Quartz2/Graphics/Window.hpp>
-#include <Quartz2/Graphics/Camera.hpp>
-#include <Quartz2/Voxels/BlockRegistry.hpp>
-#include <Quartz2/Voxels/Chunk.hpp>
-#include <Quartz2/Graphics/ChunkMesher.hpp>
-#include <Quartz2/Graphics/ChunkRenderer.hpp>
-#include <Quartz2/ImGuiHelpers.hpp>
-#include <Quartz2/Settings.hpp>
-#include <Quartz2/ContentLoader.hpp>
+#include <Phoenix/Graphics/Window.hpp>
+#include <Phoenix/Graphics/Camera.hpp>
+#include <Phoenix/Voxels/BlockRegistry.hpp>
+#include <Phoenix/Voxels/Chunk.hpp>
+#include <Phoenix/Graphics/ChunkMesher.hpp>
+#include <Phoenix/Graphics/ChunkRenderer.hpp>
+#include <Phoenix/ImGuiHelpers.hpp>
+#include <Phoenix/Settings.hpp>
+#include <Phoenix/ContentLoader.hpp>
 
-#include <Quartz2/UI.hpp>
+#include <Phoenix/UI.hpp>
 
 #include <imgui.h>
 

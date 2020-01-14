@@ -26,8 +26,8 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Quartz2/FileIO.hpp>
-#include <Quartz2/Graphics/ShaderPipeline.hpp>
+#include <Phoenix/FileIO.hpp>
+#include <Phoenix/Graphics/ShaderPipeline.hpp>
 
 #include <iostream>
 

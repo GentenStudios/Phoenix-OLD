@@ -1,4 +1,4 @@
-project(Engine)
+project(Phoenix)
 
 add_subdirectory(ThirdParty)
 add_subdirectory(Assets)

@@ -28,7 +28,7 @@
 
 #pragma once
 
-#include <Quartz2/CoreIntrinsics.hpp>
+#include <Phoenix/CoreIntrinsics.hpp>
 
 #include <glad/glad.h>
 

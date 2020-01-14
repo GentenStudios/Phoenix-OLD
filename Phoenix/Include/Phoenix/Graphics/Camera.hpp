@@ -28,9 +28,9 @@
 
 #pragma once
 
-#include <Quartz2/Math/Math.hpp>
-#include <Quartz2/Graphics/Window.hpp>
-#include <Quartz2/Settings.hpp>
+#include <Phoenix/Math/Math.hpp>
+#include <Phoenix/Graphics/Window.hpp>
+#include <Phoenix/Settings.hpp>
 
 #include <SDL.h>
 

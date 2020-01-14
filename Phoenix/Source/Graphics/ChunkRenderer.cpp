@@ -26,16 +26,16 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Quartz2/Graphics/ChunkRenderer.hpp>
-#include <Quartz2/Graphics/ShaderPipeline.hpp>
-#include <Quartz2/Voxels/BlockRegistry.hpp>
+#include <Phoenix/Graphics/ChunkRenderer.hpp>
+#include <Phoenix/Graphics/ShaderPipeline.hpp>
+#include <Phoenix/Voxels/BlockRegistry.hpp>
 
 #include <glad/glad.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
-#include "Quartz2/Graphics/OpenGLTools.hpp"
+#include "Phoenix/Graphics/OpenGLTools.hpp"
 #include <iostream>
 
 using namespace q2;

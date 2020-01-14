@@ -31,8 +31,8 @@
 #include <imgui_internal.h>
 
 // Internals
-#include <Quartz2/ImGuiHelpers.hpp>
-#include <Quartz2/UI.hpp>
+#include <Phoenix/ImGuiHelpers.hpp>
+#include <Phoenix/UI.hpp>
 
 // Standards
 //...

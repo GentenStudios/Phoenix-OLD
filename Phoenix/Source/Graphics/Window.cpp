@@ -26,9 +26,9 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Quartz2/CoreIntrinsics.hpp>
-#include <Quartz2/Graphics/OpenGLTools.hpp>
-#include <Quartz2/Graphics/Window.hpp>
+#include <Phoenix/CoreIntrinsics.hpp>
+#include <Phoenix/Graphics/OpenGLTools.hpp>
+#include <Phoenix/Graphics/Window.hpp>
 
 #include <glad/glad.h>
 

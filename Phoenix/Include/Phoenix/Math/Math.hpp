@@ -28,10 +28,10 @@
 
 #pragma once
 
-#include <Quartz2/Math/MathUtils.hpp>
-#include <Quartz2/Math/Matrix4x4.hpp>
-#include <Quartz2/Math/Vector2.hpp>
-#include <Quartz2/Math/Vector3.hpp>
+#include <Phoenix/Math/MathUtils.hpp>
+#include <Phoenix/Math/Matrix4x4.hpp>
+#include <Phoenix/Math/Vector2.hpp>
+#include <Phoenix/Math/Vector3.hpp>
 
 namespace q2
 {

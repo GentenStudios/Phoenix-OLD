@@ -28,9 +28,9 @@
 
 #pragma once
 
-#include <Quartz2/Singleton.hpp>
-#include <Quartz2/Voxels/Block.hpp>
-#include <Quartz2/Voxels/TextureRegistry.hpp>
+#include <Phoenix/Singleton.hpp>
+#include <Phoenix/Voxels/Block.hpp>
+#include <Phoenix/Voxels/TextureRegistry.hpp>
 
 #include <vector>
 

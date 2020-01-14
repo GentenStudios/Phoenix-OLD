@@ -26,8 +26,8 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Quartz2/Graphics/ChunkMesher.hpp>
-#include <Quartz2/Voxels/Chunk.hpp>
+#include <Phoenix/Graphics/ChunkMesher.hpp>
+#include <Phoenix/Voxels/Chunk.hpp>
 
 #include <iostream>
 

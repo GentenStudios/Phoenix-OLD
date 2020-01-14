@@ -26,7 +26,7 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Quartz2/Settings.hpp>
+#include <Phoenix/Settings.hpp>
 #include <climits>
 
 using namespace q2;
