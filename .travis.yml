@@ -1,9 +1,4 @@
 language: cpp
-
-cache:
-    directories:
-        - ${TRAVIS_BUILD_DIRECTORY}/Build/Engine/ThirdParty
-
 dist: bionic
 osx_image: xcode11.3
 os:
@@ -13,6 +8,13 @@ os:
 compiler:
     - gcc
     - clang
+
+cache:
+    - ccache: true
+
+install:
+    - if [ "$TRAVIS_OS_NAME" = "osx" ]; then brew install ccache; fi
+    - if [ "$TRAVIS_OS_NAME" = "osx" ]; then export PATH="/usr/local/opt/ccache/libexec:$PATH"; fi
 
 script:
     - git submodule update --init --recursive
