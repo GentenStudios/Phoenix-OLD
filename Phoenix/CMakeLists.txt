@@ -1,16 +1,17 @@
 project(Engine)
 
 add_subdirectory(ThirdParty)
-
-add_subdirectory(Include/Quartz2)
-add_subdirectory(Source)
 add_subdirectory(Assets)
 
-add_executable(${PROJECT_NAME} ${Headers} ${Sources})
-target_link_libraries(${PROJECT_NAME} PRIVATE SDL2-static SDL2main Glad ImGui sol2 liblua)
+add_subdirectory(Include/Phoenix)
+add_subdirectory(Source)
 
-target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_LIST_DIR}/Include)
+add_executable(${PROJECT_NAME} ${Headers} ${Sources})
+target_link_libraries(${PROJECT_NAME} PRIVATE SDL2-static SDL2main Glad 
+	ImGui sol2 liblua $<$<PLATFORM_ID:Windows>:opengl32.lib>)
+
 target_include_directories(${PROJECT_NAME} PUBLIC
+	${CMAKE_CURRENT_LIST_DIR}/Include
 	${CMAKE_CURRENT_LIST_DIR}/ThirdParty/SDL2/include
 	${CMAKE_CURRENT_LIST_DIR}/ThirdParty/Glad/include
 	${CMAKE_CURRENT_LIST_DIR}/ThirdParty/ImGui
@@ -21,10 +22,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 	${CMAKE_CURRENT_LIST_DIR}/ThirdParty/stb_rectpack
 )
 
-if(WIN32)
-	target_link_libraries(${PROJECT_NAME} PRIVATE opengl32.lib)
-endif()
-
+add_dependencies(${PROJECT_NAME} PhoenixAssets)
 
 ###########################################################
 ## THIS SORTS THE FILES FOR VISUAL STUDIO SOURCE GROUPS. ##
