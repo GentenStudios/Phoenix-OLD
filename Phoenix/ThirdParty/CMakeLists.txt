@@ -23,3 +23,29 @@ add_subdirectory (sol2)
 add_subdirectory (lua)
 
 set_target_properties(SDL2main SDL2-static uninstall Glad ImGui lua liblua PROPERTIES FOLDER Dependencies)
+
+# utility thing to make phoenix cmake tidier
+set(PHX_THIRD_PARTY_INCLUDES
+	${CMAKE_CURRENT_LIST_DIR}/SDL2/include
+	${CMAKE_CURRENT_LIST_DIR}/Glad/include
+	${CMAKE_CURRENT_LIST_DIR}/ImGui
+	${CMAKE_CURRENT_LIST_DIR}/ImGui/examples
+	${CMAKE_CURRENT_LIST_DIR}/lua
+	${CMAKE_CURRENT_LIST_DIR}/sol2/include
+	${CMAKE_CURRENT_LIST_DIR}/stb_image
+	${CMAKE_CURRENT_LIST_DIR}/stb_rectpack
+
+	PARENT_SCOPE
+)
+
+set(PHX_THIRD_PARTY_LIBRARIES
+	SDL2-static 
+	SDL2main
+	Glad 
+	ImGui
+	sol2
+	liblua
+	$<$<PLATFORM_ID:Windows>:opengl32.lib> # link to opengl32.lib if windows.
+
+	PARENT_SCOPE
+)

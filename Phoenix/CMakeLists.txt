@@ -7,45 +7,19 @@ add_subdirectory(Include/Phoenix)
 add_subdirectory(Source)
 
 add_executable(${PROJECT_NAME} ${Headers} ${Sources})
-target_link_libraries(${PROJECT_NAME} PRIVATE SDL2-static SDL2main Glad 
-	ImGui sol2 liblua $<$<PLATFORM_ID:Windows>:opengl32.lib>)
-
-target_include_directories(${PROJECT_NAME} PUBLIC
-	${CMAKE_CURRENT_LIST_DIR}/Include
-	${CMAKE_CURRENT_LIST_DIR}/ThirdParty/SDL2/include
-	${CMAKE_CURRENT_LIST_DIR}/ThirdParty/Glad/include
-	${CMAKE_CURRENT_LIST_DIR}/ThirdParty/ImGui
-	${CMAKE_CURRENT_LIST_DIR}/ThirdParty/ImGui/examples
-	${CMAKE_CURRENT_LIST_DIR}/ThirdParty/lua
-	${CMAKE_CURRENT_LIST_DIR}/ThirdParty/sol2/include
-	${CMAKE_CURRENT_LIST_DIR}/ThirdParty/stb_image
-	${CMAKE_CURRENT_LIST_DIR}/ThirdParty/stb_rectpack
+target_link_libraries(${PROJECT_NAME} PRIVATE ${PHX_THIRD_PARTY_LIBRARIES})
+target_include_directories(${PROJECT_NAME} PRIVATE Include ${PHX_THIRD_PARTY_INCLUDES})
+set_target_properties(${PROJECT_NAME} PROPERTIES
+	CXX_STANDARD 17
+	CMAKE_CXX_STANDARD_REQUIRED ON
+	CMAKE_CXX_EXTENSIONS OFF
 )
 
 add_dependencies(${PROJECT_NAME} PhoenixAssets)
 
-###########################################################
-## THIS SORTS THE FILES FOR VISUAL STUDIO SOURCE GROUPS. ##
-###########################################################
+#################################################
+## ORGANISE FILES FOR IDEs (Xcode, VS, etc...) ##
+#################################################
 
-foreach(FILE ${Sources}) 
-    get_filename_component(PARENT_DIR "${FILE}" DIRECTORY)
-    string(REPLACE "${CMAKE_CURRENT_SOURCE_DIR}" "" GROUP "${PARENT_DIR}")
-
-    string(REPLACE "/" "\\" GROUP "${GROUP}")
-	string(REPLACE "Source" "" GROUP "${GROUP}")
-
-    set(GROUP "Source Files${GROUP}")
-    source_group("${GROUP}" FILES "${FILE}")
-endforeach()
-
-foreach(FILE ${Headers})
-    get_filename_component(PARENT_DIR "${FILE}" DIRECTORY)
-    string(REPLACE "${CMAKE_CURRENT_SOURCE_DIR}" "" GROUP "${PARENT_DIR}")
-
-    string(REPLACE "/" "\\" GROUP "${GROUP}")
-	string(REPLACE "Include" "" GROUP "${GROUP}")
-
-    set(GROUP "Header Files${GROUP}")
-    source_group("${GROUP}" FILES "${FILE}")
-endforeach()
+source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/Include/Phoenix" PREFIX "Header Files" FILES ${Headers})
+source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/Source" PREFIX "Source Files" FILES ${Sources})
