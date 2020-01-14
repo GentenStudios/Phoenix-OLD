@@ -40,7 +40,7 @@
 #include <sol/sol.hpp>
 #include <string>
 
-namespace q2
+namespace phx
 {
 	/// @brief A lightweight struct to store a module and the list of
 	/// dependencies that module has

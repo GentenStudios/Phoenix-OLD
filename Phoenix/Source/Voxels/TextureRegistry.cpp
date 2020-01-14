@@ -28,7 +28,7 @@
 
 #include <Phoenix/Voxels/TextureRegistry.hpp>
 
-using namespace q2::voxels;
+using namespace phx::voxels;
 
 void TextureRegistry::addTexture(const std::string& texture)
 {

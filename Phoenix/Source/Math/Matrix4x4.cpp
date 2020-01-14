@@ -32,7 +32,7 @@
 
 #define INDEX_2D(x, y) x + (y * 4)
 
-using namespace q2::math::detail;
+using namespace phx::math::detail;
 
 Matrix4x4::Matrix4x4() { setIdentity(); }
 

@@ -39,7 +39,7 @@
 #include <imgui_impl_opengl3.h>
 #include <imgui_impl_sdl.h>
 
-using namespace q2;
+using namespace phx;
 using namespace gfx;
 
 Window::Window(const std::string& title, int width, int height)

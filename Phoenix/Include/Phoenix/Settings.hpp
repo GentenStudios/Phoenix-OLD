@@ -41,13 +41,13 @@
 #include <unordered_map>
 #include <string>
 
-namespace q2
+namespace phx
 {
 	/**
 	 * @brief A settings object to store a single setting
 	 * 
 	 * @description The settings object stores an integer that can be mapped to
-	 * other data. Maximum and minimum values can be set so a settings cant be 
+	 * other data. Maximum and minimum values can be set so a settings cant be
 	 * adjusted outside its limits.
 	 * 
 	 */

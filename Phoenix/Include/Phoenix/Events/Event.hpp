@@ -34,7 +34,7 @@
 
 #include <cstring>
 
-namespace q2
+namespace phx
 {
 	namespace events
 	{

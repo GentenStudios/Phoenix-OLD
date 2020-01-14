@@ -32,7 +32,7 @@
 
 #include <Phoenix/ContentLoader.hpp>
 
-using namespace q2;
+using namespace phx;
 
 Mod::Mod(std::string modName) : name(std::move(modName))
 {

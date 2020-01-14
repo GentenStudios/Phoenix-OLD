@@ -31,93 +31,93 @@
 
 #include <iostream>
 
-static const q2::math::vec3 CUBE_VERTS[] = {
+static const phx::math::vec3 CUBE_VERTS[] = {
     // front
-    q2::math::vec3(-1.f, -1.f, -1.f), q2::math::vec3(1.f, -1.f, -1.f),
-    q2::math::vec3(1.f, 1.f, -1.f), q2::math::vec3(1.f, 1.f, -1.f),
-    q2::math::vec3(-1.f, 1.f, -1.f), q2::math::vec3(-1.f, -1.f, -1.f),
+    phx::math::vec3(-1.f, -1.f, -1.f), phx::math::vec3(1.f, -1.f, -1.f),
+    phx::math::vec3(1.f, 1.f, -1.f), phx::math::vec3(1.f, 1.f, -1.f),
+    phx::math::vec3(-1.f, 1.f, -1.f), phx::math::vec3(-1.f, -1.f, -1.f),
 
 	// left
-    q2::math::vec3(-1.f, 1.f, 1.f), q2::math::vec3(-1.f, 1.f, -1.f),
-    q2::math::vec3(-1.f, -1.f, -1.f), q2::math::vec3(-1.f, -1.f, -1.f),
-    q2::math::vec3(-1.f, -1.f, 1.f), q2::math::vec3(-1.f, 1.f, 1.f),
+    phx::math::vec3(-1.f, 1.f, 1.f), phx::math::vec3(-1.f, 1.f, -1.f),
+    phx::math::vec3(-1.f, -1.f, -1.f), phx::math::vec3(-1.f, -1.f, -1.f),
+    phx::math::vec3(-1.f, -1.f, 1.f), phx::math::vec3(-1.f, 1.f, 1.f),
 
     // back
-    q2::math::vec3(-1.f, -1.f, 1.f), q2::math::vec3(1.f, -1.f, 1.f),
-    q2::math::vec3(1.f, 1.f, 1.f), q2::math::vec3(1.f, 1.f, 1.f),
-    q2::math::vec3(-1.f, 1.f, 1.f), q2::math::vec3(-1.f, -1.f, 1.f),
+    phx::math::vec3(-1.f, -1.f, 1.f), phx::math::vec3(1.f, -1.f, 1.f),
+    phx::math::vec3(1.f, 1.f, 1.f), phx::math::vec3(1.f, 1.f, 1.f),
+    phx::math::vec3(-1.f, 1.f, 1.f), phx::math::vec3(-1.f, -1.f, 1.f),
 
     // right
-    q2::math::vec3(1.f, 1.f, 1.f), q2::math::vec3(1.f, 1.f, -1.f),
-    q2::math::vec3(1.f, -1.f, -1.f), q2::math::vec3(1.f, -1.f, -1.f),
-    q2::math::vec3(1.f, -1.f, 1.f), q2::math::vec3(1.f, 1.f, 1.f),
+    phx::math::vec3(1.f, 1.f, 1.f), phx::math::vec3(1.f, 1.f, -1.f),
+    phx::math::vec3(1.f, -1.f, -1.f), phx::math::vec3(1.f, -1.f, -1.f),
+    phx::math::vec3(1.f, -1.f, 1.f), phx::math::vec3(1.f, 1.f, 1.f),
 
 	// top
-    q2::math::vec3(-1.f, 1.f, -1.f), q2::math::vec3(1.f, 1.f, -1.f),
-    q2::math::vec3(1.f, 1.f, 1.f), q2::math::vec3(1.f, 1.f, 1.f),
-    q2::math::vec3(-1.f, 1.f, 1.f), q2::math::vec3(-1.f, 1.f, -1.f),
+    phx::math::vec3(-1.f, 1.f, -1.f), phx::math::vec3(1.f, 1.f, -1.f),
+    phx::math::vec3(1.f, 1.f, 1.f), phx::math::vec3(1.f, 1.f, 1.f),
+    phx::math::vec3(-1.f, 1.f, 1.f), phx::math::vec3(-1.f, 1.f, -1.f),
 
     // bottom
-    q2::math::vec3(-1.f, -1.f, -1.f), q2::math::vec3(1.f, -1.f, -1.f),
-    q2::math::vec3(1.f, -1.f, 1.f), q2::math::vec3(1.f, -1.f, 1.f),
-    q2::math::vec3(-1.f, -1.f, 1.f), q2::math::vec3(-1.f, -1.f, -1.f),
+    phx::math::vec3(-1.f, -1.f, -1.f), phx::math::vec3(1.f, -1.f, -1.f),
+    phx::math::vec3(1.f, -1.f, 1.f), phx::math::vec3(1.f, -1.f, 1.f),
+    phx::math::vec3(-1.f, -1.f, 1.f), phx::math::vec3(-1.f, -1.f, -1.f),
 };
 
-static const q2::math::vec2 CUBE_UV[] = {
+static const phx::math::vec2 CUBE_UV[] = {
     // front north
-    q2::math::vec2(-0.f, 1.f),
-    q2::math::vec2(-1.f, 1.f),
-    q2::math::vec2(-1.f, 0.f),
-    q2::math::vec2(-1.f, 0.f),
-    q2::math::vec2(-0.f, 0.f),
-    q2::math::vec2(-0.f, 1.f),
+    phx::math::vec2(-0.f, 1.f),
+    phx::math::vec2(-1.f, 1.f),
+    phx::math::vec2(-1.f, 0.f),
+    phx::math::vec2(-1.f, 0.f),
+    phx::math::vec2(-0.f, 0.f),
+    phx::math::vec2(-0.f, 1.f),
 
 	// left west
-    q2::math::vec2(-0.f, 0.f),
-    q2::math::vec2(-1.f, 0.f),
-    q2::math::vec2(-1.f, 1.f),
-    q2::math::vec2(-1.f, 1.f),
-    q2::math::vec2(-0.f, 1.f),
-    q2::math::vec2(-0.f, 0.f),
+    phx::math::vec2(-0.f, 0.f),
+    phx::math::vec2(-1.f, 0.f),
+    phx::math::vec2(-1.f, 1.f),
+    phx::math::vec2(-1.f, 1.f),
+    phx::math::vec2(-0.f, 1.f),
+    phx::math::vec2(-0.f, 0.f),
 
     // back south
-    q2::math::vec2(0.f, 1.f),
-    q2::math::vec2(1.f, 1.f),
-    q2::math::vec2(1.f, 0.f),
-    q2::math::vec2(1.f, 0.f),
-    q2::math::vec2(0.f, 0.f),
-    q2::math::vec2(0.f, 1.f),
+    phx::math::vec2(0.f, 1.f),
+    phx::math::vec2(1.f, 1.f),
+    phx::math::vec2(1.f, 0.f),
+    phx::math::vec2(1.f, 0.f),
+    phx::math::vec2(0.f, 0.f),
+    phx::math::vec2(0.f, 1.f),
 
 	// right east
-    q2::math::vec2(0.f, 0.f),
-    q2::math::vec2(1.f, 0.f),
-    q2::math::vec2(1.f, 1.f),
-    q2::math::vec2(1.f, 1.f),
-    q2::math::vec2(0.f, 1.f),
-    q2::math::vec2(0.f, 0.f),
+    phx::math::vec2(0.f, 0.f),
+    phx::math::vec2(1.f, 0.f),
+    phx::math::vec2(1.f, 1.f),
+    phx::math::vec2(1.f, 1.f),
+    phx::math::vec2(0.f, 1.f),
+    phx::math::vec2(0.f, 0.f),
 
     // top
-    q2::math::vec2(0.f, -1.f),
-    q2::math::vec2(1.f, -1.f),
-    q2::math::vec2(1.f, -0.f),
-    q2::math::vec2(1.f, -0.f),
-    q2::math::vec2(0.f, -0.f),
-    q2::math::vec2(0.f, -1.f),
+    phx::math::vec2(0.f, -1.f),
+    phx::math::vec2(1.f, -1.f),
+    phx::math::vec2(1.f, -0.f),
+    phx::math::vec2(1.f, -0.f),
+    phx::math::vec2(0.f, -0.f),
+    phx::math::vec2(0.f, -1.f),
 
     // bottom
-    q2::math::vec2(0.f, 1.f),
-    q2::math::vec2(1.f, 1.f),
-    q2::math::vec2(1.f, 0.f),
-    q2::math::vec2(1.f, 0.f),
-    q2::math::vec2(0.f, 0.f),
-    q2::math::vec2(0.f, 1.f),
+    phx::math::vec2(0.f, 1.f),
+    phx::math::vec2(1.f, 1.f),
+    phx::math::vec2(1.f, 0.f),
+    phx::math::vec2(1.f, 0.f),
+    phx::math::vec2(0.f, 0.f),
+    phx::math::vec2(0.f, 1.f),
 };
 
 const int ACTUAL_CUBE_SIZE  = 2;
 const int NUM_FACES_IN_CUBE = 6;
 const int NUM_VERTS_IN_FACE = 6;
 
-using namespace q2;
+using namespace phx;
 using namespace gfx;
 
 void ChunkMesher::mesh()

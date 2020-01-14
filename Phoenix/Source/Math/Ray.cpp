@@ -28,7 +28,7 @@
 
 #include <Phoenix/Math/Ray.hpp>
 
-using namespace q2;
+using namespace phx;
 
 Ray::Ray(const math::vec3& start,
          const math::vec3& direction)

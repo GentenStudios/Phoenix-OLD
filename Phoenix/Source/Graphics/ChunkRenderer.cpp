@@ -38,7 +38,7 @@
 #include "Phoenix/Graphics/OpenGLTools.hpp"
 #include <iostream>
 
-using namespace q2;
+using namespace phx;
 using namespace gfx;
 
 struct Vertex

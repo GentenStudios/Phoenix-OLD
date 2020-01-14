@@ -34,7 +34,7 @@
 
 #include <vector>
 
-namespace q2
+namespace phx
 {
 	namespace voxels
 	{

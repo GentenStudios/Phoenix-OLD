@@ -31,7 +31,7 @@
 #include <string>
 #include <fstream>
 
-namespace q2
+namespace phx
 {
 	class FileIO
 	{

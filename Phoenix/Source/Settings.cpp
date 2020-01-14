@@ -29,7 +29,7 @@
 #include <Phoenix/Settings.hpp>
 #include <climits>
 
-using namespace q2;
+using namespace phx;
 
 Setting::Setting(){}
 

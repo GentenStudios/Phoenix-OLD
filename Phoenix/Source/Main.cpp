@@ -43,7 +43,7 @@
 #include <sstream>
 #include <string>
 
-using namespace q2;
+using namespace phx;
 
 static void rawEcho(const std::string& input, std::ostringstream& cout)
 {
@@ -106,7 +106,7 @@ public:
 		//}
 
 					{
-			using namespace q2::voxels;
+			using namespace phx::voxels;
 			BlockRegistry::get()->initialise();
 
 			BlockType grassBlock;
@@ -126,16 +126,16 @@ public:
 			BlockRegistry::get()->registerBlock(grassBlock);
 		}
 
-		q2::gfx::ChunkRenderer renderer(100);
+		phx::gfx::ChunkRenderer renderer(100);
 		renderer.buildTextureArray();
 
 		for (int j = 0; j < 10; ++j)
 		{
 			for (int i = 0; i < 10; ++i)
 			{
-				q2::voxels::Chunk chunk({i * 16, 0, j * 16});
+				phx::voxels::Chunk chunk({i * 16, 0, j * 16});
 				chunk.autoTestFill();
-				q2::gfx::ChunkMesher mesher(chunk.getChunkPos(),
+				phx::gfx::ChunkMesher mesher(chunk.getChunkPos(),
 				                            chunk.getBlocks(),
 				                            renderer.getTextureTable());
 				mesher.mesh();
@@ -143,14 +143,14 @@ public:
 			}
 		}
 
-		q2::gfx::ShaderPipeline shaderPipeline;
+		phx::gfx::ShaderPipeline shaderPipeline;
 		shaderPipeline.prepare("Assets/SimpleWorld.vert",
 		                       "Assets/SimpleWorld.frag",
 		                       renderer.getRequiredShaderLayout());
 
 		shaderPipeline.activate();
 
-		q2::math::mat4 model;
+		phx::math::mat4 model;
 		shaderPipeline.setMatrix("u_model", model);
 		
 		static bool wireframe = false;

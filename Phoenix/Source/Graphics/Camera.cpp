@@ -31,7 +31,7 @@
 
 const float MOVE_SPEED = 0.01f;
 
-using namespace q2;
+using namespace phx;
 using namespace gfx;
 
 FPSCamera::FPSCamera(Window* window)

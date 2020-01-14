@@ -39,7 +39,7 @@
 #ifdef ENGINE_DEBUG
 #	define GLCheck(x) \
 		x;             \
-		q2::gfx::checkError(__FILE__, __LINE__);
+		phx::gfx::checkError(__FILE__, __LINE__);
 #else
 #	define GLCheck(x) x;
 #endif
@@ -51,7 +51,7 @@
 // Uncomment this in order to enable detailed OpenGL logging
 #define OPENGL_DIAGNOSTICS_ENABLED
 
-namespace q2
+namespace phx
 {
 	namespace gfx
 	{

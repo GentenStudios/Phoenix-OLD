@@ -31,7 +31,7 @@
 #include <algorithm>
 #include <cstring>
 
-using namespace q2::voxels;
+using namespace phx::voxels;
 
 void BlockRegistry::initialise()
 {

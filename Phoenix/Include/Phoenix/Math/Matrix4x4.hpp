@@ -30,7 +30,7 @@
 
 #include <Phoenix/Math/Vector3.hpp>
 
-namespace q2
+namespace phx
 {
 	namespace math
 	{

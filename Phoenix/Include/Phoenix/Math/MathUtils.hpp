@@ -30,7 +30,7 @@
 
 #include <algorithm>
 
-namespace q2
+namespace phx
 {
 	namespace math
 	{		

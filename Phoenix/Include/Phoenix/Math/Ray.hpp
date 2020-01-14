@@ -30,7 +30,7 @@
 
 #include <Phoenix/Math/Math.hpp>
 
-namespace q2
+namespace phx
 {
 	/**
 	 * @brief Produces a castable ray for helping find things at

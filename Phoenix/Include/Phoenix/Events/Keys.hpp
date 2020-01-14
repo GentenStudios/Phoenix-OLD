@@ -32,7 +32,7 @@
 
 #include <SDL.h>
 
-namespace q2
+namespace phx
 {
 	namespace events
 	{
@@ -187,4 +187,4 @@ namespace q2
 	} // namespace events
 } // namespace q2
 
-ENABLE_BITWISE_OPERATORS(q2::events::Mods);
+ENABLE_BITWISE_OPERATORS(phx::events::Mods);

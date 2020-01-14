@@ -31,8 +31,8 @@
 
 #include <iostream>
 
-using namespace q2::gfx;
-using namespace q2;
+using namespace phx::gfx;
+using namespace phx;
 
 void ShaderPipeline::prepare(std::string vertShaderPath, std::string fragShaderPath,
                              std::vector<ShaderLayout> layout)

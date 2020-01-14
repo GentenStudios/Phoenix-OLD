@@ -30,7 +30,7 @@
 
 #include <Phoenix/Events/Event.hpp>
 
-namespace q2
+namespace phx
 {
 	namespace events
 	{

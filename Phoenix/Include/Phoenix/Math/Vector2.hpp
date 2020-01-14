@@ -31,7 +31,7 @@
 #include <cmath>
 #include <ostream>
 
-namespace q2
+namespace phx
 {
 	namespace math
 	{
@@ -216,29 +216,29 @@ namespace q2
 } // namespace q2
 
 template <typename T>
-q2::math::detail::Vector2<T> operator-(const q2::math::detail::Vector2<T>& left,
-                             const q2::math::detail::Vector2<T>& right)
+phx::math::detail::Vector2<T> operator-(const phx::math::detail::Vector2<T>& left,
+                             const phx::math::detail::Vector2<T>& right)
 {
 	return {left.x - right.x, left.y - right.y};
 }
 
 template <typename T>
-q2::math::detail::Vector2<T> operator+(const q2::math::detail::Vector2<T>& left,
-                             const q2::math::detail::Vector2<T>& right)
+phx::math::detail::Vector2<T> operator+(const phx::math::detail::Vector2<T>& left,
+                             const phx::math::detail::Vector2<T>& right)
 {
 	return {left.x + right.x, left.y + right.y};
 }
 
 template <typename T>
-q2::math::detail::Vector2<T> operator*(const q2::math::detail::Vector2<T>& left,
-                             const q2::math::detail::Vector2<T>& right)
+phx::math::detail::Vector2<T> operator*(const phx::math::detail::Vector2<T>& left,
+                             const phx::math::detail::Vector2<T>& right)
 {
 	return {left.x * right.x, left.y * right.y};
 }
 
 template <typename T>
-q2::math::detail::Vector2<T> operator/(const q2::math::detail::Vector2<T>& left,
-                             const q2::math::detail::Vector2<T>& right)
+phx::math::detail::Vector2<T> operator/(const phx::math::detail::Vector2<T>& left,
+                             const phx::math::detail::Vector2<T>& right)
 {
 	return {left.x / right.x, left.y / right.y};
 }

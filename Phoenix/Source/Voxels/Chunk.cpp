@@ -29,8 +29,8 @@
 #include <Phoenix/Voxels/BlockRegistry.hpp>
 #include <Phoenix/Voxels/Chunk.hpp>
 
-using namespace q2::voxels;
-using namespace q2;
+using namespace phx::voxels;
+using namespace phx;
 
 Chunk::Chunk(math::vec3 chunkPos) : m_pos(chunkPos)
 {

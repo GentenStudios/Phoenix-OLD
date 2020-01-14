@@ -32,7 +32,7 @@
 #include <unordered_set>
 #include <vector>
 
-namespace q2
+namespace phx
 {
 	namespace voxels
 	{

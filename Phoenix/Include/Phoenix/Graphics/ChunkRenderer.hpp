@@ -33,7 +33,7 @@
 #include <unordered_map>
 #include <vector>
 
-namespace q2
+namespace phx
 {
 	namespace gfx
 	{

@@ -111,7 +111,7 @@ Enum& operator^=(Enum& lhs, Enum rhs)
 	return lhs;
 }
 
-namespace q2
+namespace phx
 {
 	template <typename Enum, typename = typename std::enable_if<
 	                             EnableBitWiseOperators<Enum>::value>::type>
