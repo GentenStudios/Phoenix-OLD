@@ -28,7 +28,7 @@
 
 #pragma once
 
-namespace q2
+namespace phx
 {
 	template <typename T>
 	class Singleton

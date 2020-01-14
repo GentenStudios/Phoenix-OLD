@@ -11,6 +11,7 @@ set(Headers
 	${voxelHeaders}
 
 	${currentDir}/EnumTools.hpp
+	${currentDir}/Singleton.hpp
 	${currentDir}/FileIO.hpp
 
 	${currentDir}/ImGuiHelpers.hpp
