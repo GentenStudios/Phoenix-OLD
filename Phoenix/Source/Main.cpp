@@ -80,11 +80,12 @@ static ui::ChatWindow chat("Chat Window", 5,
 	void initFiles(std::string save)
 	{
 		std::ofstream saveFile;
-		if(saveFile.open("Save/" + save + "/mods.txt")){
+		saveFile.open("Save/" + save + "/mods.txt")
+		if(saveFile != null){
 			saveFile.close();
 			return;
 		} else {
-			mkdir("Save/");
+			mkdir("Save");
 			mkdir("Save/" + save);
 			saveFile.open("Save/" + save + "/mods.txt");
 			saveFile.close();
