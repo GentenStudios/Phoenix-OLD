@@ -21,14 +21,14 @@ jobs:
     vmImage: 'ubuntu-18.04'
   strategy:
     matrix:
-      Clang-7 Debug:
+      Clang-7:
         CC: clang-6.0
         CXX: clang++-6.0
         BuildType: Debug
         SelfHost: false
         CMakeArgs: ''
 
-      GCC-7 Debug:
+      GCC-7:
         CC: gcc-7
         CXX: g++-7
         BuildType: Debug
@@ -41,10 +41,12 @@ jobs:
 
     - task: CMake@1
       displayName: 'CMake Generation'
+      workingDirectory: 'Build'
       inputs:
-        cmakeArgs: '-H. -BBuild -DCMAKE_BUILD_TYPE=$(BuildType)'
+        cmakeArgs: '-H.. -DCMAKE_BUILD_TYPE=$(BuildType)'
     
     - task: CMake@1
       displayName: 'CMake Building'
+      workingDirectory: 'Build'
       inputs:
-        cmakeArgs: '--build Build'
+        cmakeArgs: '--build .'
