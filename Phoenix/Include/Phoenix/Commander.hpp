@@ -52,7 +52,7 @@ namespace phx
      * The function should take a vector of strings. Each string is an argument similar to how programs are called from the terminal.
      * 
      */
-    typedef std::function<void(std::vector<std::string> args)> command;
+    typedef std::function<void(std::vector<std::string> args)> commandFunction;
 
     /**
      * @brief The command book stores commands and information on them to be
@@ -64,7 +64,7 @@ namespace phx
         std::vector<std::string> m_command;
         std::vector<std::string> m_help;
         std::vector<std::string> m_permission;
-        std::vector<command>    m_functions;
+        std::vector<commandFunction>    m_functions;
 
         /**
          * @brief Registers a command in the command registry
@@ -73,7 +73,7 @@ namespace phx
          * @param permission What permission is required to run this command
          */
         void add(const std::string& command, const std::string& help,
-                    const std::string& permission, command f);
+                    const std::string& permission, commandFunction f);
 
         /**
          * @brief Searches for a command
