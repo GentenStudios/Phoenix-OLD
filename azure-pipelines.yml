@@ -36,6 +36,8 @@ jobs:
         CMakeArgs: ''
 
   steps:
+    - script: sudo apt update -y && sudo apt install clang-7
+      displayName: 'Updating Build Tools'
     - script: git submodule update --init
       displayName: 'Cloning Submodules'
     - script: cmake -H. -BBuild
