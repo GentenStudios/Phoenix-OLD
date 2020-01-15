@@ -27,7 +27,6 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <Phoenix/Commander.hpp>
-#include <iostream>
 #include <utility>
 
 using namespace phx;
