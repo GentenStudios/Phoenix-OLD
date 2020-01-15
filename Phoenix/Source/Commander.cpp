@@ -28,10 +28,11 @@
 
 /**
  * @file Commander.cpp
- * @brief Source file to implement a command execution system designed to interface with a terminal.
- * 
+ * @brief Source file to implement a command execution system designed to
+ * interface with a terminal.
+ *
  * @copyright Copyright (c) 2019-2020
- * 
+ *
  */
 
 #include <Phoenix/Commander.hpp>
@@ -39,10 +40,7 @@
 
 using namespace phx;
 
-Commander::Commander()
-    : m_book(CommandBook::get())
-{
-}
+Commander::Commander() : m_book(CommandBook::get()) {}
 
 Commander::~Commander() {}
 
@@ -76,13 +74,12 @@ void CommandBook::add(const std::string& command, const std::string& help,
 
 int CommandBook::getPage() { return m_page; }
 
-bool Commander::help(const std::vector<std::string>&& args,
-                     std::ostream&                    out)
+bool Commander::help(const std::vector<std::string>&& args, std::ostream& out)
 {
 	if (args.size() < 1)
 	{
 		out << "Type /help [command] to learn more about a command \nType "
-		         "/list for a list of available commands\n";
+		       "/list for a list of available commands\n";
 		return true;
 	}
 	else if (args[0] == "help")
@@ -109,8 +106,7 @@ bool Commander::help(const std::vector<std::string>&& args,
 }
 
 bool Commander::run(const std::string&               command,
-                    const std::vector<std::string>&& args,
-                    std::ostream&                    out)
+                    const std::vector<std::string>&& args, std::ostream& out)
 {
 	// Check for built in functions
 	if (command == "help")
@@ -170,7 +166,7 @@ void Commander::post(std::istream& in, std::ostream& out)
 	}
 }
 
-void Commander::callback(const std::string &input, std::ostringstream &cout)
+void Commander::callback(const std::string& input, std::ostringstream& cout)
 {
 	// easter egg commission for the tobster.
 	if (input.compare("buh-buh-bum-bah-bum") == 0)
@@ -180,14 +176,16 @@ void Commander::callback(const std::string &input, std::ostringstream &cout)
 
 	std::string s = input;
 
-	if (s.substr(0,1) == "/") {
+	if (s.substr(0, 1) == "/")
+	{
 		std::vector<std::string> args;
 
-		size_t pos = s.find(" ");
+		size_t      pos     = s.find(" ");
 		std::string command = s.substr(1, pos - 1);
 		s.erase(0, pos + 1);
 		std::string token;
-		while ((pos = s.find(" ")) != std::string::npos) {
+		while ((pos = s.find(" ")) != std::string::npos)
+		{
 			token = s.substr(0, pos - 1);
 			args.push_back(token);
 			s.erase(0, pos + 1);
