@@ -22,8 +22,8 @@ jobs:
   strategy:
     matrix:
       Clang-7:
-        CC: clang-6.0
-        CXX: clang++-6.0
+        CC: clang-7.0
+        CXX: clang++-7.0
         BuildType: Debug
         SelfHost: false
         CMakeArgs: ''
@@ -52,6 +52,19 @@ jobs:
       64-bit Debug:
         BuildType: Debug
         CMakeArgs: ''
+
+  steps:
+    - script: git submodule update --init
+      displayName: 'Cloning Submodules'
+    - script: cmake -H. -BBuild
+      displayName: 'CMake Configure'
+    - script: cmake --build Build
+      displayName: 'CMake Build'
+
+- job:
+  displayName: MacOSX
+  pool:
+    vmImage: 'macOS-latest'
 
   steps:
     - script: git submodule update --init
