@@ -77,6 +77,7 @@ static ui::ChatWindow chat("Chat Window", 5,
 
 	}
 #else
+#	include <sys/stat.h> 
 	void initFiles(std::string save)
 	{
 		std::ofstream saveFile;
