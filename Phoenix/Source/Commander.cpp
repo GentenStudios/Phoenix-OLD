@@ -26,6 +26,14 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+/**
+ * @file Commander.cpp
+ * @brief Source file to implement a command execution system designed to interface with a terminal.
+ * 
+ * @copyright Copyright (c) 2019-2020
+ * 
+ */
+
 #include <Phoenix/Commander.hpp>
 #include <utility>
 

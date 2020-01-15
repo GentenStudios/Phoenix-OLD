@@ -26,6 +26,14 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+/**
+ * @file Commander.hpp
+ * @brief Header file to implement a command execution system designed to interface with a terminal.
+ * 
+ * @copyright Copyright (c) 2019-2020
+ * 
+ */
+
 #pragma once
 
 #include <Phoenix/Singleton.hpp>
@@ -38,7 +46,13 @@
 
 namespace phx
 {
-    typedef std::function<void(std::vector<std::string> args)> function;
+    /**
+     * @brief A function that is called when a command is executed
+     * 
+     * The function should take a vector of strings. Each string is an argument similar to how programs are called from the terminal.
+     * 
+     */
+    typedef std::function<void(std::vector<std::string> args)> command;
 
     /**
      * @brief The command book stores commands and information on them to be
@@ -50,7 +64,7 @@ namespace phx
         std::vector<std::string> m_command;
         std::vector<std::string> m_help;
         std::vector<std::string> m_permission;
-        std::vector<function>    m_functions;
+        std::vector<command>    m_functions;
 
         /**
          * @brief Registers a command in the command registry
@@ -59,7 +73,7 @@ namespace phx
          * @param permission What permission is required to run this command
          */
         void add(const std::string& command, const std::string& help,
-                    const std::string& permission, function f);
+                    const std::string& permission, command f);
 
         /**
          * @brief Searches for a command
@@ -98,11 +112,6 @@ namespace phx
     public:
         /**
          * @brief Initializes a commander that can run and execute commands
-         *
-         * @param book The command book that the commander uses to route
-         * commands to functions
-         * @param out An output stream the commander outputs results to
-         * @param in An input stream the commander accepts input to
          */
         Commander();
         ~Commander();
@@ -110,7 +119,9 @@ namespace phx
         /**
          * @brief Calls a command
          *
-         * @param command The keyword for calling the command.
+         * @param command The keyword for calling the command
+         * @param args The arguments to be passed to the command
+         * @param out An output stream to output any return from internal commander functions
          * @return Returns True if the function was called and False if the
          * function could not be found
          */
@@ -123,14 +134,17 @@ namespace phx
          *
          * @param args array of input, args[0] is the command helpstring is
          * returned for, all other array values are not used
+         * @param out An output stream to putput any help text to
          * @return Returns True if successful and False if it could not find
          * the innputted command
          */
         bool help(const std::vector<std::string>&& args,
-                         std::ostream&                    out);
+                         std::ostream&             out);
 
         /**
-         * @brief Returns string listing available commands
+         * @brief Outputs a string listing available commands
+         * 
+         * @param out The output stream the list of commands is sent to
          */
         void list(std::ostream& out);
 
