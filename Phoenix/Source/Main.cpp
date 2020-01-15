@@ -35,6 +35,7 @@
 #include <Phoenix/ImGuiHelpers.hpp>
 #include <Phoenix/Settings.hpp>
 #include <Phoenix/ContentLoader.hpp>
+#include <Phoenix/Commander.hpp>
 
 #include <Phoenix/UI.hpp>
 
@@ -45,9 +46,11 @@
 
 using namespace phx;
 
+Commander kirk = Commander();
+
 static void rawEcho(const std::string& input, std::ostringstream& cout)
 {
-	cout << input << "\n";
+	kirk.callback(input, cout);
 }
 
 static ui::ChatWindow chat("Chat Window", 5,

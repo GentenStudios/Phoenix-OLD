@@ -176,11 +176,11 @@ void Commander::callback(const std::string &input, std::ostringstream &cout)
 		std::vector<std::string> args;
 
 		size_t pos = s.find(" ");
-		std::string command = s.substr(1, pos);
+		std::string command = s.substr(1, pos - 1);
 		s.erase(0, pos + 1);
 		std::string token;
 		while ((pos = s.find(" ")) != std::string::npos) {
-			token = s.substr(0, pos);
+			token = s.substr(0, pos - 1);
 			args.push_back(token);
 			s.erase(0, pos + 1);
 		}

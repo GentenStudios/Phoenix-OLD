@@ -135,7 +135,10 @@ namespace phx
         void list(std::ostream& out);
 
         /**
-         * @brief Listens for commands.
+         * @brief Terminal interface to listen for and execute commands
+         * 
+         * @param in An input stream to get input, usually (but not nessecarily) std::cin
+         * @param out An output stream output is sent to, usually (but not nessecarily) std::cout
          */
         void post(std::istream& in, std::ostream& out);
 
