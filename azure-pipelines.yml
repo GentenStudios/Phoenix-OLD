@@ -40,7 +40,7 @@ jobs:
       displayName: 'CMake Generation'
       inputs:
         workingDirectory: 'Build'
-        cmakeArgs: '-S.. -BBuild -DCMAKE_BUILD_TYPE=$(BuildType)'
+        cmakeArgs: '-H.. -BBuild -DCMAKE_BUILD_TYPE=$(BuildType)'
 
     - task: CMake@1
       displayName: 'CMake Building'
