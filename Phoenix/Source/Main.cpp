@@ -86,8 +86,8 @@ static ui::ChatWindow chat("Chat Window", 5,
 			saveFile.close();
 			return;
 		} else {
-			mkdir("Save");
-			mkdir("Save/" + save);
+			mkdir("Save", S_IRWXO);
+			mkdir("Save/" + save, S_IRWXO);
 			saveFile.open("Save/" + save + "/mods.txt");
 			saveFile.close();
 			return;
