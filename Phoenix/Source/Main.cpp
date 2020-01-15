@@ -81,7 +81,7 @@ static ui::ChatWindow chat("Chat Window", 5,
 	void initFiles(std::string save)
 	{
 		std::ofstream saveFile;
-		saveFile.open("Save/" + save + "/mods.txt")
+		saveFile.open("Save/" + save + "/mods.txt");
 		if(saveFile != NULL){
 			saveFile.close();
 			return;
