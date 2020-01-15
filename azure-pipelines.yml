@@ -42,3 +42,21 @@ jobs:
       displayName: 'CMake Configure'
     - script: cmake --build Build
       displayName: 'CMake Build'
+
+- job:
+  displayName: Windows
+  pool:
+    vmImage: 'windows-2019'
+  strategy:
+    matrix:
+      64-bit Debug:
+        BuildType: Debug
+        CMakeArgs: ''
+
+  steps:
+    - script: git submodule update --init
+      displayName: 'Cloning Submodules'
+    - script: cmake -H. -BBuild
+      displayName: 'CMake Configure'
+    - script: cmake --build Build
+      displayName: 'CMake Build'
