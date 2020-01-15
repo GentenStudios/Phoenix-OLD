@@ -36,12 +36,14 @@ jobs:
         CMakeArgs: ''
 
   steps:
+    - script: git submodule update --init
+      displayName: 'Cloning Submodules'
+
     - task: CMake@1
       displayName: 'CMake Generation'
       inputs:
-        workingDirectory: 'Build'
-        cmakeArgs: '-H.. -BBuild -DCMAKE_BUILD_TYPE=$(BuildType)'
-
+        cmakeArgs: '-H. -BBuild -DCMAKE_BUILD_TYPE=$(BuildType)'
+    
     - task: CMake@1
       displayName: 'CMake Building'
       inputs:
