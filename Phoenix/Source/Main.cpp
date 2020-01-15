@@ -26,15 +26,15 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Phoenix/Graphics/Window.hpp>
+#include <Phoenix/ContentLoader.hpp>
 #include <Phoenix/Graphics/Camera.hpp>
-#include <Phoenix/Voxels/BlockRegistry.hpp>
-#include <Phoenix/Voxels/Chunk.hpp>
 #include <Phoenix/Graphics/ChunkMesher.hpp>
 #include <Phoenix/Graphics/ChunkRenderer.hpp>
+#include <Phoenix/Graphics/Window.hpp>
 #include <Phoenix/ImGuiHelpers.hpp>
 #include <Phoenix/Settings.hpp>
-#include <Phoenix/ContentLoader.hpp>
+#include <Phoenix/Voxels/BlockRegistry.hpp>
+#include <Phoenix/Voxels/Chunk.hpp>
 
 #include <Phoenix/UI.hpp>
 
@@ -42,6 +42,7 @@
 
 #include <sstream>
 #include <string>
+#include <fstream>
 
 using namespace phx;
 
@@ -52,6 +53,45 @@ static void rawEcho(const std::string& input, std::ostringstream& cout)
 
 static ui::ChatWindow chat("Chat Window", 5,
                            "Type something and hit enter to run a command!\n");
+
+// This gross thing is our desire to use std::filesystem despite OSX not
+// supporting it until 10.15. Of the methods we tried, this was the easiest and
+// most functional solution without importing another library to use intead of
+// std::filesystem on all other systems. When Apple stops performing security
+// updates for OSX 10.14 (Sometime in 2022?) we will delete this and just use
+// the std::filesystem code inline where the function exists. 
+// - @sonosfuer (Austin)
+#if defined(__cpp_lib_filesystem)
+#	include <filesystem>
+	void initFiles(std::string save) 
+	{ 
+		if (!std::filesystem::exists("Save")){
+			std::filesystem::create_directory("Save");
+		}
+		if (!std::filesystem::exists("Save/"+ save)){
+			std::filesystem::create_directory("Save/" + save);
+			std::ofstream mods;
+			mods.open("Save/save1/Mods.txt");
+			mods.close();
+		}
+
+	}
+#else
+	void initFiles(std::string save)
+	{
+		std::ofstream saveFile;
+		if(saveFile.open("Save/" + save + "/mods.txt")){
+			saveFile.close();
+			return;
+		} else {
+			mkdir("Save/");
+			mkdir("Save/" + save);
+			saveFile.open("Save/" + save + "/mods.txt");
+			saveFile.close();
+			return;
+		}
+	}
+#endif
 
 class Phoenix : public events::IEventListener
 {
@@ -95,17 +135,17 @@ public:
 
 	void run()
 	{
-		// skip this until filesystem stuff works or it gets annoying.
-		//sol::state lua;
-		//lua.open_libraries(sol::lib::base);
-		//luaapi::loadAPI(lua);
-		//bool loadedLua = modules::loadModules("save1", lua);
-		//if (!loadedLua)
-		//{
-		//	m_window->close();
-		//}
-
-					{
+		std::string save = "save1";
+		initFiles(save);
+		sol::state lua;
+		lua.open_libraries(sol::lib::base);
+		luaapi::loadAPI(lua);
+		bool loadedLua = modules::loadModules("save1", lua);
+		if (!loadedLua)
+		{
+			m_window->close();
+		}
+		{
 			using namespace phx::voxels;
 			BlockRegistry::get()->initialise();
 
@@ -136,8 +176,8 @@ public:
 				phx::voxels::Chunk chunk({i * 16, 0, j * 16});
 				chunk.autoTestFill();
 				phx::gfx::ChunkMesher mesher(chunk.getChunkPos(),
-				                            chunk.getBlocks(),
-				                            renderer.getTextureTable());
+				                             chunk.getBlocks(),
+				                             renderer.getTextureTable());
 				mesher.mesh();
 				renderer.submitChunkMesh(mesher.getMesh(), i + (j * 10));
 			}
@@ -152,7 +192,7 @@ public:
 
 		phx::math::mat4 model;
 		shaderPipeline.setMatrix("u_model", model);
-		
+
 		static bool wireframe = false;
 		static int  prevSens;
 
@@ -214,7 +254,7 @@ public:
 
 			shaderPipeline.setMatrix("u_view", m_camera->calculateViewMatrix());
 			shaderPipeline.setMatrix("u_projection", m_camera->getProjection());
-			
+
 			renderer.render();
 
 			m_window->endFrame();
