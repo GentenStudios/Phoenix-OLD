@@ -34,6 +34,7 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <sstream>
 
 namespace phx
 {
@@ -137,5 +138,13 @@ namespace phx
          * @brief Listens for commands.
          */
         void post(std::istream& in, std::ostream& out);
+
+        /**
+         * @brief A callback function that runs a single command and outputs to a stream
+         * 
+         * @param input Input string containing the command and arguments to be ran
+         * @param out The output stream any output goes to
+         */
+        void callback(const std::string &input, std::ostringstream &cout);
     };
 } // namespace qz
