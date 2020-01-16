@@ -115,7 +115,7 @@ namespace phx
 		 * @brief Initializes a commander that can run and execute commands
 		 */
 		Commander();
-		~Commander();
+		~Commander() = default;
 
 		/**
 		 * @brief Calls a command

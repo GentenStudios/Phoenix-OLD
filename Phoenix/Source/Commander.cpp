@@ -42,8 +42,6 @@ using namespace phx;
 
 Commander::Commander() : m_book(CommandBook::get()) {}
 
-Commander::~Commander() {}
-
 int CommandBook::find(const std::string& command)
 {
 	for (int j = 0; j < m_page; j++)
@@ -64,7 +62,7 @@ void CommandBook::add(const std::string& command, const std::string& help,
 	if (j == -1)
 	{
 		j = m_page;
-		m_page++;
+		++m_page;
 	}
 	m_command.push_back(command);
 	m_help.push_back(help);
