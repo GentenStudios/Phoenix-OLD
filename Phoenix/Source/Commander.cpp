@@ -91,7 +91,7 @@ bool Commander::help(const std::vector<std::string>&& args, std::ostream& out)
 		return true;
 	}
 	const int j = m_book->find(args[0]);
-	if (j == 0)
+	if (j == -1)
 	{
 		out << "Command \"" + args[0] + "\" not found \n";
 		return false;
@@ -168,23 +168,49 @@ void Commander::callback(const std::string& input, std::ostringstream& cout)
 {
 	cout << "->" << input << "\n";
 
-	// easter egg commission for the tobster.
-	if (input.compare("buh-buh-bum-bah-bum") == 0)
-		cout << "I'll be back\n";
+	// String views are cheaper and since the push_back vector function
+	// copies the contents of the input string as well we can avoid
+	// directly copying characters for the most part here.
+	std::string_view search = input;
+	std::string command;
+	std::string arg; // Just used to copy the args out of the search string.
+	std::vector<std::string> args;
+	size_t searchLoc;
+	size_t spaceLoc;
 
-	std::string s = input;
+	// Substring was unnecessary because it creates a duplicate string
+	// to store the memory in when we can just refference it statically.
+	if ( ! search.empty() && search[0] == '/')
 
-	if (s.substr(0, 1) == "/")
 	{
-		std::vector<std::string> args;
+		// NOTE:
+		//   Can't enter \t or \n rn, might be a good idea to sanitize l8r
+		// Search `first_of` initially, it's faster when there's no spaces.
+		spaceLoc = search.find_first_of(' ');
 
-		size_t      pos     = s.find(" ");
-		std::string command = s.substr(1, pos - 1);
-		s.erase(0, pos + 1);
-		while ((pos = s.find(" ")) != std::string::npos)
+		// if we don't have arguments don't try and populate the args array.
+		if (spaceLoc != std::string_view::npos)
 		{
-			args.push_back(s.substr(0, pos - 1));
-			s.erase(0, pos + 1);
+			command = search.substr(1, spaceLoc);
+
+			// doesn't create a new string object, just moves the start forward.
+			search.remove_prefix(1+spaceLoc);
+
+			// `first_not_of` space keeps errors from happening if a user
+			// accidentally separates the args with extra whitespace.
+			while ((searchLoc = search.find_first_not_of(' ')) != std::string_view::npos)
+			{
+				search.remove_prefix(searchLoc); // strip the leading whitspace
+				spaceLoc = search.find_first_of(' ');
+				arg = search.substr(0, (spaceLoc > 0 ? spaceLoc : search.length()));
+				args.push_back(arg);
+				search.remove_prefix(spaceLoc);
+			}
+		}
+		else
+		{
+			// otherwise just use the whole string without the command char.
+			command = search.substr(1, search.length());
 		}
 		run(command, std::move(args), cout);
 	}
