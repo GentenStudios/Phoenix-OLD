@@ -93,7 +93,7 @@ bool Commander::help(const std::vector<std::string>&& args, std::ostream& out)
 		return true;
 	}
 	const int j = m_book->find(args[0]);
-	if (j == 0)
+	if (j == -1)
 	{
 		out << "Command \"" + args[0] + "\" not found \n";
 		return false;
