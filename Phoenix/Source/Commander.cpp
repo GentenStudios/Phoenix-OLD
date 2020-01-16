@@ -57,7 +57,7 @@ int CommandBook::find(const std::string& command)
 }
 
 void CommandBook::add(const std::string& command, const std::string& help,
-                      const std::string& permission, commandFunction f)
+                      const std::string& permission, CommandFunction f)
 {
 	int j = find(command);
 	// If command does not already exist, enter new command
@@ -76,7 +76,7 @@ int CommandBook::getPage() { return m_page; }
 
 bool Commander::help(const std::vector<std::string>&& args, std::ostream& out)
 {
-	if (args.size() < 1)
+	if (args.empty())
 	{
 		out << "Type /help [command] to learn more about a command \nType "
 		       "/list for a list of available commands\n";
@@ -106,7 +106,7 @@ bool Commander::help(const std::vector<std::string>&& args, std::ostream& out)
 }
 
 bool Commander::run(const std::string&               command,
-                    const std::vector<std::string>&& args, std::ostream& out)
+                    std::vector<std::string> args, std::ostream& out)
 {
 	// Check for built in functions
 	if (command == "help")
@@ -183,6 +183,7 @@ void Commander::callback(const std::string& input, std::ostringstream& cout)
 	// Substring was unnecessary because it creates a duplicate string
 	// to store the memory in when we can just refference it statically.
 	if ( ! search.empty() && search[0] == '/')
+
 	{
 		// NOTE:
 		//   Can't enter \t or \n rn, might be a good idea to sanitize l8r
