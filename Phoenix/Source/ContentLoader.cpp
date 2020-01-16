@@ -138,6 +138,8 @@ bool modules::loadModules(std::string save, sol::state& lua)
 
 //TODO: replace this with an API registration system
 #include <Phoenix/Settings.hpp>
+#include <Phoenix/Voxels/BlockRegistry.hpp>
+#include <array>
 
 void luaapi::loadAPI(sol::state& lua){
     lua["core"] = lua.create_table();
@@ -156,5 +158,27 @@ void luaapi::loadAPI(sol::state& lua){
 		[](std::string key, int value)
 		{
 			Settings::get()->getSetting(key)->set(value); 
+		};
+	lua["voxel"] = lua.create_table();
+	lua["voxel"]["block"] = lua.create_table();
+	lua["voxel"]["block"]["register"] =
+		[](std::string displayName, std::string id, std::vector<std::string> textures)
+		{
+			using namespace phx::voxels;
+			BlockType block;
+			{
+				block.displayName = displayName;
+				block.id          = id;
+				block.category    = BlockCategory::SOLID;
+
+				// front, left, back, right, top, bottom
+				block.textures = {
+				    textures[0], textures[1],
+				    textures[2], textures[3],
+				    textures[4], textures[5],
+				};
+			}
+
+			BlockRegistry::get()->registerBlock(block);
 		};
 }
