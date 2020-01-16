@@ -14,6 +14,9 @@ pr:
     include:
     - '*'  # must quote since "*" is a YAML reserved character; we want a string
 
+variables:
+  CCACHE_DIR: $(Pipeline.Workspace)/ccache
+
 jobs:
 - job:
   displayName: Linux
@@ -36,14 +39,20 @@ jobs:
         CMakeArgs: ''
 
   steps:
-    - script: sudo apt update -y && sudo apt install clang-7
-      displayName: 'Updating Build Tools'
+    - script: |
+        sudo apt-get install ccache -y
+        echo "##vso[task.prependpath]/usr/lib/ccache"
     - script: git submodule update --init
       displayName: 'Cloning Submodules'
     - script: cmake -H. -BBuild
       displayName: 'CMake Configure'
     - script: cmake --build Build
       displayName: 'CMake Build'
+    - task: Cache@2
+      inputs:
+        key: 'ccache | "$(Agent.OS)"'
+        path: $(CCACHE_DIR)
+      displayName: 'Update CCache'
 
 - job:
   displayName: Windows
