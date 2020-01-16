@@ -25,8 +25,8 @@ jobs:
   strategy:
     matrix:
       Clang-6:
-        CC: clang-6.0
-        CXX: clang++-6.0
+        CC: ccache clang
+        CXX: ccache clang++
         BuildType: Debug
         SelfHost: false
         CMakeArgs: ''
@@ -42,6 +42,7 @@ jobs:
     - script: |
         sudo apt-get install ccache ninja-build -y
         echo "##vso[task.prependpath]/usr/lib/ccache"
+	export CCACHE_CPP2=yes
       displayName: 'Install build dependencies'
     - task: Cache@2
       inputs:
