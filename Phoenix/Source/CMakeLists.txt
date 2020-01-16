@@ -13,6 +13,7 @@ set(Sources
 	${currentDir}/ImGuiHelpers.cpp
 	${currentDir}/UI.cpp
 	${currentDir}/Player.cpp
+	${currentDir}/Actor.cpp
 
 	${currentDir}/Main.cpp
 

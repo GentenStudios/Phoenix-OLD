@@ -19,6 +19,7 @@ set(Headers
 	${currentDir}/Settings.hpp
 	${currentDir}/UI.hpp
 	${currentDir}/Player.hpp
+	${currentDir}/Actor.hpp
 
 	PARENT_SCOPE
 )
