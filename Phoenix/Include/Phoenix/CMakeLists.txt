@@ -18,6 +18,7 @@ set(Headers
 	${currentDir}/ContentLoader.hpp
 	${currentDir}/Settings.hpp
 	${currentDir}/UI.hpp
+	${currentDir}/Player.hpp
 
 	PARENT_SCOPE
 )
