@@ -50,7 +50,7 @@ jobs:
       displayName: 'CMake Build'
     - task: Cache@2
       inputs:
-        key: 'ccache | "$(Agent.OS)"'
+        key: 'ccache | "$(Agent.OS)" | "$(Agent.JobName)"'
         path: $(CCACHE_DIR)
       displayName: 'Update CCache'
 
