@@ -1,0 +1,87 @@
+# C/C++ with GCC
+# Build your C/C++ project with GCC using make.
+# Add steps that publish test results, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/apps/c-cpp/gcc
+
+trigger:
+  branches:
+    include:
+    - '*'  # must quote since "*" is a YAML reserved character; we want a string
+
+pr:
+  autoCancel: true
+  branches:
+    include:
+    - '*'  # must quote since "*" is a YAML reserved character; we want a string
+
+variables:
+  CCACHE_DIR: $(Pipeline.Workspace)/.ccache
+
+jobs:
+- job:
+  displayName: Linux
+  pool:
+    vmImage: 'ubuntu-18.04'
+  strategy:
+    matrix:
+      Clang-7:
+        CC: clang-6.0
+        CXX: clang++-6.0
+        BuildType: Debug
+        SelfHost: false
+        CMakeArgs: ''
+
+      GCC-7:
+        CC: gcc-7
+        CXX: g++-7
+        BuildType: Debug
+        SelfHost: false
+        CMakeArgs: ''
+
+  steps:
+    - script: |
+        sudo apt-get install ccache -y
+        echo "##vso[task.prependpath]/usr/lib/ccache"
+      displayName: 'Install build dependencies'
+    - task: Cache@2
+      inputs:
+        key: 'ccache | "$(Agent.JobName)"'
+        path: $(CCACHE_DIR)
+      displayName: 'CCache'
+    - script: git submodule update --init
+      displayName: 'Cloning Submodules'
+    - script: cmake -H. -BBuild
+      displayName: 'CMake Configure'
+    - script: cmake --build Build
+      displayName: 'CMake Build'
+
+- job:
+  displayName: Windows
+  pool:
+    vmImage: 'windows-2019'
+  strategy:
+    matrix:
+      64-bit Debug:
+        BuildType: Debug
+        CMakeArgs: ''
+
+  steps:
+    - script: git submodule update --init
+      displayName: 'Cloning Submodules'
+    - script: cmake -H. -BBuild
+      displayName: 'CMake Configure'
+    - script: cmake --build Build
+      displayName: 'CMake Build'
+
+- job:
+  displayName: MacOSX
+  pool:
+    vmImage: 'macOS-latest'
+
+  steps:
+    - script: git submodule update --init
+      displayName: 'Cloning Submodules'
+    - script: cmake -H. -BBuild
+      displayName: 'CMake Configure'
+    - script: cmake --build Build
+      displayName: 'CMake Build'
