@@ -42,7 +42,7 @@ jobs:
     - script: |
         sudo apt-get install ccache ninja-build -y
         echo "##vso[task.prependpath]/usr/lib/ccache"
-	export CCACHE_CPP2=yes
+        export CCACHE_CPP2=yes
       displayName: 'Install build dependencies'
     - task: Cache@2
       inputs:
