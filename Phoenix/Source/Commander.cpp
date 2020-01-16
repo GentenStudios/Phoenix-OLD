@@ -213,6 +213,6 @@ void Commander::callback(const std::string& input, std::ostringstream& cout)
 			// otherwise just use the whole string without the command char.
 			command = search.substr(1, search.length());
 		}
-		kirk.run(command, std::move(args), cout);
+		run(command, std::move(args), cout);
 	}
 }
