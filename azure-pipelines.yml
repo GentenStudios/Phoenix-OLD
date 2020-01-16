@@ -40,7 +40,7 @@ jobs:
 
   steps:
     - script: |
-        sudo apt-get install ccache -y
+        sudo apt-get install ccache ninja-build -y
         echo "##vso[task.prependpath]/usr/lib/ccache"
       displayName: 'Install build dependencies'
     - task: Cache@2
@@ -50,9 +50,9 @@ jobs:
       displayName: 'CCache'
     - script: git submodule update --init
       displayName: 'Cloning Submodules'
-    - script: cmake -H. -BBuild
+    - script: cmake -G"Ninja" -H. -BBuild
       displayName: 'CMake Configure'
-    - script: cmake --build Build
+    - script: cd Build && ninja
       displayName: 'CMake Build'
 
 - job:
