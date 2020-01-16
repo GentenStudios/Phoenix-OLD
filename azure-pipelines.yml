@@ -42,17 +42,18 @@ jobs:
     - script: |
         sudo apt-get install ccache -y
         echo "##vso[task.prependpath]/usr/lib/ccache"
+      displayName: 'Install build dependencies'
+    - task: Cache@2
+      inputs:
+        key: 'ccache | "$(Agent.JobName)"'
+        path: $(CCACHE_DIR)
+      displayName: 'CCache'
     - script: git submodule update --init
       displayName: 'Cloning Submodules'
     - script: cmake -H. -BBuild
       displayName: 'CMake Configure'
     - script: cmake --build Build
       displayName: 'CMake Build'
-    - task: Cache@2
-      inputs:
-        key: 'ccache | "$(Agent.OS)" | "$(Agent.JobName)"'
-        path: $(CCACHE_DIR)
-      displayName: 'Update CCache'
 
 - job:
   displayName: Windows
