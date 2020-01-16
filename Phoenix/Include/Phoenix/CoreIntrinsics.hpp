@@ -35,10 +35,13 @@
 // Determine the compiler and set the corresponding defines for it.
 #ifdef _MSC_VER
 #	define ENGINE_MSVC
+#	pragma message("Compiling on MSVC.")
 #elif defined(__clang__)
 #	define ENGINE_CLANG
+#	pragma message( "Compiling on CLang." )
 #elif defined(__GNUC__)
 #	define ENGINE_GNUC
+#	pragma message("Compiling on GCC.")
 #endif
 
 // Determine the OS and set the corresponding defines for it.
