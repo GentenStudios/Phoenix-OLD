@@ -25,8 +25,8 @@ jobs:
   strategy:
     matrix:
       Clang-7:
-        CC: clang-6
-        CXX: clang++-6
+        CC: clang-6.0
+        CXX: clang++-6.0
         BuildType: Debug
         SelfHost: false
         CMakeArgs: ''
