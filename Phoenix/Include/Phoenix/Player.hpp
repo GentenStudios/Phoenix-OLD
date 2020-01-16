@@ -28,15 +28,20 @@
 
 #pragma once
 
-namespace q2
+#include <Phoenix/Actor.hpp>
+
+namespace phx
 {
-    class Player{
-        int m_moveSpeed;
+    /**
+     * @brief An object representing the player in a game
+     * 
+     * Objects created by this class represent any player in the game, the
+     * player can be controlled by a camera object.
+     * 
+     */
+    class Player: public Actor{
 
     public:
-        Player();
-
-        int getMoveSpeed();
-        bool setMoveSpeed(int speed);
+        math::vec3 getTarget();
     };
 };

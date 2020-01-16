@@ -1,23 +1,3 @@
-Skip to content
-Search or jump to…
-
-Pull requests
-Issues
-Marketplace
-Explore
- 
-@apachano 
-GentenStudios
-/
-Phoenix
-6
-62
- Code Issues 20 Pull requests 6 Actions Projects 0 Security Insights Settings
-Phoenix/Engine/Source/Player.cpp
-@apachano apachano create player class that stores movement speed
-36e1bdf 24 days ago
- 52 lines (46 sloc)  1.89 KB
-  
 // Copyright 2019 Genten Studios
 //
 // Redistribution and use in source and binary forms, with or without
@@ -48,25 +28,10 @@ Phoenix/Engine/Source/Player.cpp
 
 #include <Phoenix/Player.hpp>
 
-const int MAX_MOVE_SPEED = 500;
-const int DEFAULT_MOVE_SPEED = 10;
+using namespace phx;
 
-using namespace q2;
-
-Player::Player() : m_moveSpeed(DEFAULT_MOVE_SPEED)
-{};
-
-int Player::getMoveSpeed()
-{
-    return m_moveSpeed;
+math::vec3 Player::getTarget(){
+    //@beep mentioned that the camera and block grid use diferent measurement systems
+    // I need help designing this
 }
 
-bool Player::setMoveSpeed(int speed)
-{
-    if(MAX_MOVE_SPEED >= speed && speed >= 0)
-    {
-        m_moveSpeed = speed;
-        return true;
-    } 
-    return false;
-}

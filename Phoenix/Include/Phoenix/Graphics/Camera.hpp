@@ -31,6 +31,7 @@
 #include <Phoenix/Math/Math.hpp>
 #include <Phoenix/Graphics/Window.hpp>
 #include <Phoenix/Settings.hpp>
+#include <Phoenix/Actor.hpp>
 
 #include <SDL.h>
 
@@ -55,6 +56,9 @@ namespace phx
 
 			math::vec3 getPosition() const;
 			math::vec3 getDirection() const;
+
+			void setActor(Actor actor);
+
 			void setProjection(const math::mat4& projection);
 			math::mat4 getProjection() const;
 			math::mat4 calculateViewMatrix() const;
@@ -70,6 +74,8 @@ namespace phx
 			Window* m_window;
 
 			math::mat4 m_projection;
+
+			Actor* m_actor;
 
 			math::vec3 m_rotation;
 			math::vec3 m_position;

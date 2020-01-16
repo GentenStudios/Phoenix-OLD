@@ -1,4 +1,4 @@
-// Copyright 2019 Genten Studios
+// Copyright 2019-20 Genten Studios
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -34,15 +34,31 @@ namespace phx
 {
     class Actor{
     public:
+        Actor();
+
 		math::vec3 getPosition() const;
 		bool setPosition(math::vec3 pos);
-		math::vec3 getDirection() const;
-		bool setDirection(math::vec3 dir);
+		math::vec3 getRotation() const;
+		bool setRotation(math::vec3 rot);
+
+        /**
+         * @brief Get the players current speed
+         * 
+         * @return The players current speed
+         */
+        int getMoveSpeed();
+        /**
+         * @brief Set the players current speed
+         * 
+         * @param speed The speed you want to set
+         * @return true if the speed was able to be set
+         * @return false if the supplied speed is invalid
+         */
+        bool setMoveSpeed(int speed);
 
     private:
         math::vec3 m_rotation;
         math::vec3 m_position;
-        math::vec3 m_up;
-        math::vec3 m_direction;
+        int m_moveSpeed;
     };
 }

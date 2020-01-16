@@ -1,4 +1,4 @@
-// Copyright 2019 Genten Studios
+// Copyright 2019-20 Genten Studios
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -27,9 +27,8 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <Phoenix/Graphics/Camera.hpp>
+#include <Phoenix/Player.hpp>
 #include <iostream>
-
-const float MOVE_SPEED = 0.01f;
 
 using namespace phx;
 using namespace gfx;
@@ -45,6 +44,9 @@ FPSCamera::FPSCamera(Window* window)
 
 	m_windowCentre = {std::floor(windowSize.x / 2.f),
 	                  std::floor(windowSize.y / 2.f)};
+	//TODO: When the actor system has a registry, get player from there instead
+	static Player player = Player();
+	m_actor = &player;
 
 	m_settingSensitivity =
 	    Settings::get()->add("Sensitivity", "camera:sensitivity", 5);
@@ -63,6 +65,8 @@ void FPSCamera::setProjection(const math::mat4& projection)
 
 math::mat4 FPSCamera::getProjection() const { return m_projection; }
 
+void FPSCamera::setActor(Actor actor){m_actor = &actor;};
+
 math::mat4 FPSCamera::calculateViewMatrix() const
 {
 	const math::vec3 centre = m_position + m_direction;
@@ -80,6 +84,9 @@ void FPSCamera::tick(float dt)
 
 	const float sensitivity = m_settingSensitivity->value() * 0.00001;
 
+	m_rotation = m_actor->getRotation();
+	m_position = m_actor->getPosition();
+
 	m_rotation.x += sensitivity * dt * (m_windowCentre.x - mousePos.x);
 	m_rotation.y += sensitivity * dt * (m_windowCentre.y - mousePos.y);
 
@@ -94,7 +101,7 @@ void FPSCamera::tick(float dt)
 
 	m_up = math::vec3::cross(right, m_direction);
 
-	const float moveSpeed = MOVE_SPEED;
+	const float moveSpeed = m_actor->getMoveSpeed() * 0.001f;
 
 	if (m_window->isKeyDown(events::Keys::KEY_W))
 	{
@@ -122,6 +129,9 @@ void FPSCamera::tick(float dt)
 	{
 		m_position.y -= dt * moveSpeed;
 	}
+
+	m_actor->setPosition(m_position);
+	m_actor->setRotation(m_rotation);
 }
 
 void FPSCamera::enable(bool enabled)

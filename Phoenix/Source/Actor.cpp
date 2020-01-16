@@ -28,9 +28,12 @@
 
 #include <Phoenix/Actor.hpp>
 
-const float MOVE_SPEED = 0.01f;
+const int MAX_MOVE_SPEED = 500;
+const int DEFAULT_MOVE_SPEED = 10;
 
 using namespace phx;
+
+Actor::Actor() : m_moveSpeed(DEFAULT_MOVE_SPEED) {};
 
 math::vec3 Actor::getPosition() const { return m_position; }
 bool Actor::setPosition(math::vec3 pos)
@@ -39,9 +42,24 @@ bool Actor::setPosition(math::vec3 pos)
     return true;
 }
 
-math::vec3 Actor::getDirection() const { return m_direction; }
-bool Actor::setDirection(math::vec3 dir)
+math::vec3 Actor::getRotation() const { return m_rotation; }
+bool Actor::setRotation(math::vec3 dir)
 {
-    m_direction = dir; 
+    m_rotation = dir; 
     return true;
+}
+
+int Actor::getMoveSpeed()
+{
+    return m_moveSpeed;
+}
+
+bool Actor::setMoveSpeed(int speed)
+{
+    if(speed >= 0 && speed <= MAX_MOVE_SPEED)
+    {
+        m_moveSpeed = speed;
+        return true;
+    } 
+    return false;
 }
