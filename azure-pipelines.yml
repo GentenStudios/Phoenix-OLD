@@ -24,7 +24,7 @@ jobs:
     vmImage: 'ubuntu-18.04'
   strategy:
     matrix:
-      Clang-7:
+      Clang-6:
         CC: clang-6.0
         CXX: clang++-6.0
         BuildType: Debug
