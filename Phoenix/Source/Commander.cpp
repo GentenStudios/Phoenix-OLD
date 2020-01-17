@@ -74,7 +74,7 @@ void CommandBook::add(const std::string& command, const std::string& help,
 
 int CommandBook::getPage() { return m_page; }
 
-bool Commander::help(const std::vector<std::string>&& args, std::ostream& out)
+bool Commander::help(const std::vector<std::string>& args, std::ostream& out)
 {
 	if (args.empty())
 	{
@@ -105,13 +105,13 @@ bool Commander::help(const std::vector<std::string>&& args, std::ostream& out)
 	}
 }
 
-bool Commander::run(const std::string&               command,
-                    std::vector<std::string> args, std::ostream& out)
+bool Commander::run(const std::string&                              command,
+                    const std::vector<std::string>& args, std::ostream& out)
 {
 	// Check for built in functions
 	if (command == "help")
 	{
-		return this->help(std::move(args), out);
+		return this->help(args, out);
 	}
 	else if (command == "list")
 	{
@@ -214,6 +214,6 @@ void Commander::callback(const std::string& input, std::ostringstream& cout)
 			// otherwise just use the whole string without the command char.
 			command = search.substr(1, search.length());
 		}
-		run(command, std::move(args), cout);
+		run(command, args, cout);
 	}
 }
