@@ -72,7 +72,7 @@ void CommandBook::add(const std::string& command, const std::string& help,
 
 int CommandBook::getPage() { return m_page; }
 
-bool Commander::help(const std::vector<std::string>&& args, std::ostream& out)
+bool Commander::help(const std::vector<std::string>& args, std::ostream& out)
 {
 	if (args.empty())
 	{
@@ -103,13 +103,13 @@ bool Commander::help(const std::vector<std::string>&& args, std::ostream& out)
 	}
 }
 
-bool Commander::run(const std::string&               command,
-                    std::vector<std::string> args, std::ostream& out)
+bool Commander::run(const std::string&                              command,
+                    const std::vector<std::string>& args, std::ostream& out)
 {
 	// Check for built in functions
 	if (command == "help")
 	{
-		return this->help(std::move(args), out);
+		return this->help(args, out);
 	}
 	else if (command == "list")
 	{
@@ -160,7 +160,7 @@ void Commander::post(std::istream& in, std::ostream& out)
 		{
 			break;
 		}
-		run(command, std::move(args), out);
+		run(command, args, out);
 	}
 }
 
@@ -191,10 +191,11 @@ void Commander::callback(const std::string& input, std::ostringstream& cout)
 		// if we don't have arguments don't try and populate the args array.
 		if (spaceLoc != std::string_view::npos)
 		{
-			command = search.substr(1, spaceLoc);
+			command = search.substr(1, spaceLoc-1);
 
 			// doesn't create a new string object, just moves the start forward.
-			search.remove_prefix(1+spaceLoc);
+			// negative offset handled by leading char
+			search.remove_prefix(spaceLoc);
 
 			// `first_not_of` space keeps errors from happening if a user
 			// accidentally separates the args with extra whitespace.
@@ -202,8 +203,22 @@ void Commander::callback(const std::string& input, std::ostringstream& cout)
 			{
 				search.remove_prefix(searchLoc); // strip the leading whitspace
 				spaceLoc = search.find_first_of(' ');
-				arg = search.substr(0, (spaceLoc > 0 ? spaceLoc : search.length()));
-				args.push_back(arg);
+
+				if (spaceLoc != std::string_view::npos)
+				{
+					arg = search.substr(0, spaceLoc); // gen new string from view
+					args.push_back(arg);
+				}
+
+				// Don't forget to double check if spaceLoc is npos before we
+				// remove_prefix, otherwise we might end up out of bounds...
+				else
+				{
+					arg = search.substr(0, search.length());
+					args.push_back(arg);
+					break;
+				}
+
 				search.remove_prefix(spaceLoc);
 			}
 		}
@@ -212,6 +227,6 @@ void Commander::callback(const std::string& input, std::ostringstream& cout)
 			// otherwise just use the whole string without the command char.
 			command = search.substr(1, search.length());
 		}
-		run(command, std::move(args), cout);
+		run(command, args, cout);
 	}
 }

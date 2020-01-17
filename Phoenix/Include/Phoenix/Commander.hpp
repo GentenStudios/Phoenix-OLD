@@ -127,8 +127,8 @@ namespace phx
 		 * @return Returns True if the function was called and False if the
 		 * function could not be found
 		 */
-		bool run(const std::string&               command,
-		         std::vector<std::string> args, std::ostream& out);
+		bool run(const std::string&                              command,
+		         const std::vector<std::string>& args, std::ostream& out);
 
 		/**
 		 * @brief Returns helpstring for command
@@ -139,7 +139,7 @@ namespace phx
 		 * @return Returns True if successful and False if it could not find
 		 * the innputted command
 		 */
-		bool help(const std::vector<std::string>&& args, std::ostream& out);
+		bool help(const std::vector<std::string>& args, std::ostream& out);
 
 		/**
 		 * @brief Outputs a string listing available commands
