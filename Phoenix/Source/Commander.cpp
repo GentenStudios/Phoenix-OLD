@@ -162,7 +162,7 @@ void Commander::post(std::istream& in, std::ostream& out)
 		{
 			break;
 		}
-		run(command, std::move(args), out);
+		run(command, args, out);
 	}
 }
 
