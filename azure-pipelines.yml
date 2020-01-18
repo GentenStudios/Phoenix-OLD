@@ -14,8 +14,8 @@ pr:
     include:
     - '*'  # must quote since "*" is a YAML reserved character; we want a string
 
-variables:
-  CCACHE_DIR: $(Pipeline.Workspace)/.ccache
+#variables:
+#  CCACHE_DIR: $(Pipeline.Workspace)/.ccache
 
 jobs:
 - job:
@@ -39,16 +39,16 @@ jobs:
         CMakeArgs: ''
 
   steps:
-    - script: |
-        sudo apt-get install ccache ninja-build -y
-        echo "##vso[task.prependpath]/usr/lib/ccache"
-        export CCACHE_CPP2=yes
-      displayName: 'Install build dependencies'
-    - task: Cache@2
-      inputs:
-        key: 'ccache | "$(Agent.JobName)"'
-        path: $(CCACHE_DIR)
-      displayName: 'CCache'
+#    - script: |
+#        sudo apt-get install ccache ninja-build -y
+#        echo "##vso[task.prependpath]/usr/lib/ccache"
+#        export CCACHE_CPP2=yes
+#      displayName: 'Install build dependencies'
+#    - task: Cache@2
+#      inputs:
+#        key: 'ccache | "$(Agent.JobName)"'
+#        path: $(CCACHE_DIR)
+#      displayName: 'CCache'
     - script: git submodule update --init
       displayName: 'Cloning Submodules'
     - script: cmake -G"Ninja" -H. -BBuild
