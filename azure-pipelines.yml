@@ -53,7 +53,7 @@ jobs:
       displayName: 'Cloning Submodules'
     - script: cmake -H. -BBuild
       displayName: 'CMake Configure'
-    - script: cd Build && ninja
+    - script: cmake --build Build
       displayName: 'CMake Build'
 
 - job:
