@@ -40,7 +40,8 @@
 #include <Phoenix/Singleton.hpp>
 
 #include <functional>
-#include <iostream>
+#include <ostream>
+#include <istream>
 #include <sstream>
 #include <string>
 #include <vector>
