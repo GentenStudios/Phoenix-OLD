@@ -51,7 +51,7 @@ jobs:
 #      displayName: 'CCache'
     - script: git submodule update --init
       displayName: 'Cloning Submodules'
-    - script: cmake -G"Ninja" -H. -BBuild
+    - script: cmake -H. -BBuild
       displayName: 'CMake Configure'
     - script: cd Build && ninja
       displayName: 'CMake Build'
