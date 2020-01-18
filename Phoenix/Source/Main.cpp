@@ -26,15 +26,16 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Phoenix/Graphics/Window.hpp>
+#include <Phoenix/Commander.hpp>
+#include <Phoenix/ContentLoader.hpp>
 #include <Phoenix/Graphics/Camera.hpp>
-#include <Phoenix/Voxels/BlockRegistry.hpp>
-#include <Phoenix/Voxels/Chunk.hpp>
 #include <Phoenix/Graphics/ChunkMesher.hpp>
 #include <Phoenix/Graphics/ChunkRenderer.hpp>
+#include <Phoenix/Graphics/Window.hpp>
 #include <Phoenix/ImGuiHelpers.hpp>
 #include <Phoenix/Settings.hpp>
-#include <Phoenix/ContentLoader.hpp>
+#include <Phoenix/Voxels/BlockRegistry.hpp>
+#include <Phoenix/Voxels/Chunk.hpp>
 
 #include <Phoenix/UI.hpp>
 
@@ -45,9 +46,11 @@
 
 using namespace phx;
 
+Commander kirk = Commander();
+
 static void rawEcho(const std::string& input, std::ostringstream& cout)
 {
-	cout << input << "\n";
+	kirk.callback(input, cout);
 }
 
 static ui::ChatWindow chat("Chat Window", 5,
@@ -96,16 +99,16 @@ public:
 	void run()
 	{
 		// skip this until filesystem stuff works or it gets annoying.
-		//sol::state lua;
-		//lua.open_libraries(sol::lib::base);
-		//luaapi::loadAPI(lua);
-		//bool loadedLua = modules::loadModules("save1", lua);
-		//if (!loadedLua)
+		// sol::state lua;
+		// lua.open_libraries(sol::lib::base);
+		// luaapi::loadAPI(lua);
+		// bool loadedLua = modules::loadModules("save1", lua);
+		// if (!loadedLua)
 		//{
 		//	m_window->close();
 		//}
 
-					{
+		{
 			using namespace phx::voxels;
 			BlockRegistry::get()->initialise();
 
@@ -136,8 +139,8 @@ public:
 				phx::voxels::Chunk chunk({i * 16, 0, j * 16});
 				chunk.autoTestFill();
 				phx::gfx::ChunkMesher mesher(chunk.getChunkPos(),
-				                            chunk.getBlocks(),
-				                            renderer.getTextureTable());
+				                             chunk.getBlocks(),
+				                             renderer.getTextureTable());
 				mesher.mesh();
 				renderer.submitChunkMesh(mesher.getMesh(), i + (j * 10));
 			}
@@ -152,7 +155,7 @@ public:
 
 		phx::math::mat4 model;
 		shaderPipeline.setMatrix("u_model", model);
-		
+
 		static bool wireframe = false;
 		static int  prevSens;
 
@@ -214,7 +217,7 @@ public:
 
 			shaderPipeline.setMatrix("u_view", m_camera->calculateViewMatrix());
 			shaderPipeline.setMatrix("u_projection", m_camera->getProjection());
-			
+
 			renderer.render();
 
 			m_window->endFrame();
