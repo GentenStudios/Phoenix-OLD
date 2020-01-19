@@ -141,6 +141,7 @@ bool ContentManager::loadModules(std::string save, sol::state& lua)
 #include <Phoenix/Settings.hpp>
 #include <Phoenix/Voxels/BlockRegistry.hpp>
 #include <array>
+#include <map>
 
 void ContentManager::loadAPI(sol::state& lua){
     lua["core"] = lua.create_table();
@@ -163,16 +164,19 @@ void ContentManager::loadAPI(sol::state& lua){
 	lua["voxel"] = lua.create_table();
 	lua["voxel"]["block"] = lua.create_table();
 	lua["voxel"]["block"]["register"] =
-		[](std::string displayName, std::string id, std::vector<std::string> textures)
+		//[](std::string displayName, std::string id, std::vector<std::string> textures)
+		[](sol::table luaBlock)
 		{
 			using namespace phx::voxels;
 			BlockType block;
 			{
-				block.displayName = displayName;
-				block.id          = id;
+				block.displayName = luaBlock["name"];
+				block.id          = luaBlock["id"];
 				block.category    = BlockCategory::SOLID;
 
-				if (textures.size() == 1){
+				sol::table textures = luaBlock["textures"];
+
+				if (textures[1] == ""){
 					block.textures = {
 						"Modules/" + m_currentMod + "/" + textures[0], 
 						"Modules/" + m_currentMod + "/" + textures[0],
