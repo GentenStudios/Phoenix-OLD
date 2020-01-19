@@ -30,6 +30,7 @@
 
 #include <Phoenix/Math/Math.hpp>
 
+#include <functional>
 #include <array>
 #include <string>
 
