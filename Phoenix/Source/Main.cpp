@@ -102,31 +102,12 @@ public:
 
 		sol::state lua;
 		lua.open_libraries(sol::lib::base);
-		ContentManager::loadAPI(lua);
+		ContentManager::loadAPI(lua, chat);
 		bool loadedLua = ContentManager::loadModules("save1", lua);
 		if (!loadedLua)
 		{
 			m_window->close();
 		}
-
-		// {
-		// 	using namespace phx::voxels;
-		// 	BlockType grassBlock;
-		// 	{
-		// 		grassBlock.displayName = "Grass";
-		// 		grassBlock.id          = "core:grass";
-		// 		grassBlock.category    = BlockCategory::SOLID;
-
-		// 		// top, left, back, right, top, bottom
-		// 		grassBlock.textures = {
-		// 		    "Assets/grass_side.png", "Assets/grass_side.png",
-		// 		    "Assets/grass_side.png", "Assets/grass_side.png",
-		// 		    "Assets/grass_top.png",  "Assets/dirt.png",
-		// 		};
-		// 	}
-
-		// 	BlockRegistry::get()->registerBlock(grassBlock);
-		// }
 
 		phx::gfx::ChunkRenderer renderer(100);
 		renderer.buildTextureArray();

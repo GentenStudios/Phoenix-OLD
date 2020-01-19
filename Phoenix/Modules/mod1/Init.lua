@@ -1,6 +1,5 @@
 print ("Load mod 1")
---[[function hello (args)
-
+function hello (args)
     if args[1] == "there" then
         core.print("General Kenobi")
     elseif args[1] == "world" then
@@ -9,7 +8,7 @@ print ("Load mod 1")
         core.print("with you, the force is not")
     end
 end
-addcommand("Hello", "Master the arts of the Jedi you must", hello)]]--
+addcommand("Hello", "Master the arts of the Jedi you must", hello)
 voxel.block.register("Dirt", "core:dirt",  
                     {"Assets/dirt.png"})
 voxel.block.register("Grass", "core:grass",  

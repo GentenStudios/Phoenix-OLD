@@ -40,6 +40,9 @@
 #include <sol/sol.hpp>
 #include <string>
 
+//TODO: Replace this with a registry system
+		#include <Phoenix/UI.hpp>
+
 namespace phx
 {
 	/// @brief A lightweight struct to store a module and the list of
@@ -80,7 +83,7 @@ namespace phx
 		 * 
 		 * @param lua The sol state used during runtime
 		 */
-        static void loadAPI(sol::state& lua);
+        static void loadAPI(sol::state& lua, ui::ChatWindow& chat);
 
 	private:
 		static std::string m_currentMod;

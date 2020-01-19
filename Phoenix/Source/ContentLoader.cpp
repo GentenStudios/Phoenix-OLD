@@ -139,11 +139,16 @@ bool ContentManager::loadModules(std::string save, sol::state& lua)
 
 //TODO: replace this with an API registration system
 #include <Phoenix/Settings.hpp>
+#include <Phoenix/Commander.hpp>
 #include <Phoenix/Voxels/BlockRegistry.hpp>
 #include <array>
 
-void ContentManager::loadAPI(sol::state& lua){
+void ContentManager::loadAPI(sol::state& lua, ui::ChatWindow& chat){
     lua["core"] = lua.create_table();
+	lua["core"]["print"] = [chat](std::string text)
+	{
+		chat.cout << text;
+	};
     lua["core"]["setting"] = lua.create_table();
     lua["core"]["setting"]["register"] = 
 		[](std::string displayName, std::string key, int defaultValue)
@@ -159,6 +164,24 @@ void ContentManager::loadAPI(sol::state& lua){
 		[](std::string key, int value)
 		{
 			Settings::get()->getSetting(key)->set(value); 
+		};
+	lua["core"]["command"] = lua.create_table();
+	//lua.set_function("addcommand",
+	lua["core"]["command"]["register"] =
+		[](std::string command, std::string help, sol::function f)
+		{
+			/*static std::list<sol::function> functions;
+			functions.push_back(f);
+			CommandBook::get()->add(command, help, "all", 
+				[f = functions.back()](std::vector<std::string> args) 
+				{
+					f(sol::as_table(args));
+				}
+			);*/
+			static CommandFunction fx = f;
+			std::vector<std::string> args;
+			fx(args);
+			CommandBook::get()->add(command, help, "all", fx);
 		};
 	lua["voxel"] = lua.create_table();
 	lua["voxel"]["block"] = lua.create_table();
