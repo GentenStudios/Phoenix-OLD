@@ -51,9 +51,7 @@ Mod::Mod(std::string modName) : name(std::move(modName))
 	fileStream.close();
 };
 
-Mod::~Mod() {};
-
-bool ContentManager::loadModules(std::string save, sol::state& lua)
+bool ContentManager::loadModules(const std::string& save, sol::state& lua)
 {
 	std::fstream fileStream;
 	std::queue<Mod> toLoad; // A queue of mods that need loaded

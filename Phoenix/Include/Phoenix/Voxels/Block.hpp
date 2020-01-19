@@ -44,6 +44,8 @@ namespace phx
 			LIQUID
 		};
 
+		typedef std::function<void(math::vec3 pos)> BlockCallback;
+
 		class BlockType
 		{
 		public:
@@ -54,6 +56,10 @@ namespace phx
 			std::string id;
 
 			BlockCategory category = BlockCategory::AIR;
+
+			BlockCallback onPlace;
+			BlockCallback onBreak;
+			BlockCallback onInteract;
 
 			// front, left, back, right, top, bottom
 			std::array<std::string, 6> textures;
