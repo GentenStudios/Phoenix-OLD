@@ -166,18 +166,9 @@ void ContentManager::loadAPI(sol::state& lua, ui::ChatWindow& chat){
 			Settings::get()->getSetting(key)->set(value); 
 		};
 	lua["core"]["command"] = lua.create_table();
-	//lua.set_function("addcommand",
 	lua["core"]["command"]["register"] =
 		[](std::string command, std::string help, sol::function f)
 		{
-			/*static std::list<sol::function> functions;
-			functions.push_back(f);
-			CommandBook::get()->add(command, help, "all", 
-				[f = functions.back()](std::vector<std::string> args) 
-				{
-					f(sol::as_table(args));
-				}
-			);*/
 			static CommandFunction fx = f;
 			std::vector<std::string> args;
 			fx(args);
