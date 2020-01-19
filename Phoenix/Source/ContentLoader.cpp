@@ -53,7 +53,7 @@ Mod::Mod(std::string modName) : name(std::move(modName))
 
 Mod::~Mod() {};
 
-bool modules::loadModules(std::string save, sol::state& lua)
+bool ContentManager::loadModules(std::string save, sol::state& lua)
 {
 	std::fstream fileStream;
 	std::queue<Mod> toLoad; // A queue of mods that need loaded
@@ -103,6 +103,7 @@ bool modules::loadModules(std::string save, sol::state& lua)
 			// list Otherwise, move mod to back of load queue
 			if (satisfied)
 			{
+				m_currentMod = mod.name;
 				lua.script_file("Modules/" + mod.name + "/Init.lua");
 				loadedMods.push_back(mod.name);
 			}
@@ -141,7 +142,7 @@ bool modules::loadModules(std::string save, sol::state& lua)
 #include <Phoenix/Voxels/BlockRegistry.hpp>
 #include <array>
 
-void luaapi::loadAPI(sol::state& lua){
+void ContentManager::loadAPI(sol::state& lua){
     lua["core"] = lua.create_table();
     lua["core"]["setting"] = lua.create_table();
     lua["core"]["setting"]["register"] = 
@@ -171,14 +172,30 @@ void luaapi::loadAPI(sol::state& lua){
 				block.id          = id;
 				block.category    = BlockCategory::SOLID;
 
-				// front, left, back, right, top, bottom
-				block.textures = {
-				    textures[0], textures[1],
-				    textures[2], textures[3],
-				    textures[4], textures[5],
-				};
+				if (textures.size() == 1){
+					block.textures = {
+						"Modules/" + m_currentMod + "/" + textures[0], 
+						"Modules/" + m_currentMod + "/" + textures[0],
+						"Modules/" + m_currentMod + "/" + textures[0], 
+						"Modules/" + m_currentMod + "/" + textures[0],
+						"Modules/" + m_currentMod + "/" + textures[0], 
+						"Modules/" + m_currentMod + "/" + textures[0],
+					};
+				} else {
+					// front, left, back, right, top, bottom
+					block.textures = {
+						"Modules/" + m_currentMod + "/" + textures[0], 
+						"Modules/" + m_currentMod + "/" + textures[1],
+						"Modules/" + m_currentMod + "/" + textures[2], 
+						"Modules/" + m_currentMod + "/" + textures[3],
+						"Modules/" + m_currentMod + "/" + textures[4], 
+						"Modules/" + m_currentMod + "/" + textures[5],
+					};
+				}
 			}
 
 			BlockRegistry::get()->registerBlock(block);
 		};
 }
+
+std::string ContentManager::m_currentMod = "";
