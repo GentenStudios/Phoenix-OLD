@@ -58,7 +58,7 @@ namespace phx
 			ChunkRenderer(std::size_t visibleChunks);
 			~ChunkRenderer();
 
-			std::vector<ShaderLayout> getRequiredShaderLayout();
+			static std::vector<ShaderLayout> getRequiredShaderLayout();
 
 			void                           buildTextureArray();
 			const AssociativeTextureTable& getTextureTable() const;

@@ -29,13 +29,11 @@
 #include <Phoenix/Commander.hpp>
 #include <Phoenix/ContentLoader.hpp>
 #include <Phoenix/Graphics/Camera.hpp>
-#include <Phoenix/Graphics/ChunkMesher.hpp>
-#include <Phoenix/Graphics/ChunkRenderer.hpp>
 #include <Phoenix/Graphics/Window.hpp>
 #include <Phoenix/ImGuiHelpers.hpp>
 #include <Phoenix/Settings.hpp>
 #include <Phoenix/Voxels/BlockRegistry.hpp>
-#include <Phoenix/Voxels/Chunk.hpp>
+#include <Phoenix/Voxels/ChunkManager.hpp>
 
 #include <Phoenix/UI.hpp>
 
@@ -126,39 +124,53 @@ public:
 				};
 			}
 
-			BlockRegistry::get()->registerBlock(grassBlock);
-		}
-
-		phx::gfx::ChunkRenderer renderer(100);
-		renderer.buildTextureArray();
-
-		for (int j = 0; j < 10; ++j)
-		{
-			for (int i = 0; i < 10; ++i)
+			BlockType air;
 			{
-				phx::voxels::Chunk chunk({i * 16, 0, j * 16});
-				chunk.autoTestFill();
-				phx::gfx::ChunkMesher mesher(chunk.getChunkPos(),
-				                             chunk.getBlocks(),
-				                             renderer.getTextureTable());
-				mesher.mesh();
-				renderer.submitChunkMesh(mesher.getMesh(), i + (j * 10));
+				air.id = "core:air";
+				air.category = BlockCategory::AIR;
 			}
+
+			BlockRegistry::get()->registerBlock(grassBlock);
+			BlockRegistry::get()->registerBlock(air);
 		}
+
+		// phx::gfx::ChunkRenderer renderer(100);
+		// renderer.buildTextureArray();
+
+		// for (int j = 0; j < 10; ++j)
+		//{
+		//	for (int i = 0; i < 10; ++i)
+		//	{
+		//		phx::voxels::Chunk chunk({i * 16, 0, j * 16});
+		//		chunk.autoTestFill();
+		//		phx::gfx::ChunkMesher mesher(chunk.getChunkPos(),
+		//		                             chunk.getBlocks(),
+		//		                             renderer.getTextureTable());
+		//		mesher.mesh();
+		//		renderer.submitChunkMesh(mesher.getMesh(), i + (j * 10));
+		//	}
+		//}
+
+		voxels::ChunkManager world(
+		    voxels::BlockRegistry::get()->getFromID("core:grass"), 1234);
 
 		phx::gfx::ShaderPipeline shaderPipeline;
 		shaderPipeline.prepare("Assets/SimpleWorld.vert",
 		                       "Assets/SimpleWorld.frag",
-		                       renderer.getRequiredShaderLayout());
+		                       gfx::ChunkRenderer::getRequiredShaderLayout());
 
 		shaderPipeline.activate();
 
 		phx::math::mat4 model;
 		shaderPipeline.setMatrix("u_model", model);
 
-		static bool wireframe = false;
-		static int  prevSens;
+		static bool       wireframe    = false;
+		static bool       followCamera = true;
+		static int        prevSens;
+		static math::vec3 lastPos;
 
+		m_window->setVSync(true);
+		
 		float last = static_cast<float>(SDL_GetTicks());
 		while (m_window->isRunning())
 		{
@@ -169,6 +181,7 @@ public:
 			m_window->startFrame();
 
 			m_camera->tick(dt);
+			world.tick(lastPos);
 
 			{
 				ImGuiIO& io         = ImGui::GetIO();
@@ -202,6 +215,10 @@ public:
 					glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 			}
 
+			ImGui::Checkbox("Follow Camera", &followCamera);
+			if (followCamera)
+				lastPos = m_camera->getPosition();
+			
 			static Setting* sensSetting =
 			    Settings::get()->getSetting("camera:sensitivity");
 			static int sens = sensSetting->value();
@@ -218,7 +235,7 @@ public:
 			shaderPipeline.setMatrix("u_view", m_camera->calculateViewMatrix());
 			shaderPipeline.setMatrix("u_projection", m_camera->getProjection());
 
-			renderer.render();
+			world.render();
 
 			m_window->endFrame();
 		}

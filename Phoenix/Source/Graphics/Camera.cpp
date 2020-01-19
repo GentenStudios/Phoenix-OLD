@@ -29,7 +29,7 @@
 #include <Phoenix/Graphics/Camera.hpp>
 #include <iostream>
 
-const float MOVE_SPEED = 0.01f;
+const float MOVE_SPEED = 0.1f;
 
 using namespace phx;
 using namespace gfx;
