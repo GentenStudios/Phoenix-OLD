@@ -40,7 +40,7 @@ Mod::Mod(std::string modName) : name(std::move(modName))
 	fileStream.open("Modules/" + name + "/Dependencies.txt");
 	if(!fileStream.is_open()){
 		std::cout << "Couldnt find dependencies file for mod: " << name << "\n";
-		return;	
+		return;
 	}
 	while (fileStream.peek() != EOF)
 	{
@@ -61,7 +61,7 @@ bool ContentManager::loadModules(std::string save, sol::state& lua)
 	fileStream.open("Save/" + save + "/Mods.txt");
 	if(!fileStream.is_open()){
 		std::cout << "Error opening save file";
-		return false;	
+		return false;
 	}
 	int i = 0;
 	while (fileStream.peek() != EOF)
@@ -143,27 +143,28 @@ bool ContentManager::loadModules(std::string save, sol::state& lua)
 #include <Phoenix/Voxels/BlockRegistry.hpp>
 #include <array>
 
-void ContentManager::loadAPI(sol::state& lua, ui::ChatWindow& chat){
+void ContentManager::loadAPI(sol::state& lua, ImGui::BasicTerminal& chat){
     lua["core"] = lua.create_table();
-	lua["core"]["print"] = [chat](std::string text)
-	{
-		chat.cout << text;
-	};
-    lua["core"]["setting"] = lua.create_table();
-    lua["core"]["setting"]["register"] = 
+	lua["core"]["print"] = [&chat](std::string text)
+		{
+			chat.cout << text;
+		};
+
+  lua["core"]["setting"] = lua.create_table();
+  lua["core"]["setting"]["register"] =
 		[](std::string displayName, std::string key, int defaultValue)
 		{
 			Settings::get()->add(displayName, key, defaultValue);
 		};
-    lua["core"]["setting"]["get"] = 
+  lua["core"]["setting"]["get"] =
 		[](std::string key)
 		{
-			return Settings::get()->getSetting(key)->value(); 
+			return Settings::get()->getSetting(key)->value();
 		};
 	lua["core"]["setting"]["set"] =
 		[](std::string key, int value)
 		{
-			Settings::get()->getSetting(key)->set(value); 
+			Settings::get()->getSetting(key)->set(value);
 		};
 	lua["core"]["command"] = lua.create_table();
 	lua["core"]["command"]["register"] =
@@ -188,21 +189,21 @@ void ContentManager::loadAPI(sol::state& lua, ui::ChatWindow& chat){
 
 				if (textures.size() == 1){
 					block.textures = {
-						"Modules/" + m_currentMod + "/" + textures[0], 
 						"Modules/" + m_currentMod + "/" + textures[0],
-						"Modules/" + m_currentMod + "/" + textures[0], 
 						"Modules/" + m_currentMod + "/" + textures[0],
-						"Modules/" + m_currentMod + "/" + textures[0], 
+						"Modules/" + m_currentMod + "/" + textures[0],
+						"Modules/" + m_currentMod + "/" + textures[0],
+						"Modules/" + m_currentMod + "/" + textures[0],
 						"Modules/" + m_currentMod + "/" + textures[0],
 					};
 				} else {
 					// front, left, back, right, top, bottom
 					block.textures = {
-						"Modules/" + m_currentMod + "/" + textures[0], 
+						"Modules/" + m_currentMod + "/" + textures[0],
 						"Modules/" + m_currentMod + "/" + textures[1],
-						"Modules/" + m_currentMod + "/" + textures[2], 
+						"Modules/" + m_currentMod + "/" + textures[2],
 						"Modules/" + m_currentMod + "/" + textures[3],
-						"Modules/" + m_currentMod + "/" + textures[4], 
+						"Modules/" + m_currentMod + "/" + textures[4],
 						"Modules/" + m_currentMod + "/" + textures[5],
 					};
 				}
