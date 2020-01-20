@@ -73,5 +73,36 @@ namespace phx
 		{
 			return std::max(lower, std::min(n, upper));
 		}
+
+		/**
+		 * @brief Flattens a coordinate in a rectangle into a single value
+		 * 
+		 * @tparam T
+		 * @param x X position of point in rectangle
+		 * @param y Y position of point in rectangle
+		 * @param z Z position of point in rectangle
+		 * @param lenX Length of side X in rectangle
+		 * @param lenY Length of side Y in rectangle
+		 * @return constexpr T Flattened position
+		 */
+		template <typename T>
+		constexpr T flatten(T x, T y, T z, T lenX, T lenY){
+			return x + lenX * (y + lenY * z);
+		}
+
+		/**
+		 * @brief Flattens a coordinate in a square into a single value
+		 * 
+		 * @tparam T
+		 * @param x X position of point in square
+		 * @param y Y position of point in square
+		 * @param z Z position of point in square
+		 * @param len Length of a side in the square
+		 * @return constexpr T Flattened position
+		 */
+		template <typename T>
+		constexpr T flatten(T x, T y, T z, T len){
+			return x + len * (y + len * z);
+		}
 	}
 } // namespace q2
