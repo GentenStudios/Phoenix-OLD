@@ -119,7 +119,7 @@ namespace phx
 				template <typename X, typename Len>
 				constexpr explicit Vector3(X val, Len len )
 				{
-					z = static_cast<T>((val / (len * len);
+					z = static_cast<T>((val / (len * len)));
 					y = static_cast<T>((val - (z * len * len))/ len);
 					x = static_cast<T>((val - len * (y + (len * z))));
 				}
@@ -128,13 +128,11 @@ namespace phx
 				 * @brief Flattens a Vector3 representing a coordinate in a 
 				 * rectangle into a single value
 				 * 
-				 * @tparam T
 				 * @param lenX Length of side X in rectangle
 				 * @param lenY Length of side Y in rectangle
-				 * @return constexpr T  Flattened position
+				 * @return constexpr Flattened position
 				 */
-				template <typename T>
-				constexpr T flatten(T lenX, T lenY){
+				constexpr ValueType flatten(ValueType lenX, ValueType lenY){
 					return x + lenX * (y + lenY * z);
 				}
 
@@ -142,12 +140,10 @@ namespace phx
 				 * @brief Flattens a Vector3 representing a coordinate in a 
 				 * square into a single value
 				 * 
-				 * @tparam T
 				 * @param len Length of a side in the square
-				 * @return constexpr T Flattened position
+				 * @return constexpr Flattened position
 				 */
-				template <typename T>
-				constexpr T flatten(T len){
+				constexpr ValueType flatten(ValueType len){
 					return x + len * (y + len * z);
 				}
 
