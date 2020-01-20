@@ -151,12 +151,22 @@ void ContentManager::loadAPI(sol::state& lua){
 	 * 
 	 */
     lua["core"] = lua.create_table();
+		/**
+		 * @addtogroup luaapi
+		 * @section core core
+		 * @brief The core API for interacting with Quartz
+		 */
     lua["core"]["setting"] = lua.create_table();
+		/**
+		 * @addtogroup luaapi
+		 * @subsection coreset core.setting
+		 * @brief Interfaces with the settings system
+		 */
     lua["core"]["setting"]["register"] = 
 		/**
 		 * @addtogroup luaapi
 		 * 
-		 * @section coresetreg core.setting.register(displayName, key, defaultValue)
+		 * @subsubsection coresetreg core.setting.register(displayName, key, defaultValue)
 		 * @brief Registers a setting that the player can adjust via the settings menu
 		 * 
 		 * @param displayName The Display name for the setting seen in the settings menu
@@ -172,7 +182,7 @@ void ContentManager::loadAPI(sol::state& lua){
 		/**
 		 * @addtogroup luaapi
 		 * 
-		 * @section coresetreg core.setting.get(key)
+		 * @subsubsection coresetget core.setting.get(key)
 		 * @brief Gets the value of a setting based on its unique key
 		 * 
 		 * @param key The unique key for the setting, usually in the form module:setting
@@ -187,7 +197,7 @@ void ContentManager::loadAPI(sol::state& lua){
 		/**
 		 * @addtogroup luaapi
 		 * 
-		 * @section coresetreg core.setting.set(key)
+		 * @subsubsection coresetset core.setting.set(key)
 		 * @brief Sets the value of a setting based on its unique key
 		 * 
 		 * @param key The unique key for the setting, usually in the form module:setting
@@ -199,8 +209,56 @@ void ContentManager::loadAPI(sol::state& lua){
 			Settings::get()->getSetting(key)->set(value); 
 		};
 	lua["voxel"] = lua.create_table();
+		/**
+		 * @addtogroup luaapi
+		 * @section voxel voxel
+		 * @brief The voxel API for interacting voxels
+		 */
 	lua["voxel"]["block"] = lua.create_table();
+		/**
+		 * @addtogroup luaapi
+		 * @subsection voxelblock voxel.block
+		 * @brief Interfaces with blocks
+		 */
 	lua["voxel"]["block"]["register"] =
+		/**
+		 * @addtogroup luaapi
+		 * 
+		 * @subsubsection voxelblockreg voxel.block.register(luaBlock)
+		 * @brief Sets the value of a setting based on its unique key
+		 * 
+		 * @param luaBlock a table storing the data used to create a block
+		 * 
+		 * @details The luaBlock table stores the following values: \n
+		 * Required:
+		 * - @b name: The display name for the block
+		 * - @b id: The unique id for the block usually in the form module:block
+		 * 
+		 * Optional:
+		 * - @b category: The category of the block chosen from "Air", "liquid", or "Solid" \n
+		 * 			   If not specified, the default is "Solid"
+		 * - @b onPlace: A function that is run when the block is placed
+		 * - @b onBreak: A function that is run when the block is broken
+		 * - @b onInteract: A function that is run when the block is interacted with
+		 * - @b textures: A table of filepaths where textures are located \n
+		 * 			   Filepaths are relative to to the module directory \n
+		 * 			   If only one filepath is specified, that will be used for all textures
+		 * 
+		 * @b Example:
+		 * 
+		 * @code
+		 * block = {}
+		 * block.name = "Grass"
+		 * block.id = "core:grass"
+		 * block.textures = {"Assets/grass_side.png", "Assets/grass_side.png",
+		 * "Assets/grass_side.png", "Assets/grass_side.png",
+		 * "Assets/grass_top.png",  "Assets/dirt.png"}
+		 * block.onBreak = function (position)
+		 * 	print("grass broken at" + position)
+		 * end
+		 * voxel.block.register(block)
+		 * @endcode
+		 */
 		[](sol::table luaBlock)
 		{
 			using namespace phx::voxels;
