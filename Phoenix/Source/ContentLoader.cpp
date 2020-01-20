@@ -141,46 +141,59 @@ bool ContentManager::loadModules(const std::string& save, sol::state& lua)
 #include <array>
 #include <map>
 
-/**
- * @brief Registers the Lua API
- * 
- * @TODO This needs replaced with a system allowing the API 
- * to be defined as each other class is registered.
- * 
- * @param lua The lua state that the API is loaded into
- */
 void ContentManager::loadAPI(sol::state& lua){
 	/**
-	 * @page LuaAPI Lua API
+	 * @defgroup luaapi Lua API
 	 * 
 	 * The lua API is . . . 
+	 * 
+	 * @tableofcontents
 	 * 
 	 */
     lua["core"] = lua.create_table();
     lua["core"]["setting"] = lua.create_table();
-	/**
-	 * @page LuaAPI
-	 * 
-	 * @fn core.setting.register(displayName, key, defaultValue)
-	 * 
-	 * @brief Registers a setting that the player can adjust via the settings menu
-	 * 
-	 * @param displayName The Display name for the setting seen in the settings menu
-	 * @param key The unique key for the settings, usually in the form module:setting
-	 * @param defaultValue The default value for the setting if not already set
-	 * 
-	 */
     lua["core"]["setting"]["register"] = 
+		/**
+		 * @addtogroup luaapi
+		 * 
+		 * @section coresetreg core.setting.register(displayName, key, defaultValue)
+		 * @brief Registers a setting that the player can adjust via the settings menu
+		 * 
+		 * @param displayName The Display name for the setting seen in the settings menu
+		 * @param key The unique key for the setting, usually in the form module:setting
+		 * @param defaultValue The default value for the setting if not already set
+		 * 
+		 */
 		[](std::string displayName, std::string key, int defaultValue)
 		{
 			Settings::get()->add(displayName, key, defaultValue);
 		};
     lua["core"]["setting"]["get"] = 
+		/**
+		 * @addtogroup luaapi
+		 * 
+		 * @section coresetreg core.setting.get(key)
+		 * @brief Gets the value of a setting based on its unique key
+		 * 
+		 * @param key The unique key for the setting, usually in the form module:setting
+		 * @return The integer value of the setting
+		 * 
+		 */
 		[](std::string key)
 		{
 			return Settings::get()->getSetting(key)->value(); 
 		};
 	lua["core"]["setting"]["set"] =
+		/**
+		 * @addtogroup luaapi
+		 * 
+		 * @section coresetreg core.setting.set(key)
+		 * @brief Sets the value of a setting based on its unique key
+		 * 
+		 * @param key The unique key for the setting, usually in the form module:setting
+		 * @param value The value the setting should be set to
+		 * 
+		 */
 		[](std::string key, int value)
 		{
 			Settings::get()->getSetting(key)->set(value); 
