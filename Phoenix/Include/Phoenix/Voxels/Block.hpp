@@ -45,7 +45,7 @@ namespace phx
 			LIQUID
 		};
 
-		do using BlockCallback = std::function<void(math::vec3 pos
+		using BlockCallback = std::function<void(math::vec3 pos)>;
 
 		class BlockType
 		{

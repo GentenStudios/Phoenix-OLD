@@ -141,9 +141,35 @@ bool ContentManager::loadModules(const std::string& save, sol::state& lua)
 #include <array>
 #include <map>
 
+/**
+ * @brief Registers the Lua API
+ * 
+ * @TODO This needs replaced with a system allowing the API 
+ * to be defined as each other class is registered.
+ * 
+ * @param lua The lua state that the API is loaded into
+ */
 void ContentManager::loadAPI(sol::state& lua){
+	/**
+	 * @page LuaAPI Lua API
+	 * 
+	 * The lua API is . . . 
+	 * 
+	 */
     lua["core"] = lua.create_table();
     lua["core"]["setting"] = lua.create_table();
+	/**
+	 * @page LuaAPI
+	 * 
+	 * @fn core.setting.register(displayName, key, defaultValue)
+	 * 
+	 * @brief Registers a setting that the player can adjust via the settings menu
+	 * 
+	 * @param displayName The Display name for the setting seen in the settings menu
+	 * @param key The unique key for the settings, usually in the form module:setting
+	 * @param defaultValue The default value for the setting if not already set
+	 * 
+	 */
     lua["core"]["setting"]["register"] = 
 		[](std::string displayName, std::string key, int defaultValue)
 		{
