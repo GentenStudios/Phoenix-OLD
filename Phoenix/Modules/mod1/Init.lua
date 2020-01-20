@@ -23,4 +23,7 @@ block.id = "core:grass"
 block.textures = {"Assets/grass_side.png", "Assets/grass_side.png",
 "Assets/grass_side.png", "Assets/grass_side.png",
 "Assets/grass_top.png",  "Assets/dirt.png"}
+block.onBreak = function (position)
+	print("grass broken at" + position)
+end
 voxel.block.register(block)

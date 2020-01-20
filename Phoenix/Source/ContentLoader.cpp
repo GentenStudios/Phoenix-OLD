@@ -169,13 +169,32 @@ void ContentManager::loadAPI(sol::state& lua){
 			{
 				block.displayName = luaBlock["name"];
 				block.id          = luaBlock["id"];
-				block.category    = BlockCategory::SOLID;
+
+				if(luaBlock["category"] == "Air"){
+					block.category    = BlockCategory::AIR;
+				} else if (luaBlock["category"] == "Liquid") {
+					block.category    = BlockCategory::LIQUID;
+				} else {
+					block.category    = BlockCategory::SOLID;
+				}
+
+				if(luaBlock["onPlace"]){
+					block.onPlace = luaBlock["onPlace"];
+				}
+
+				if(luaBlock["onBreak"]){
+					block.onPlace = luaBlock["onPlace"];
+				}
+
+				if(luaBlock["onInteract"]){
+					block.onPlace = luaBlock["onPlace"];
+				}
 
 				std::array<std::string, 6> textures;
 				for(int i = 0; i < 6; i++){
 					std::string texture = luaBlock["textures"][i+1];
 					if (texture.size() == 0){
-						//If a texture is missing, we use the first texture in its place
+						//If a texture is not supplied, we use the first texture in its place
 						texture = luaBlock["textures"][1];
 					}
 					textures[i] = "Modules/" + m_currentMod + "/" + texture;
