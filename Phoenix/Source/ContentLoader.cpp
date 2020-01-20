@@ -51,9 +51,7 @@ Mod::Mod(std::string modName) : name(std::move(modName))
 	fileStream.close();
 };
 
-Mod::~Mod() {};
-
-bool modules::loadModules(std::string save, sol::state& lua)
+bool ContentManager::loadModules(const std::string& save, sol::state& lua)
 {
 	std::fstream fileStream;
 	std::queue<Mod> toLoad; // A queue of mods that need loaded
@@ -103,6 +101,7 @@ bool modules::loadModules(std::string save, sol::state& lua)
 			// list Otherwise, move mod to back of load queue
 			if (satisfied)
 			{
+				m_currentMod = mod.name;
 				lua.script_file("Modules/" + mod.name + "/Init.lua");
 				loadedMods.push_back(mod.name);
 			}
@@ -138,10 +137,39 @@ bool modules::loadModules(std::string save, sol::state& lua)
 
 //TODO: replace this with an API registration system
 #include <Phoenix/Settings.hpp>
+#include <Phoenix/Voxels/BlockRegistry.hpp>
+#include <array>
+#include <map>
 
-void luaapi::loadAPI(sol::state& lua){
+/**
+ * @brief Registers the Lua API
+ * 
+ * @TODO This needs replaced with a system allowing the API 
+ * to be defined as each other class is registered.
+ * 
+ * @param lua The lua state that the API is loaded into
+ */
+void ContentManager::loadAPI(sol::state& lua){
+	/**
+	 * @page LuaAPI Lua API
+	 * 
+	 * The lua API is . . . 
+	 * 
+	 */
     lua["core"] = lua.create_table();
     lua["core"]["setting"] = lua.create_table();
+	/**
+	 * @page LuaAPI
+	 * 
+	 * @fn core.setting.register(displayName, key, defaultValue)
+	 * 
+	 * @brief Registers a setting that the player can adjust via the settings menu
+	 * 
+	 * @param displayName The Display name for the setting seen in the settings menu
+	 * @param key The unique key for the settings, usually in the form module:setting
+	 * @param defaultValue The default value for the setting if not already set
+	 * 
+	 */
     lua["core"]["setting"]["register"] = 
 		[](std::string displayName, std::string key, int defaultValue)
 		{
@@ -157,4 +185,50 @@ void luaapi::loadAPI(sol::state& lua){
 		{
 			Settings::get()->getSetting(key)->set(value); 
 		};
+	lua["voxel"] = lua.create_table();
+	lua["voxel"]["block"] = lua.create_table();
+	lua["voxel"]["block"]["register"] =
+		[](sol::table luaBlock)
+		{
+			using namespace phx::voxels;
+			BlockType block;
+			{
+				block.displayName = luaBlock["name"];
+				block.id          = luaBlock["id"];
+
+				if(luaBlock["category"] == "Air"){
+					block.category    = BlockCategory::AIR;
+				} else if (luaBlock["category"] == "Liquid") {
+					block.category    = BlockCategory::LIQUID;
+				} else {
+					block.category    = BlockCategory::SOLID;
+				}
+
+				if(luaBlock["onPlace"]){
+					block.onPlace = luaBlock["onPlace"];
+				}
+
+				if(luaBlock["onBreak"]){
+					block.onPlace = luaBlock["onPlace"];
+				}
+
+				if(luaBlock["onInteract"]){
+					block.onPlace = luaBlock["onPlace"];
+				}
+
+				std::array<std::string, 6> textures;
+				for(int i = 0; i < 6; i++){
+					std::string texture = luaBlock["textures"][i+1];
+					if (texture.size() == 0){
+						//If a texture is not supplied, we use the first texture in its place
+						texture = luaBlock["textures"][1];
+					}
+					textures[i] = "Modules/" + m_currentMod + "/" + texture;
+				}
+				block.textures = textures;
+			}
+			BlockRegistry::get()->registerBlock(block);
+		};
 }
+
+std::string ContentManager::m_currentMod = "";

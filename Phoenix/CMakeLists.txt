@@ -1,7 +1,6 @@
 project(Phoenix)
 
 add_subdirectory(ThirdParty)
-add_subdirectory(Assets)
 
 add_subdirectory(Include/Phoenix)
 add_subdirectory(Source)
@@ -15,11 +14,17 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 	CMAKE_CXX_EXTENSIONS OFF
 )
 
-add_dependencies(${PROJECT_NAME} PhoenixAssets)
-
 #################################################
 ## ORGANISE FILES FOR IDEs (Xcode, VS, etc...) ##
 #################################################
 
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/Include/Phoenix" PREFIX "Header Files" FILES ${Headers})
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/Source" PREFIX "Source Files" FILES ${Sources})
+
+#################################################
+## COPY SAVE, ASSETS, and MODULES TO BUILD DIR ##
+#################################################
+
+file(COPY Save DESTINATION ${CMAKE_BINARY_DIR}/Phoenix)
+file(COPY Modules DESTINATION ${CMAKE_BINARY_DIR}/Phoenix)
+file(COPY Assets DESTINATION ${CMAKE_BINARY_DIR}/Phoenix)

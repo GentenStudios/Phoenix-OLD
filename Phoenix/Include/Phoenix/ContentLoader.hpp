@@ -56,16 +56,12 @@ namespace phx
 		 * dependencies.txt inside modules folder must exist
 		 */
 		explicit Mod(std::string name);
-		~Mod();
+		~Mod() = default;
 	};
 
-	// clang-format off
-    // modules needs to stay lowercase as it's just to namespace.
-    // apparently we can't have a namespaced function prototype in a header
-    // (beep + sonos 08/12/2019)
-    struct modules
-	// clang-format on
+    class ContentManager
 	{
+	public:
 		/**
 		 * @brief Loads necessary lua modules required to load a save file
 		 * 
@@ -76,17 +72,17 @@ namespace phx
 		 *         be outputted to the terminal
 		 * 
 		 */
-		static bool loadModules(std::string save, sol::state& lua);
+		static bool loadModules(const std::string& save, sol::state& lua);
 		//TODO : Add proper error handling instead of returning a boolean
-	};
 
-	struct luaapi
-	{
 		/**
 		 * @brief Loads the Lua API for use in modules
 		 * 
 		 * @param lua The sol state used during runtime
 		 */
         static void loadAPI(sol::state& lua);
-    };
+
+	private:
+		static std::string m_currentMod;
+	};
 }; // namespace q2

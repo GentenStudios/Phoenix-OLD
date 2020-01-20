@@ -30,6 +30,7 @@
 
 #include <Phoenix/Math/Math.hpp>
 
+#include <functional>
 #include <array>
 #include <string>
 
@@ -44,6 +45,8 @@ namespace phx
 			LIQUID
 		};
 
+		using BlockCallback = std::function<void(math::vec3 pos)>;
+
 		class BlockType
 		{
 		public:
@@ -54,6 +57,10 @@ namespace phx
 			std::string id;
 
 			BlockCategory category = BlockCategory::AIR;
+
+			BlockCallback onPlace;
+			BlockCallback onBreak;
+			BlockCallback onInteract;
 
 			// front, left, back, right, top, bottom
 			std::array<std::string, 6> textures;

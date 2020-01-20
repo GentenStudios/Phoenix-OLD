@@ -98,35 +98,15 @@ public:
 
 	void run()
 	{
-		// skip this until filesystem stuff works or it gets annoying.
-		// sol::state lua;
-		// lua.open_libraries(sol::lib::base);
-		// luaapi::loadAPI(lua);
-		// bool loadedLua = modules::loadModules("save1", lua);
-		// if (!loadedLua)
-		//{
-		//	m_window->close();
-		//}
+		voxels::BlockRegistry::get()->initialise();
 
+		sol::state lua;
+		lua.open_libraries(sol::lib::base);
+		ContentManager::loadAPI(lua);
+		bool loadedLua = ContentManager::loadModules("save1", lua);
+		if (!loadedLua)
 		{
-			using namespace phx::voxels;
-			BlockRegistry::get()->initialise();
-
-			BlockType grassBlock;
-			{
-				grassBlock.displayName = "Grass";
-				grassBlock.id          = "core:grass";
-				grassBlock.category    = BlockCategory::SOLID;
-
-				// top, left, back, right, top, bottom
-				grassBlock.textures = {
-				    "Assets/grass_side.png", "Assets/grass_side.png",
-				    "Assets/grass_side.png", "Assets/grass_side.png",
-				    "Assets/grass_top.png",  "Assets/dirt.png",
-				};
-			}
-
-			BlockRegistry::get()->registerBlock(grassBlock);
+			m_window->close();
 		}
 
 		phx::gfx::ChunkRenderer renderer(100);
