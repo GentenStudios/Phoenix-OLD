@@ -147,16 +147,16 @@ void ContentManager::loadAPI(sol::state& lua, ImGui::BasicTerminal& chat){
     lua["core"] = lua.create_table();
 	lua["core"]["print"] = [&chat](std::string text)
 		{
-			chat.cout << text;
+			chat.cout << text << "\n";
 		};
 
-  lua["core"]["setting"] = lua.create_table();
-  lua["core"]["setting"]["register"] =
+    lua["core"]["setting"] = lua.create_table();
+    lua["core"]["setting"]["register"] =
 		[](std::string displayName, std::string key, int defaultValue)
 		{
 			Settings::get()->add(displayName, key, defaultValue);
 		};
-  lua["core"]["setting"]["get"] =
+    lua["core"]["setting"]["get"] =
 		[](std::string key)
 		{
 			return Settings::get()->getSetting(key)->value();
@@ -170,10 +170,7 @@ void ContentManager::loadAPI(sol::state& lua, ImGui::BasicTerminal& chat){
 	lua["core"]["command"]["register"] =
 		[](std::string command, std::string help, sol::function f)
 		{
-			static CommandFunction fx = f;
-			std::vector<std::string> args;
-			fx(args);
-			CommandBook::get()->add(command, help, "all", fx);
+			CommandBook::get()->add(command, help, "all", f);
 		};
 	lua["voxel"] = lua.create_table();
 	lua["voxel"]["block"] = lua.create_table();

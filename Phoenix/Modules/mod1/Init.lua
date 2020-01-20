@@ -8,7 +8,7 @@ function hello (args)
         core.print("with you, the force is not")
     end
 end
-addcommand("Hello", "Master the arts of the Jedi you must", hello)
+core.command.register("Hello", "Master the arts of the Jedi you must", hello)
 voxel.block.register("Dirt", "core:dirt",  
                     {"Assets/dirt.png"})
 voxel.block.register("Grass", "core:grass",  
