@@ -139,5 +139,17 @@ namespace phx
 		 * @return Setting* A pointer to the setting object
 		 */
 		Setting* getSetting(const std::string& key);
+
+		/**
+		 * @brief Loads settings from file
+		 * 
+		 * @note this must be run after all settings have been registered
+		 */
+		void load();
+
+		/**
+		 * @brief Saves settings to file
+		 */
+		void save();
 	};
 }; // namespace q2

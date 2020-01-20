@@ -27,6 +27,8 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <Phoenix/Settings.hpp>
+#include <fstream>
+#include <iostream>
 #include <climits>
 
 using namespace phx;
@@ -68,4 +70,45 @@ Setting* Settings::getSetting(const std::string& key)
 		return &m_settings[key];
 	else
 		return nullptr;
+}
+
+void Settings::load(){
+	std::ifstream file;
+	std::string buffer;
+	file.open("settings");
+	if (file)
+	{
+		while (file >> buffer)
+		{
+			size_t pointA = buffer.find(",");
+			std::string key = buffer.substr(0, pointA);
+			size_t pointB = buffer.find(";");
+			std::string val = buffer.substr(pointA + 1, pointB - pointA - 1);
+			getSetting(key)->set(std::stoi(val));
+		}
+		
+	/* std::string_view search = save;
+	std::string key;
+	std::string value;
+	while ( ! search.empty()){
+		size_t pointA = search.find(",");
+		key = search.substr(0, pointA - 1);
+		size_t pointB = search.find(";");
+		value = search.substr(pointA + 1, pointB - 1);
+		getSetting(key)->set(std::stoi(value));
+		search.remove_prefix(pointB); */
+	}
+	file.close();
+}
+
+void Settings::save(){
+	std::ofstream file;
+	file.open("settings");
+	for (const auto& setting : m_settings){
+		file << setting.first 
+			 << ","
+			 << setting.second.value()
+			 << ";";
+	}
+	file.close();
 }
