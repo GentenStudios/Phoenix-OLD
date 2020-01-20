@@ -59,7 +59,7 @@ namespace phx
 		 * dependencies.txt inside modules folder must exist
 		 */
 		explicit Mod(std::string name);
-		~Mod();
+		~Mod() = default;
 	};
 
     class ContentManager
@@ -75,7 +75,7 @@ namespace phx
 		 *         be outputted to the terminal
 		 *
 		 */
-		static bool loadModules(std::string save, sol::state& lua);
+		static bool loadModules(const std::string& save, sol::state& lua);
 		//TODO : Add proper error handling instead of returning a boolean
 
 		/**

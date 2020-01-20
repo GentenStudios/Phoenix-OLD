@@ -51,9 +51,7 @@ Mod::Mod(std::string modName) : name(std::move(modName))
 	fileStream.close();
 };
 
-Mod::~Mod() {};
-
-bool ContentManager::loadModules(std::string save, sol::state& lua)
+bool ContentManager::loadModules(const std::string& save, sol::state& lua)
 {
 	std::fstream fileStream;
 	std::queue<Mod> toLoad; // A queue of mods that need loaded
@@ -175,37 +173,45 @@ void ContentManager::loadAPI(sol::state& lua, ImGui::BasicTerminal& chat){
 	lua["voxel"] = lua.create_table();
 	lua["voxel"]["block"] = lua.create_table();
 	lua["voxel"]["block"]["register"] =
-		[](std::string displayName, std::string id, std::vector<std::string> textures)
+		[](sol::table luaBlock)
 		{
 			using namespace phx::voxels;
 			BlockType block;
 			{
-				block.displayName = displayName;
-				block.id          = id;
-				block.category    = BlockCategory::SOLID;
+				block.displayName = luaBlock["name"];
+				block.id          = luaBlock["id"];
 
-				if (textures.size() == 1){
-					block.textures = {
-						"Modules/" + m_currentMod + "/" + textures[0],
-						"Modules/" + m_currentMod + "/" + textures[0],
-						"Modules/" + m_currentMod + "/" + textures[0],
-						"Modules/" + m_currentMod + "/" + textures[0],
-						"Modules/" + m_currentMod + "/" + textures[0],
-						"Modules/" + m_currentMod + "/" + textures[0],
-					};
+				if(luaBlock["category"] == "Air"){
+					block.category    = BlockCategory::AIR;
+				} else if (luaBlock["category"] == "Liquid") {
+					block.category    = BlockCategory::LIQUID;
 				} else {
-					// front, left, back, right, top, bottom
-					block.textures = {
-						"Modules/" + m_currentMod + "/" + textures[0],
-						"Modules/" + m_currentMod + "/" + textures[1],
-						"Modules/" + m_currentMod + "/" + textures[2],
-						"Modules/" + m_currentMod + "/" + textures[3],
-						"Modules/" + m_currentMod + "/" + textures[4],
-						"Modules/" + m_currentMod + "/" + textures[5],
-					};
+					block.category    = BlockCategory::SOLID;
 				}
-			}
 
+				if(luaBlock["onPlace"]){
+					block.onPlace = luaBlock["onPlace"];
+				}
+
+				if(luaBlock["onBreak"]){
+					block.onPlace = luaBlock["onPlace"];
+				}
+
+				if(luaBlock["onInteract"]){
+					block.onPlace = luaBlock["onPlace"];
+				}
+
+				std::array<std::string, 6> textures;
+				for(int i = 0; i < 6; i++){
+					std::string texture = luaBlock["textures"][i+1];
+					if (texture.size() == 0){
+						//If a texture is not supplied, we use the first texture in its place
+						texture = luaBlock["textures"][1];
+					}
+					textures[i] = "Modules/" + m_currentMod + "/" + texture;
+				}
+				block.textures = textures;
+			}
 			BlockRegistry::get()->registerBlock(block);
 		};
 }
