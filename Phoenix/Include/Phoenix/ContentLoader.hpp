@@ -29,9 +29,9 @@
 /**
  * @file ContentLoader.hpp
  * @brief Implements Lua module loading system.
- * 
+ *
  * @copyright Copyright (c) 2020 Genten Studios
- * 
+ *
  */
 
 #pragma once
@@ -39,6 +39,9 @@
 #include <vector>
 #include <sol/sol.hpp>
 #include <string>
+
+//TODO: Replace this with a registry system
+#include <Phoenix/ImGuiHelpers.hpp>
 
 namespace phx
 {
@@ -64,23 +67,23 @@ namespace phx
 	public:
 		/**
 		 * @brief Loads necessary lua modules required to load a save file
-		 * 
+		 *
 		 * @param save The save file to be loaded
 		 * @param lua The sol state used during runtime
 		 * @return true If the function successfully loaded all modules
 		 * @return false If the function failed to load modules, details will
 		 *         be outputted to the terminal
-		 * 
+		 *
 		 */
 		static bool loadModules(const std::string& save, sol::state& lua);
 		//TODO : Add proper error handling instead of returning a boolean
 
 		/**
 		 * @brief Loads the Lua API for use in modules
-		 * 
+		 *
 		 * @param lua The sol state used during runtime
 		 */
-        static void loadAPI(sol::state& lua);
+        static void loadAPI(sol::state& lua, ImGui::BasicTerminal& chat);
 
 	private:
 		static std::string m_currentMod;

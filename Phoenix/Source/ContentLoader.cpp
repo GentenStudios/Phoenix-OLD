@@ -40,7 +40,7 @@ Mod::Mod(std::string modName) : name(std::move(modName))
 	fileStream.open("Modules/" + name + "/Dependencies.txt");
 	if(!fileStream.is_open()){
 		std::cout << "Couldnt find dependencies file for mod: " << name << "\n";
-		return;	
+		return;
 	}
 	while (fileStream.peek() != EOF)
 	{
@@ -59,7 +59,7 @@ bool ContentManager::loadModules(const std::string& save, sol::state& lua)
 	fileStream.open("Save/" + save + "/Mods.txt");
 	if(!fileStream.is_open()){
 		std::cout << "Error opening save file";
-		return false;	
+		return false;
 	}
 	int i = 0;
 	while (fileStream.peek() != EOF)
@@ -137,53 +137,38 @@ bool ContentManager::loadModules(const std::string& save, sol::state& lua)
 
 //TODO: replace this with an API registration system
 #include <Phoenix/Settings.hpp>
+#include <Phoenix/Commander.hpp>
 #include <Phoenix/Voxels/BlockRegistry.hpp>
 #include <array>
-#include <map>
 
-/**
- * @brief Registers the Lua API
- * 
- * @TODO This needs replaced with a system allowing the API 
- * to be defined as each other class is registered.
- * 
- * @param lua The lua state that the API is loaded into
- */
-void ContentManager::loadAPI(sol::state& lua){
-	/**
-	 * @page LuaAPI Lua API
-	 * 
-	 * The lua API is . . . 
-	 * 
-	 */
+void ContentManager::loadAPI(sol::state& lua, ImGui::BasicTerminal& chat){
     lua["core"] = lua.create_table();
+	lua["core"]["print"] = [&chat](std::string text)
+		{
+			chat.cout << text << "\n";
+		};
+
     lua["core"]["setting"] = lua.create_table();
-	/**
-	 * @page LuaAPI
-	 * 
-	 * @fn core.setting.register(displayName, key, defaultValue)
-	 * 
-	 * @brief Registers a setting that the player can adjust via the settings menu
-	 * 
-	 * @param displayName The Display name for the setting seen in the settings menu
-	 * @param key The unique key for the settings, usually in the form module:setting
-	 * @param defaultValue The default value for the setting if not already set
-	 * 
-	 */
-    lua["core"]["setting"]["register"] = 
+    lua["core"]["setting"]["register"] =
 		[](std::string displayName, std::string key, int defaultValue)
 		{
 			Settings::get()->add(displayName, key, defaultValue);
 		};
-    lua["core"]["setting"]["get"] = 
+    lua["core"]["setting"]["get"] =
 		[](std::string key)
 		{
-			return Settings::get()->getSetting(key)->value(); 
+			return Settings::get()->getSetting(key)->value();
 		};
 	lua["core"]["setting"]["set"] =
 		[](std::string key, int value)
 		{
-			Settings::get()->getSetting(key)->set(value); 
+			Settings::get()->getSetting(key)->set(value);
+		};
+	lua["core"]["command"] = lua.create_table();
+	lua["core"]["command"]["register"] =
+		[](std::string command, std::string help, sol::function f)
+		{
+			CommandBook::get()->add(command, help, "all", f);
 		};
 	lua["voxel"] = lua.create_table();
 	lua["voxel"]["block"] = lua.create_table();

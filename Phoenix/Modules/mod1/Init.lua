@@ -1,6 +1,5 @@
 print ("Load mod 1")
---[[function hello (args)
-
+function hello (args)
     if args[1] == "there" then
         print("General Kenobi")
     elseif args[1] == "world" then
@@ -9,7 +8,7 @@ print ("Load mod 1")
         print("with you, the force is not")
     end
 end
-core.command.register("Hello", "Master the arts of the Jedi you must", hello)]]--
+core.command.register("Hello", "Master the arts of the Jedi you must", hello)
 
 block = {}
 block.name = "Dirt"

@@ -102,7 +102,7 @@ public:
 
 		sol::state lua;
 		lua.open_libraries(sol::lib::base);
-		ContentManager::loadAPI(lua);
+		ContentManager::loadAPI(lua, chat);
 		bool loadedLua = ContentManager::loadModules("save1", lua);
 		if (!loadedLua)
 		{
