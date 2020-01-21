@@ -59,6 +59,8 @@ namespace phx
 		std::string m_key;
 		/// @brief Value of setting
 		int m_value;
+		/// @brief Default value for setting
+		int m_default;
 		/// @brief Maximim value that the setting can be set to
 		int m_maxValue;
 		/// @brief Minimum value that the setting cab be set to
@@ -83,6 +85,11 @@ namespace phx
 		 */
 		bool set(int value);
 		/**
+		 * @brief Resets the value of the setting back to the default
+		 * 
+		 */
+		void reset();
+		/**
 		 * @brief Set the maximum value for the setting
 		 *
 		 * @param value The maximum value the setting can be
@@ -106,6 +113,12 @@ namespace phx
 		 * @return std::size_t The value of the setting
 		 */
 		int value() const;
+		/**
+		 * @brief Gets the default of a setting
+		 *
+		 * @return std::size_t The value of the setting
+		 */
+		int getDefault() const;
 	};
 
 	/**
@@ -119,6 +132,7 @@ namespace phx
 	class Settings : public Singleton<Settings>
 	{
 		std::unordered_map<std::string, Setting> m_settings;
+		std::string m_unused;
 
 	public:
 		/**
