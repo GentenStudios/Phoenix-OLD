@@ -27,18 +27,19 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <Phoenix/Settings.hpp>
+#include <climits>
 #include <fstream>
 #include <iostream>
-#include <climits>
 
 using namespace phx;
 
-Setting::Setting(){}
+Setting::Setting() {}
 
 Setting::Setting(std::string name, std::string key, int defaultValue)
-    : m_name(std::move(name)), m_key(std::move(key)), m_value(defaultValue), 
-	  m_maxValue(SHRT_MAX), m_minValue(SHRT_MIN), m_default(defaultValue)
-{}
+    : m_name(std::move(name)), m_key(std::move(key)), m_value(defaultValue),
+      m_maxValue(SHRT_MAX), m_minValue(SHRT_MIN), m_default(defaultValue)
+{
+}
 
 bool Setting::set(int value)
 {
@@ -50,9 +51,7 @@ bool Setting::set(int value)
 	return false;
 }
 
-void Setting::reset(){
-	m_value = m_default;
-}
+void Setting::reset() { m_value = m_default; }
 
 void Setting::setMax(int value) { m_maxValue = value; }
 
@@ -64,7 +63,8 @@ int Setting::value() const { return m_value; }
 
 int Setting::getDefault() const { return m_default; }
 
-Setting* Settings::add(const std::string& name, const std::string& key, int defaultValue)
+Setting* Settings::add(const std::string& name, const std::string& key,
+                       int defaultValue)
 {
 	m_settings[key] = Setting(name, key, defaultValue);
 	return &m_settings[key];
@@ -78,22 +78,27 @@ Setting* Settings::getSetting(const std::string& key)
 		return nullptr;
 }
 
-void Settings::load(){
+void Settings::load()
+{
 	std::ifstream file;
-	std::string buffer;
+	std::string   buffer;
 	file.open("settings");
-	if(file)
+	if (file)
 	{
 		while (file >> buffer)
 		{
-			size_t pointA = buffer.find(',');
-			std::string key = buffer.substr(0, pointA);
-			Setting* setting = getSetting(key);
-			if (setting == nullptr){
+			size_t      pointA  = buffer.find(',');
+			std::string key     = buffer.substr(0, pointA);
+			Setting*    setting = getSetting(key);
+			if (setting == nullptr)
+			{
 				m_unused += buffer + "\n";
-			} else {
-				size_t pointB = buffer.find(';');
-				std::string val = buffer.substr(pointA + 1, pointB - pointA - 1);
+			}
+			else
+			{
+				size_t      pointB = buffer.find(';');
+				std::string val =
+				    buffer.substr(pointA + 1, pointB - pointA - 1);
 				setting->set(std::stoi(val));
 			}
 		}
@@ -101,16 +106,16 @@ void Settings::load(){
 	file.close();
 }
 
-void Settings::save(){
+void Settings::save()
+{
 	std::ofstream file;
 	file.open("settings");
 	file << m_unused;
-	for (const auto& setting : m_settings){
-		if (setting.second.value() != setting.second.getDefault()){
-			file << setting.first 
-				 << ","
-				 << setting.second.value()
-				 << ";\n";
+	for (const auto& setting : m_settings)
+	{
+		if (setting.second.value() != setting.second.getDefault())
+		{
+			file << setting.first << "," << setting.second.value() << ";\n";
 		}
 	}
 	file.close();
