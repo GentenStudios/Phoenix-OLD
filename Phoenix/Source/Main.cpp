@@ -109,6 +109,8 @@ public:
 			m_window->close();
 		}
 
+		Settings::get()->load();
+
 		phx::gfx::ChunkRenderer renderer(100);
 		renderer.buildTextureArray();
 
@@ -202,6 +204,11 @@ public:
 
 			m_window->endFrame();
 		}
+
+		// ============== //
+		// Begin Shutdown //
+		// ============== //
+		Settings::get()->save();
 	}
 
 private:

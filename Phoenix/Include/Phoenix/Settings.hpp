@@ -29,27 +29,27 @@
 /**
  * @file Settings.hpp
  * @brief Implements a settings management system
- * 
+ *
  * @copyright Copyright (c) 2019-20 Genten Studios
- * 
+ *
  */
 
 #pragma once
 
 #include <Phoenix/Singleton.hpp>
 
-#include <unordered_map>
 #include <string>
+#include <unordered_map>
 
 namespace phx
 {
 	/**
 	 * @brief A settings object to store a single setting
-	 * 
+	 *
 	 * @description The settings object stores an integer that can be mapped to
 	 * other data. Maximum and minimum values can be set so a settings cant be
 	 * adjusted outside its limits.
-	 * 
+	 *
 	 */
 	class Setting
 	{
@@ -59,6 +59,8 @@ namespace phx
 		std::string m_key;
 		/// @brief Value of setting
 		int m_value;
+		/// @brief Default value for setting
+		int m_default;
 		/// @brief Maximim value that the setting can be set to
 		int m_maxValue;
 		/// @brief Minimum value that the setting cab be set to
@@ -68,7 +70,7 @@ namespace phx
 		Setting();
 		/**
 		 * @brief Construct a new Setting object
-		 * 
+		 *
 		 * @param name The human readable name for the setting
 		 * @param key The unique name for the setting in the format core:volume
 		 * @param defaultValue The default value for the setting upon creation
@@ -82,6 +84,11 @@ namespace phx
 		 * @return false if the value was not within the settings max/min
 		 */
 		bool set(int value);
+		/**
+		 * @brief Resets the value of the setting back to the default
+		 *
+		 */
+		void reset();
 		/**
 		 * @brief Set the maximum value for the setting
 		 *
@@ -106,19 +113,26 @@ namespace phx
 		 * @return std::size_t The value of the setting
 		 */
 		int value() const;
+		/**
+		 * @brief Gets the default of a setting
+		 *
+		 * @return std::size_t The value of the setting
+		 */
+		int getDefault() const;
 	};
 
 	/**
 	 * @brief A setting registry to store settings for universal access
-	 * 
+	 *
 	 * @description This registry allows us to access any registered setting
-	 * from anywhere in the program just using the settings unique key in the 
+	 * from anywhere in the program just using the settings unique key in the
 	 * format core:volume
-	 * 
+	 *
 	 */
 	class Settings : public Singleton<Settings>
 	{
 		std::unordered_map<std::string, Setting> m_settings;
+		std::string                              m_unused;
 
 	public:
 		/**
@@ -130,14 +144,27 @@ namespace phx
 		 * @return std::size_t Reuturns the numerical key the setting is stored
 		 * at
 		 */
-		Setting* add(const std::string& name, const std::string& key, int defaultValue);
+		Setting* add(const std::string& name, const std::string& key,
+		             int defaultValue);
 
 		/**
 		 * @brief Get the Setting object
-		 * 
+		 *
 		 * @param key Unique Name for key ex: core:volume
 		 * @return Setting* A pointer to the setting object
 		 */
 		Setting* getSetting(const std::string& key);
+
+		/**
+		 * @brief Loads settings from file
+		 *
+		 * @note this must be run after all settings have been registered
+		 */
+		void load();
+
+		/**
+		 * @brief Saves settings to file
+		 */
+		void save();
 	};
-}; // namespace q2
+}; // namespace phx
