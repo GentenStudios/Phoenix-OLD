@@ -154,6 +154,7 @@ void ContentManager::loadAPI(sol::state& lua, ImGui::BasicTerminal& chat){
     lua["core"] = lua.create_table();
 		/**
 		 * @addtogroup luaapi
+		 * ---
 		 * @section core core
 		 * @brief The core API for interacting with Quartz
 		 */
@@ -268,6 +269,7 @@ void ContentManager::loadAPI(sol::state& lua, ImGui::BasicTerminal& chat){
 	lua["voxel"] = lua.create_table();
 		/**
 		 * @addtogroup luaapi
+		 * ---
 		 * @section voxel voxel
 		 * @brief The voxel API for interacting voxels
 		 */
