@@ -157,7 +157,17 @@ void ContentManager::loadAPI(sol::state& lua, ImGui::BasicTerminal& chat){
 		 * @section core core
 		 * @brief The core API for interacting with Quartz
 		 */
-	lua["core"]["print"] = [&chat](std::string text)
+	lua["core"]["print"] = 
+		/**
+		 * @addtogroup luaapi
+		 * 
+		 * @subsubsection coreprint core.print(text)
+		 * @brief Prints text to the players terminal
+		 * 
+		 * @param text The text to be outputted to the terminal
+		 * 
+		 */
+		[&chat](std::string text)
 		{
 			chat.cout << text << "\n";
 		};
@@ -213,8 +223,44 @@ void ContentManager::loadAPI(sol::state& lua, ImGui::BasicTerminal& chat){
 		{
 			Settings::get()->getSetting(key)->set(value);
 		};
-	lua["core"]["command"] = lua.create_table();
+	lua["core"]["command"] = 
+		/**
+		 * @addtogroup luaapi
+		 * 
+		 * @subsection corecmd core.command
+		 * @brief Interfaces with the commander
+		 * 
+		 */
+		lua.create_table();
 	lua["core"]["command"]["register"] =
+		/**
+		 * @addtogroup luaapi
+		 * 
+		 * @subsubsection corecmdreg core.command.register
+		 * @brief Registers a new command
+		 * 
+		 * In the terminal typing "/" followed by a command will execute the command
+		 * 
+		 * @param command The command to register
+		 * @param help A helpstring that is printed to terminal when typing "/help <command>"
+		 * @param f The callback function that is called by the commander
+		 * The callback function must take a table as an argument
+		 * Any arguments included when the command is executed will be passed in this table
+		 * 
+		 * @b Example:
+		 * @code {.lua}
+		 * function hello (args)
+		 *     if args[1] == "there" then
+         *         print("General Kenobi")
+    	 *	   elseif args[1] == "world" then
+         * 		   print("World says hi")
+    	 *	   else
+         *         print("with you, the force is not")
+         *     end
+         * end
+         * core.command.register("Hello", "Master the arts of the Jedi you must", hello)
+		 * @endcode
+		 */
 		[](std::string command, std::string help, sol::function f)
 		{
 			CommandBook::get()->add(command, help, "all", f);
@@ -257,7 +303,7 @@ void ContentManager::loadAPI(sol::state& lua, ImGui::BasicTerminal& chat){
 		 * 
 		 * @b Example:
 		 * 
-		 * @code
+		 * @code {.lua}
 		 * block = {}
 		 * block.name = "Grass"
 		 * block.id = "core:grass"
