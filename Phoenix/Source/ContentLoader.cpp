@@ -40,7 +40,7 @@ Mod::Mod(std::string modName) : name(std::move(modName))
 	fileStream.open("Modules/" + name + "/Dependencies.txt");
 	if(!fileStream.is_open()){
 		std::cout << "Couldnt find dependencies file for mod: " << name << "\n";
-		return;	
+		return;
 	}
 	while (fileStream.peek() != EOF)
 	{
@@ -59,7 +59,7 @@ bool ContentManager::loadModules(const std::string& save, sol::state& lua)
 	fileStream.open("Save/" + save + "/Mods.txt");
 	if(!fileStream.is_open()){
 		std::cout << "Error opening save file";
-		return false;	
+		return false;
 	}
 	int i = 0;
 	while (fileStream.peek() != EOF)
@@ -137,11 +137,12 @@ bool ContentManager::loadModules(const std::string& save, sol::state& lua)
 
 //TODO: replace this with an API registration system
 #include <Phoenix/Settings.hpp>
+#include <Phoenix/Commander.hpp>
 #include <Phoenix/Voxels/BlockRegistry.hpp>
 #include <array>
 #include <map>
 
-void ContentManager::loadAPI(sol::state& lua){
+void ContentManager::loadAPI(sol::state& lua, ImGui::BasicTerminal& chat){
 	/**
 	 * @defgroup luaapi Lua API
 	 * 
@@ -156,6 +157,10 @@ void ContentManager::loadAPI(sol::state& lua){
 		 * @section core core
 		 * @brief The core API for interacting with Quartz
 		 */
+	lua["core"]["print"] = [&chat](std::string text)
+		{
+			chat.cout << text << "\n";
+		};
     lua["core"]["setting"] = lua.create_table();
 		/**
 		 * @addtogroup luaapi
@@ -191,7 +196,7 @@ void ContentManager::loadAPI(sol::state& lua){
 		 */
 		[](std::string key)
 		{
-			return Settings::get()->getSetting(key)->value(); 
+			return Settings::get()->getSetting(key)->value();
 		};
 	lua["core"]["setting"]["set"] =
 		/**
@@ -206,7 +211,13 @@ void ContentManager::loadAPI(sol::state& lua){
 		 */
 		[](std::string key, int value)
 		{
-			Settings::get()->getSetting(key)->set(value); 
+			Settings::get()->getSetting(key)->set(value);
+		};
+	lua["core"]["command"] = lua.create_table();
+	lua["core"]["command"]["register"] =
+		[](std::string command, std::string help, sol::function f)
+		{
+			CommandBook::get()->add(command, help, "all", f);
 		};
 	lua["voxel"] = lua.create_table();
 		/**

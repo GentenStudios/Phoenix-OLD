@@ -102,12 +102,14 @@ public:
 
 		sol::state lua;
 		lua.open_libraries(sol::lib::base);
-		ContentManager::loadAPI(lua);
+		ContentManager::loadAPI(lua, chat);
 		bool loadedLua = ContentManager::loadModules("save1", lua);
 		if (!loadedLua)
 		{
 			m_window->close();
 		}
+
+		Settings::get()->load();
 
 		phx::gfx::ChunkRenderer renderer(100);
 		renderer.buildTextureArray();
@@ -202,6 +204,11 @@ public:
 
 			m_window->endFrame();
 		}
+
+		// ============== //
+		// Begin Shutdown //
+		// ============== //
+		Settings::get()->save();
 	}
 
 private:
