@@ -27,11 +27,30 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <Phoenix/Player.hpp>
+#include <Phoenix/Voxels/Block.hpp>
+#include <Phoenix/Math/Ray.hpp>
+#include <Phoenix/Math/Math.hpp>
 
 using namespace phx;
 
 math::vec3 Player::getTarget(){
-    //@beep mentioned that the camera and block grid use diferent measurement systems
-    // I need help designing this
+    const float MAX_PICKING_DISTANCE = 32.f;
+	const float RAY_INCREMENT = 0.5f;
+
+    math::vec3 pos = (getPosition() / 2.f) + .5f;
+
+    Ray ray(pos, getDirection());
+
+    while (ray.getLength() < MAX_PICKING_DISTANCE)
+    {
+        pos.floor();
+
+        if (m_world->getBlockAt(pos).getBlockType() == BlockCategory::SOLID)
+        {
+            return pos;
+        }
+
+        pos = ray.advance(RAY_INCREMENT);
+    }
 }
 

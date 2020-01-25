@@ -49,6 +49,14 @@ bool Actor::setRotation(math::vec3 dir)
     return true;
 }
 
+math::vec3 Actor::getDirection() const {
+    return math::vec3(
+        std::cos(m_rotation.y) * std::sin(m_rotation.x),
+        std::sin(m_rotation.y),
+        std::cos(m_rotation.y) * std::cos(m_rotation.x)
+    );
+}
+
 int Actor::getMoveSpeed()
 {
     return m_moveSpeed;

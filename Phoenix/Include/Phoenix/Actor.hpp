@@ -41,6 +41,8 @@ namespace phx
 		math::vec3 getRotation() const;
 		bool setRotation(math::vec3 rot);
 
+        math::vec3 getDirection() const;
+
         /**
          * @brief Get the players current speed
          * 
