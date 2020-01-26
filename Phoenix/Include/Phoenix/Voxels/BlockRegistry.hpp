@@ -53,6 +53,9 @@ namespace phx
 
 			TextureRegistry* getTextures();
 
+			static constexpr int UNKNOWN_BLOCK = 0;
+			static constexpr int OUT_OF_BOUNDS_BLOCK = 1;
+
 		private:
 			// NOTE: We used to use an std::list to prevent invalidating any
 			// pointers, however, since all blocks will be registered in ONE go

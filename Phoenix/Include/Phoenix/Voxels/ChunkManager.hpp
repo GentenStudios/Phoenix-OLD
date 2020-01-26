@@ -26,59 +26,45 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Phoenix/Voxels/BlockRegistry.hpp>
+#pragma once
+
+#include <Phoenix/Graphics/ChunkRenderer.hpp>
+#include <Phoenix/Math/Math.hpp>
 #include <Phoenix/Voxels/Chunk.hpp>
 
-using namespace phx::voxels;
-using namespace phx;
+#include <vector>
 
-Chunk::Chunk(math::vec3 chunkPos) : m_pos(chunkPos)
+namespace phx
 {
-	m_blocks.reserve(CHUNK_WIDTH * CHUNK_HEIGHT * CHUNK_DEPTH);
-}
-
-void Chunk::autoTestFill()
-{
-	if (m_pos.y > 0)
+	namespace voxels
 	{
-		BlockType* air = BlockRegistry::get()->getFromID("core:air");
-		for (std::size_t i = 0; i < CHUNK_WIDTH * CHUNK_HEIGHT * CHUNK_DEPTH;
-		     ++i)
+		class ChunkManager
 		{
-			m_blocks.push_back(air);
-		}
-	}
-	else
-	{
-		BlockType* grass = BlockRegistry::get()->getFromID("core:grass");
-		for (std::size_t i = 0; i < CHUNK_WIDTH * CHUNK_HEIGHT * CHUNK_DEPTH;
-		     ++i)
-		{
-			m_blocks.push_back(grass);
-		}
-	}
-}
+		public:
+			ChunkManager(BlockType* defaultBlockType, unsigned int seed);
+			ChunkManager(ChunkManager&& other) = default;
 
-math::vec3               Chunk::getChunkPos() const { return m_pos; }
-std::vector<BlockType*>& Chunk::getBlocks() { return m_blocks; }
+			~ChunkManager() = default;
 
-BlockType* Chunk::getBlockAt(math::vec3 position) const
-{
-	if (position.x < CHUNK_WIDTH && position.y < CHUNK_HEIGHT &&
-	    position.z < CHUNK_DEPTH)
-	{
-		return m_blocks[getVectorIndex(position)];
-	}
+			void tick(math::vec3 position);
+			void testGeneration();
 
-	return BlockRegistry::get()->getFromRegistryID(
-	    1); // 1 is always out of bounds
-}
+			void       setBlockAt(math::vec3 position, BlockType* block);
+			BlockType* getBlockAt(math::vec3 position) const;
 
-void Chunk::setBlockAt(math::vec3 position, BlockType* newBlock)
-{
-	if (position.x < CHUNK_WIDTH && position.y < CHUNK_HEIGHT &&
-	    position.z < CHUNK_DEPTH)
-	{
-		m_blocks[getVectorIndex(position)] = newBlock;
-	}
-}
+			void breakBlockAt(math::vec3 position, BlockType* block);
+			void placeBlockAt(math::vec3 position, BlockType* block);
+
+			void render();
+
+		private:
+			unsigned int m_seed;
+			BlockType*   m_defaultBlockType;
+
+			math::vec3 m_lastPos;
+			
+			std::vector<Chunk>  m_chunks;
+			gfx::ChunkRenderer* m_renderer;
+		};
+	} // namespace voxels
+} // namespace phx

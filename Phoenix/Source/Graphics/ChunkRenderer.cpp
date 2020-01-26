@@ -77,10 +77,8 @@ ChunkRenderer::ChunkRenderer(std::size_t visibleChunks)
 	glEnableVertexAttribArray(m_vertexAttributeLocation);
 	glEnableVertexAttribArray(m_uvAttributeLocation);
 
-	for (int i = 0; i < visibleChunks; ++i)
-	{
-		m_bigBufferLocations.push_back(i);
-	}
+	m_multiDrawStarts.push_back(0);
+	m_multiDrawCounts.push_back(0);
 }
 
 ChunkRenderer::~ChunkRenderer() { glDeleteVertexArrays(1, &m_vao); }
@@ -144,7 +142,6 @@ const ChunkRenderer::AssociativeTextureTable& ChunkRenderer::getTextureTable()
 ChunkRenderer::MeshIdentifier ChunkRenderer::submitChunkMesh(
     const std::vector<float>& mesh, MeshIdentifier slot)
 {
-	
 	glBindVertexArray(m_vao);
 	glBindBuffer(GL_ARRAY_BUFFER, m_buffer);
 	glBufferSubData(GL_ARRAY_BUFFER, sizeof(Vertex) * 36 * 16 * 16 * 16 * slot,
