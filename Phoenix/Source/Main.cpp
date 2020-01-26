@@ -40,9 +40,9 @@
 
 #include <imgui.h>
 
+#include <fstream>
 #include <sstream>
 #include <string>
-#include <fstream>
 
 using namespace phx;
 
@@ -66,50 +66,54 @@ static ui::ChatWindow chat("Chat Window", 5,
 // TODO: consider sanitizing for file delimeters if users can access `save`
 #if defined(__cpp_lib_filesystem)
 #	include <filesystem>
-	static void initFiles(std::string save)
+static void initFiles(std::string save)
+{
+	if (!std::filesystem::exists("Save"))
 	{
-		if (!std::filesystem::exists("Save")){
-			std::filesystem::create_directory("Save");
-		}
-		if (!std::filesystem::exists("Save/"+ save)){
-			std::filesystem::create_directory("Save/" + save);
-			std::ofstream mods;
-			mods.open("Save/save1/Mods.txt");
-			mods.close();
-		}
-
+		std::filesystem::create_directory("Save");
 	}
+	if (!std::filesystem::exists("Save/" + save))
+	{
+		std::filesystem::create_directory("Save/" + save);
+		std::ofstream mods;
+		mods.open("Save/save1/Mods.txt");
+		mods.close();
+	}
+}
 #else
 #	include <sys/stat.h>
-	static void initFiles(std::string save)
+static void initFiles(std::string save)
+{
+	std::ofstream saveFile;
+	save = "Save/" + save + "/mods.txt"; // reused fine for now.
+	saveFile.open(save);
+
+	if (saveFile.is_open())
 	{
-		std::ofstream saveFile;
-		save = "Save/" + save + "/mods.txt"; // reused fine for now.
-		saveFile.open(save);
-
-		if (saveFile.is_open()) { saveFile.close(); }
-		else
-		{
-			std::string sp;
-			size_t delimeter = 0;
-
-			//just loop through the leading elements for now.
-			while ((delimeter = save.find('/', delimeter+1)) != std::string::npos)
-			{
-				// Shis way the string isn't deconstructed until the loop ends and
-				// the mkdir funciton doesn't execute on an invalid string as well.
-				sp = save.substr(0, delimeter);
-
-				// S_IRWXU is all flags for Current User
-				// S_IRWXO is all flags for Other Users
-				// S_IRWXG is all flags for the associated Unix Group
-				mkdir(sp.c_str(), S_IRWXO | S_IRWXG | S_IRWXU);
-			}
-
-			saveFile.open(save);
-			saveFile.close();
-		}
+		saveFile.close();
 	}
+	else
+	{
+		std::string sp;
+		size_t      delimeter = 0;
+
+		// just loop through the leading elements for now.
+		while ((delimeter = save.find('/', delimeter + 1)) != std::string::npos)
+		{
+			// Shis way the string isn't deconstructed until the loop ends and
+			// the mkdir funciton doesn't execute on an invalid string as well.
+			sp = save.substr(0, delimeter);
+
+			// S_IRWXU is all flags for Current User
+			// S_IRWXO is all flags for Other Users
+			// S_IRWXG is all flags for the associated Unix Group
+			mkdir(sp.c_str(), S_IRWXO | S_IRWXG | S_IRWXU);
+		}
+
+		saveFile.open(save);
+		saveFile.close();
+	}
+}
 #endif
 
 class Phoenix : public events::IEventListener

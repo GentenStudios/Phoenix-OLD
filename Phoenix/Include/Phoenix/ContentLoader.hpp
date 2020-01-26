@@ -36,9 +36,9 @@
 
 #pragma once
 
-#include <vector>
 #include <sol/sol.hpp>
 #include <string>
+#include <vector>
 
 namespace phx
 {
@@ -72,8 +72,8 @@ namespace phx
 		 *
 		 */
 		bool loadModules(std::string save, sol::state& lua);
-		//TODO : Add proper error handling instead of returning a boolean
-	};
+		// TODO : Add proper error handling instead of returning a boolean
+	}; // namespace modules
 
 	namespace luaapi
 	{
@@ -83,5 +83,5 @@ namespace phx
 		 * @param lua The sol state used during runtime
 		 */
 		void loadAPI(sol::state& lua);
-	};
-}; // namespace q2
+	}; // namespace luaapi
+};     // namespace phx

@@ -38,7 +38,8 @@ Mod::Mod(std::string modName) : name(std::move(modName))
 {
 	std::fstream fileStream;
 	fileStream.open("Modules/" + name + "/Dependencies.txt");
-	if(!fileStream.is_open()){
+	if (!fileStream.is_open())
+	{
 		std::cout << "Couldnt find dependencies file for mod: " << name << "\n";
 		return;
 	}
@@ -55,11 +56,12 @@ Mod::~Mod() {};
 
 bool modules::loadModules(std::string save, sol::state& lua)
 {
-	std::fstream fileStream;
+	std::fstream    fileStream;
 	std::queue<Mod> toLoad; // A queue of mods that need loaded
 
 	fileStream.open(std::string("Save/") + save + "/mods.txt");
-	if(!fileStream.is_open()){
+	if (!fileStream.is_open())
+	{
 		std::cout << "Error opening save file";
 		return false;
 	}
@@ -136,25 +138,21 @@ bool modules::loadModules(std::string save, sol::state& lua)
 	return true;
 }
 
-//TODO: replace this with an API registration system
+// TODO: replace this with an API registration system
 #include <Phoenix/Settings.hpp>
 
-void luaapi::loadAPI(sol::state& lua){
-    lua["core"] = lua.create_table();
-    lua["core"]["setting"] = lua.create_table();
-    lua["core"]["setting"]["register"] =
-		[](std::string displayName, std::string key, int defaultValue)
-		{
-			Settings::get()->add(displayName, key, defaultValue);
-		};
-    lua["core"]["setting"]["get"] =
-		[](std::string key)
-		{
-			return Settings::get()->getSetting(key)->value();
-		};
-	lua["core"]["setting"]["set"] =
-		[](std::string key, int value)
-		{
-			Settings::get()->getSetting(key)->set(value);
-		};
+void luaapi::loadAPI(sol::state& lua)
+{
+	lua["core"]                        = lua.create_table();
+	lua["core"]["setting"]             = lua.create_table();
+	lua["core"]["setting"]["register"] = [](std::string displayName,
+	                                        std::string key, int defaultValue) {
+		Settings::get()->add(displayName, key, defaultValue);
+	};
+	lua["core"]["setting"]["get"] = [](std::string key) {
+		return Settings::get()->getSetting(key)->value();
+	};
+	lua["core"]["setting"]["set"] = [](std::string key, int value) {
+		Settings::get()->getSetting(key)->set(value);
+	};
 }
