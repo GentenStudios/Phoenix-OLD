@@ -18,6 +18,5 @@ set(Sources
 
 	${currentDir}/Main.cpp
 
-
 	PARENT_SCOPE
 )

@@ -45,7 +45,7 @@ math::vec3 Player::getTarget(){
     {
         pos.floor();
 
-        if (m_world->getBlockAt(pos).getBlockType() == BlockCategory::SOLID)
+        //if (m_world->getBlockAt(pos).getBlockType() == BlockCategory::SOLID)
         {
             return pos;
         }
