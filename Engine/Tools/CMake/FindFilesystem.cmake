@@ -91,11 +91,23 @@ Using `find_package(Filesystem)` with no component arguments:
 
 .. code-block:: cmake
 
+		# required to hook our exported filesystem interface.
+		add_library(std::filesystem INTERFACE IMPORTED GLOBAL)
     find_package(Filesystem REQUIRED)
 
     add_executable(my-program main.cpp)
     target_link_libraries(my-program PRIVATE std::filesystem)
 
+Using `find_package(Filesystem)` with component argument(s):
+
+.. code-block:: cmake
+
+		add_library(std::filesystem INTERFACE IMPORTED GLOBAL)
+		# either of the components flags may be omitted individually
+		find_package(Filesystem REQUIRED COMPONENTS Final Experimental)
+
+		add_executable(my-program main.cpp)
+		target_link_libraries(my-program PRIVATE std::filesystem)
 
 #]=======================================================================]
 
@@ -207,7 +219,6 @@ if(CXX_FILESYSTEM_HAVE_FS)
     endif()
 
     if(can_link)
-        add_library(std::filesystem INTERFACE IMPORTED)
         target_compile_features(std::filesystem INTERFACE cxx_std_17)
         set(_found TRUE)
 

@@ -4,7 +4,9 @@ add_subdirectory(ThirdParty)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_LIST_DIR}/Tools/CMake")
 
-find_package(Filesystem REQUIRED)
+# required to hook the exported std::filesystem interface. 
+add_library(std::filesystem INTERFACE IMPORTED GLOBAL)
+find_package(Filesystem REQUIRED COMPONENTS Final Experimental)
 
 add_subdirectory(Include/Quartz2)
 add_subdirectory(Source)
@@ -33,7 +35,7 @@ endif()
 ## THIS SORTS THE FILES FOR VISUAL STUDIO SOURCE GROUPS. ##
 ###########################################################
 
-foreach(FILE ${Sources}) 
+foreach(FILE ${Sources})
     get_filename_component(PARENT_DIR "${FILE}" DIRECTORY)
     string(REPLACE "${CMAKE_CURRENT_SOURCE_DIR}" "" GROUP "${PARENT_DIR}")
 
