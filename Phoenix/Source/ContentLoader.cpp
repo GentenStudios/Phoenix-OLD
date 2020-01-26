@@ -40,7 +40,7 @@ Mod::Mod(std::string modName) : name(std::move(modName))
 	fileStream.open("Modules/" + name + "/Dependencies.txt");
 	if(!fileStream.is_open()){
 		std::cout << "Couldnt find dependencies file for mod: " << name << "\n";
-		return;	
+		return;
 	}
 	while (fileStream.peek() != EOF)
 	{
@@ -51,9 +51,7 @@ Mod::Mod(std::string modName) : name(std::move(modName))
 	fileStream.close();
 };
 
-Mod::~Mod() {};
-
-bool modules::loadModules(std::string save, sol::state& lua)
+bool ContentManager::loadModules(const std::string& save, sol::state& lua)
 {
 	std::fstream fileStream;
 	std::queue<Mod> toLoad; // A queue of mods that need loaded
@@ -61,7 +59,7 @@ bool modules::loadModules(std::string save, sol::state& lua)
 	fileStream.open("Save/" + save + "/Mods.txt");
 	if(!fileStream.is_open()){
 		std::cout << "Error opening save file";
-		return false;	
+		return false;
 	}
 	int i = 0;
 	while (fileStream.peek() != EOF)
@@ -103,6 +101,7 @@ bool modules::loadModules(std::string save, sol::state& lua)
 			// list Otherwise, move mod to back of load queue
 			if (satisfied)
 			{
+				m_currentMod = mod.name;
 				lua.script_file("Modules/" + mod.name + "/Init.lua");
 				loadedMods.push_back(mod.name);
 			}
@@ -138,23 +137,83 @@ bool modules::loadModules(std::string save, sol::state& lua)
 
 //TODO: replace this with an API registration system
 #include <Phoenix/Settings.hpp>
+#include <Phoenix/Commander.hpp>
+#include <Phoenix/Voxels/BlockRegistry.hpp>
+#include <array>
 
-void luaapi::loadAPI(sol::state& lua){
+void ContentManager::loadAPI(sol::state& lua, ImGui::BasicTerminal& chat){
     lua["core"] = lua.create_table();
+	lua["core"]["print"] = [&chat](std::string text)
+		{
+			chat.cout << text << "\n";
+		};
+
     lua["core"]["setting"] = lua.create_table();
-    lua["core"]["setting"]["register"] = 
+    lua["core"]["setting"]["register"] =
 		[](std::string displayName, std::string key, int defaultValue)
 		{
 			Settings::get()->add(displayName, key, defaultValue);
 		};
-    lua["core"]["setting"]["get"] = 
+    lua["core"]["setting"]["get"] =
 		[](std::string key)
 		{
-			return Settings::get()->getSetting(key)->value(); 
+			return Settings::get()->getSetting(key)->value();
 		};
 	lua["core"]["setting"]["set"] =
 		[](std::string key, int value)
 		{
-			Settings::get()->getSetting(key)->set(value); 
+			Settings::get()->getSetting(key)->set(value);
+		};
+	lua["core"]["command"] = lua.create_table();
+	lua["core"]["command"]["register"] =
+		[](std::string command, std::string help, sol::function f)
+		{
+			CommandBook::get()->add(command, help, "all", f);
+		};
+	lua["voxel"] = lua.create_table();
+	lua["voxel"]["block"] = lua.create_table();
+	lua["voxel"]["block"]["register"] =
+		[](sol::table luaBlock)
+		{
+			using namespace phx::voxels;
+			BlockType block;
+			{
+				block.displayName = luaBlock["name"];
+				block.id          = luaBlock["id"];
+
+				if(luaBlock["category"] == "Air"){
+					block.category    = BlockCategory::AIR;
+				} else if (luaBlock["category"] == "Liquid") {
+					block.category    = BlockCategory::LIQUID;
+				} else {
+					block.category    = BlockCategory::SOLID;
+				}
+
+				if(luaBlock["onPlace"]){
+					block.onPlace = luaBlock["onPlace"];
+				}
+
+				if(luaBlock["onBreak"]){
+					block.onPlace = luaBlock["onPlace"];
+				}
+
+				if(luaBlock["onInteract"]){
+					block.onPlace = luaBlock["onPlace"];
+				}
+
+				std::array<std::string, 6> textures;
+				for(int i = 0; i < 6; i++){
+					std::string texture = luaBlock["textures"][i+1];
+					if (texture.size() == 0){
+						//If a texture is not supplied, we use the first texture in its place
+						texture = luaBlock["textures"][1];
+					}
+					textures[i] = "Modules/" + m_currentMod + "/" + texture;
+				}
+				block.textures = textures;
+			}
+			BlockRegistry::get()->registerBlock(block);
 		};
 }
+
+std::string ContentManager::m_currentMod = "";

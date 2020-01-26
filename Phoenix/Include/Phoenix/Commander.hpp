@@ -40,7 +40,8 @@
 #include <Phoenix/Singleton.hpp>
 
 #include <functional>
-#include <iostream>
+#include <ostream>
+#include <istream>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -54,7 +55,7 @@ namespace phx
 	 * similar to how programs are called from the terminal.
 	 *
 	 */
-	typedef std::function<void(std::vector<std::string> args)> commandFunction;
+	typedef std::function<void(std::vector<std::string> args)> CommandFunction;
 
 	/**
 	 * @brief The command book stores commands and information on them to be
@@ -66,16 +67,18 @@ namespace phx
 		std::vector<std::string>     m_command;
 		std::vector<std::string>     m_help;
 		std::vector<std::string>     m_permission;
-		std::vector<commandFunction> m_functions;
+		std::vector<CommandFunction> m_functions;
 
 		/**
 		 * @brief Registers a command in the command registry
 		 *
 		 * @param command The keyword for calling the command
+		 * @param help A help string that can be displayed to the user
 		 * @param permission What permission is required to run this command
+		 * @param f The function that is called when the command is executed
 		 */
 		void add(const std::string& command, const std::string& help,
-		         const std::string& permission, commandFunction f);
+		         const std::string& permission, CommandFunction f);
 
 		/**
 		 * @brief Searches for a command
@@ -94,7 +97,7 @@ namespace phx
 
 	private:
 		/**
-		 * @brief Counter that keep track of next space in the arrays (eg
+		 * @brief Counter that keeps track of next space in the arrays (eg
 		 * next page in the book)
 		 */
 		int m_page;
@@ -108,15 +111,12 @@ namespace phx
 	 */
 	class Commander
 	{
-	private:
-		CommandBook* m_book;
-
 	public:
 		/**
 		 * @brief Initializes a commander that can run and execute commands
 		 */
 		Commander();
-		~Commander();
+		~Commander() = default;
 
 		/**
 		 * @brief Calls a command
@@ -128,8 +128,8 @@ namespace phx
 		 * @return Returns True if the function was called and False if the
 		 * function could not be found
 		 */
-		bool run(const std::string&               command,
-		         const std::vector<std::string>&& args, std::ostream& out);
+		bool run(const std::string&                              command,
+		         const std::vector<std::string>& args, std::ostream& out);
 
 		/**
 		 * @brief Returns helpstring for command
@@ -140,7 +140,7 @@ namespace phx
 		 * @return Returns True if successful and False if it could not find
 		 * the innputted command
 		 */
-		bool help(const std::vector<std::string>&& args, std::ostream& out);
+		bool help(const std::vector<std::string>& args, std::ostream& out);
 
 		/**
 		 * @brief Outputs a string listing available commands
@@ -168,5 +168,8 @@ namespace phx
 		 * @param out The output stream any output goes to
 		 */
 		void callback(const std::string& input, std::ostringstream& cout);
+
+	private:
+		CommandBook* m_book;
 	};
 } // namespace phx
