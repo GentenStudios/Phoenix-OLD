@@ -140,39 +140,193 @@ bool ContentManager::loadModules(const std::string& save, sol::state& lua)
 #include <Phoenix/Commander.hpp>
 #include <Phoenix/Voxels/BlockRegistry.hpp>
 #include <array>
+#include <map>
 
 void ContentManager::loadAPI(sol::state& lua, ImGui::BasicTerminal& chat){
+	/**
+	 * @defgroup luaapi Lua API
+	 * 
+	 * The lua API is . . . 
+	 * 
+	 * @tableofcontents
+	 * 
+	 */
     lua["core"] = lua.create_table();
-	lua["core"]["print"] = [&chat](std::string text)
+		/**
+		 * @addtogroup luaapi
+		 * 
+		 * ---
+		 * ---
+		 * @section core core
+		 * @brief The core API for interacting with Quartz
+		 */
+	lua["core"]["print"] = 
+		/**
+		 * @addtogroup luaapi
+		 * 
+		 * @subsubsection coreprint core.print(text)
+		 * @brief Prints text to the players terminal
+		 * 
+		 * @param text The text to be outputted to the terminal
+		 * 
+		 */
+		[&chat](std::string text)
 		{
 			chat.cout << text << "\n";
 		};
-
     lua["core"]["setting"] = lua.create_table();
-    lua["core"]["setting"]["register"] =
+		/**
+		 * @addtogroup luaapi
+		 * 
+		 * ---
+		 * @subsection coreset core.setting
+		 * @brief Interfaces with the settings system
+		 */
+    lua["core"]["setting"]["register"] = 
+		/**
+		 * @addtogroup luaapi
+		 * 
+		 * @subsubsection coresetreg core.setting.register(displayName, key, defaultValue)
+		 * @brief Registers a setting that the player can adjust via the settings menu
+		 * 
+		 * @param displayName The Display name for the setting seen in the settings menu
+		 * @param key The unique key for the setting, usually in the form module:setting
+		 * @param defaultValue The default value for the setting if not already set
+		 * 
+		 */
 		[](std::string displayName, std::string key, int defaultValue)
 		{
 			Settings::get()->add(displayName, key, defaultValue);
 		};
-    lua["core"]["setting"]["get"] =
+    lua["core"]["setting"]["get"] = 
+		/**
+		 * @addtogroup luaapi
+		 * 
+		 * @subsubsection coresetget core.setting.get(key)
+		 * @brief Gets the value of a setting based on its unique key
+		 * 
+		 * @param key The unique key for the setting, usually in the form module:setting
+		 * @return The integer value of the setting
+		 * 
+		 */
 		[](std::string key)
 		{
 			return Settings::get()->getSetting(key)->value();
 		};
 	lua["core"]["setting"]["set"] =
+		/**
+		 * @addtogroup luaapi
+		 * 
+		 * @subsubsection coresetset core.setting.set(key)
+		 * @brief Sets the value of a setting based on its unique key
+		 * 
+		 * @param key The unique key for the setting, usually in the form module:setting
+		 * @param value The value the setting should be set to
+		 * 
+		 */
 		[](std::string key, int value)
 		{
 			Settings::get()->getSetting(key)->set(value);
 		};
-	lua["core"]["command"] = lua.create_table();
+	lua["core"]["command"] = 
+		/**
+		 * @addtogroup luaapi
+		 * 
+		 * ---
+		 * @subsection corecmd core.command
+		 * @brief Interfaces with the commander
+		 * 
+		 */
+		lua.create_table();
 	lua["core"]["command"]["register"] =
+		/**
+		 * @addtogroup luaapi
+		 * 
+		 * @subsubsection corecmdreg core.command.register
+		 * @brief Registers a new command
+		 * 
+		 * In the terminal typing "/" followed by a command will execute the command
+		 * 
+		 * @param command The command to register
+		 * @param help A helpstring that is printed to terminal when typing "/help <command>"
+		 * @param f The callback function that is called by the commander
+		 * The callback function must take a table as an argument
+		 * Any arguments included when the command is executed will be passed in this table
+		 * 
+		 * @b Example:
+		 * @code {.lua}
+		 * function hello (args)
+		 *     if args[1] == "there" then
+		 *         print("General Kenobi")
+		 *	   elseif args[1] == "world" then
+		 * 		   print("World says hi")
+		 *	   else
+		 *         print("with you, the force is not")
+		 *     end
+		 * end
+		 * core.command.register("Hello", "Master the arts of the Jedi you must", hello)
+		 * @endcode
+		 */
 		[](std::string command, std::string help, sol::function f)
 		{
 			CommandBook::get()->add(command, help, "all", f);
 		};
 	lua["voxel"] = lua.create_table();
+		/**
+		 * @addtogroup luaapi
+		 * 
+		 * ---
+		 * ---
+		 * @section voxel voxel
+		 * @brief The voxel API for interacting voxels
+		 */
 	lua["voxel"]["block"] = lua.create_table();
+		/**
+		 * @addtogroup luaapi
+		 * 
+		 * ---
+		 * @subsection voxelblock voxel.block
+		 * @brief Interfaces with blocks
+		 */
 	lua["voxel"]["block"]["register"] =
+		/**
+		 * @addtogroup luaapi
+		 * 
+		 * @subsubsection voxelblockreg voxel.block.register(luaBlock)
+		 * @brief Sets the value of a setting based on its unique key
+		 * 
+		 * @param luaBlock a table storing the data used to create a block
+		 * 
+		 * @details The luaBlock table stores the following values: \n
+		 * Required:
+		 * - @b name: The display name for the block
+		 * - @b id: The unique id for the block usually in the form module:block
+		 * 
+		 * Optional:
+		 * - @b category: The category of the block chosen from "Air", "liquid", or "Solid" \n
+		 * 			   If not specified, the default is "Solid"
+		 * - @b onPlace: A function that is run when the block is placed
+		 * - @b onBreak: A function that is run when the block is broken
+		 * - @b onInteract: A function that is run when the block is interacted with
+		 * - @b textures: A table of filepaths where textures are located \n
+		 * 			   Filepaths are relative to to the module directory \n
+		 * 			   If only one filepath is specified, that will be used for all textures
+		 * 
+		 * @b Example:
+		 * 
+		 * @code {.lua}
+		 * block = {}
+		 * block.name = "Grass"
+		 * block.id = "core:grass"
+		 * block.textures = {"Assets/grass_side.png", "Assets/grass_side.png",
+		 * "Assets/grass_side.png", "Assets/grass_side.png",
+		 * "Assets/grass_top.png",  "Assets/dirt.png"}
+		 * block.onBreak = function (position)
+		 * 	print("grass broken at" + position)
+		 * end
+		 * voxel.block.register(block)
+		 * @endcode
+		 */
 		[](sol::table luaBlock)
 		{
 			using namespace phx::voxels;
