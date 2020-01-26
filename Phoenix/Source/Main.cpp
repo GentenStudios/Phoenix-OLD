@@ -29,13 +29,11 @@
 #include <Phoenix/Commander.hpp>
 #include <Phoenix/ContentLoader.hpp>
 #include <Phoenix/Graphics/Camera.hpp>
-#include <Phoenix/Graphics/ChunkMesher.hpp>
-#include <Phoenix/Graphics/ChunkRenderer.hpp>
 #include <Phoenix/Graphics/Window.hpp>
 #include <Phoenix/ImGuiHelpers.hpp>
 #include <Phoenix/Settings.hpp>
 #include <Phoenix/Voxels/BlockRegistry.hpp>
-#include <Phoenix/Voxels/Chunk.hpp>
+#include <Phoenix/Voxels/ChunkManager.hpp>
 
 #include <Phoenix/UI.hpp>
 
@@ -120,31 +118,16 @@ public:
 
 		Settings::get()->load();
 
-		phx::gfx::ChunkRenderer renderer(100);
-		renderer.buildTextureArray();
-
-		for (int j = 0; j < 10; ++j)
-		{
-			for (int i = 0; i < 10; ++i)
-			{
-				phx::voxels::Chunk chunk({i * 16, 0, j * 16});
-				chunk.autoTestFill();
-				phx::gfx::ChunkMesher mesher(chunk.getChunkPos(),
-				                             chunk.getBlocks(),
-				                             renderer.getTextureTable());
-				mesher.mesh();
-				renderer.submitChunkMesh(mesher.getMesh(), i + (j * 10));
-			}
-		}
-
-		phx::gfx::ShaderPipeline shaderPipeline;
+		gfx::ShaderPipeline shaderPipeline;
 		shaderPipeline.prepare("Assets/SimpleWorld.vert",
 		                       "Assets/SimpleWorld.frag",
-		                       renderer.getRequiredShaderLayout());
+		                       gfx::ChunkRenderer::getRequiredShaderLayout());
+
+		voxels::ChunkManager world(1);
 
 		shaderPipeline.activate();
 
-		phx::math::mat4 model;
+		math::mat4 model;
 		shaderPipeline.setMatrix("u_model", model);
 
 		static bool wireframe = false;
@@ -160,6 +143,7 @@ public:
 			m_window->startFrame();
 
 			m_camera->tick(dt);
+			world.tick(m_camera->getPosition());
 
 			{
 				ImGuiIO& io         = ImGui::GetIO();
@@ -209,7 +193,7 @@ public:
 			shaderPipeline.setMatrix("u_view", m_camera->calculateViewMatrix());
 			shaderPipeline.setMatrix("u_projection", m_camera->getProjection());
 
-			renderer.render();
+			world.render();
 
 			m_window->endFrame();
 		}

@@ -77,9 +77,13 @@ ChunkRenderer::ChunkRenderer(std::size_t visibleChunks)
 	glEnableVertexAttribArray(m_vertexAttributeLocation);
 	glEnableVertexAttribArray(m_uvAttributeLocation);
 
+	m_multiDrawStarts.reserve(visibleChunks);
+	m_multiDrawCounts.reserve(visibleChunks);
+
 	for (int i = 0; i < visibleChunks; ++i)
 	{
-		m_bigBufferLocations.push_back(i);
+		m_multiDrawStarts.push_back(0);
+		m_multiDrawCounts.push_back(0);
 	}
 }
 
@@ -144,7 +148,6 @@ const ChunkRenderer::AssociativeTextureTable& ChunkRenderer::getTextureTable()
 ChunkRenderer::MeshIdentifier ChunkRenderer::submitChunkMesh(
     const std::vector<float>& mesh, MeshIdentifier slot)
 {
-	
 	glBindVertexArray(m_vao);
 	glBindBuffer(GL_ARRAY_BUFFER, m_buffer);
 	glBufferSubData(GL_ARRAY_BUFFER, sizeof(Vertex) * 36 * 16 * 16 * 16 * slot,
@@ -152,10 +155,19 @@ ChunkRenderer::MeshIdentifier ChunkRenderer::submitChunkMesh(
 
 	glBindVertexArray(0);
 
-	m_multiDrawStarts.push_back(36 * 16 * 16 * 16 * slot);
-	m_multiDrawCounts.push_back(static_cast<GLsizei>(mesh.size()));
+	m_multiDrawStarts[slot] = (36 * 16 * 16 * 16 * slot);
+	m_multiDrawCounts[slot] = (static_cast<GLsizei>(mesh.size()));
 
 	return 1;
+}
+
+void ChunkRenderer::invalidateSlot(MeshIdentifier slot)
+{
+	m_multiDrawStarts.erase(m_multiDrawStarts.begin() + slot);
+	m_multiDrawCounts.erase(m_multiDrawCounts.begin() + slot);
+
+	m_multiDrawStarts.push_back(0);
+	m_multiDrawCounts.push_back(0);
 }
 
 void ChunkRenderer::render()

@@ -111,39 +111,42 @@ namespace phx
 				}
 
 				/**
-				 * @brief Create a Vector3 from a flattened cube number and cube side length
-				 * 
+				 * @brief Create a Vector3 from a flattened cube number and cube
+				 * side length
+				 *
 				 * @tparam X Flattened cube number
 				 * @tparam Len Cube side length
 				 */
 				template <typename X, typename Len>
-				constexpr explicit Vector3(X val, Len len )
+				constexpr explicit Vector3(X val, Len len)
 				{
 					z = static_cast<T>((val / (len * len)));
-					y = static_cast<T>((val - (z * len * len))/ len);
+					y = static_cast<T>((val - (z * len * len)) / len);
 					x = static_cast<T>((val - len * (y + (len * z))));
 				}
-				
+
 				/**
-				 * @brief Flattens a Vector3 representing a coordinate in a 
+				 * @brief Flattens a Vector3 representing a coordinate in a
 				 * rectangle into a single value
-				 * 
+				 *
 				 * @param lenX Length of side X in rectangle
 				 * @param lenY Length of side Y in rectangle
 				 * @return constexpr Flattened position
 				 */
-				constexpr ValueType flatten(ValueType lenX, ValueType lenY){
+				constexpr ValueType flatten(ValueType lenX, ValueType lenY)
+				{
 					return x + lenX * (y + lenY * z);
 				}
 
 				/**
-				 * @brief Flattens a Vector3 representing a coordinate in a 
+				 * @brief Flattens a Vector3 representing a coordinate in a
 				 * square into a single value
-				 * 
+				 *
 				 * @param len Length of a side in the square
 				 * @return constexpr Flattened position
 				 */
-				constexpr ValueType flatten(ValueType len){
+				constexpr ValueType flatten(ValueType len)
+				{
 					return x + len * (y + len * z);
 				}
 
@@ -174,17 +177,18 @@ namespace phx
 					const float magnitude = std::sqrt(dotProduct(vec, vec));
 
 					return Vector3(vec.x / magnitude, vec.y / magnitude,
-					             vec.z / magnitude);
+					               vec.z / magnitude);
 				}
 
 				static Vector3 cross(const Vector3& vec1, const Vector3& vec2)
 				{
 					return Vector3(vec1.y * vec2.z - vec1.z * vec2.y,
-					             vec1.z * vec2.x - vec1.x * vec2.z,
-					             vec1.x * vec2.y - vec1.y * vec2.x);
+					               vec1.z * vec2.x - vec1.x * vec2.z,
+					               vec1.x * vec2.y - vec1.y * vec2.x);
 				}
 
-				static float dotProduct(const Vector3& vec1, const Vector3& vec2)
+				static float dotProduct(const Vector3& vec1,
+				                        const Vector3& vec2)
 				{
 					return vec1.x * vec2.x + vec1.y * vec2.y + vec1.z * vec2.z;
 				}
@@ -316,41 +320,67 @@ namespace phx
 					return result;
 				}
 
-				friend std::ostream& operator<<(std::ostream& os,
-				                                const Vector3&  vec)
+				friend std::ostream& operator<<(std::ostream&  os,
+				                                const Vector3& vec)
 				{
 					os << "(" << vec.x << ", " << vec.y << ", " << vec.z << ")";
 					return os;
 				}
 			};
 		} // namespace detail
-	}     // namespace math
-} // namespace q2
+
+		// Hasher to use when using Vector3 inside a hash map.
+		struct Vector3Hasher
+		{
+			template <typename T>
+			size_t operator()(const detail::Vector3<T>& k) const
+			{
+				return std::hash<int>()(k.x) ^ std::hash<int>()(k.y) ^ std::hash<int>()(k.z);
+			}
+
+		};
+
+		// 'KeyEqual' parameter to use when using Vector3 inside a hash map.
+		struct Vector3KeyComparator
+		{
+			template <typename T>
+			bool operator()(const detail::Vector3<T>& a,
+			                const detail::Vector3<T>& b) const
+			{
+				return a.x == b.x && a.y == b.y && a.z == b.z;
+			}
+		};
+	} // namespace math
+} // namespace phx
 
 template <typename T>
-phx::math::detail::Vector3<T> operator-(const phx::math::detail::Vector3<T>& left,
-                             const phx::math::detail::Vector3<T>& right)
+phx::math::detail::Vector3<T> operator-(
+    const phx::math::detail::Vector3<T>& left,
+    const phx::math::detail::Vector3<T>& right)
 {
 	return {left.x - right.x, left.y - right.y, left.z - right.z};
 }
 
 template <typename T>
-phx::math::detail::Vector3<T> operator+(const phx::math::detail::Vector3<T>& left,
-                             const phx::math::detail::Vector3<T>& right)
+phx::math::detail::Vector3<T> operator+(
+    const phx::math::detail::Vector3<T>& left,
+    const phx::math::detail::Vector3<T>& right)
 {
 	return {left.x + right.x, left.y + right.y, left.z + right.z};
 }
 
 template <typename T>
-phx::math::detail::Vector3<T> operator*(const phx::math::detail::Vector3<T>& left,
-                             const phx::math::detail::Vector3<T>& right)
+phx::math::detail::Vector3<T> operator*(
+    const phx::math::detail::Vector3<T>& left,
+    const phx::math::detail::Vector3<T>& right)
 {
 	return {left.x * right.x, left.y * right.y, left.z * right.z};
 }
 
 template <typename T>
-phx::math::detail::Vector3<T> operator/(const phx::math::detail::Vector3<T>& left,
-                             const phx::math::detail::Vector3<T>& right)
+phx::math::detail::Vector3<T> operator/(
+    const phx::math::detail::Vector3<T>& left,
+    const phx::math::detail::Vector3<T>& right)
 {
 	return {left.x / right.x, left.y / right.y, left.z / right.z};
 }

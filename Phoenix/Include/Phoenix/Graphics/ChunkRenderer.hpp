@@ -58,7 +58,7 @@ namespace phx
 			ChunkRenderer(std::size_t visibleChunks);
 			~ChunkRenderer();
 
-			std::vector<ShaderLayout> getRequiredShaderLayout();
+			static std::vector<ShaderLayout> getRequiredShaderLayout();
 
 			void                           buildTextureArray();
 			const AssociativeTextureTable& getTextureTable() const;
@@ -66,6 +66,8 @@ namespace phx
 			// returns unique chunk mesh id. Used to set the render list.
 			MeshIdentifier submitChunkMesh(const std::vector<float>& mesh,
 			                               MeshIdentifier            slot);
+
+			void invalidateSlot(MeshIdentifier slot);
 
 			void render();
 
@@ -78,13 +80,11 @@ namespace phx
 
 			const int m_vertexAttributeLocation   = 0;
 			const int m_uvAttributeLocation       = 1;
-			const int m_texLayerAttributeLocation = 2;
 
 			AssociativeTextureTable m_textureTable;
 
 			std::vector<int>     m_multiDrawStarts;
 			std::vector<GLsizei> m_multiDrawCounts;
-			std::vector<int>     m_bigBufferLocations;
 		};
 	} // namespace gfx
 } // namespace q2
