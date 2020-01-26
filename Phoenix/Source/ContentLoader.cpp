@@ -257,13 +257,13 @@ void ContentManager::loadAPI(sol::state& lua, ImGui::BasicTerminal& chat){
 		 * @code {.lua}
 		 * function hello (args)
 		 *     if args[1] == "there" then
-         *         print("General Kenobi")
-    	 *	   elseif args[1] == "world" then
-         * 		   print("World says hi")
-    	 *	   else
-         *         print("with you, the force is not")
-         *     end
-         * end
+		 *         print("General Kenobi")
+		 *	   elseif args[1] == "world" then
+		 * 		   print("World says hi")
+		 *	   else
+		 *         print("with you, the force is not")
+		 *     end
+		 * end
          * core.command.register("Hello", "Master the arts of the Jedi you must", hello)
 		 * @endcode
 		 */
