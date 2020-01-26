@@ -18,12 +18,9 @@ set(Headers
 	${currentDir}/ContentLoader.hpp
 	${currentDir}/Settings.hpp
 	${currentDir}/UI.hpp
-<<<<<<< HEAD
 	${currentDir}/Player.hpp
 	${currentDir}/Actor.hpp
-=======
 	${currentDir}/Commander.hpp
->>>>>>> b56ecfc282529ad650aa88ea04eb0c9e800eb6b0
 
 	PARENT_SCOPE
 )

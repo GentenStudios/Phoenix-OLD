@@ -99,8 +99,8 @@ void FPSCamera::tick(float dt)
 	const math::vec3 right = {std::sin(m_rotation.x - math::PIDIV2), 0.f,
 	                          std::cos(m_rotation.x - math::PIDIV2)};
 
-	const math::vec3 z = {std::sin(m_rotation.z - math::PIDIV2), 0.f,
-	                          std::cos(m_rotation.z - math::PIDIV2)};
+	const math::vec3 forward = {std::sin(m_rotation.x), 0.f,
+	                          std::cos(m_rotation.x)};
 
 	m_up = math::vec3::cross(right, m_direction);
 
@@ -108,11 +108,11 @@ void FPSCamera::tick(float dt)
 
 	if (m_window->isKeyDown(events::Keys::KEY_W))
 	{
-		m_position += z * dt * moveSpeed;
+		m_position += forward * dt * moveSpeed;
 	}
 	else if (m_window->isKeyDown(events::Keys::KEY_S))
 	{
-		m_position -= z * dt * moveSpeed;
+		m_position -= forward * dt * moveSpeed;
 	}
 
 	if (m_window->isKeyDown(events::Keys::KEY_A))
