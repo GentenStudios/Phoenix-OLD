@@ -29,9 +29,9 @@
 /**
  * @file ContentLoader.hpp
  * @brief Implements Lua module loading system.
- * 
+ *
  * @copyright Copyright (c) 2020 Genten Studios
- * 
+ *
  */
 
 #pragma once
@@ -59,34 +59,29 @@ namespace phx
 		~Mod();
 	};
 
-	// clang-format off
-    // modules needs to stay lowercase as it's just to namespace.
-    // apparently we can't have a namespaced function prototype in a header
-    // (beep + sonos 08/12/2019)
-    struct modules
-	// clang-format on
+	namespace modules
 	{
 		/**
 		 * @brief Loads necessary lua modules required to load a save file
-		 * 
+		 *
 		 * @param save The save file to be loaded
 		 * @param lua The sol state used during runtime
 		 * @return true If the function successfully loaded all modules
 		 * @return false If the function failed to load modules, details will
 		 *         be outputted to the terminal
-		 * 
+		 *
 		 */
-		static bool loadModules(std::string save, sol::state& lua);
+		bool loadModules(std::string save, sol::state& lua);
 		//TODO : Add proper error handling instead of returning a boolean
 	};
 
-	struct luaapi
+	namespace luaapi
 	{
 		/**
 		 * @brief Loads the Lua API for use in modules
-		 * 
+		 *
 		 * @param lua The sol state used during runtime
 		 */
-        static void loadAPI(sol::state& lua);
-    };
+		void loadAPI(sol::state& lua);
+	};
 }; // namespace q2
