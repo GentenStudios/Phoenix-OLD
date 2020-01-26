@@ -264,7 +264,7 @@ void ContentManager::loadAPI(sol::state& lua, ImGui::BasicTerminal& chat){
 		 *         print("with you, the force is not")
 		 *     end
 		 * end
-         * core.command.register("Hello", "Master the arts of the Jedi you must", hello)
+		 * core.command.register("Hello", "Master the arts of the Jedi you must", hello)
 		 * @endcode
 		 */
 		[](std::string command, std::string help, sol::function f)
