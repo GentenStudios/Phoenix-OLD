@@ -34,6 +34,7 @@
 #include <Phoenix/Settings.hpp>
 #include <Phoenix/Voxels/BlockRegistry.hpp>
 #include <Phoenix/Voxels/ChunkManager.hpp>
+#include <Phoenix/Player.hpp>
 
 #include <Phoenix/UI.hpp>
 
@@ -62,7 +63,9 @@ public:
 		m_window = new gfx::Window("Phoenix Game!", 1280, 720);
 		m_window->registerEventListener(this);
 
-		m_camera = new gfx::FPSCamera(m_window);
+
+		m_player = Player();
+		m_camera = new gfx::FPSCamera(m_window, &m_player);
 
 		chat.registerCallback(&rawEcho);
 	}
@@ -88,6 +91,19 @@ public:
 				break;
 			}
 			break;
+
+		case events::EventType::MOUSE_BUTTON_PRESSED:
+			switch (e.mouse.button)
+			{
+			case events::MouseButtons::LEFT:
+				m_player.action1();
+
+			case events::MouseButtons::RIGHT:
+				m_player.action2();
+			
+			default:
+				break;
+			}
 
 		default:
 			break;
@@ -138,6 +154,8 @@ public:
 		voxels::ChunkManager world(
 		    voxels::BlockRegistry::get()->getFromID("core:grass"), 1234);
 
+		//m_player.m_world = &world;
+
 		phx::gfx::ShaderPipeline shaderPipeline;
 		shaderPipeline.prepare("Assets/SimpleWorld.vert",
 		                       "Assets/SimpleWorld.frag",
@@ -153,7 +171,7 @@ public:
 		static int        prevSens;
 		static math::vec3 lastPos;
 
-		//m_window->setVSync(true);
+		m_window->setVSync(true);
 		
 		float last = static_cast<float>(SDL_GetTicks());
 		while (m_window->isRunning())
@@ -201,7 +219,7 @@ public:
 
 			ImGui::Checkbox("Follow Camera", &followCamera);
 			if (followCamera)
-				lastPos = m_camera->getPosition();
+				lastPos = m_player.getPosition();
 			
 			static Setting* sensSetting =
 			    Settings::get()->getSetting("camera:sensitivity");
@@ -212,6 +230,11 @@ public:
 				prevSens = sens;
 				sensSetting->set(sens);
 			}
+			
+			ImGui::Text("X: %f\nY: %f\nZ: %f",
+						m_player.getPosition().x,
+						m_player.getPosition().y,
+						m_player.getPosition().z);
 			ImGui::End();
 
 			chat.draw();
@@ -233,6 +256,7 @@ public:
 private:
 	gfx::Window*    m_window;
 	gfx::FPSCamera* m_camera;
+	Player          m_player;
 };
 
 #undef main

@@ -52,7 +52,7 @@ namespace phx
 		class FPSCamera
 		{
 		public:
-			explicit FPSCamera(Window* window);
+			explicit FPSCamera(Window* window, Actor* actor);
 
 			math::vec3 getPosition() const;
 			math::vec3 getDirection() const;

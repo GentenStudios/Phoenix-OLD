@@ -33,7 +33,7 @@
 using namespace phx;
 using namespace gfx;
 
-FPSCamera::FPSCamera(Window* window)
+FPSCamera::FPSCamera(Window* window, Actor* actor)
 {
 	m_window = window;
 	m_window->setCursorState(CursorState::DISABLED);
@@ -45,8 +45,7 @@ FPSCamera::FPSCamera(Window* window)
 	m_windowCentre = {std::floor(windowSize.x / 2.f),
 	                  std::floor(windowSize.y / 2.f)};
 	//TODO: When the actor system has a registry, get player from there instead
-	static Player player = Player();
-	m_actor = &player;
+	m_actor = actor;
 
 	m_settingSensitivity =
 	    Settings::get()->add("Sensitivity", "camera:sensitivity", 5);

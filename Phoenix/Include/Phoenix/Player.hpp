@@ -29,6 +29,7 @@
 #pragma once
 
 #include <Phoenix/Actor.hpp>
+#include <Phoenix/Voxels/ChunkManager.hpp>
 
 namespace phx
 {
@@ -43,5 +44,13 @@ namespace phx
 
     public:
         math::vec3 getTarget();
+
+        bool action1();
+        bool action2();
+
+    //private: proof of concept, dont merge
+        voxels::ChunkManager* m_world;
+    private:
+        float m_reach = 32.f;
     };
 };

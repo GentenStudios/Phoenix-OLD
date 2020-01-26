@@ -30,27 +30,40 @@
 #include <Phoenix/Voxels/Block.hpp>
 #include <Phoenix/Math/Ray.hpp>
 #include <Phoenix/Math/Math.hpp>
+#include <Phoenix/Voxels/BlockRegistry.hpp>
+#include <iostream>
 
 using namespace phx;
 
 math::vec3 Player::getTarget(){
-    const float MAX_PICKING_DISTANCE = 32.f;
 	const float RAY_INCREMENT = 0.5f;
 
     math::vec3 pos = (getPosition() / 2.f) + .5f;
 
     Ray ray(pos, getDirection());
 
-    while (ray.getLength() < MAX_PICKING_DISTANCE)
+    while (ray.getLength() < m_reach)
     {
         pos.floor();
 
-        //if (m_world->getBlockAt(pos).getBlockType() == BlockCategory::SOLID)
+        if (m_world->getBlockAt(pos)->category == voxels::BlockCategory::SOLID)
         {
             return pos;
         }
 
         pos = ray.advance(RAY_INCREMENT);
     }
+    return getPosition();
 }
 
+bool Player::action1(){
+    std::cout << "action 1\n";
+    m_world->setBlockAt(getTarget(), voxels::BlockRegistry::get()->getFromID("core:air"));
+    return true;
+}
+
+bool Player::action2(){
+    std::cout << "action 2\n";
+    m_world->setBlockAt(getTarget(), voxels::BlockRegistry::get()->getFromID("core:air"));
+    return true;
+}
