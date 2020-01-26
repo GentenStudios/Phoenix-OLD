@@ -111,11 +111,10 @@ Using `find_package(Filesystem)` with component argument(s):
 
 #]=======================================================================]
 
-
-if(TARGET std::filesystem)
-    # This module has already been processed. Don't do it again.
-    return()
-endif()
+# if(TARGET std::filesystem)
+#     # This module has already been processed. Don't do it again.
+#     return()
+# endif()
 
 include(CMakePushCheckState)
 include(CheckIncludeFileCXX)
@@ -219,16 +218,17 @@ if(CXX_FILESYSTEM_HAVE_FS)
     endif()
 
     if(can_link)
-        target_compile_features(std::filesystem INTERFACE cxx_std_17)
-        set(_found TRUE)
+				# implied if using std::filesystem to begin with
+				#target_compile_features(std::filesystem INTERFACE cxx_std_17)
+				set(_found TRUE)
 
-        if(CXX_FILESYSTEM_NO_LINK_NEEDED)
-            # Nothing to add...
-        elseif(CXX_FILESYSTEM_STDCPPFS_NEEDED)
-            target_link_libraries(std::filesystem INTERFACE -lstdc++fs)
-        elseif(CXX_FILESYSTEM_CPPFS_NEEDED)
-            target_link_libraries(std::filesystem INTERFACE -lc++fs)
-        endif()
+				if(CXX_FILESYSTEM_NO_LINK_NEEDED)
+						# Nothing to add...
+				elseif(CXX_FILESYSTEM_STDCPPFS_NEEDED)
+						target_link_libraries(std::filesystem INTERFACE -lstdc++fs)
+				elseif(CXX_FILESYSTEM_CPPFS_NEEDED)
+						target_link_libraries(std::filesystem INTERFACE -lc++fs)
+				endif()
     endif()
 endif()
 
