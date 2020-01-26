@@ -1,10 +1,15 @@
 project(Engine)
 
+if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+  execute_process(COMMAND xcodebuild -version OUTPUT_VARIABLE xver)
+	message(STATUS "${xver}")
+endif()
+
 add_subdirectory(ThirdParty)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_LIST_DIR}/Tools/CMake")
 
-# required to hook the exported std::filesystem interface. 
+# required to hook the exported std::filesystem interface.
 add_library(std::filesystem INTERFACE IMPORTED GLOBAL)
 find_package(Filesystem REQUIRED COMPONENTS Final Experimental)
 
