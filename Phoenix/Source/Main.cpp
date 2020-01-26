@@ -59,12 +59,15 @@ static ui::ChatWindow chat("Chat Window", 5,
 // most functional solution without importing another library to use intead of
 // std::filesystem on all other systems. When Apple stops performing security
 // updates for OSX 10.14 (Sometime in 2022?) we will delete this and just use
-// the std::filesystem code inline where the function exists. 
+// the std::filesystem code inline where the function exists.
 // - @sonosfuer (Austin)
+//
+// Note from M3TIOR:
+// TODO: consider sanitizing for file delimeters if users can access `save`
 #if defined(__cpp_lib_filesystem)
 #	include <filesystem>
-	void initFiles(std::string save) 
-	{ 
+	static void initFiles(std::string save)
+	{
 		if (!std::filesystem::exists("Save")){
 			std::filesystem::create_directory("Save");
 		}
@@ -77,20 +80,34 @@ static ui::ChatWindow chat("Chat Window", 5,
 
 	}
 #else
-#	include <sys/stat.h> 
-	void initFiles(std::string save)
+#	include <sys/stat.h>
+	static void initFiles(std::string save)
 	{
 		std::ofstream saveFile;
-		saveFile.open("Save/" + save + "/mods.txt");
-		if(saveFile != NULL){
+		save = "Save/" + save + "/mods.txt"; // reused fine for now.
+		saveFile.open(save);
+
+		if (saveFile.is_open()) { saveFile.close(); }
+		else
+		{
+			std::string sp;
+			size_t delimeter = 0;
+
+			//just loop through the leading elements for now.
+			while ((delimeter = save.find('/', delimeter+1)) != std::string::npos)
+			{
+				// Shis way the string isn't deconstructed until the loop ends and
+				// the mkdir funciton doesn't execute on an invalid string as well.
+				sp = save.substr(0, delimeter);
+
+				// S_IRWXU is all flags for Current User
+				// S_IRWXO is all flags for Other Users
+				// S_IRWXG is all flags for the associated Unix Group
+				mkdir(sp.c_str(), S_IRWXO | S_IRWXG | S_IRWXU);
+			}
+
+			saveFile.open(save);
 			saveFile.close();
-			return;
-		} else {
-			mkdir("Save", S_IRWXO);
-			mkdir("Save/" + save, S_IRWXO);
-			saveFile.open("Save/" + save + "/mods.txt");
-			saveFile.close();
-			return;
 		}
 	}
 #endif
