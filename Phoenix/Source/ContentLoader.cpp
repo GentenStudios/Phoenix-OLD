@@ -40,7 +40,7 @@ Mod::Mod(std::string modName) : name(std::move(modName))
 	fileStream.open("Modules/" + name + "/Dependencies.txt");
 	if(!fileStream.is_open()){
 		std::cout << "Couldnt find dependencies file for mod: " << name << "\n";
-		return;	
+		return;
 	}
 	while (fileStream.peek() != EOF)
 	{
@@ -58,10 +58,10 @@ bool modules::loadModules(std::string save, sol::state& lua)
 	std::fstream fileStream;
 	std::queue<Mod> toLoad; // A queue of mods that need loaded
 
-	fileStream.open("Save/" + save + "/Mods.txt");
+	fileStream.open(std::string("Save/") + save + "/mods.txt");
 	if(!fileStream.is_open()){
 		std::cout << "Error opening save file";
-		return false;	
+		return false;
 	}
 	int i = 0;
 	while (fileStream.peek() != EOF)
@@ -142,19 +142,19 @@ bool modules::loadModules(std::string save, sol::state& lua)
 void luaapi::loadAPI(sol::state& lua){
     lua["core"] = lua.create_table();
     lua["core"]["setting"] = lua.create_table();
-    lua["core"]["setting"]["register"] = 
+    lua["core"]["setting"]["register"] =
 		[](std::string displayName, std::string key, int defaultValue)
 		{
 			Settings::get()->add(displayName, key, defaultValue);
 		};
-    lua["core"]["setting"]["get"] = 
+    lua["core"]["setting"]["get"] =
 		[](std::string key)
 		{
-			return Settings::get()->getSetting(key)->value(); 
+			return Settings::get()->getSetting(key)->value();
 		};
 	lua["core"]["setting"]["set"] =
 		[](std::string key, int value)
 		{
-			Settings::get()->getSetting(key)->set(value); 
+			Settings::get()->getSetting(key)->set(value);
 		};
 }
