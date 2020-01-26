@@ -153,7 +153,7 @@ public:
 		static int        prevSens;
 		static math::vec3 lastPos;
 
-		m_window->setVSync(true);
+		//m_window->setVSync(true);
 		
 		float last = static_cast<float>(SDL_GetTicks());
 		while (m_window->isRunning())
