@@ -90,7 +90,16 @@ public:
 				break;
 			}
 			break;
-
+		case events::EventType::MOUSE_BUTTON_PRESSED:
+			switch (e.mouse.button)
+			{
+			case events::MouseButtons::LEFT:
+				std::cout << "left mosue button" << std::endl;
+				break;
+			default:
+				break;
+			}
+			break;
 		default:
 			break;
 		}
