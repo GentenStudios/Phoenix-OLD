@@ -16,6 +16,9 @@ Project Phoenix is a open world sandbox style voxel game with a twist. The game 
 - OpenGL (Version >= 3.3)
 
 ## Build Instructions
+Clone with the `--recursive` flag to also clone all submodules
+If you already cloned you can run `git submodule update --init` to do the same thing on an existing clone
+
 Once cloned, navigate to the projects root directory and execute the following commands in a terminal.
 
   1. `mkdir Build`
