@@ -13,8 +13,9 @@ set(Sources
 	${currentDir}/ImGuiHelpers.cpp
 	${currentDir}/UI.cpp
 	${currentDir}/Commander.cpp
+	${currentDir}/Client.cpp
 
-	${currentDir}/Main.cpp
+    ${currentDir}/Main.cpp
 
 
 	PARENT_SCOPE
