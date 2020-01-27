@@ -151,6 +151,7 @@ void Window::pollEvents()
 			e.mouse.button = static_cast<MouseButtons>(event.button.button);
 			e.mouse.x      = event.button.x;
 			e.mouse.y      = event.button.y;
+			dispatchToListeners(e);
 			break;
 		case SDL_MOUSEBUTTONUP:
 			e.type         = EventType::MOUSE_BUTTON_RELEASED;
