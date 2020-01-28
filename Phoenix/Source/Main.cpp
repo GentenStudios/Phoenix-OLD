@@ -58,7 +58,7 @@ static ui::ChatWindow chat("Chat Window", 5,
 class Phoenix : public events::IEventListener
 {
 public:
-	Phoenix()
+	Phoenix() : m_world(nullptr)
 	{
 		m_window = new gfx::Window("Phoenix Game!", 1280, 720);
 		m_window->registerEventListener(this);
@@ -100,7 +100,7 @@ public:
 
 			case events::MouseButtons::RIGHT:
 				m_player.action2();
-			
+
 			default:
 				break;
 			}
@@ -151,10 +151,10 @@ public:
 		//	}
 		//}
 
-		voxels::ChunkManager world(
-		    voxels::BlockRegistry::get()->getFromID("core:grass"), 1234);
-
-		//m_player.m_world = &world;
+		// voxels::ChunkManager world(
+		//     voxels::BlockRegistry::get()->getFromID("core:grass"), 1234);
+		m_world = new voxels::ChunkManager(voxels::BlockRegistry::get()->getFromID("core:grass"), 1234);
+		m_player.m_world = m_world;
 
 		phx::gfx::ShaderPipeline shaderPipeline;
 		shaderPipeline.prepare("Assets/SimpleWorld.vert",
@@ -172,7 +172,7 @@ public:
 		static math::vec3 lastPos;
 
 		m_window->setVSync(true);
-		
+
 		float last = static_cast<float>(SDL_GetTicks());
 		while (m_window->isRunning())
 		{
@@ -183,7 +183,7 @@ public:
 			m_window->startFrame();
 
 			m_camera->tick(dt);
-			world.tick(lastPos);
+			m_world->tick(lastPos);
 
 			{
 				ImGuiIO& io         = ImGui::GetIO();
@@ -220,7 +220,7 @@ public:
 			ImGui::Checkbox("Follow Camera", &followCamera);
 			if (followCamera)
 				lastPos = m_player.getPosition();
-			
+
 			static Setting* sensSetting =
 			    Settings::get()->getSetting("camera:sensitivity");
 			static int sens = sensSetting->value();
@@ -230,7 +230,7 @@ public:
 				prevSens = sens;
 				sensSetting->set(sens);
 			}
-			
+
 			ImGui::Text("X: %f\nY: %f\nZ: %f",
 						m_player.getPosition().x,
 						m_player.getPosition().y,
@@ -242,7 +242,7 @@ public:
 			shaderPipeline.setMatrix("u_view", m_camera->calculateViewMatrix());
 			shaderPipeline.setMatrix("u_projection", m_camera->getProjection());
 
-			world.render();
+			m_world->render();
 
 			m_window->endFrame();
 		}
@@ -257,6 +257,7 @@ private:
 	gfx::Window*    m_window;
 	gfx::FPSCamera* m_camera;
 	Player          m_player;
+	voxels::ChunkManager* m_world;
 };
 
 #undef main
