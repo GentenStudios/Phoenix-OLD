@@ -335,9 +335,8 @@ namespace phx
 			template <typename T>
 			size_t operator()(const detail::Vector3<T>& k) const
 			{
-				return std::hash<int>()(k.x) ^ std::hash<int>()(k.y) ^ std::hash<int>()(k.z);
+				return std::hash<T>()(k.x) ^ std::hash<T>()(k.y) ^ std::hash<T>()(k.z);
 			}
-
 		};
 
 		// 'KeyEqual' parameter to use when using Vector3 inside a hash map.

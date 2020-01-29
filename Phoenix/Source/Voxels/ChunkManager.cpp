@@ -41,12 +41,6 @@ ChunkManager::ChunkManager(int viewDistance) : m_viewDistance(viewDistance)
 
 	m_renderer = new gfx::ChunkRenderer(maxVisibleChunks);
 	m_renderer->buildTextureArray();
-
-	for (int i = 0; i < maxVisibleChunks; ++i)
-	{
-		m_availableSlots.push_back(i);
-	}
-	m_usedSlots.reserve(maxVisibleChunks);
 }
 
 ChunkManager::~ChunkManager() { delete m_renderer; }
@@ -63,8 +57,6 @@ void ChunkManager::tick(math::vec3 playerPos)
 	// Get diameter to generate for.
 	const int chunkViewDistance = m_viewDistance;
 
-
-	
 	for (int x = -chunkViewDistance; x <= chunkViewDistance; x++)
 	{
 		for (int y = -chunkViewDistance; y <= chunkViewDistance; y++)
@@ -72,9 +64,9 @@ void ChunkManager::tick(math::vec3 playerPos)
 			for (int z = -chunkViewDistance; z <= chunkViewDistance; z++)
 			{
 				math::vec3 chunkToCheck = {
-				    static_cast<float>(x * chunkViewDistance + posX),
-				    static_cast<float>(y * chunkViewDistance + posY),
-				    static_cast<float>(z * chunkViewDistance + posZ)};
+				    static_cast<float>(x + posX),
+				    static_cast<float>(y + posY),
+				    static_cast<float>(z + posZ)};
 
 				chunkToCheck =
 				    chunkToCheck * static_cast<float>(Chunk::CHUNK_WIDTH);
@@ -90,20 +82,13 @@ void ChunkManager::tick(math::vec3 playerPos)
 					m_activeChunks.emplace_back(chunkToCheck);
 					m_activeChunks.back().autoTestFill();
 
-					if (!m_availableSlots.empty())
-					{
-						gfx::ChunkMesher mesher(
-						    chunkToCheck, m_activeChunks.back().getBlocks(),
-						    m_renderer->getTextureTable());
+					gfx::ChunkMesher mesher(chunkToCheck,
+					                        m_activeChunks.back().getBlocks(),
+					                        m_renderer->getTextureTable());
 
-						mesher.mesh();
+					mesher.mesh();
 
-						m_renderer->submitChunkMesh(mesher.getMesh(),
-						                            m_availableSlots.front());
-						m_usedSlots.insert(
-						    {chunkToCheck, m_availableSlots.back()});
-						m_availableSlots.pop_front();
-					}
+					m_renderer->submitChunk(mesher.getMesh(), chunkToCheck);
 				}
 			}
 		}

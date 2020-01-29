@@ -34,6 +34,8 @@
 #include <Phoenix/Settings.hpp>
 #include <Phoenix/Voxels/BlockRegistry.hpp>
 #include <Phoenix/Voxels/ChunkManager.hpp>
+#include <Phoenix/Graphics/ChunkRenderer.hpp>
+#include <Phoenix/Graphics/ChunkMesher.hpp>
 
 #include <Phoenix/UI.hpp>
 
@@ -123,11 +125,11 @@ public:
 		                       "Assets/SimpleWorld.frag",
 		                       gfx::ChunkRenderer::getRequiredShaderLayout());
 
-		voxels::ChunkManager world(1);
+		voxels::ChunkManager world(3);
 
 		shaderPipeline.activate();
 
-		math::mat4 model;
+		const math::mat4 model;
 		shaderPipeline.setMatrix("u_model", model);
 
 		static bool wireframe = false;

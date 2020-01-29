@@ -29,11 +29,8 @@
 #pragma once
 
 #include <Phoenix/Graphics/ChunkRenderer.hpp>
-#include <Phoenix/Voxels/BlockRegistry.hpp>
 #include <Phoenix/Voxels/Chunk.hpp>
 
-#include <unordered_map>
-#include <deque>
 #include <vector>
 
 namespace phx
@@ -52,11 +49,7 @@ namespace phx
 		private:
 			int m_viewDistance = 1; // 1 chunk
 
-			std::vector<Chunk>                              m_activeChunks;
-			std::deque<gfx::ChunkRenderer::MeshIdentifier> m_availableSlots;
-			std::unordered_map<math::vec3, gfx::ChunkRenderer::MeshIdentifier, math::Vector3Hasher, math::Vector3KeyComparator>
-			    m_usedSlots;
-
+			std::vector<Chunk>  m_activeChunks;
 			gfx::ChunkRenderer* m_renderer;
 		};
 	} // namespace voxels
