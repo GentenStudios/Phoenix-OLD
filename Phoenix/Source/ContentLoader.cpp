@@ -345,12 +345,12 @@ void ContentManager::loadAPI(sol::state& lua, ImGui::BasicTerminal& chat)
 			    block.displayName = luaBlock["name"];
 			    block.id          = luaBlock["id"];
 
-			    if (luaBlock["category"] == "Air")
+				std::string category = luaBlock["category"];
+			    if (category == "Air")
 			    {
 				    block.category = BlockCategory::AIR;
-				    std::cout << "air" << std::endl;
 			    }
-			    else if (luaBlock["category"] == "Liquid")
+			    else if (category == "Liquid")
 			    {
 				    block.category = BlockCategory::LIQUID;
 			    }
@@ -374,9 +374,9 @@ void ContentManager::loadAPI(sol::state& lua, ImGui::BasicTerminal& chat)
 				    block.onPlace = luaBlock["onPlace"];
 			    }
 
-			    std::array<std::string, 6> textures;
-			    if (block.category != BlockCategory::AIR)
+			    if (luaBlock["textures"])
 			    {
+			    	std::array<std::string, 6> textures;
 				    for (int i = 0; i < 6; i++)
 				    {
 					    std::string texture = luaBlock["textures"][i + 1];
@@ -388,8 +388,8 @@ void ContentManager::loadAPI(sol::state& lua, ImGui::BasicTerminal& chat)
 					    }
 					    textures[i] = "Modules/" + m_currentMod + "/" + texture;
 				    }
+			    	block.textures = textures;
 			    }
-			    block.textures = textures;
 		    }
 		    BlockRegistry::get()->registerBlock(block);
 	    };

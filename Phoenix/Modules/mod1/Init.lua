@@ -30,5 +30,5 @@ voxel.block.register(block)
 block = {}
 block.name = "Air"
 block.id = "core:air"
-block.category = Air
+block.category = "Air"
 voxel.block.register(block)
