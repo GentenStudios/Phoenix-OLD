@@ -28,6 +28,7 @@
 
 #include <Phoenix/Graphics/ChunkMesher.hpp>
 #include <Phoenix/Voxels/ChunkManager.hpp>
+#include <Phoenix/Voxels/BlockRegistry.hpp>
 
 #include <iostream>
 
@@ -96,3 +97,110 @@ void ChunkManager::tick(math::vec3 playerPos)
 }
 
 void ChunkManager::render() { m_renderer->render(); }
+
+BlockType* ChunkManager::getBlockAt(math::vec3 position) const
+{
+	int posX = static_cast<int>(position.x / Chunk::CHUNK_WIDTH);
+	int posY = static_cast<int>(position.y / Chunk::CHUNK_HEIGHT);
+	int posZ = static_cast<int>(position.z / Chunk::CHUNK_DEPTH);
+
+	position.x =
+	    static_cast<float>(static_cast<int>(position.x) % Chunk::CHUNK_WIDTH);
+	if (position.x < 0)
+	{
+		posX -= 1;
+		position.x += Chunk::CHUNK_WIDTH;
+	}
+
+	position.y =
+	    static_cast<float>(static_cast<int>(position.y) % Chunk::CHUNK_HEIGHT);
+	if (position.y < 0)
+	{
+		posY -= 1;
+		position.y += Chunk::CHUNK_HEIGHT;
+	}
+
+	position.z =
+	    static_cast<float>(static_cast<int>(position.z) % Chunk::CHUNK_DEPTH);
+	if (position.z < 0)
+	{
+		posZ -= 1;
+		position.z += Chunk::CHUNK_DEPTH;
+	}
+
+	const math::vec3 chunkPosition =
+	    math::vec3(static_cast<float>(posX * Chunk::CHUNK_WIDTH),
+	               static_cast<float>(posY * Chunk::CHUNK_HEIGHT),
+	               static_cast<float>(posZ * Chunk::CHUNK_DEPTH));
+
+	for (auto& chunk : m_activeChunks)
+	{
+		if (chunk.getChunkPos() == chunkPosition)
+		{
+			return chunk.getBlockAt({
+			    // "INLINE" VECTOR 3 DECLARATION
+			    position.x, // x position IN the chunk, not overall
+			    position.y, // y position IN the chunk, not overall
+			    position.z  // z position IN the chunk, not overall
+			});
+		}
+	}
+
+	return BlockRegistry::get()->getFromRegistryID(
+	    BlockRegistry::OUT_OF_BOUNDS_BLOCK);
+}
+
+void ChunkManager::setBlockAt(math::vec3 position, BlockType* block)
+{
+	int posX = static_cast<int>(position.x / Chunk::CHUNK_WIDTH);
+	int posY = static_cast<int>(position.y / Chunk::CHUNK_HEIGHT);
+	int posZ = static_cast<int>(position.z / Chunk::CHUNK_DEPTH);
+
+	position.x =
+	    static_cast<float>(static_cast<int>(position.x) % Chunk::CHUNK_WIDTH);
+	if (position.x < 0)
+	{
+		posX -= 1;
+		position.x += Chunk::CHUNK_WIDTH;
+	}
+
+	position.y =
+	    static_cast<float>(static_cast<int>(position.y) % Chunk::CHUNK_HEIGHT);
+	if (position.y < 0)
+	{
+		posY -= 1;
+		position.y += Chunk::CHUNK_HEIGHT;
+	}
+
+	position.z =
+	    static_cast<float>(static_cast<int>(position.z) % Chunk::CHUNK_DEPTH);
+	if (position.z < 0)
+	{
+		posZ -= 1;
+		position.z += Chunk::CHUNK_DEPTH;
+	}
+
+	const math::vec3 chunkPosition =
+	    math::vec3(static_cast<float>(posX * Chunk::CHUNK_WIDTH),
+	               static_cast<float>(posY * Chunk::CHUNK_HEIGHT),
+	               static_cast<float>(posZ * Chunk::CHUNK_DEPTH));
+
+	for (auto& chunk : m_activeChunks)
+	{
+		if (chunk.getChunkPos() == chunkPosition)
+		{
+			chunk.setBlockAt(
+			    {
+			        // "INLINE" VECTOR 3 DECLARATION
+			        position.x, // x position IN the chunk, not overall
+			        position.y, // y position IN the chunk, not overall
+			        position.z  // z position IN the chunk, not overall
+			    },
+			    block);
+
+			break;
+		}
+	}
+
+	render();
+}

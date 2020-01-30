@@ -58,6 +58,8 @@ math::vec3 Player::getTarget(){
 
 bool Player::action1(){
     std::cout << "action 1\n";
+    math::vec3 target = getTarget();
+    std::cout << "target " << target << "\n";
     m_world->setBlockAt(getTarget(), voxels::BlockRegistry::get()->getFromID("core:air"));
     return true;
 }

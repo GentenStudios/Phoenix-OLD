@@ -29,10 +29,6 @@
 #pragma once
 
 #include <Phoenix/Graphics/ChunkRenderer.hpp>
-<<<<<<< HEAD
-#include <Phoenix/Math/Math.hpp>
-=======
->>>>>>> feat-chunk-management
 #include <Phoenix/Voxels/Chunk.hpp>
 
 #include <vector>
@@ -49,6 +45,9 @@ namespace phx
 
 			void tick(math::vec3 playerPos);
 			void render();
+
+			BlockType* getBlockAt(math::vec3 position) const;
+			void setBlockAt(math::vec3 position, BlockType* block);
 
 		private:
 			int m_viewDistance = 1; // 1 chunk

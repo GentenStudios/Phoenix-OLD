@@ -99,9 +99,11 @@ public:
 			{
 			case events::MouseButtons::LEFT:
 				m_player.action1();
+				break;
 
 			case events::MouseButtons::RIGHT:
 				m_player.action2();
+				break;
 			
 			default:
 				break;
@@ -142,6 +144,7 @@ public:
 		                       gfx::ChunkRenderer::getRequiredShaderLayout());
 
 		voxels::ChunkManager world(3);
+		m_player.m_world = &world;
 
 		shaderPipeline.activate();
 
