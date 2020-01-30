@@ -29,7 +29,10 @@
 #pragma once
 
 #include <Phoenix/Graphics/ChunkRenderer.hpp>
+<<<<<<< HEAD
 #include <Phoenix/Math/Math.hpp>
+=======
+>>>>>>> feat-chunk-management
 #include <Phoenix/Voxels/Chunk.hpp>
 
 #include <vector>
@@ -41,29 +44,16 @@ namespace phx
 		class ChunkManager
 		{
 		public:
-			ChunkManager(BlockType* defaultBlockType, unsigned int seed);
-			ChunkManager(ChunkManager&& other) = default;
+			ChunkManager(int viewDistance);
+			~ChunkManager();
 
-			~ChunkManager() = default;
-
-			void tick(math::vec3 position);
-			void testGeneration();
-
-			void       setBlockAt(math::vec3 position, BlockType* block);
-			BlockType* getBlockAt(math::vec3 position) const;
-
-			void breakBlockAt(math::vec3 position, BlockType* block);
-			void placeBlockAt(math::vec3 position, BlockType* block);
-
+			void tick(math::vec3 playerPos);
 			void render();
 
 		private:
-			unsigned int m_seed;
-			BlockType*   m_defaultBlockType;
+			int m_viewDistance = 1; // 1 chunk
 
-			math::vec3 m_lastPos;
-			
-			std::vector<Chunk>  m_chunks;
+			std::vector<Chunk>  m_activeChunks;
 			gfx::ChunkRenderer* m_renderer;
 		};
 	} // namespace voxels

@@ -43,45 +43,27 @@ using namespace gfx;
 
 struct Vertex
 {
-	math::vec3 verts;
-	math::vec3 uv; // includes tex layer
+	float x;
+	float y;
+	float z;
+	float u;
+	float v;
+	float tex;
 };
 
 ChunkRenderer::ChunkRenderer(std::size_t visibleChunks)
+    : m_visibleChunks(visibleChunks)
 {
-	glGenVertexArrays(1, &m_vao);
-	glBindVertexArray(m_vao);
-
-	// 36 Verts per cube.
-	// 16 * 16 * 16 cubes in each chunk = 4096;
-	// 4096 * 36 = 147,456 verts
-	// This assumes that every face and every vert is pumped to the GPU. Some
-	// verts maybe empty but whatevs. THIS IS TEMPORARY.
-
-	glGenBuffers(1, &m_buffer);
-
-	glBindBuffer(GL_ARRAY_BUFFER, m_buffer);
-	glBufferData(GL_ARRAY_BUFFER,
-	             sizeof(Vertex) * (36 * 16 * 16 * 16) * visibleChunks, nullptr,
-	             GL_DYNAMIC_DRAW);
-
-	glVertexAttribPointer(m_vertexAttributeLocation, 3, GL_FLOAT, GL_FALSE,
-	                      sizeof(Vertex),
-	                      reinterpret_cast<void*>(offsetof(Vertex, verts)));
-
-	// we're gonna pack texLayer into this cos why not.
-	glVertexAttribPointer(m_uvAttributeLocation, 3, GL_FLOAT, GL_FALSE,
-	                      sizeof(Vertex),
-	                      reinterpret_cast<void*>(offsetof(Vertex, uv)));
-
-	glEnableVertexAttribArray(m_vertexAttributeLocation);
-	glEnableVertexAttribArray(m_uvAttributeLocation);
-
-	m_multiDrawStarts.push_back(0);
-	m_multiDrawCounts.push_back(0);
 }
 
-ChunkRenderer::~ChunkRenderer() { glDeleteVertexArrays(1, &m_vao); }
+ChunkRenderer::~ChunkRenderer()
+{
+	for (auto& buffer : m_buffers)
+	{
+		glDeleteBuffers(1, &buffer.second.buffer);
+		glDeleteVertexArrays(1, &buffer.second.vao);
+	}
+}
 
 std::vector<ShaderLayout> ChunkRenderer::getRequiredShaderLayout()
 {
@@ -139,28 +121,78 @@ const ChunkRenderer::AssociativeTextureTable& ChunkRenderer::getTextureTable()
 	return m_textureTable;
 }
 
-ChunkRenderer::MeshIdentifier ChunkRenderer::submitChunkMesh(
-    const std::vector<float>& mesh, MeshIdentifier slot)
+void ChunkRenderer::submitChunk(const std::vector<float>& mesh, math::vec3 pos)
 {
-	glBindVertexArray(m_vao);
-	glBindBuffer(GL_ARRAY_BUFFER, m_buffer);
-	glBufferSubData(GL_ARRAY_BUFFER, sizeof(Vertex) * 36 * 16 * 16 * 16 * slot,
-	                sizeof(float) * mesh.size(), mesh.data());
+	if (mesh.empty())
+	{
+		return;
+	}
 
-	glBindVertexArray(0);
+	unsigned int vao;
+	unsigned int buf;
 
-	m_multiDrawStarts.push_back(36 * 16 * 16 * 16 * slot);
-	m_multiDrawCounts.push_back(static_cast<GLsizei>(mesh.size()));
+	glGenVertexArrays(1, &vao);
+	glBindVertexArray(vao);
 
-	return 1;
+	glGenBuffers(1, &buf);
+	glBindBuffer(GL_ARRAY_BUFFER, buf);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * mesh.size(), mesh.data(),
+	             GL_DYNAMIC_DRAW);
+
+	glVertexAttribPointer(m_vertexAttributeLocation, 3, GL_FLOAT, GL_FALSE,
+	                      sizeof(Vertex),
+	                      reinterpret_cast<void*>(offsetof(Vertex, x)));
+
+	// we're gonna pack texLayer into this cos why not.
+	glVertexAttribPointer(m_uvAttributeLocation, 3, GL_FLOAT, GL_FALSE,
+	                      sizeof(Vertex),
+	                      reinterpret_cast<void*>(offsetof(Vertex, u)));
+
+	glEnableVertexAttribArray(m_vertexAttributeLocation);
+	glEnableVertexAttribArray(m_uvAttributeLocation);
+
+	m_buffers.insert({pos, {vao, buf, mesh.size()}});
 }
+
+void ChunkRenderer::updateChunk(const std::vector<float>& mesh, math::vec3 pos)
+{
+	auto it = m_buffers.find(pos);
+	if (it == m_buffers.end())
+	{
+		submitChunk(mesh, pos);
+		return;
+	}
+
+	glBindVertexArray(it->second.vao);
+	glBindBuffer(GL_ARRAY_BUFFER, it->second.buffer);
+
+	// If the amount of vertices are the same, then it's actually more
+	// efficient to just sub the data. glBufferData does a "re-alloc then
+	// copy" - effectively the equivalent of std::vector::clear() then
+	// filling it with data. glBufferSubData is more like std::vector::[i] =
+	// blah.
+	if (mesh.size() == it->second.vertexCount)
+	{
+		glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float) * mesh.size(),
+		                mesh.data());
+	}
+	else
+	{
+		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * mesh.size(), mesh.data(),
+		             GL_DYNAMIC_DRAW);
+	}
+}
+
+void ChunkRenderer::dropChunk(math::vec3 pos) { m_buffers.erase(pos); }
 
 void ChunkRenderer::render()
 {
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D_ARRAY, m_textureArray);
 
-	glBindVertexArray(m_vao);
-	glMultiDrawArrays(GL_TRIANGLES, &m_multiDrawStarts[0],
-	                  &m_multiDrawCounts[0], m_multiDrawStarts.size());
+	for (auto& buffer : m_buffers)
+	{
+		glBindVertexArray(buffer.second.vao);
+		glDrawArrays(GL_TRIANGLES, 0, buffer.second.vertexCount);
+	}
 }

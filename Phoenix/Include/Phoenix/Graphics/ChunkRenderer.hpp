@@ -39,6 +39,13 @@ namespace phx
 	{
 		class ShaderPipeline;
 
+		struct ChunkRenderData
+		{
+			unsigned int vao;
+			unsigned int buffer;
+			std::size_t vertexCount;
+		};
+
 		// NOTE: (mainly to self - @beeperdeeper089)
 		// All blocks must be loaded in before the texture array is generated.
 		// Once the texture array is generated, no new blocks should be loaded
@@ -51,7 +58,6 @@ namespace phx
 		class ChunkRenderer
 		{
 		public:
-			using MeshIdentifier = int;
 			using AssociativeTextureTable =
 			    std::unordered_map<std::string, std::size_t>;
 
@@ -63,28 +69,24 @@ namespace phx
 			void                           buildTextureArray();
 			const AssociativeTextureTable& getTextureTable() const;
 
-			// returns unique chunk mesh id. Used to set the render list.
-			MeshIdentifier submitChunkMesh(const std::vector<float>& mesh,
-			                               MeshIdentifier            slot);
+			void submitChunk(const std::vector<float>& mesh, math::vec3 pos);
+			void updateChunk(const std::vector<float>& mesh, math::vec3 pos);
+			void dropChunk(math::vec3 pos);
 
 			void render();
 
 		private:
 			std::size_t m_visibleChunks;
 
-			unsigned int m_vao;
-			unsigned int m_buffer;
+			std::unordered_map<math::vec3, ChunkRenderData, math::Vector3Hasher,
+			                   math::Vector3KeyComparator>
+			             m_buffers;
 			unsigned int m_textureArray;
 
-			const int m_vertexAttributeLocation   = 0;
-			const int m_uvAttributeLocation       = 1;
-			const int m_texLayerAttributeLocation = 2;
+			const int m_vertexAttributeLocation = 0;
+			const int m_uvAttributeLocation     = 1;
 
 			AssociativeTextureTable m_textureTable;
-
-			std::vector<int>     m_multiDrawStarts;
-			std::vector<GLsizei> m_multiDrawCounts;
-			std::vector<int>     m_bigBufferLocations;
 		};
 	} // namespace gfx
-} // namespace q2
+} // namespace phx

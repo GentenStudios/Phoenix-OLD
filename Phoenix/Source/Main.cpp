@@ -35,6 +35,8 @@
 #include <Phoenix/Voxels/BlockRegistry.hpp>
 #include <Phoenix/Voxels/ChunkManager.hpp>
 #include <Phoenix/Player.hpp>
+#include <Phoenix/Graphics/ChunkRenderer.hpp>
+#include <Phoenix/Graphics/ChunkMesher.hpp>
 
 #include <Phoenix/UI.hpp>
 
@@ -134,36 +136,16 @@ public:
 
 		Settings::get()->load();
 
-		phx::gfx::ChunkRenderer renderer(100);
-		renderer.buildTextureArray();
-
-		// for (int j = 0; j < 10; ++j)
-		//{
-		//	for (int i = 0; i < 10; ++i)
-		//	{
-		//		phx::voxels::Chunk chunk({i * 16, 0, j * 16});
-		//		chunk.autoTestFill();
-		//		phx::gfx::ChunkMesher mesher(chunk.getChunkPos(),
-		//		                             chunk.getBlocks(),
-		//		                             renderer.getTextureTable());
-		//		mesher.mesh();
-		//		renderer.submitChunkMesh(mesher.getMesh(), i + (j * 10));
-		//	}
-		//}
-
-		voxels::ChunkManager world(
-		    voxels::BlockRegistry::get()->getFromID("core:grass"), 1234);
-
-		//m_player.m_world = &world;
-
-		phx::gfx::ShaderPipeline shaderPipeline;
+		gfx::ShaderPipeline shaderPipeline;
 		shaderPipeline.prepare("Assets/SimpleWorld.vert",
 		                       "Assets/SimpleWorld.frag",
 		                       gfx::ChunkRenderer::getRequiredShaderLayout());
 
+		voxels::ChunkManager world(3);
+
 		shaderPipeline.activate();
 
-		phx::math::mat4 model;
+		const math::mat4 model;
 		shaderPipeline.setMatrix("u_model", model);
 
 		static bool       wireframe    = false;
@@ -183,7 +165,7 @@ public:
 			m_window->startFrame();
 
 			m_camera->tick(dt);
-			world.tick(lastPos);
+			world.tick(m_camera->getPosition());
 
 			{
 				ImGuiIO& io         = ImGui::GetIO();
