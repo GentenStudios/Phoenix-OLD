@@ -14,8 +14,7 @@ set(Sources
 	${currentDir}/UI.cpp
 	${currentDir}/Commander.cpp
 
-	${currentDir}/Main.cpp
-
+	${currentDir}/Client.cpp
 
 	PARENT_SCOPE
 )
