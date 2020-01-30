@@ -60,7 +60,7 @@ static ui::ChatWindow chat("Chat Window", 5,
 class Phoenix : public events::IEventListener
 {
 public:
-	Phoenix() : m_world(nullptr)
+	Phoenix()
 	{
 		m_window = new gfx::Window("Phoenix Game!", 1280, 720);
 		m_window->registerEventListener(this);
@@ -143,8 +143,8 @@ public:
 		                       "Assets/SimpleWorld.frag",
 		                       gfx::ChunkRenderer::getRequiredShaderLayout());
 
-		voxels::ChunkManager world(3);
-		m_player.m_world = &world;
+		voxels::ChunkManager m_world(3);
+		m_player.m_world = &m_world;
 
 		shaderPipeline.activate();
 
@@ -168,7 +168,7 @@ public:
 			m_window->startFrame();
 
 			m_camera->tick(dt);
-			world.tick(m_camera->getPosition());
+			m_world.tick(m_camera->getPosition());
 
 			{
 				ImGuiIO& io         = ImGui::GetIO();
@@ -227,7 +227,7 @@ public:
 			shaderPipeline.setMatrix("u_view", m_camera->calculateViewMatrix());
 			shaderPipeline.setMatrix("u_projection", m_camera->getProjection());
 
-			m_world->render();
+			m_world.render();
 
 			m_window->endFrame();
 		}
@@ -242,7 +242,6 @@ private:
 	gfx::Window*    m_window;
 	gfx::FPSCamera* m_camera;
 	Player          m_player;
-	voxels::ChunkManager* m_world;
 };
 
 #undef main
