@@ -36,6 +36,8 @@
 #include <Phoenix/Settings.hpp>
 #include <Phoenix/Voxels/BlockRegistry.hpp>
 #include <Phoenix/Voxels/Chunk.hpp>
+#include <Phoenix/GUI/Container.hpp>
+#include <Phoenix/GUI/Button.hpp>
 
 #include <Phoenix/UI.hpp>
 
@@ -63,6 +65,8 @@ public:
 	{
 		m_window = new gfx::Window("Phoenix Game!", 1280, 720);
 		m_window->registerEventListener(this);
+
+		m_ui = gui::Container(1280, 720);
 
 		m_camera = new gfx::FPSCamera(m_window);
 
@@ -137,6 +141,10 @@ public:
 			}
 		}
 
+		gui::Button button = gui::Button(50, 50);
+
+		m_ui.addComponent(button, 10, 10);
+
 		phx::gfx::ShaderPipeline shaderPipeline;
 		shaderPipeline.prepare("Assets/SimpleWorld.vert",
 		                       "Assets/SimpleWorld.frag",
@@ -206,6 +214,8 @@ public:
 
 			chat.draw();
 
+			m_ui.draw(0, 0);
+
 			shaderPipeline.setMatrix("u_view", m_camera->calculateViewMatrix());
 			shaderPipeline.setMatrix("u_projection", m_camera->getProjection());
 
@@ -223,6 +233,7 @@ public:
 private:
 	gfx::Window*    m_window;
 	gfx::FPSCamera* m_camera;
+	gui::Container m_ui;
 };
 
 #undef main
