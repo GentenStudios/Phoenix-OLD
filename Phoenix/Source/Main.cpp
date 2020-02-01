@@ -29,13 +29,13 @@
 #include <Phoenix/Commander.hpp>
 #include <Phoenix/ContentLoader.hpp>
 #include <Phoenix/Graphics/Camera.hpp>
+#include <Phoenix/Graphics/ChunkMesher.hpp>
+#include <Phoenix/Graphics/ChunkRenderer.hpp>
 #include <Phoenix/Graphics/Window.hpp>
 #include <Phoenix/ImGuiHelpers.hpp>
 #include <Phoenix/Settings.hpp>
 #include <Phoenix/Voxels/BlockRegistry.hpp>
 #include <Phoenix/Voxels/ChunkManager.hpp>
-#include <Phoenix/Graphics/ChunkRenderer.hpp>
-#include <Phoenix/Graphics/ChunkMesher.hpp>
 
 #include <Phoenix/UI.hpp>
 
@@ -116,6 +116,12 @@ public:
 		if (!loadedLua)
 		{
 			m_window->close();
+		}
+
+		for (int i = 0; i < 5; ++i)
+		{
+			auto test = voxels::BlockRegistry::get()->getFromRegistryID(i);
+			std::cout << static_cast<int>(test->category) << std::endl;
 		}
 
 		Settings::get()->load();
