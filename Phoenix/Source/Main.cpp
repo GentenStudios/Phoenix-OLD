@@ -118,12 +118,6 @@ public:
 			m_window->close();
 		}
 
-		for (int i = 0; i < 5; ++i)
-		{
-			auto test = voxels::BlockRegistry::get()->getFromRegistryID(i);
-			std::cout << static_cast<int>(test->category) << std::endl;
-		}
-
 		Settings::get()->load();
 
 		gfx::ShaderPipeline shaderPipeline;
