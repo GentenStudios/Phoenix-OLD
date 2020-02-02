@@ -27,7 +27,6 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <Phoenix/Graphics/Camera.hpp>
-#include <iostream>
 
 const float MOVE_SPEED = 0.01f;
 
@@ -39,10 +38,13 @@ FPSCamera::FPSCamera(Window* window)
 	m_window = window;
 	m_window->setCursorState(CursorState::DISABLED);
 
+	// Calculates the perspective projection
 	const math::vec2f windowSize = static_cast<math::vec2f>(window->getSize());
 	m_projection = math::mat4::perspective(windowSize.x / windowSize.y, 45.f,
 	                                       1000.f, 0.1f);
 
+	// This stores the centre of the window to prevent requesting the window
+	// size every frame, which is incredibly inefficient.
 	m_windowCentre = {std::floor(windowSize.x / 2.f),
 	                  std::floor(windowSize.y / 2.f)};
 
@@ -71,6 +73,7 @@ math::mat4 FPSCamera::calculateViewMatrix() const
 
 void FPSCamera::tick(float dt)
 {
+	// makes sure we don't waste CPU cycles if we've disabled the camera.
 	if (!m_enabled)
 		return;
 
@@ -78,8 +81,9 @@ void FPSCamera::tick(float dt)
 
 	m_window->setCursorPosition(m_windowCentre);
 
-	const float sensitivity = m_settingSensitivity->value() * 0.00001;
+	const float sensitivity = m_settingSensitivity->value() * 0.00001f;
 
+	/// @todo Fix this up since we're having an issue where we turn more/less due to higher/lower frames.
 	m_rotation.x += sensitivity * dt * (m_windowCentre.x - mousePos.x);
 	m_rotation.y += sensitivity * dt * (m_windowCentre.y - mousePos.y);
 
@@ -128,11 +132,13 @@ void FPSCamera::enable(bool enabled)
 {
 	if (enabled)
 	{
+		// gain control of the cursor
 		m_window->setCursorState(gfx::CursorState::DISABLED);
 		m_window->setCursorPosition(m_windowCentre);
 	}
 	else
 	{
+		// release cursor for the user to do whatever they want.
 		m_window->setCursorState(gfx::CursorState::NORMAL);
 	}
 
@@ -141,6 +147,7 @@ void FPSCamera::enable(bool enabled)
 
 void FPSCamera::onWindowResize(events::Event e)
 {
+	// recalculate window size again, to not be inefficient.
 	const math::vec2i windowSize = m_window->getSize();
 	m_projection = math::mat4::perspective(static_cast<float>(windowSize.x) /
 	                                           static_cast<float>(windowSize.y),
