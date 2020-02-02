@@ -35,9 +35,13 @@
 #include <Phoenix/ImGuiHelpers.hpp>
 #include <Phoenix/Settings.hpp>
 #include <Phoenix/Voxels/BlockRegistry.hpp>
+<<<<<<< HEAD
 #include <Phoenix/Voxels/Chunk.hpp>
 #include <Phoenix/GUI/Container.hpp>
 #include <Phoenix/GUI/Button.hpp>
+=======
+#include <Phoenix/Voxels/ChunkManager.hpp>
+>>>>>>> fbf1a92dd6b50a8c4746244b4056d0847b53e63d
 
 #include <Phoenix/UI.hpp>
 
@@ -125,23 +129,6 @@ public:
 
 		Settings::get()->load();
 
-		phx::gfx::ChunkRenderer renderer(100);
-		renderer.buildTextureArray();
-
-		for (int j = 0; j < 10; ++j)
-		{
-			for (int i = 0; i < 10; ++i)
-			{
-				phx::voxels::Chunk chunk({i * 16, 0, j * 16});
-				chunk.autoTestFill();
-				phx::gfx::ChunkMesher mesher(chunk.getChunkPos(),
-				                             chunk.getBlocks(),
-				                             renderer.getTextureTable());
-				mesher.mesh();
-				renderer.submitChunkMesh(mesher.getMesh(), i + (j * 10));
-			}
-		}
-
 		// =========================== //
 		// In house GUI initialization //
 		// =========================== //
@@ -149,18 +136,20 @@ public:
 		gui::Button button = gui::Button(50, 50);
 		m_ui.addComponent(button, 10, 10);
 
-		// ==================== //
-		// BSome rendering shiz //
-		// ==================== //
+		// =================== //
+		// Some rendering shiz //
+		// =================== //
 
-		phx::gfx::ShaderPipeline shaderPipeline;
+		gfx::ShaderPipeline shaderPipeline;
 		shaderPipeline.prepare("Assets/SimpleWorld.vert",
 		                       "Assets/SimpleWorld.frag",
-		                       renderer.getRequiredShaderLayout());
+		                       gfx::ChunkRenderer::getRequiredShaderLayout());
+
+		voxels::ChunkManager world(3);
 
 		shaderPipeline.activate();
 
-		phx::math::mat4 model;
+		const math::mat4 model;
 		shaderPipeline.setMatrix("u_model", model);
 
 		static bool wireframe = false;
@@ -176,6 +165,7 @@ public:
 			m_window->startFrame();
 
 			m_camera->tick(dt);
+			world.tick(m_camera->getPosition());
 
 			{
 				ImGuiIO& io         = ImGui::GetIO();
@@ -228,7 +218,7 @@ public:
 			shaderPipeline.setMatrix("u_view", m_camera->calculateViewMatrix());
 			shaderPipeline.setMatrix("u_projection", m_camera->getProjection());
 
-			renderer.render();
+			world.render();
 
 			m_window->endFrame();
 		}

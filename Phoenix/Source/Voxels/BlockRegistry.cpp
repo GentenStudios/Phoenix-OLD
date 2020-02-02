@@ -80,7 +80,7 @@ BlockType* BlockRegistry::getFromID(const std::string& id)
 
 BlockType* BlockRegistry::getFromRegistryID(std::size_t registryID)
 {
-	if (registryID > m_blocks.size())
+	if (registryID >= m_blocks.size())
 	{
 		return &m_blocks[0];
 	}

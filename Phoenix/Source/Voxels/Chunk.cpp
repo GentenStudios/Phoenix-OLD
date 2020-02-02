@@ -39,10 +39,15 @@ Chunk::Chunk(math::vec3 chunkPos) : m_pos(chunkPos)
 
 void Chunk::autoTestFill()
 {
-	BlockType* grass = BlockRegistry::get()->getFromID("core:grass");
+	BlockType* block = BlockRegistry::get()->getFromID("core:air");
+	if (m_pos.y < 16 && m_pos.y >= 0.f)
+	{
+		block = BlockRegistry::get()->getFromID("core:grass");
+	}
+
 	for (std::size_t i = 0; i < CHUNK_WIDTH * CHUNK_HEIGHT * CHUNK_DEPTH; ++i)
 	{
-		m_blocks.push_back(grass);
+		m_blocks.push_back(block);
 	}
 }
 
