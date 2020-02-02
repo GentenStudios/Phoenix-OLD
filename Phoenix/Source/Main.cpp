@@ -35,13 +35,10 @@
 #include <Phoenix/ImGuiHelpers.hpp>
 #include <Phoenix/Settings.hpp>
 #include <Phoenix/Voxels/BlockRegistry.hpp>
-<<<<<<< HEAD
 #include <Phoenix/Voxels/Chunk.hpp>
 #include <Phoenix/GUI/Container.hpp>
 #include <Phoenix/GUI/Button.hpp>
-=======
 #include <Phoenix/Voxels/ChunkManager.hpp>
->>>>>>> fbf1a92dd6b50a8c4746244b4056d0847b53e63d
 
 #include <Phoenix/UI.hpp>
 
@@ -70,8 +67,8 @@ public:
 		m_window = new gfx::Window("Phoenix Game!", 1280, 720);
 		m_window->registerEventListener(this);
 
-		m_ui = gui::Container(1280, 720);
-		m_ui.posx = m_ui.posy = 0;
+		m_ui = gui::Container(m_window->getSize());
+		m_ui.m_pos = {0,0};
 
 		m_camera = new gfx::FPSCamera(m_window);
 
@@ -133,8 +130,9 @@ public:
 		// In house GUI initialization //
 		// =========================== //
 
-		gui::Button button = gui::Button(50, 50);
-		m_ui.addComponent(button, 10, 10);
+		gui::Button button = gui::Button(math::vec2(50, 50));
+		button.action = [](){std::cout << "Button pressed";};
+		m_ui.addComponent(button, math::vec2(10,10));
 
 		// =================== //
 		// Some rendering shiz //
@@ -212,8 +210,8 @@ public:
 
 			chat.draw();
 
-			m_ui.size = m_window->getSize;
-			m_ui.draw(0, 0);
+			m_ui.m_size = m_window->getSize();
+			m_ui.draw({0, 0});
 
 			shaderPipeline.setMatrix("u_view", m_camera->calculateViewMatrix());
 			shaderPipeline.setMatrix("u_projection", m_camera->getProjection());
