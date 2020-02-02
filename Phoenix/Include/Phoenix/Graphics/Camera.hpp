@@ -27,9 +27,10 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 /**
- * @file Camera.hpp Phoenix/Math/Math.hpp
- *
+ * @file Camera.hpp
  * @brief The main class for the FPS Camera design.
+ *
+ * @copyright Copyright (c) 2019-20 Genten Studios
  */
 
 #pragma once

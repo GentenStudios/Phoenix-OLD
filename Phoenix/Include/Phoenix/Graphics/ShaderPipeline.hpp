@@ -26,6 +26,13 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+/**
+ * @file ShaderPipeline.hpp
+ * @brief The rendering pipeline paired with shaders.
+ *
+ * @copyright Copyright (c) 2019-20 Genten Studios
+ */
+
 #pragma once
 
 #include <Phoenix/Math/Math.hpp>

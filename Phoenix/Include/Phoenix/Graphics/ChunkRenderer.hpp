@@ -27,7 +27,10 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 /**
- * @file ChunkRenderer.hpp Phoenix/Graphics/ChunkRenderer.hpp
+ * @file ChunkRenderer.hpp
+ * @brief The ChunkRenderer.
+ * 
+ * @copyright Copyright (c) 2019-20 Genten Studios
  */
 
 #pragma once
