@@ -26,46 +26,84 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+#include <Phoenix/Math/Math.hpp>
 #include <Phoenix/Player.hpp>
 #include <Phoenix/Voxels/Block.hpp>
-#include <Phoenix/Math/Ray.hpp>
-#include <Phoenix/Math/Math.hpp>
 #include <Phoenix/Voxels/BlockRegistry.hpp>
-#include <iostream>
 
 using namespace phx;
 
-math::vec3 Player::getTarget(){
-	const float RAY_INCREMENT = 0.5f;
+static const float RAY_INCREMENT = 0.5f;
 
-    math::vec3 pos = (getPosition() / 2.f) + .5f;
+math::Ray Player::getTarget()
+{
 
-    Ray ray(pos, getDirection());
+	math::vec3 pos = (getPosition() / 2.f) + .5f;
 
-    while (ray.getLength() < m_reach)
-    {
-        pos.floor();
+	math::Ray ray(pos, getDirection());
 
-        if (m_world->getBlockAt(pos)->category == voxels::BlockCategory::SOLID)
-        {
-            return pos;
-        }
+	while (ray.getLength() < m_reach)
+	{
+		pos.floor();
 
-        pos = ray.advance(RAY_INCREMENT);
-    }
-    return getPosition();
+		if (m_world->getBlockAt(pos)->category == voxels::BlockCategory::SOLID)
+		{
+			return ray;
+		}
+
+		pos = ray.advance(RAY_INCREMENT);
+	}
+
+	return ray;
 }
 
-bool Player::action1(){
-    std::cout << "action 1\n";
-    math::vec3 target = getTarget();
-    std::cout << "target " << target << "\n";
-    m_world->setBlockAt(getTarget(), voxels::BlockRegistry::get()->getFromID("core:air"));
-    return true;
+bool Player::action1()
+{
+	math::vec3 pos = (getPosition() / 2.f) + .5f;
+
+	math::Ray ray(pos, getDirection());
+
+	while (ray.getLength() < m_reach)
+	{
+		pos.floor();
+
+		if (m_world->getBlockAt(pos)->category == voxels::BlockCategory::SOLID)
+		{
+			m_world->setBlockAt(
+			    pos, voxels::BlockRegistry::get()->getFromID("core:air"));
+
+			return true;
+		}
+
+		pos = ray.advance(RAY_INCREMENT);
+	}
+
+	return false;
 }
 
-bool Player::action2(){
-    std::cout << "action 2\n";
-    m_world->setBlockAt(getTarget(), voxels::BlockRegistry::get()->getFromID("core:air"));
-    return true;
+bool Player::action2()
+{
+	math::vec3 pos = (getPosition() / 2.f) + .5f;
+
+	math::Ray ray(pos, getDirection());
+
+	while (ray.getLength() < m_reach)
+	{
+		pos.floor();
+
+		if (m_world->getBlockAt(pos)->category == voxels::BlockCategory::SOLID)
+		{
+			math::vec3 back = ray.backtrace(RAY_INCREMENT);
+			back.floor();
+
+			m_world->setBlockAt(
+			    back, voxels::BlockRegistry::get()->getFromID("core:dirt"));
+
+			return true;
+		}
+
+		pos = ray.advance(RAY_INCREMENT);
+	}
+
+	return false;
 }

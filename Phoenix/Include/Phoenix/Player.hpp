@@ -43,7 +43,7 @@ namespace phx
     class Player: public Actor{
 
     public:
-        math::vec3 getTarget();
+        math::Ray getTarget();
 
         bool action1();
         bool action2();

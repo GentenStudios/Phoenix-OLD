@@ -27,8 +27,8 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <Phoenix/Graphics/ChunkMesher.hpp>
-#include <Phoenix/Voxels/ChunkManager.hpp>
 #include <Phoenix/Voxels/BlockRegistry.hpp>
+#include <Phoenix/Voxels/ChunkManager.hpp>
 
 #include <iostream>
 
@@ -49,7 +49,8 @@ ChunkManager::~ChunkManager() { delete m_renderer; }
 
 void ChunkManager::tick(math::vec3 playerPos)
 {
-	// this block converts the raw camera/player position into voxel-world positions.
+	// this block converts the raw camera/player position into voxel-world
+	// positions.
 	playerPos = playerPos / 2.f;
 	playerPos += 0.5f;
 
@@ -66,10 +67,9 @@ void ChunkManager::tick(math::vec3 playerPos)
 		{
 			for (int z = -chunkViewDistance; z <= chunkViewDistance; z++)
 			{
-				math::vec3 chunkToCheck = {
-				    static_cast<float>(x + posX),
-				    static_cast<float>(y + posY),
-				    static_cast<float>(z + posZ)};
+				math::vec3 chunkToCheck = {static_cast<float>(x + posX),
+				                           static_cast<float>(y + posY),
+				                           static_cast<float>(z + posZ)};
 
 				chunkToCheck =
 				    chunkToCheck * static_cast<float>(Chunk::CHUNK_WIDTH);
@@ -200,9 +200,13 @@ void ChunkManager::setBlockAt(math::vec3 position, BlockType* block)
 			    },
 			    block);
 
-			break;
+			gfx::ChunkMesher mesher(chunkPosition, chunk.getBlocks(),
+			                        m_renderer->getTextureTable());
+			mesher.mesh();
+
+			m_renderer->updateChunk(mesher.getMesh(), chunkPosition);
+
+		    break;
 		}
 	}
-
-	render();
 }
