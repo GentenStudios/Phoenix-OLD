@@ -67,6 +67,7 @@ public:
 		m_window->registerEventListener(this);
 
 		m_ui = gui::Container(1280, 720);
+		m_ui.posx = m_ui.posy = 0;
 
 		m_camera = new gfx::FPSCamera(m_window);
 
@@ -141,9 +142,16 @@ public:
 			}
 		}
 
-		gui::Button button = gui::Button(50, 50);
+		// =========================== //
+		// In house GUI initialization //
+		// =========================== //
 
+		gui::Button button = gui::Button(50, 50);
 		m_ui.addComponent(button, 10, 10);
+
+		// ==================== //
+		// BSome rendering shiz //
+		// ==================== //
 
 		phx::gfx::ShaderPipeline shaderPipeline;
 		shaderPipeline.prepare("Assets/SimpleWorld.vert",
@@ -214,6 +222,7 @@ public:
 
 			chat.draw();
 
+			m_ui.size = m_window->getSize;
 			m_ui.draw(0, 0);
 
 			shaderPipeline.setMatrix("u_view", m_camera->calculateViewMatrix());
