@@ -39,34 +39,126 @@ namespace phx
 {
 	namespace gfx
 	{
+		/**
+		 * @brief The layout for shader vertex locations.
+		 *
+		 * A shader has a layout in which vertices and data in general is sent
+		 * to it in, this makes sure that all renderer objects can specify a
+		 * their own layout to allow better compatability.
+		 *
+		 * @paragraph Usage
+		 * @code
+		 * std::vector<ShaderLayout> attributes;
+		 * attributes.emplace_back("a_Vertex", 0);
+		 * attributes.emplace_back("a_UV", 1);
+		 *
+		 * ShaderPipeline pipeline;
+		 * pipeline.prepare("myvert.shader", "myfrag.shader", attributes);
+		 * @endcode
+		 */
 		struct ShaderLayout
 		{
-			ShaderLayout(std::string attribName, int desiredIndex)
+			ShaderLayout(const std::string& attribName, int desiredIndex)
 			    : attribName(attribName), desiredIndex(desiredIndex)
-			{}
+			{
+			}
 
 			std::string attribName;
-			int desiredIndex = -1;
+			int         desiredIndex = -1;
 		};
 
+		/**
+		 * @brief The Pipeline through which basic rendering occurs.
+		 *
+		 * This class provides the ability to use shaders while rendering - and
+		 * you need shaders to render anything more than a triangle so this is a
+		 * necessity. Shaders must be written with ambiguous location parameters
+		 * on inputs but will be set through this class, to allow for maximum
+		 * compatibility.
+		 *
+		 * The activate method must be called before rendering the system
+		 * associated with this pipeline, otherwise you may render without or
+		 * with the wrong shaders.
+		 *
+		 * The set* methods are to set uniform data, for example the MVP
+		 * matrices from the camera.
+		 *
+		 * @paragraph Usage
+		 * @code
+		 * // using the chunk renderer as an example.
+		 * ShaderPipeline pipeline;
+		 * pipeline.prepare("myvert.shader", "myfrag.shader", ChunkRenderer::getRequiredShaderLayout());
+		 *
+		 * mainGameLoop()
+		 * {
+		 *     // individually activate since we have another shader that could be active.
+		 *     pipeline.activate();
+		 *     pipeline.setMatrix(myViewMatrix);
+		 *     pipeline.setMatrix(myProjectionMatrix);
+		 *     world.render();
+		 *
+		 *     // lets say we made this for a ui element
+		 *     pipeline2.activate();
+		 *     ui.render();
+		 * }
+		 * @endcode
+		 */
 		class ShaderPipeline
 		{
 		public:
 			ShaderPipeline()  = default;
 			~ShaderPipeline() = default;
 
+			/**
+			 * @brief Prepares a pipeline with the provided shaders and layout.
+			 * @param vertShaderPath Path to vertex shader.
+			 * @param fragShaderPath Path to fragment/pixel shader.
+			 * @param layout The required layout for the shaders to adhere to.
+			 */
 			void prepare(std::string vertShaderPath, std::string fragShaderPath,
 			             std::vector<ShaderLayout> layout);
+
+			/**
+			 * @brief Activates the pipeline, prepared shaders are activated.
+			 *
+			 * This must be called before calling the render method for
+			 * associated objects, otherwise you may render with the wrong
+			 * shader, or just without an active shader. If you don't plan on
+			 * changing shaders at any point, this can be called once beforehand
+			 * and never again.
+			 */
 			void activate();
 
+			/**
+			 * @brief Sets a uniform location to a 2 component vector.
+			 * @param location The location being set.
+			 * @param value The value to set provided location.
+			 */
 			void setVector2(std::string location, math::vec2 value);
+
+			/**
+			 * @brief Sets a uniform location to a 3 component vector.
+			 * @param location The location being set.
+			 * @param value The value to set provided location.
+			 */
 			void setVector3(std::string location, math::vec3 value);
+
+			/**
+			 * @brief Sets a uniform location to a 4x4 matrix.
+			 * @param location The location being set.
+			 * @param value The value to set provided location.
+			 */
 			void setMatrix(std::string location, math::mat4 value);
 
+			/**
+			 * @brief Queries the location set for a specific attribute.
+			 * @param attr The attribute location to query
+			 * @return The set location for the attribute.
+			 */
 			int queryLayoutOfAttribute(std::string attr);
 
 		private:
 			unsigned int m_program;
 		};
 	} // namespace gfx
-} // namespace q2
+} // namespace phx
