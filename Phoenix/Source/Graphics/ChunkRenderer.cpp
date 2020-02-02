@@ -27,7 +27,6 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <Phoenix/Graphics/ChunkRenderer.hpp>
-#include <Phoenix/Graphics/ShaderPipeline.hpp>
 #include <Phoenix/Voxels/BlockRegistry.hpp>
 
 #include <glad/glad.h>
