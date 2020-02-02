@@ -89,7 +89,7 @@ namespace phx
 		 * renderer->render():
 		 * @endcode
 		 *
-		 * @todo Find solution to this issue. Not urgent but hopefully by 0.3/4
+		 * @todo Find solution to the max texture limit. Not urgent but hopefully by 0.3/4
 		 */
 		class ChunkRenderer
 		{
