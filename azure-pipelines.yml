@@ -1,8 +1,3 @@
-# C/C++ with GCC
-# Build your C/C++ project with GCC using make.
-# Add steps that publish test results, save build artifacts, deploy, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/apps/c-cpp/gcc
-
 trigger:
   branches:
     include:
@@ -14,8 +9,8 @@ pr:
     include:
     - '*'  # must quote since "*" is a YAML reserved character; we want a string
 
-variables:
-  CCACHE_DIR: $(Pipeline.Workspace)/.ccache
+#variables:
+#  CCACHE_DIR: $(Pipeline.Workspace)/.ccache
 
 jobs:
 - job:
@@ -25,8 +20,8 @@ jobs:
   strategy:
     matrix:
       Clang-6:
-        CC: ccache clang
-        CXX: ccache clang++
+        CC: clang
+        CXX: clang++
         BuildType: Debug
         SelfHost: false
         CMakeArgs: ''
@@ -39,21 +34,21 @@ jobs:
         CMakeArgs: ''
 
   steps:
-    - script: |
-        sudo apt-get install ccache ninja-build -y
-        echo "##vso[task.prependpath]/usr/lib/ccache"
-        export CCACHE_CPP2=yes
-      displayName: 'Install build dependencies'
-    - task: Cache@2
-      inputs:
-        key: 'ccache | "$(Agent.JobName)"'
-        path: $(CCACHE_DIR)
-      displayName: 'CCache'
+#    - script: |
+#        sudo apt-get install ccache ninja-build -y
+#        echo "##vso[task.prependpath]/usr/lib/ccache"
+#        export CCACHE_CPP2=yes
+#      displayName: 'Install build dependencies'
+#    - task: Cache@2
+#      inputs:
+#        key: 'ccache | "$(Agent.JobName)"'
+#        path: $(CCACHE_DIR)
+#      displayName: 'CCache'
     - script: git submodule update --init
       displayName: 'Cloning Submodules'
-    - script: cmake -G"Ninja" -H. -BBuild
+    - script: cmake -H. -BBuild
       displayName: 'CMake Configure'
-    - script: cd Build && ninja
+    - script: cmake --build Build
       displayName: 'CMake Build'
 
 - job:

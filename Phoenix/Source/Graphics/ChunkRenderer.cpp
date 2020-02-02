@@ -27,7 +27,6 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <Phoenix/Graphics/ChunkRenderer.hpp>
-#include <Phoenix/Graphics/ShaderPipeline.hpp>
 #include <Phoenix/Voxels/BlockRegistry.hpp>
 
 #include <glad/glad.h>
@@ -41,6 +40,7 @@
 using namespace phx;
 using namespace gfx;
 
+// struct to help with laying out the data inside the buffers.
 struct Vertex
 {
 	float x;

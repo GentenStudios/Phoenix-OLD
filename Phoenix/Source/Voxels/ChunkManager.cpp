@@ -37,6 +37,7 @@ using namespace phx;
 
 ChunkManager::ChunkManager(int viewDistance) : m_viewDistance(viewDistance)
 {
+	// calculates the maximum visible chunks.
 	const int viewLength       = (viewDistance * 2) + 1;
 	const int maxVisibleChunks = viewLength * viewLength * viewLength;
 
@@ -48,6 +49,7 @@ ChunkManager::~ChunkManager() { delete m_renderer; }
 
 void ChunkManager::tick(math::vec3 playerPos)
 {
+	// this block converts the raw camera/player position into voxel-world positions.
 	playerPos = playerPos / 2.f;
 	playerPos += 0.5f;
 
