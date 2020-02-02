@@ -29,8 +29,6 @@
 #include <Phoenix/Graphics/ChunkMesher.hpp>
 #include <Phoenix/Voxels/Chunk.hpp>
 
-#include <iostream>
-
 static const phx::math::vec3 CUBE_VERTS[] = {
     // front
     phx::math::vec3(-1.f, -1.f, -1.f), phx::math::vec3(1.f, -1.f, -1.f),
@@ -174,7 +172,6 @@ void ChunkMesher::addBlockFace(voxels::BlockType* block, BlockFace face,
                                float x, float y, float z)
 {
 	int texLayer = -1;
-
 	texLayer = m_texTable.at(block->textures[static_cast<std::size_t>(face)]);
 
 	for (int i = 0; i < NUM_VERTS_IN_FACE; ++i)
@@ -193,6 +190,6 @@ void ChunkMesher::addBlockFace(voxels::BlockType* block, BlockFace face,
 		m_mesh.push_back(cubeUVs.x);
 		m_mesh.push_back(cubeUVs.y);
 
-		m_mesh.push_back(texLayer);
+		m_mesh.push_back(static_cast<float>(texLayer));
 	}
 }

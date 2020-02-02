@@ -26,3 +26,9 @@ block.onBreak = function (position)
 	print("grass broken at" + position)
 end
 voxel.block.register(block)
+
+block = {}
+block.name = "Air"
+block.id = "core:air"
+block.category = "Air"
+voxel.block.register(block)
