@@ -37,6 +37,7 @@
 #include <Phoenix/Settings.hpp>
 #include <Phoenix/Voxels/BlockRegistry.hpp>
 #include <Phoenix/Voxels/Chunk.hpp>
+#include <Phoenix/Voxels/ChunkManager.hpp>
 
 #include <Phoenix/UI.hpp>
 
@@ -122,25 +123,12 @@ void Phoenix::run()
 
 	Settings::get()->load();
 
-	gfx::ChunkRenderer renderer {100};
-	renderer.buildTextureArray();
-
-	for (int j {0}; j < 10; ++j)
-	{
-		for (int i {0}; i < 10; ++i)
-		{
-			voxels::Chunk chunk({i * 16, 0, j * 16});
-			chunk.autoTestFill();
-			gfx::ChunkMesher mesher {chunk.getChunkPos(), chunk.getBlocks(),
-			                         renderer.getTextureTable()};
-			mesher.mesh();
-			renderer.submitChunkMesh(mesher.getMesh(), i + (j * 10));
-		}
-	}
-
 	gfx::ShaderPipeline shaderPipeline;
-	shaderPipeline.prepare("Assets/SimpleWorld.vert", "Assets/SimpleWorld.frag",
-	                       renderer.getRequiredShaderLayout());
+	shaderPipeline.prepare("Assets/SimpleWorld.vert",
+                           "Assets/SimpleWorld.frag",
+	                       gfx::ChunkRenderer::getRequiredShaderLayout());
+
+    voxels::ChunkManager world { 3 };
 
 	shaderPipeline.activate();
 
@@ -209,7 +197,7 @@ void Phoenix::run()
 		shaderPipeline.setMatrix("u_view", m_camera->calculateViewMatrix());
 		shaderPipeline.setMatrix("u_projection", m_camera->getProjection());
 
-		renderer.render();
+		world.render();
 
 		m_window->endFrame();
 	}
