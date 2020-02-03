@@ -58,9 +58,12 @@ namespace phx
 		bool action1();
 		bool action2();
 
+        void setHand(voxels::BlockType* block);
+        voxels::BlockType* getHand();
 
 	private:
 		float m_reach = 32.f;
 		voxels::ChunkManager* m_world;
+        voxels::BlockType* m_hand;
 	};
 } // namespace phx

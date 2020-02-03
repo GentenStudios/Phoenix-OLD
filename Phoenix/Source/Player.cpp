@@ -96,7 +96,7 @@ bool Player::action2()
 			back.floor();
 
 			m_world->setBlockAt(
-			    back, voxels::BlockRegistry::get()->getFromID("core:dirt"));
+			    back, m_hand);
 
 			return true;
 		}
@@ -107,4 +107,12 @@ bool Player::action2()
 	return false;
 }
 
+void Player::setHand(voxels::BlockType* block)
+{
+	m_hand = block;
+}
 
+voxels::BlockType* Player::getHand()
+{
+	return m_hand;
+}

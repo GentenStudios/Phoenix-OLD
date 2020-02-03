@@ -85,6 +85,20 @@ public:
 				m_window->close();
 				break;
 
+			case events::Keys::KEY_E:
+				m_playerHand++;
+				m_player->setHand(
+				    voxels::BlockRegistry::get()->getFromRegistryID(
+				        m_playerHand));
+				break;
+
+			case events::Keys::KEY_R:
+				m_playerHand--;
+				m_player->setHand(
+				    voxels::BlockRegistry::get()->getFromRegistryID(
+				        m_playerHand));
+				break;
+
 			default:
 				break;
 			}
@@ -138,6 +152,8 @@ public:
 		m_player = new Player(m_world);
 		m_camera = new gfx::FPSCamera(m_window);
 		m_camera->setActor(m_player);
+
+		m_player->setHand(voxels::BlockRegistry::get()->getFromRegistryID(0));
 
 		gfx::ShaderPipeline shaderPipeline;
 		shaderPipeline.prepare("Assets/SimpleWorld.vert",
@@ -216,6 +232,9 @@ public:
 
 			ImGui::Text("X: %f\nY: %f\nZ: %f", m_player->getPosition().x,
 			            m_player->getPosition().y, m_player->getPosition().z);
+
+			ImGui::Text("Block in hand: %i: %s", m_playerHand,
+			            m_player->getHand()->displayName.c_str());
 			ImGui::End();
 
 			chat.draw();
@@ -244,6 +263,7 @@ private:
 	gfx::FPSCamera*       m_camera = nullptr;
 	Player*               m_player = nullptr;
 	voxels::ChunkManager* m_world  = nullptr;
+	int                   m_playerHand = 0;
 };
 
 #undef main
