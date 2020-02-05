@@ -38,6 +38,8 @@
 #include <Phoenix/Graphics/Window.hpp>
 #include <Phoenix/Settings.hpp>
 
+#include <Phoenix/Actor.hpp>
+
 namespace phx
 {
 	namespace gfx
@@ -198,11 +200,17 @@ namespace phx
 			 */
 			void onWindowResize(events::Event e);
 
+			/**
+			 * @brief Sets the actor for the camera to "follow".
+			 * @param actor The actor to set the camera to use.
+			 */
+			void setActor(Actor* actor);
+
 		private:
 			Window* m_window;
 
 			math::mat4 m_projection;
-
+			
 			math::vec3 m_rotation;
 			math::vec3 m_position;
 			math::vec3 m_up;
@@ -213,6 +221,7 @@ namespace phx
 			bool m_enabled = true;
 
 			Setting* m_settingSensitivity;
+			Actor*   m_actor = nullptr;
 		};
 	} // namespace gfx
 } // namespace q2
