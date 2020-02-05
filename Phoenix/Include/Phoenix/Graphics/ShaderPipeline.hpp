@@ -50,8 +50,8 @@ namespace phx
 		 * @brief The layout for shader vertex locations.
 		 *
 		 * A shader has a layout in which vertices and data in general is sent
-		 * to it in, this makes sure that all renderer objects can specify a
-		 * their own layout to allow better compatability.
+		 * to it in, this makes sure that all renderer objects can specify
+		 * their own layout to allow better compatibility.
 		 *
 		 * @paragraph Usage
 		 * @code
@@ -145,8 +145,12 @@ namespace phx
 
 			/**
 			 * @brief Sets a uniform location to a 3 component vector.
-			 * @param location The location being set.
+			 * @param location The unique identifier for the uniform.
 			 * @param value The value to set provided location.
+			 *
+			 * The uniform location being set must be equivalent to the name
+			 * provided to identify data specific to this type in the shaders
+			 * themselves.
 			 */
 			void setVector3(std::string location, math::vec3 value);
 
@@ -154,12 +158,16 @@ namespace phx
 			 * @brief Sets a uniform location to a 4x4 matrix.
 			 * @param location The location being set.
 			 * @param value The value to set provided location.
+			 * 
+			 * The uniform location being set must be equivalent to the name
+			 * provided to identify data specific to this type in the shaders
+			 * themselves.
 			 */
 			void setMatrix(std::string location, math::mat4 value);
 
 			/**
 			 * @brief Queries the location set for a specific attribute.
-			 * @param attr The attribute location to query
+			 * @param attr The layout/attribute name provided in the shader.
 			 * @return The set location for the attribute.
 			 */
 			int queryLayoutOfAttribute(std::string attr);

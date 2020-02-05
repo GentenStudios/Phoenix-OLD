@@ -64,7 +64,7 @@ namespace phx
 		/**
 		 * @brief The Window to be rendering too.
 		 *
-		 * The window is cross-platform, however will not work on neither
+		 * The window is cross-platform, however will not work on either
 		 * Android or iOS since these are mobile platforms and we do not support
 		 * them as of yet.
 		 *
@@ -73,7 +73,7 @@ namespace phx
 		 * will auto-exit and a user will have to find another computer to use
 		 * that supports OpenGL 3.3.
 		 *
-		 * @paragraph Usag
+		 * @paragraph Usage
 		 * @code
 		 * Window* window = new Window("Phoenix!", 1280, 720);
 		 * window->show();
@@ -100,6 +100,9 @@ namespace phx
 			 * @param title The window title.
 			 * @param width The width of the window.
 			 * @param height The height of the window.
+			 *
+			 * @todo Change from using 2 integers to a math::vec2i at some
+			 * point.
 			 */
 			Window(const std::string& title, int width, int height);
 			~Window();
@@ -114,7 +117,7 @@ namespace phx
 			 * events are documented in the events system.
 			 */
 			void pollEvents();
-			
+
 			/**
 			 * @brief Swaps the OpenGL buffers to update what's on screen.
 			 */
@@ -189,7 +192,7 @@ namespace phx
 			 * @brief Resizes the window.
 			 * @param size The size to set the window.
 			 */
-			void        resize(math::vec2i size);
+			void resize(math::vec2i size);
 
 			/**
 			 * @brief Gets the size of the window.
@@ -201,7 +204,7 @@ namespace phx
 			 * @brief Enables or Disables the ability to resize the window.
 			 * @param enabled Whether to enable resizing or not.
 			 */
-			void        setResizable(bool enabled);
+			void setResizable(bool enabled);
 
 			/**
 			 * @brief Enables or Disables VSync.
@@ -241,12 +244,14 @@ namespace phx
 			 * @brief Registers a new event listener.
 			 * @param listener The object to send events to.
 			 *
-			 * Event listeners should inherit from events::IEventListener, for example:
+			 * Event listeners should inherit from events::IEventListener, for
+			 * example:
 			 * @code
 			 * class Phoenix : public events::IEventListener;
 			 * @endcode
 			 *
-			 * They will all have an onEvent method which will execute at necessary.
+			 * They will all have an onEvent method which will execute at
+			 * necessary.
 			 */
 			void registerEventListener(events::IEventListener* listener);
 
@@ -270,13 +275,13 @@ namespace phx
 			 * Information for cursor states can be found in the documentation
 			 * for gfx::CursorState.
 			 */
-			void        setCursorState(gfx::CursorState state);
+			void setCursorState(gfx::CursorState state);
 
 			/**
 			 * @brief Sets the cursor position.
 			 * @param pos The position in the window to set the cursor to.
 			 */
-			void        setCursorPosition(math::vec2i pos);
+			void setCursorPosition(math::vec2i pos);
 
 			/**
 			 * @brief Gets the position of the cursor.
@@ -300,4 +305,4 @@ namespace phx
 			std::vector<events::IEventListener*> m_eventListeners;
 		};
 	} // namespace gfx
-} // namespace q2
+} // namespace phx
