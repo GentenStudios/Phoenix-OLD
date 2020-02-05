@@ -181,6 +181,8 @@ void ChunkRenderer::updateChunk(const std::vector<float>& mesh, math::vec3 pos)
 		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * mesh.size(), mesh.data(),
 		             GL_DYNAMIC_DRAW);
 	}
+
+	it->second.vertexCount = mesh.size();
 }
 
 void ChunkRenderer::dropChunk(math::vec3 pos) { m_buffers.erase(pos); }
