@@ -33,6 +33,7 @@
 #include <Phoenix/Graphics/ChunkRenderer.hpp>
 #include <Phoenix/Graphics/Window.hpp>
 #include <Phoenix/ImGuiHelpers.hpp>
+#include <Phoenix/Player.hpp>
 #include <Phoenix/Settings.hpp>
 #include <Phoenix/Voxels/BlockRegistry.hpp>
 #include <Phoenix/Voxels/ChunkManager.hpp>
@@ -64,8 +65,6 @@ public:
 		m_window = new gfx::Window("Phoenix Game!", 1280, 720);
 		m_window->registerEventListener(this);
 
-		m_camera = new gfx::FPSCamera(m_window);
-
 		chat.registerCallback(&rawEcho);
 	}
 
@@ -90,16 +89,22 @@ public:
 				break;
 			}
 			break;
+
 		case events::EventType::MOUSE_BUTTON_PRESSED:
 			switch (e.mouse.button)
 			{
 			case events::MouseButtons::LEFT:
-				std::cout << "left mosue button" << std::endl;
+				m_player->action1();
 				break;
+
+			case events::MouseButtons::RIGHT:
+				m_player->action2();
+				break;
+
 			default:
 				break;
 			}
-			break;
+
 		default:
 			break;
 		}
@@ -108,6 +113,15 @@ public:
 	void run()
 	{
 		voxels::BlockRegistry::get()->initialise();
+
+		{
+			voxels::BlockType air;
+			{
+				air.id       = "core:air";
+				air.category = voxels::BlockCategory::AIR;
+			}
+			voxels::BlockRegistry::get()->registerBlock(air);
+		}
 
 		sol::state lua;
 		lua.open_libraries(sol::lib::base);
@@ -120,20 +134,27 @@ public:
 
 		Settings::get()->load();
 
+		m_world  = new voxels::ChunkManager(3);
+		m_player = new Player(m_world);
+		m_camera = new gfx::FPSCamera(m_window);
+		m_camera->setActor(m_player);
+
 		gfx::ShaderPipeline shaderPipeline;
 		shaderPipeline.prepare("Assets/SimpleWorld.vert",
 		                       "Assets/SimpleWorld.frag",
 		                       gfx::ChunkRenderer::getRequiredShaderLayout());
-
-		voxels::ChunkManager world(3);
 
 		shaderPipeline.activate();
 
 		const math::mat4 model;
 		shaderPipeline.setMatrix("u_model", model);
 
-		static bool wireframe = false;
-		static int  prevSens;
+		static bool       wireframe    = false;
+		static bool       followCamera = true;
+		static int        prevSens;
+		static math::vec3 lastPos;
+
+		m_window->setVSync(true);
 
 		float last = static_cast<float>(SDL_GetTicks());
 		while (m_window->isRunning())
@@ -145,7 +166,7 @@ public:
 			m_window->startFrame();
 
 			m_camera->tick(dt);
-			world.tick(m_camera->getPosition());
+			m_world->tick(m_camera->getPosition());
 
 			{
 				ImGuiIO& io         = ImGui::GetIO();
@@ -179,6 +200,10 @@ public:
 					glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 			}
 
+			ImGui::Checkbox("Follow Camera", &followCamera);
+			if (followCamera)
+				lastPos = m_player->getPosition();
+
 			static Setting* sensSetting =
 			    Settings::get()->getSetting("camera:sensitivity");
 			static int sens = sensSetting->value();
@@ -188,6 +213,9 @@ public:
 				prevSens = sens;
 				sensSetting->set(sens);
 			}
+
+			ImGui::Text("X: %f\nY: %f\nZ: %f", m_player->getPosition().x,
+			            m_player->getPosition().y, m_player->getPosition().z);
 			ImGui::End();
 
 			chat.draw();
@@ -195,7 +223,7 @@ public:
 			shaderPipeline.setMatrix("u_view", m_camera->calculateViewMatrix());
 			shaderPipeline.setMatrix("u_projection", m_camera->getProjection());
 
-			world.render();
+			m_world->render();
 
 			m_window->endFrame();
 		}
@@ -204,11 +232,18 @@ public:
 		// Begin Shutdown //
 		// ============== //
 		Settings::get()->save();
+
+		delete m_world;
+		delete m_camera;
+		delete m_player;
+		delete m_window;
 	}
 
 private:
-	gfx::Window*    m_window;
-	gfx::FPSCamera* m_camera;
+	gfx::Window*          m_window = nullptr;
+	gfx::FPSCamera*       m_camera = nullptr;
+	Player*               m_player = nullptr;
+	voxels::ChunkManager* m_world  = nullptr;
 };
 
 #undef main

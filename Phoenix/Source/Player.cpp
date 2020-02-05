@@ -1,4 +1,4 @@
-// Copyright 2019-20 Genten Studios
+// Copyright 2019 Genten Studios
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -26,63 +26,85 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#pragma once
+#include <Phoenix/Player.hpp>
+#include <Phoenix/Voxels/BlockRegistry.hpp>
 
-#include <Phoenix/Math/Vector3.hpp>
+using namespace phx;
 
-namespace phx
+static const float RAY_INCREMENT = 0.5f;
+
+Player::Player(voxels::ChunkManager* world) : m_world(world) {}
+
+math::Ray Player::getTarget()
 {
-	namespace math
+	math::vec3 pos = (getPosition() / 2.f) + .5f;
+
+	math::Ray ray(pos, getDirection());
+
+	while (ray.getLength() < m_reach)
 	{
-	/**
-	 * @brief Produces a castable ray for helping find things at
-	 * positions/intervals along the ray.
-	 */
-	class Ray
-	{
-		using vec3 = detail::Vector3<float>;
-	public:
-		/**
-		 * @brief Constructs a Ray object.
-		 * @param start The position of the start of the ray.
-		 * @param direction The direction the ray is "traveling" in.
-		 */
-		Ray(const vec3& start, const vec3& direction);
+		pos.floor();
 
-		Ray(const Ray& other) = default;
-		~Ray()                = default;
+		if (m_world->getBlockAt(pos)->category == voxels::BlockCategory::SOLID)
+		{
+			return ray;
+		}
 
-		/**
-		 * @brief Advances along a ray.
-		 * @param scale The distance to advance along the ray
-		 * @return The new position along the ray.
-		 */
-		vec3 advance(float scale);
-
-		/**
-		 * @brief Backtracks (goes backwards) along a ray.
-		 * @param scale The distance to backtrack along the ray.
-		 * @return The new position along the ray.
-		 */
-		vec3 backtrace(float scale);
-
-		/**
-		 * @brief Gets the current length of the ray.
-		 * @return The length of the ray.
-		 */
-		float getLength() const;
-
-		/**
-		 * @brief Gets the current position along the ray.
-		 * @return The current position along the ray
-		 */
-		vec3 getCurrentPosition() const;
-
-	private:
-		float      m_length;
-		vec3 m_start;
-		vec3 m_direction;
-		vec3 m_currentPosition;
-	};
+		pos = ray.advance(RAY_INCREMENT);
 	}
-} // namespace phx
+
+	return ray;
+}
+
+bool Player::action1()
+{
+	math::vec3 pos = (getPosition() / 2.f) + .5f;
+
+	math::Ray ray(pos, getDirection());
+
+	while (ray.getLength() < m_reach)
+	{
+		pos.floor();
+
+		if (m_world->getBlockAt(pos)->category == voxels::BlockCategory::SOLID)
+		{
+			m_world->setBlockAt(
+			    pos, voxels::BlockRegistry::get()->getFromID("core:air"));
+
+			return true;
+		}
+
+		pos = ray.advance(RAY_INCREMENT);
+	}
+
+	return false;
+}
+
+bool Player::action2()
+{
+	math::vec3 pos = (getPosition() / 2.f) + .5f;
+
+	math::Ray ray(pos, getDirection());
+
+	while (ray.getLength() < m_reach)
+	{
+		pos.floor();
+
+		if (m_world->getBlockAt(pos)->category == voxels::BlockCategory::SOLID)
+		{
+			math::vec3 back = ray.backtrace(RAY_INCREMENT);
+			back.floor();
+
+			m_world->setBlockAt(
+			    back, voxels::BlockRegistry::get()->getFromID("core:dirt"));
+
+			return true;
+		}
+
+		pos = ray.advance(RAY_INCREMENT);
+	}
+
+	return false;
+}
+
+

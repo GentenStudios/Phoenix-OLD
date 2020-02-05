@@ -21,6 +21,7 @@ set(Headers
 	${currentDir}/Commander.hpp
 
 	${currentDir}/Actor.hpp
+	${currentDir}/Player.hpp
 
 	PARENT_SCOPE
 )

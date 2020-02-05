@@ -96,6 +96,22 @@ namespace phx
 			 */
 			void render();
 
+
+			/**
+			 * @brief Gets the block at a specific position.
+			 * @param position The position of the block to get.
+			 * @return The block in said position.
+			 * @return "core:out_of_bounds" if an invalid position is provided.
+			 */
+			BlockType* getBlockAt(math::vec3 position) const;
+
+			/**
+			 * @brief Sets the block at a specific position.
+			 * @param position The position to set a block.
+			 * @param block The block to set.
+			 */
+			void setBlockAt(math::vec3 position, BlockType* block);
+
 		private:
 			int m_viewDistance = 1; // 1 chunk
 
