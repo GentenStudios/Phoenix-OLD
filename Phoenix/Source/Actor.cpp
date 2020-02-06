@@ -1,4 +1,4 @@
-// Copyright 2019-20 Genten Studios
+// Copyright 2019 Genten Studios
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -26,63 +26,47 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#pragma once
+#include <Phoenix/Actor.hpp>
 
-#include <Phoenix/Math/Vector3.hpp>
+using namespace phx;
 
-namespace phx
+static const int MAX_MOVE_SPEED     = 500;
+static const int DEFAULT_MOVE_SPEED = 10;
+
+Actor::Actor() : m_moveSpeed(DEFAULT_MOVE_SPEED) {}
+
+math::vec3 Actor::getPosition() const { return m_position; }
+
+bool Actor::setPosition(math::vec3 pos)
 {
-	namespace math
+	m_position = pos;
+	return true;
+}
+
+math::vec3 Actor::getRotation() const { return m_rotation; }
+
+bool Actor::setRotation(math::vec3 rot)
+{
+	m_rotation = rot;
+	return true;
+}
+
+math::vec3 Actor::getDirection() const
+{
+	return {std::cos(m_rotation.y) * std::sin(m_rotation.x),
+	        std::sin(m_rotation.y),
+	        std::cos(m_rotation.y) * std::cos(m_rotation.x)};
+}
+
+int Actor::getMoveSpeed() { return m_moveSpeed; }
+
+bool Actor::setMoveSpeed(int speed)
+{
+	if (speed >= 0 && speed <= MAX_MOVE_SPEED)
 	{
-	/**
-	 * @brief Produces a castable ray for helping find things at
-	 * positions/intervals along the ray.
-	 */
-	class Ray
-	{
-		using vec3 = detail::Vector3<float>;
-	public:
-		/**
-		 * @brief Constructs a Ray object.
-		 * @param start The position of the start of the ray.
-		 * @param direction The direction the ray is "traveling" in.
-		 */
-		Ray(const vec3& start, const vec3& direction);
-
-		Ray(const Ray& other) = default;
-		~Ray()                = default;
-
-		/**
-		 * @brief Advances along a ray.
-		 * @param scale The distance to advance along the ray
-		 * @return The new position along the ray.
-		 */
-		vec3 advance(float scale);
-
-		/**
-		 * @brief Backtracks (goes backwards) along a ray.
-		 * @param scale The distance to backtrack along the ray.
-		 * @return The new position along the ray.
-		 */
-		vec3 backtrace(float scale);
-
-		/**
-		 * @brief Gets the current length of the ray.
-		 * @return The length of the ray.
-		 */
-		float getLength() const;
-
-		/**
-		 * @brief Gets the current position along the ray.
-		 * @return The current position along the ray
-		 */
-		vec3 getCurrentPosition() const;
-
-	private:
-		float      m_length;
-		vec3 m_start;
-		vec3 m_direction;
-		vec3 m_currentPosition;
-	};
+		m_moveSpeed = speed;
+		return true;
 	}
-} // namespace phx
+
+	return false;
+}

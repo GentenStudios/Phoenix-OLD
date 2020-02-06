@@ -1,4 +1,4 @@
-// Copyright 2019-20 Genten Studios
+// Copyright 2019 Genten Studios
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -26,63 +26,48 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+/**
+ * @file Actor.hpp
+ * @brief Header file for the Actor interface.
+ *
+ * @copyright Copyright (c) 2019-2020 Genten Studios
+ */
+
 #pragma once
 
-#include <Phoenix/Math/Vector3.hpp>
+#include <Phoenix/Math/Math.hpp>
 
 namespace phx
 {
-	namespace math
+	class Actor
 	{
-	/**
-	 * @brief Produces a castable ray for helping find things at
-	 * positions/intervals along the ray.
-	 */
-	class Ray
-	{
-		using vec3 = detail::Vector3<float>;
 	public:
-		/**
-		 * @brief Constructs a Ray object.
-		 * @param start The position of the start of the ray.
-		 * @param direction The direction the ray is "traveling" in.
-		 */
-		Ray(const vec3& start, const vec3& direction);
+		Actor();
 
-		Ray(const Ray& other) = default;
-		~Ray()                = default;
+		math::vec3 getPosition() const;
+		bool       setPosition(math::vec3 pos);
+		math::vec3 getRotation() const;
+		bool       setRotation(math::vec3 rot);
 
-		/**
-		 * @brief Advances along a ray.
-		 * @param scale The distance to advance along the ray
-		 * @return The new position along the ray.
-		 */
-		vec3 advance(float scale);
+		math::vec3 getDirection() const;
 
 		/**
-		 * @brief Backtracks (goes backwards) along a ray.
-		 * @param scale The distance to backtrack along the ray.
-		 * @return The new position along the ray.
+		 * @brief Gets the actor's current speed.
+		 * @return The actor's current speed.
 		 */
-		vec3 backtrace(float scale);
+		int getMoveSpeed();
 
 		/**
-		 * @brief Gets the current length of the ray.
-		 * @return The length of the ray.
+		 * @brief Sets the actors's current speed.
+		 * @param speed The speed to set.
+		 * @return true If the speed was able to be set.
+		 * @return false If the speed was invalid, or unable to set.
 		 */
-		float getLength() const;
-
-		/**
-		 * @brief Gets the current position along the ray.
-		 * @return The current position along the ray
-		 */
-		vec3 getCurrentPosition() const;
+		bool setMoveSpeed(int speed);
 
 	private:
-		float      m_length;
-		vec3 m_start;
-		vec3 m_direction;
-		vec3 m_currentPosition;
+		math::vec3 m_rotation;
+		math::vec3 m_position;
+		int        m_moveSpeed;
 	};
-	}
 } // namespace phx

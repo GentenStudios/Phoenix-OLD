@@ -26,45 +26,93 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#pragma once
+#include <Phoenix/Player.hpp>
+#include <Phoenix/Voxels/BlockRegistry.hpp>
 
-#include <Phoenix/Singleton.hpp>
-#include <Phoenix/Voxels/Block.hpp>
-#include <Phoenix/Voxels/TextureRegistry.hpp>
+using namespace phx;
 
-#include <vector>
+static const float RAY_INCREMENT = 0.5f;
 
-namespace phx
+Player::Player(voxels::ChunkManager* world) : m_world(world) {}
+
+math::Ray Player::getTarget()
 {
-	namespace voxels
+	math::vec3 pos = (getPosition() / 2.f) + .5f;
+
+	math::Ray ray(pos, getDirection());
+
+	while (ray.getLength() < m_reach)
 	{
-		class BlockRegistry : public Singleton<BlockRegistry>
+		pos.floor();
+
+		if (m_world->getBlockAt(pos)->category == voxels::BlockCategory::SOLID)
 		{
-		public:
-			void initialise();
+			return ray;
+		}
 
-			void       registerBlock(BlockType blockInfo);
-			BlockType* getFromID(const std::string& id);
+		pos = ray.advance(RAY_INCREMENT);
+	}
 
-			// registry int is stored in the block, it's a quicker way of
-			// getting a block's data. do NOT store this in chunk data, that is
-			// only valid once the registry table is built.
-			BlockType* getFromRegistryID(std::size_t registryID);
+	return ray;
+}
 
-			TextureRegistry* getTextures();
+bool Player::action1()
+{
+	math::vec3 pos = (getPosition() / 2.f) + .5f;
 
-			static constexpr int UNKNOWN_BLOCK       = 0;
-			static constexpr int OUT_OF_BOUNDS_BLOCK = 1;
+	math::Ray ray(pos, getDirection());
 
-		private:
-			// NOTE: We used to use an std::list to prevent invalidating any
-			// pointers, however, since all blocks will be registered in ONE go
-			// from a Lua initialisation, these pointers will not be invalidated
-			// for their whole lifetime, until the block registry is destroyed -
-			// but that will be quite late in the destruction of the program so
-			// this *shouldn't* be an issue. - @beeperdeeper089
-			std::vector<BlockType> m_blocks;
-			TextureRegistry        m_textures;
-		};
-	} // namespace voxels
-} // namespace q2
+	while (ray.getLength() < m_reach)
+	{
+		pos.floor();
+
+		if (m_world->getBlockAt(pos)->category == voxels::BlockCategory::SOLID)
+		{
+			m_world->setBlockAt(
+			    pos, voxels::BlockRegistry::get()->getFromID("core:air"));
+
+			return true;
+		}
+
+		pos = ray.advance(RAY_INCREMENT);
+	}
+
+	return false;
+}
+
+bool Player::action2()
+{
+	math::vec3 pos = (getPosition() / 2.f) + .5f;
+
+	math::Ray ray(pos, getDirection());
+
+	while (ray.getLength() < m_reach)
+	{
+		pos.floor();
+
+		if (m_world->getBlockAt(pos)->category == voxels::BlockCategory::SOLID)
+		{
+			math::vec3 back = ray.backtrace(RAY_INCREMENT);
+			back.floor();
+
+			m_world->setBlockAt(
+			    back, m_hand);
+
+			return true;
+		}
+
+		pos = ray.advance(RAY_INCREMENT);
+	}
+
+	return false;
+}
+
+void Player::setHand(voxels::BlockType* block)
+{
+	m_hand = block;
+}
+
+voxels::BlockType* Player::getHand()
+{
+	return m_hand;
+}
