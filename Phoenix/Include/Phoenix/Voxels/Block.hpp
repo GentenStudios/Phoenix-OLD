@@ -1,4 +1,4 @@
-// Copyright 2019 Genten Studios
+// Copyright 2019 - 2020 Genten Studios
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -26,6 +26,14 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+/**
+ * @file Block.hpp
+ * @brief The basic block type object
+ * 
+ * @copyright Copyright (c) Genten Studios 2019 - 2020
+ * 
+ */
+
 #pragma once
 
 #include <Phoenix/Math/Math.hpp>
@@ -38,6 +46,12 @@ namespace phx
 {
 	namespace voxels
 	{
+		/**
+		 * @brief The material state of the block
+		 * 
+		 * A block exist in one of three states, either "SOLID", "AIR", or a "LIQUID". These states define if the player can walk through the block or not in addition to other potential information (like does the object flow)
+		 * 
+		 */
 		enum class BlockCategory : unsigned int
 		{
 			AIR,
@@ -45,30 +59,69 @@ namespace phx
 			LIQUID
 		};
 
+		/**
+		 * @brief A callback function for when actions related to a block occur.
+		 * 
+		 */
 		using BlockCallback = std::function<void(math::vec3 pos)>;
 
+		/**
+		 * @brief The universal data for blocks. 
+		 * 
+		 * This stores any information that is consistent of blocks of the same "Type" regardless of the number of instances of that block in the world. For example a dirt block will have the same basic information every time it exists in the world.
+		 * 
+		 */
 		class BlockType
 		{
 		public:
 			BlockType()  = default;
 			~BlockType() = default;
 
+			/// @brief The name of the block as displayed to the player
 			std::string displayName;
+			/// @brief The unique name of the block, generally in the format core::dirt
 			std::string id;
 
+			/// @brief The material state of the block
 			BlockCategory category = BlockCategory::AIR;
 
+			/// @brief Callback when the block is placed
 			BlockCallback onPlace;
+			/// @brief Callback when the block is broken
 			BlockCallback onBreak;
+			/// @brief Callback when the block is interacted with
 			BlockCallback onInteract;
 
-			// front, left, back, right, top, bottom
+			/**
+			 * @brief An array of texture paths used for rendering the block
+			 * 
+			 * The textures are in the order front, left, back, right, top, bottom
+			 */
 			std::array<std::string, 6> textures;
 
+			/**
+			 * @brief Sets all the textures to be the same thing
+			 * 
+			 * @param tex Path to the texture to be used
+			 */
 			void setAllTextures(const std::string& tex) { textures.fill(tex); }
 
+			/**
+			 * @brief Get the Registry ID of the blockType
+			 * 
+			 * The registry ID is a runtime specific int that allows for faster access but is not preserved between runs
+			 * 
+			 * @return std::size_t the ID of the blockType
+			 */
 			std::size_t getRegistryID() const { return m_registryID; }
 
+			/**
+			 * @brief Beep, what is this?
+			 * 
+			 * @param rhs 
+			 * @return true 
+			 * @return false 
+			 */
 			bool operator==(const BlockType& rhs) const
 			{
 				return (id == rhs.id);
@@ -79,12 +132,22 @@ namespace phx
 			friend class BlockRegistry;
 		};
 
+		/**
+		 * @brief Data stored when a block in the world is diferent than other blocks of the same Type
+		 * 
+		 */
 		struct BlockMetadata
 		{
+			/**
+			 * @brief The position of the block in the world
+			 * 
+			 */
 			math::vec3  blockPos;
-			std::string data; // serialised data, we can decide how we wanna do
-			                  // this some other time (just an implementation
-			                  // attempt to stop pains later in life.)
+			/**
+			 * @brief serialised data, we can decide how we wanna do this some other time (just an implementation attempt to stop pains later in life.)
+			 * 
+			 */
+			std::string data; 
 		};
 	} // namespace voxels
 } // namespace q2
