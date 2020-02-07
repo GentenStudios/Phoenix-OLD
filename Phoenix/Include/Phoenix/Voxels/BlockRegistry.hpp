@@ -38,32 +38,66 @@ namespace phx
 {
 	namespace voxels
 	{
+		/**
+		 * @brief A registry of all [[BlockTypes]] that have been loaded. 
+		 * 
+		 */
 		class BlockRegistry : public Singleton<BlockRegistry>
 		{
 		public:
+			/// @brief Initializes the registry
 			void initialise();
 
+			/**
+			 * @brief Registers a block in the registry
+			 * 
+			 * @param blockInfo The blockType already put together
+			 */
 			void       registerBlock(BlockType blockInfo);
+			/**
+			 * @brief Gets a block from the registry based on its unique ID
+			 * 
+			 * @param id The unique ID of the block, usually in the form core::dirt
+			 * @return BlockType* A pointer to the block in the registry.
+			 */
 			BlockType* getFromID(const std::string& id);
 
-			// registry int is stored in the block, it's a quicker way of
-			// getting a block's data. do NOT store this in chunk data, that is
-			// only valid once the registry table is built.
+			/**
+			 * @brief Gets a block from the registry based on its registry ID
+			 * 
+			 * @note The registry ID is only used during runtime, do not try to store in a save
+			 * 
+			 * @param registryID The registry ID for the block
+			 * @return BlockType* A pointer to the block in the registry
+			 */
 			BlockType* getFromRegistryID(std::size_t registryID);
 
+			/**
+			 * @brief Get the textures for the block
+			 * 
+			 * @return TextureRegistry* The textures for the block
+			 */
 			TextureRegistry* getTextures();
 
 			static constexpr int UNKNOWN_BLOCK       = 0;
 			static constexpr int OUT_OF_BOUNDS_BLOCK = 1;
 
 		private:
-			// NOTE: We used to use an std::list to prevent invalidating any
-			// pointers, however, since all blocks will be registered in ONE go
-			// from a Lua initialisation, these pointers will not be invalidated
-			// for their whole lifetime, until the block registry is destroyed -
-			// but that will be quite late in the destruction of the program so
-			// this *shouldn't* be an issue. - @beeperdeeper089
+			/**
+			 * @brief Stores the blockTypes in the registry
+			 * 
+			 * @note We used to use an std::list to prevent invalidating any
+			 * pointers, however, since all blocks will be registered in ONE go
+			 * from a Lua initialisation, these pointers will not be invalidated
+			 * for their whole lifetime, until the block registry is destroyed -
+			 * but that will be quite late in the destruction of the program so
+			 * this *shouldn't* be an issue. - @beeperdeeper089
+			 */
 			std::vector<BlockType> m_blocks;
+			/**
+			 * @brief Stores the unique paths to textures
+			 * 
+			 */
 			TextureRegistry        m_textures;
 		};
 	} // namespace voxels
