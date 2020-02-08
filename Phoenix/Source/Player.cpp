@@ -78,10 +78,22 @@ Player::Player(voxels::ChunkManager* world) : m_world(world)
 	     * @subsubsection coreplayergetposition core.player.getPosition()
 	     * @brief Gets the players position
 		 * 
-		 * @return The players position
+		 * @return The players position in a table
+		 * 
+		 * @par Example usage
+		 * 
+		 * @code
+		 * print(core.player.getPosition().x)
+		 * print(core.player.getPosition().y)
+		 * print(core.player.getPosition().z)
+		 * @endcode
 	     */
 	    [this]() {
-		    return getPosition();
+			sol::table pos = ContentManager::get()->lua.create_table();
+			pos["x"] = getPosition().x;
+			pos["y"] = getPosition().y;
+			pos["z"] = getPosition().z;
+		    return pos;
 	    };
 	ContentManager::get()->lua["core"]["player"]["setPosition"] =
 	    /**
