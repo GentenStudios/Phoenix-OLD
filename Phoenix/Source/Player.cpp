@@ -70,6 +70,31 @@ Player::Player(voxels::ChunkManager* world) : m_world(world)
 	    [this](int speed) {
 		   setMoveSpeed(speed);
 	    };
+	ContentManager::get()->lua["core"]["player"]["getPosition"] =
+	    /**
+	     * @addtogroup luaapi
+	     *
+	     * @subsubsection coreplayergetposition core.player.getPosition()
+	     * @brief Gets the players position
+		 * 
+		 * @return The players position
+	     */
+	    [this]() {
+		    return getPosition();
+	    };
+	ContentManager::get()->lua["core"]["player"]["setPosition"] =
+	    /**
+	     * @addtogroup luaapi
+	     *
+	     * @subsubsection coreplayersetposition core.player.setPosition(position)
+	     * @brief Sets the player's position
+	     *
+	     * @param key The new position to set the player to
+	     *
+	     */
+	    [this](int position) {
+		   setPosition(position);
+	    };
 }
 
 math::Ray Player::getTarget()
