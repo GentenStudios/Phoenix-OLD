@@ -29,6 +29,7 @@
 #include <Phoenix/Player.hpp>
 #include <Phoenix/Voxels/BlockRegistry.hpp>
 #include <Phoenix/ContentLoader.hpp>
+#include <Phoenix/Commander.hpp>
 
 using namespace phx;
 
@@ -89,12 +90,22 @@ Player::Player(voxels::ChunkManager* world) : m_world(world)
 	     * @subsubsection coreplayersetposition core.player.setPosition(position)
 	     * @brief Sets the player's position
 	     *
-	     * @param key The new position to set the player to
+	     * @param posx The x component of the players position
+	     * @param posy The y component of the players position
+	     * @param posz The z component of the players position
 	     *
 	     */
-	    [this](int position) {
-		   setPosition(position);
+	    [this](int posx, int posy, int posz) {
+		   setPosition({posx, posy, posz});
 	    };
+
+	CommandBook::get()->add(
+		"tp", 
+		"Teleports player to supplied coordiantes \n /tp <x> <y> <z>", 
+		"all", 
+		[this](const std::vector<std::string>& args){
+			setPosition({std::stoi(args[0]), std::stoi(args[1]), std::stoi(args[2])});
+		});
 }
 
 math::Ray Player::getTarget()
