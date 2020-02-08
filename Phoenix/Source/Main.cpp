@@ -66,6 +66,17 @@ public:
 		m_window->registerEventListener(this);
 
 		chat.registerCallback(&rawEcho);
+		ContentManager::get()->lua["core"]["print"] =
+	    /**
+	     * @addtogroup luaapi
+	     *
+	     * @subsubsection coreprint core.print(text)
+	     * @brief Prints text to the players terminal
+	     *
+	     * @param text The text to be outputted to the terminal
+	     *
+	     */
+	    [](std::string text) { chat.cout << text << "\n"; };
 	}
 
 	~Phoenix() { delete m_window; }
@@ -137,11 +148,7 @@ public:
 			voxels::BlockRegistry::get()->registerBlock(air);
 		}
 
-		sol::state lua;
-		lua.open_libraries(sol::lib::base);
-		ContentManager::loadAPI(lua, chat);
-		bool loadedLua = ContentManager::loadModules("save1", lua);
-		if (!loadedLua)
+		if (!ContentManager::get()->loadModules("save1"))
 		{
 			m_window->close();
 		}
