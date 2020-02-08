@@ -27,6 +27,8 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <Phoenix/Settings.hpp>
+#include <Phoenix/ContentLoader.hpp>
+
 #include <climits>
 #include <fstream>
 #include <iostream>
@@ -62,6 +64,68 @@ std::string Setting::getKey() const { return m_key; }
 int Setting::value() const { return m_value; }
 
 int Setting::getDefault() const { return m_default; }
+
+Settings::Settings(){
+	ContentManager::get()->lua["core"]["setting"] = 
+		/**
+		 * @addtogroup luaapi
+		 *
+		 * ---
+		 * @subsection coreset core.setting
+		 * @brief Interfaces with the settings system
+		 */
+		ContentManager::get()->lua.create_table();
+	ContentManager::get()->lua["core"]["setting"]["register"] =
+	    /**
+	     * @addtogroup luaapi
+	     *
+	     * @subsubsection coresetreg core.setting.register(displayName, key,
+	     * defaultValue)
+	     * @brief Registers a setting that the player can adjust via the
+	     * settings menu
+	     *
+	     * @param displayName The Display name for the setting seen in the
+	     * settings menu
+	     * @param key The unique key for the setting, usually in the form
+	     * module:setting
+	     * @param defaultValue The default value for the setting if not already
+	     * set
+	     *
+	     */
+	    [](std::string displayName, std::string key, int defaultValue) {
+		    Settings::get()->add(displayName, key, defaultValue);
+	    };
+	ContentManager::get()->lua["core"]["setting"]["get"] =
+	    /**
+	     * @addtogroup luaapi
+	     *
+	     * @subsubsection coresetget core.setting.get(key)
+	     * @brief Gets the value of a setting based on its unique key
+	     *
+	     * @param key The unique key for the setting, usually in the form
+	     * module:setting
+	     * @return The integer value of the setting
+	     *
+	     */
+	    [](std::string key) {
+		    return Settings::get()->getSetting(key)->value();
+	    };
+	ContentManager::get()->lua["core"]["setting"]["set"] =
+	    /**
+	     * @addtogroup luaapi
+	     *
+	     * @subsubsection coresetset core.setting.set(key)
+	     * @brief Sets the value of a setting based on its unique key
+	     *
+	     * @param key The unique key for the setting, usually in the form
+	     * module:setting
+	     * @param value The value the setting should be set to
+	     *
+	     */
+	    [](std::string key, int value) {
+		    Settings::get()->getSetting(key)->set(value);
+	    };
+}
 
 Setting* Settings::add(const std::string& name, const std::string& key,
                        int defaultValue)
