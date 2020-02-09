@@ -29,6 +29,7 @@
 #include <Phoenix/Graphics/ChunkMesher.hpp>
 #include <Phoenix/Voxels/ChunkManager.hpp>
 #include <Phoenix/Voxels/BlockRegistry.hpp>
+#include <Phoenix/Voxels//Map.hpp>
 
 #include <iostream>
 

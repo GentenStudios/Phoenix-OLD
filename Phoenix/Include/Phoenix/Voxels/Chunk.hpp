@@ -34,61 +34,62 @@
 
 #include <vector>
 
-namespace phx
+namespace phx::voxels
 {
-	namespace voxels
-	{
-		enum class BlockFace : int
-		{
-			FRONT  = 0,
-			LEFT   = 1,
-			BACK   = 2,
-			RIGHT  = 3,
-			TOP    = 4,
-			BOTTOM = 5,
-		};
+    enum class BlockFace : int
+    {
+        FRONT  = 0,
+        LEFT   = 1,
+        BACK   = 2,
+        RIGHT  = 3,
+        TOP    = 4,
+        BOTTOM = 5,
+    };
 
-		class Chunk
-		{
-		public:
-			Chunk() = delete;
+    class Chunk
+    {
+    public:
+        Chunk() = delete;
 
-			explicit Chunk(math::vec3 chunkPos);
-			~Chunk()                  = default;
-			Chunk(const Chunk& other) = default;
-			Chunk& operator=(const Chunk& other) = default;
-			Chunk(Chunk&& other) noexcept        = default;
-			Chunk& operator=(Chunk&& other) noexcept = default;
+        explicit Chunk(math::vec3 chunkPos);
+        ~Chunk()                  = default;
+        Chunk(const Chunk& other) = default;
+        Chunk& operator=(const Chunk& other) = default;
+        Chunk(Chunk&& other) noexcept        = default;
+        Chunk& operator=(Chunk&& other) noexcept = default;
 
-			void autoTestFill();
+        Chunk(std::string save);
 
-			math::vec3               getChunkPos() const;
-			std::vector<BlockType*>& getBlocks();
+        std::string save();
 
-			BlockType* getBlockAt(math::vec3 position) const;
-			void       setBlockAt(math::vec3 position, BlockType* newBlock);
+        void autoTestFill();
 
-			static constexpr int CHUNK_WIDTH  = 16;
-			static constexpr int CHUNK_HEIGHT = 16;
-			static constexpr int CHUNK_DEPTH  = 16;
+        math::vec3               getChunkPos() const;
+        std::vector<BlockType*>& getBlocks();
 
-			static std::size_t getVectorIndex(std::size_t x, std::size_t y,
-			                                  std::size_t z)
-			{
-				return x + CHUNK_WIDTH * (y + CHUNK_HEIGHT * z);
-			}
+        BlockType* getBlockAt(math::vec3 position) const;
+        void       setBlockAt(math::vec3 position, BlockType* newBlock);
 
-			ENGINE_FORCE_INLINE static std::size_t getVectorIndex(
-			    math::vec3 pos)
-			{
-				return getVectorIndex(static_cast<std::size_t>(pos.x),
-				                      static_cast<std::size_t>(pos.y),
-				                      static_cast<std::size_t>(pos.z));
-			}
+        static constexpr int CHUNK_WIDTH  = 16;
+        static constexpr int CHUNK_HEIGHT = 16;
+        static constexpr int CHUNK_DEPTH  = 16;
 
-		private:
-			math::vec3              m_pos;
-			std::vector<BlockType*> m_blocks;
-		};
-	} // namespace voxels
-} // namespace q2
+        static std::size_t getVectorIndex(std::size_t x, std::size_t y,
+                                          std::size_t z)
+        {
+            return x + CHUNK_WIDTH * (y + CHUNK_HEIGHT * z);
+        }
+
+        ENGINE_FORCE_INLINE static std::size_t getVectorIndex(
+            math::vec3 pos)
+        {
+            return getVectorIndex(static_cast<std::size_t>(pos.x),
+                                  static_cast<std::size_t>(pos.y),
+                                  static_cast<std::size_t>(pos.z));
+        }
+
+    private:
+        math::vec3              m_pos;
+        std::vector<BlockType*> m_blocks;
+    };
+} // namespace phx::voxels

@@ -37,6 +37,26 @@ Chunk::Chunk(math::vec3 chunkPos) : m_pos(chunkPos)
 	m_blocks.reserve(CHUNK_WIDTH * CHUNK_HEIGHT * CHUNK_DEPTH);
 }
 
+Chunk::Chunk(std::string save){
+    std::string_view search = save;
+    size_t pos;
+    while((pos = search.find_last_of(';')) != search.npos){
+        std::string result;
+        result = search.substr(0, pos);
+        m_blocks.push_back(BlockRegistry::get()->getFromID(result));
+        search.remove_prefix(pos);
+    }
+}
+
+std::string Chunk::save(){
+    std::string save;
+    for(BlockType* block: m_blocks){
+        save += block->id;
+        save += ";"
+    }
+    return save;
+}
+
 void Chunk::autoTestFill()
 {
 	BlockType* block = BlockRegistry::get()->getFromID("core:air");
