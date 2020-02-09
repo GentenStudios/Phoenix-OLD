@@ -28,12 +28,97 @@
 
 #include <Phoenix/Player.hpp>
 #include <Phoenix/Voxels/BlockRegistry.hpp>
+#include <Phoenix/ContentLoader.hpp>
+#include <Phoenix/Commander.hpp>
 
 using namespace phx;
 
 static const float RAY_INCREMENT = 0.5f;
 
-Player::Player(voxels::ChunkManager* world) : m_world(world) {}
+Player::Player(voxels::ChunkManager* world) : m_world(world) 
+{
+	ContentManager::get()->lua["core"]["player"] = 
+		/**
+		 * @addtogroup luaapi
+		 *
+		 * ---
+		 * @subsection coreplayer core.player
+		 * @brief Interfaces with the player
+		 */
+		ContentManager::get()->lua.create_table();
+	ContentManager::get()->lua["core"]["player"]["getSpeed"] =
+	    /**
+	     * @addtogroup luaapi
+	     *
+	     * @subsubsection coreplayergetspeed core.player.getSpeed()
+	     * @brief Gets the players speed
+		 * 
+		 * @return The players speed
+	     */
+	    [this]() {
+		    return getMoveSpeed();
+	    };
+	ContentManager::get()->lua["core"]["player"]["setSpeed"] =
+	    /**
+	     * @addtogroup luaapi
+	     *
+	     * @subsubsection coreplayersetspeed core.player.setSpeed(speed)
+	     * @brief Sets the player speed
+	     *
+	     * @param key The new speed to set the player to
+	     *
+	     */
+	    [this](int speed) {
+		   setMoveSpeed(speed);
+	    };
+	ContentManager::get()->lua["core"]["player"]["getPosition"] =
+	    /**
+	     * @addtogroup luaapi
+	     *
+	     * @subsubsection coreplayergetposition core.player.getPosition()
+	     * @brief Gets the players position
+		 * 
+		 * @return The players position in a table
+		 * 
+		 * @par Example usage
+		 * 
+		 * @code
+		 * print(core.player.getPosition().x)
+		 * print(core.player.getPosition().y)
+		 * print(core.player.getPosition().z)
+		 * @endcode
+	     */
+	    [this]() {
+			sol::table pos = ContentManager::get()->lua.create_table();
+			pos["x"] = getPosition().x;
+			pos["y"] = getPosition().y;
+			pos["z"] = getPosition().z;
+		    return pos;
+	    };
+	ContentManager::get()->lua["core"]["player"]["setPosition"] =
+	    /**
+	     * @addtogroup luaapi
+	     *
+	     * @subsubsection coreplayersetposition core.player.setPosition(position)
+	     * @brief Sets the player's position
+	     *
+	     * @param posx The x component of the players position
+	     * @param posy The y component of the players position
+	     * @param posz The z component of the players position
+	     *
+	     */
+	    [this](int posx, int posy, int posz) {
+		   setPosition({posx, posy, posz});
+	    };
+
+	CommandBook::get()->add(
+		"tp", 
+		"Teleports player to supplied coordiantes \n /tp <x> <y> <z>", 
+		"all", 
+		[this](const std::vector<std::string>& args){
+			setPosition({std::stoi(args[0]), std::stoi(args[1]), std::stoi(args[2])});
+		});
+}
 
 math::Ray Player::getTarget()
 {
