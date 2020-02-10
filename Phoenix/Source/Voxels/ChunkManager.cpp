@@ -35,7 +35,7 @@
 using namespace phx::voxels;
 using namespace phx;
 
-ChunkManager::ChunkManager(int viewDistance) : m_viewDistance(viewDistance)
+ChunkManager::ChunkManager(int viewDistance, Map map) : m_viewDistance(viewDistance), m_map(map)
 {
 	// calculates the maximum visible chunks.
 	const int viewLength       = (viewDistance * 2) + 1;
@@ -82,8 +82,7 @@ void ChunkManager::tick(math::vec3 playerPos)
 
 				if (result == m_activeChunks.end())
 				{
-					m_activeChunks.emplace_back(chunkToCheck);
-					m_activeChunks.back().autoTestFill();
+					m_activeChunks.emplace_back(m_map.getChunk(chunkToCheck));
 
 					gfx::ChunkMesher mesher(chunkToCheck,
 					                        m_activeChunks.back().getBlocks(),

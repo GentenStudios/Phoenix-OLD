@@ -38,10 +38,12 @@ Map::Map(std::string save, std::string name)
 {}
 
 Chunk Map::getChunk(math::vec3 pos){
-    std::cout << "get chunk: " << pos << "\n";
+    std::cout << "get chunk: " << pos;
     if(m_chunks.find(pos) != m_chunks.end()){
+        std::cout << " -> Exists\n";
         return m_chunks.at(pos);
     } else {
+        std::cout << " -> Generate\n";
         m_chunks.emplace(pos,Chunk(pos));
         m_chunks.at(pos).autoTestFill();
         save(pos);
