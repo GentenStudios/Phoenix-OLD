@@ -38,6 +38,7 @@ Map::Map(std::string save, std::string name)
 {}
 
 Chunk Map::getChunk(math::vec3 pos){
+    std::cout << "get chunk: " << pos << "\n";
     if(m_chunks.find(pos) != m_chunks.end()){
         return m_chunks.at(pos);
     } else {
@@ -96,9 +97,9 @@ void Map::setBlockAt(phx::math::vec3 position, BlockType *block) {
 
 void Map::save(phx::math::vec3 pos) {
     std::ofstream saveFile;
-    std::string position = "." + std::to_string(int(pos.x) + "_" + std::to_string(int(pos.y)) + "_" + std::to_string(int(pos.z));
-    saveFile.open("Save/" + m_save + "/Maps/" + m_mapName + position + ".save");
-    std::cout << "save: " << "Save/" + m_save + "/" + m_mapName + position + ".save";
+    std::string position = "." + std::to_string(int(pos.x)) + "_" + std::to_string(int(pos.y)) + "_" + std::to_string(int(pos.z));
+    saveFile.open("Save/" + m_save + "/" + m_mapName + position + ".save");
+    std::cout << "save: " << "Save/" + m_save + "/" + m_mapName + position + ".save\n";
     saveFile << m_chunks.at(pos).save();
 
     saveFile.close();

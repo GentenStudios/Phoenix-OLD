@@ -35,7 +35,7 @@
 using namespace phx::voxels;
 using namespace phx;
 
-ChunkManager::ChunkManager(int viewDistance, Map map) : m_viewDistance(viewDistance), m_map(map)
+ChunkManager::ChunkManager(int viewDistance) : m_viewDistance(viewDistance)
 {
 	// calculates the maximum visible chunks.
 	const int viewLength       = (viewDistance * 2) + 1;
@@ -82,8 +82,8 @@ void ChunkManager::tick(math::vec3 playerPos)
 
 				if (result == m_activeChunks.end())
 				{
-                    /// @todo during server development, replace this with a network call
-					m_activeChunks.emplace_back(m_map.getChunk(chunkToCheck));
+					m_activeChunks.emplace_back(chunkToCheck);
+					m_activeChunks.back().autoTestFill();
 
 					gfx::ChunkMesher mesher(chunkToCheck,
 					                        m_activeChunks.back().getBlocks(),
@@ -154,9 +154,6 @@ BlockType* ChunkManager::getBlockAt(math::vec3 position) const
 
 void ChunkManager::setBlockAt(math::vec3 position, BlockType* block)
 {
-    /// @todo during server development, replace this with a network call
-    m_map.setBlockAt(position, block);
-
 	int posX = static_cast<int>(position.x / Chunk::CHUNK_WIDTH);
 	int posY = static_cast<int>(position.y / Chunk::CHUNK_HEIGHT);
 	int posZ = static_cast<int>(position.z / Chunk::CHUNK_DEPTH);
