@@ -52,7 +52,7 @@ std::string Chunk::save(){
     std::string save;
     for(BlockType* block: m_blocks){
         save += block->id;
-        save += ";"
+        save += ";";
     }
     return save;
 }

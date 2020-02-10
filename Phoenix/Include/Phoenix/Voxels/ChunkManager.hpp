@@ -116,7 +116,7 @@ namespace phx
 		private:
 			int m_viewDistance = 1; // 1 chunk
 
-			std::vector<*Chunk>  m_activeChunks;
+			std::vector<Chunk>  m_activeChunks;
 			gfx::ChunkRenderer* m_renderer;
 			Map m_map;
 		};

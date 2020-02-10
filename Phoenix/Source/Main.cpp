@@ -148,14 +148,15 @@ public:
 			voxels::BlockRegistry::get()->registerBlock(air);
 		}
 
-		if (!ContentManager::get()->loadModules("save1"))
+		std::string save = "save1";
+
+		if (!ContentManager::get()->loadModules(save))
 		{
 			m_window->close();
 		}
 
 		Settings::get()->load();
-
-		m_world  = new voxels::ChunkManager(3);
+		m_world  = new voxels::ChunkManager(3, voxels::Map(save, "map1"));
 		m_player = new Player(m_world);
 		m_camera = new gfx::FPSCamera(m_window);
 		m_camera->setActor(m_player);
