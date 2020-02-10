@@ -36,8 +36,11 @@
 
 #pragma once
 
-#include <vector>
+#include <Phoenix/Singleton.hpp>
+
 #include <sol/sol.hpp>
+
+#include <vector>
 #include <string>
 
 //TODO: Replace this with a registry system
@@ -62,7 +65,7 @@ namespace phx
 		~Mod() = default;
 	};
 
-    class ContentManager
+    class ContentManager : public Singleton<ContentManager>
 	{
 	public:
 		/**
@@ -75,17 +78,13 @@ namespace phx
 		 *         be outputted to the terminal
 		 *
 		 */
-		static bool loadModules(const std::string& save, sol::state& lua);
+		bool loadModules(const std::string& save);
 		//TODO : Add proper error handling instead of returning a boolean
 
-		/**
-		 * @brief Loads the Lua API for use in modules
-		 *
-		 * @param lua The sol state used during runtime
-		 */
-        static void loadAPI(sol::state& lua, ImGui::BasicTerminal& chat);
+		sol::state lua;
 
-	private:
-		static std::string m_currentMod;
+		std::string currentMod;
+		
+		ContentManager();
 	};
 }; // namespace q2

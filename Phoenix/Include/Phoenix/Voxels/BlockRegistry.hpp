@@ -41,6 +41,8 @@ namespace phx
 		class BlockRegistry : public Singleton<BlockRegistry>
 		{
 		public:
+			BlockRegistry();
+
 			void initialise();
 
 			void       registerBlock(BlockType blockInfo);

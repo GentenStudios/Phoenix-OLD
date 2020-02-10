@@ -135,6 +135,9 @@ namespace phx
 		std::string                              m_unused;
 
 	public:
+
+		Settings();
+		
 		/**
 		 * @brief Adds a new setting
 		 *
