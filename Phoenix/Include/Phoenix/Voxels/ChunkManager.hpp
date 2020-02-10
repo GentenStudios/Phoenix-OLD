@@ -30,6 +30,7 @@
 
 #include <Phoenix/Graphics/ChunkRenderer.hpp>
 #include <Phoenix/Voxels/Chunk.hpp>
+#include <Phoenix/Voxels/Map.hpp>
 
 #include <vector>
 
@@ -74,7 +75,7 @@ namespace phx
 			 * @brief Constructs the ChunkManager
 			 * @param viewDistance The view distance in every direction.
 			 */
-			ChunkManager(int viewDistance);
+			ChunkManager(int viewDistance, Map map);
 			~ChunkManager();
 
 			/**
@@ -117,6 +118,7 @@ namespace phx
 
 			std::vector<*Chunk>  m_activeChunks;
 			gfx::ChunkRenderer* m_renderer;
+			Map m_map;
 		};
 	} // namespace voxels
 } // namespace phx

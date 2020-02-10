@@ -29,14 +29,13 @@
 #include <Phoenix/Graphics/ChunkMesher.hpp>
 #include <Phoenix/Voxels/ChunkManager.hpp>
 #include <Phoenix/Voxels/BlockRegistry.hpp>
-#include <Phoenix/Voxels//Map.hpp>
 
 #include <iostream>
 
 using namespace phx::voxels;
 using namespace phx;
 
-ChunkManager::ChunkManager(int viewDistance) : m_viewDistance(viewDistance)
+ChunkManager::ChunkManager(int viewDistance, Map map) : m_viewDistance(viewDistance), m_map(map)
 {
 	// calculates the maximum visible chunks.
 	const int viewLength       = (viewDistance * 2) + 1;
