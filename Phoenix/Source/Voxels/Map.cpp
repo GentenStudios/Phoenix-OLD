@@ -28,7 +28,6 @@
 
 #include <Phoenix/Voxels/Map.hpp>
 #include <fstream>
-#include <iostream>
 #include <utility>
 
 using namespace phx::voxels;
