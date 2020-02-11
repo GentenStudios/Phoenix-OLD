@@ -34,9 +34,7 @@
 
 #include <vector>
 
-namespace phx
-{
-	namespace voxels
+namespace phx::voxels
 	{
 		/**
 		 * @brief Generation and Rendering manager for the "world".
@@ -80,7 +78,8 @@ namespace phx
 
 			/**
 			 * @brief Updates visible chunk depending on player position.
-			 * @param playerPos The position of the player, should be straight from the camera - conversion calculations done internally,.
+			 * @param playerPos The position of the player, should be straight
+			 * from the camera - conversion calculations done internally,.
 			 *
 			 * This function will load/unload chunks as required while moving
 			 * around as the player. When the player position is sent, it should
@@ -88,7 +87,8 @@ namespace phx
 			 * camera coordinates to voxel coordinates is done internally. This
 			 * needs to be repaired and done explicitly through external code.
 			 *
-			 * @todo Create classes to solve said issue, decide on whether to rely on explicit or implicit conversion of coordinate systems.
+			 * @todo Create classes to solve said issue, decide on whether to
+			 * rely on explicit or implicit conversion of coordinate systems.
 			 */
 			void tick(math::vec3 playerPos);
 
@@ -96,7 +96,6 @@ namespace phx
 			 * @brief Renders active chunks.
 			 */
 			void render();
-
 
 			/**
 			 * @brief Gets the block at a specific position.
@@ -118,7 +117,6 @@ namespace phx
 
 			std::vector<Chunk>  m_activeChunks;
 			gfx::ChunkRenderer* m_renderer;
-			Map m_map;
+			Map                 m_map;
 		};
-	} // namespace voxels
-} // namespace phx
+	} // namespace phx

@@ -27,15 +27,17 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <Phoenix/Graphics/ChunkMesher.hpp>
-#include <Phoenix/Voxels/ChunkManager.hpp>
 #include <Phoenix/Voxels/BlockRegistry.hpp>
+#include <Phoenix/Voxels/ChunkManager.hpp>
 
 #include <iostream>
+#include <utility>
 
 using namespace phx::voxels;
 using namespace phx;
 
-ChunkManager::ChunkManager(int viewDistance, Map map) : m_viewDistance(viewDistance), m_map(map)
+ChunkManager::ChunkManager(int viewDistance, Map map)
+    : m_viewDistance(viewDistance), m_map(std::move(map))
 {
 	// calculates the maximum visible chunks.
 	const int viewLength       = (viewDistance * 2) + 1;
@@ -153,7 +155,7 @@ BlockType* ChunkManager::getBlockAt(math::vec3 position) const
 
 void ChunkManager::setBlockAt(math::vec3 position, BlockType* block)
 {
-    m_map.setBlockAt(position, block);
+	m_map.setBlockAt(position, block);
 
 	int posX = static_cast<int>(position.x / Chunk::CHUNK_WIDTH);
 	int posY = static_cast<int>(position.y / Chunk::CHUNK_HEIGHT);

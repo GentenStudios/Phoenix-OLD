@@ -76,7 +76,7 @@ public:
 	     * @param text The text to be outputted to the terminal
 	     *
 	     */
-	    [](std::string text) { chat.cout << text << "\n"; };
+	    [](const std::string& text) { chat.cout << text << "\n"; };
 	}
 
 	~Phoenix() { delete m_window; }
