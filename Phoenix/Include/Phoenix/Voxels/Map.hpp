@@ -30,6 +30,7 @@
 
 #include <Phoenix/Voxels/Chunk.hpp>
 #include <map>
+#include <Phoenix/Math/Math.hpp>
 
 namespace phx::voxels
 {
