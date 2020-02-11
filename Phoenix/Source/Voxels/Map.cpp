@@ -38,15 +38,24 @@ Map::Map(std::string save, std::string name)
 {}
 
 Chunk Map::getChunk(math::vec3 pos){
-    std::cout << "get chunk: " << pos;
     if(m_chunks.find(pos) != m_chunks.end()){
-        std::cout << " -> Exists\n";
         return m_chunks.at(pos);
     } else {
-        std::cout << " -> Generate\n";
-        m_chunks.emplace(pos,Chunk(pos));
-        m_chunks.at(pos).autoTestFill();
-        save(pos);
+        std::ifstream saveFile;
+        std::string position = "." + std::to_string(int(pos.x)) + "_" + std::to_string(int(pos.y)) + "_" + std::to_string(int(pos.z));
+        saveFile.open("Save/" + m_save + "/" + m_mapName + position + ".save");
+        if (saveFile)
+        {
+            std::string saveString;
+            std::getline(saveFile, saveString);
+            m_chunks.emplace(pos,Chunk(pos, saveString));
+        }
+        else
+        {
+            m_chunks.emplace(pos, Chunk(pos));
+            m_chunks.at(pos).autoTestFill();
+            save(pos);
+        }
         return m_chunks.at(pos);
     }
 }
@@ -81,9 +90,9 @@ void Map::setBlockAt(phx::math::vec3 position, BlockType *block) {
     }
 
     const math::vec3 chunkPosition =
-        math::vec3(static_cast<int>(posX),
-                   static_cast<int>(posY),
-                   static_cast<int>(posZ));
+        math::vec3(static_cast<float>(posX * Chunk::CHUNK_WIDTH),
+                   static_cast<float>(posY * Chunk::CHUNK_HEIGHT),
+                   static_cast<float>(posZ * Chunk::CHUNK_DEPTH));
 
     m_chunks.at(chunkPosition).setBlockAt(
         {
@@ -101,7 +110,6 @@ void Map::save(phx::math::vec3 pos) {
     std::ofstream saveFile;
     std::string position = "." + std::to_string(int(pos.x)) + "_" + std::to_string(int(pos.y)) + "_" + std::to_string(int(pos.z));
     saveFile.open("Save/" + m_save + "/" + m_mapName + position + ".save");
-    std::cout << "save: " << "Save/" + m_save + "/" + m_mapName + position + ".save\n";
     saveFile << m_chunks.at(pos).save();
 
     saveFile.close();

@@ -28,6 +28,7 @@
 
 #include <Phoenix/Voxels/BlockRegistry.hpp>
 #include <Phoenix/Voxels/Chunk.hpp>
+#include <iostream>
 
 using namespace phx::voxels;
 using namespace phx;
@@ -37,14 +38,14 @@ Chunk::Chunk(math::vec3 chunkPos) : m_pos(chunkPos)
 	m_blocks.reserve(CHUNK_WIDTH * CHUNK_HEIGHT * CHUNK_DEPTH);
 }
 
-Chunk::Chunk(std::string save){
+Chunk::Chunk(math::vec3 chunkPos, const std::string& save) : m_pos(chunkPos){
     std::string_view search = save;
     size_t pos;
-    while((pos = search.find_last_of(';')) != search.npos){
+    while((pos = search.find_first_of(';')) != std::string_view::npos){
         std::string result;
         result = search.substr(0, pos);
         m_blocks.push_back(BlockRegistry::get()->getFromID(result));
-        search.remove_prefix(pos);
+        search.remove_prefix(pos + 1);
     }
 }
 

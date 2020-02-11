@@ -58,7 +58,7 @@ namespace phx::voxels
         Chunk(Chunk&& other) noexcept        = default;
         Chunk& operator=(Chunk&& other) noexcept = default;
 
-        Chunk(std::string save);
+        Chunk(math::vec3 chunkPos, const std::string& save);
 
         std::string save();
 

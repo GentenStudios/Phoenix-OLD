@@ -153,6 +153,8 @@ BlockType* ChunkManager::getBlockAt(math::vec3 position) const
 
 void ChunkManager::setBlockAt(math::vec3 position, BlockType* block)
 {
+    m_map.setBlockAt(position, block);
+
 	int posX = static_cast<int>(position.x / Chunk::CHUNK_WIDTH);
 	int posY = static_cast<int>(position.y / Chunk::CHUNK_HEIGHT);
 	int posZ = static_cast<int>(position.z / Chunk::CHUNK_DEPTH);
