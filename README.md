@@ -5,6 +5,7 @@ Project Phoenix is a open world sandbox style voxel game with a twist. The game 
 
 ## Community
 [Here's a link to our public discord server](https://discord.gg/XRttqAm), where we collaborate and discuss the development of the Phoenix.
+[Here's a link to our community guidelines](./CODE_OF_CONDUCT.md)
 
 ## Dependencies
 - CMake (Version >= 3.0)
@@ -37,3 +38,6 @@ Now follow the platform specific instructions detailed below.
 ### Linux, Mac OS X, MSYS
  
   - Navigate to the `Build/Phoenix` folder and run `./Phoenix` to run the executable.
+
+## Contributing
+We encourage everyone to contribute, this is an open source project that will ultimately be powered by its community. If you are interested in contributing check out [our contributing guidelines](./CONTRIBUTING.md) for information on how we work and our coding standards. Before you get started, reach out on #programming on discord to collaborate so you aren't duplicating any work. Finally check out [Our issues on GitHub](https://github.com/GentenStudios/Phoenix/issues) for a list of what we currently have planned/ need help with.
