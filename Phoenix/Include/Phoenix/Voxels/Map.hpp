@@ -42,7 +42,8 @@ namespace phx::voxels
         void setBlockAt(math::vec3 pos, BlockType* block);
         void save(math::vec3 pos);
     private:
-        std::map<math::vec3, Chunk> m_chunks;
+        std::map<math::vec3, Chunk,
+            math::Vector3KeyComparator> m_chunks;
         std::string m_save;
         std::string m_mapName;
     };
