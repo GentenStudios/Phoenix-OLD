@@ -69,8 +69,11 @@ namespace phx
 				return m_layers.rend();
 			}
 
-			Storage::reference front() { return m_layers.front(); }
+			Storage::reference       front() { return m_layers.front(); }
 			Storage::const_reference front() const { return m_layers.front(); }
+
+			Storage::reference       back() { return m_layers.back(); }
+			Storage::const_reference back() const { return m_layers.back(); }
 
 		private:
 			std::deque<Layer*> m_layers;

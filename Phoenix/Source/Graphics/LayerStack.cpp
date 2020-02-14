@@ -29,6 +29,7 @@
 #include <Phoenix/Graphics/LayerStack.hpp>
 
 using namespace phx::gfx;
+using namespace phx;
 
 LayerStack::~LayerStack()
 {
