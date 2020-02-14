@@ -1,6 +1,7 @@
 set(currentDir ${CMAKE_CURRENT_LIST_DIR})
 set(graphicsSources
 	${currentDir}/Window.cpp
+	${currentDir}/LayerStack.cpp
 	${currentDir}/Camera.cpp
 
 	${currentDir}/ShaderPipeline.cpp

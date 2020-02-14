@@ -3,6 +3,8 @@ set(graphicsHeaders
 	${currentDir}/OpenGLTools.hpp
 
 	${currentDir}/Window.hpp
+	${currentDir}/Layer.hpp
+	${currentDir}/LayerStack.hpp
 	${currentDir}/Camera.hpp
 
 	${currentDir}/ShaderPipeline.hpp
