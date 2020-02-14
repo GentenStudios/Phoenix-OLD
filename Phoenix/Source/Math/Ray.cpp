@@ -28,16 +28,16 @@
 
 #include <Phoenix/Math/Ray.hpp>
 
-using namespace phx;
+using namespace phx::math;
 
-Ray::Ray(const math::vec3& start,
-         const math::vec3& direction)
+Ray::Ray(const Ray::vec3& start,
+         const Ray::vec3& direction)
     : m_start(start), m_direction(direction), m_currentPosition(start),
       m_length(0.f)
 {
 }
 
-math::vec3 Ray::advance(float scale)
+Ray::vec3 Ray::advance(float scale)
 {
 	m_currentPosition += m_direction * scale;
 	m_length += scale;
@@ -45,7 +45,7 @@ math::vec3 Ray::advance(float scale)
 	return m_currentPosition;
 }
 
-math::vec3 Ray::backtrace(float scale)
+Ray::vec3 Ray::backtrace(float scale)
 {
 	m_currentPosition -= m_direction * scale;
 	m_length -= scale;
@@ -55,7 +55,7 @@ math::vec3 Ray::backtrace(float scale)
 
 float Ray::getLength() const { return m_length; }
 
-math::vec3 Ray::getCurrentPosition() const
+Ray::vec3 Ray::getCurrentPosition() const
 {
 	return m_currentPosition;
 }

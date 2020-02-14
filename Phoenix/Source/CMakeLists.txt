@@ -14,6 +14,9 @@ set(Sources
 	${currentDir}/UI.cpp
 	${currentDir}/Commander.cpp
 
+	${currentDir}/Actor.cpp
+	${currentDir}/Player.cpp
+
 	${currentDir}/Main.cpp
 
 

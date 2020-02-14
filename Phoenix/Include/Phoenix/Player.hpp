@@ -26,47 +26,44 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+/**
+ * @file Player.hpp
+ * @brief Header file for the Player derivation of Actor.
+ *
+ * @copyright Copyright (c) 2019-2020 Genten Studios
+ */
+
 #pragma once
 
-#include <Phoenix/Singleton.hpp>
-#include <Phoenix/Voxels/Block.hpp>
-#include <Phoenix/Voxels/TextureRegistry.hpp>
-
-#include <vector>
+#include <Phoenix/Actor.hpp>
+#include <Phoenix/Voxels/ChunkManager.hpp>
 
 namespace phx
 {
-	namespace voxels
+	/**
+	 * @brief An object representing the player in a game
+	 *
+	 * Objects created by this class represent any player in the game, the
+	 * player can be controlled by a camera object.
+	 *
+	 */
+	class Player : public Actor
 	{
-		class BlockRegistry : public Singleton<BlockRegistry>
-		{
-		public:
-			BlockRegistry();
+	public:
+		// temporary until a proper management system is put in place.
+		Player(voxels::ChunkManager* world);
+		
+		math::Ray getTarget();
 
-			void initialise();
+		bool action1();
+		bool action2();
 
-			void       registerBlock(BlockType blockInfo);
-			BlockType* getFromID(const std::string& id);
+        void setHand(voxels::BlockType* block);
+        voxels::BlockType* getHand();
 
-			// registry int is stored in the block, it's a quicker way of
-			// getting a block's data. do NOT store this in chunk data, that is
-			// only valid once the registry table is built.
-			BlockType* getFromRegistryID(std::size_t registryID);
-
-			TextureRegistry* getTextures();
-
-			static constexpr int UNKNOWN_BLOCK       = 0;
-			static constexpr int OUT_OF_BOUNDS_BLOCK = 1;
-
-		private:
-			// NOTE: We used to use an std::list to prevent invalidating any
-			// pointers, however, since all blocks will be registered in ONE go
-			// from a Lua initialisation, these pointers will not be invalidated
-			// for their whole lifetime, until the block registry is destroyed -
-			// but that will be quite late in the destruction of the program so
-			// this *shouldn't* be an issue. - @beeperdeeper089
-			std::vector<BlockType> m_blocks;
-			TextureRegistry        m_textures;
-		};
-	} // namespace voxels
-} // namespace q2
+	private:
+		float m_reach = 32.f;
+		voxels::ChunkManager* m_world;
+        voxels::BlockType* m_hand;
+	};
+} // namespace phx
