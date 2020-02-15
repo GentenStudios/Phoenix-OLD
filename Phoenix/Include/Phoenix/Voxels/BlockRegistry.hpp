@@ -39,43 +39,61 @@ namespace phx
 	namespace voxels
 	{
 		/**
-		 * @brief A registry of all [[BlockTypes]] that have been loaded. 
-		 * 
+		 * @brief A registry of all [[BlockTypes]] that have been loaded.
+		 *
+		 * This class is to some extent a wrapper over an std::vector. It does
+		 * however, make functionality easier to use, and as a singleton it
+		 * makes it a lot easier to access this data across the whole game code.
+		 *
+		 * @paragraph Usage
+		 * @code
+		 * BlockRegistry::get()->initialise(); // the get method is inherited
+		 *                                     // from the Singleton base class.
+		 *
+		 * BlockType dirtBlock;
+		 *     dirtBlock.displayName = "Air";
+		 *     dirtBlock.id = "core:air";
+		 *     dirtBlock.category = BlockCategory::AIR;
+		 *
+		 * BlockRegistry::get()->registerBlock(dirtBlock);
+		 *
+		 * std::cout << BlockRegistry::get()->getFromID("core:air") <<
+		 * std::endl;
+		 * @endcode
 		 */
 		class BlockRegistry : public Singleton<BlockRegistry>
 		{
 		public:
-			/// @brief Initializes the registry
+			/// @brief Initializes the registry.
 			void initialise();
 
 			/**
-			 * @brief Registers a block in the registry
-			 * 
-			 * @param blockInfo The blockType already put together
+			 * @brief Registers a block in the registry.
+			 * @param blockInfo The blockType already put together.
 			 */
-			void       registerBlock(BlockType blockInfo);
+			void registerBlock(BlockType blockInfo);
 			/**
-			 * @brief Gets a block from the registry based on its unique ID
-			 * 
-			 * @param id The unique ID of the block, usually in the form core::dirt
+			 * @brief Gets a block from the registry based on its unique ID.
+			 * @param id The unique ID of the block, usually in the form
+			 * core::dirt.
 			 * @return BlockType* A pointer to the block in the registry.
 			 */
 			BlockType* getFromID(const std::string& id);
 
 			/**
-			 * @brief Gets a block from the registry based on its registry ID
-			 * 
-			 * @note The registry ID is only used during runtime, do not try to store in a save
-			 * 
-			 * @param registryID The registry ID for the block
-			 * @return BlockType* A pointer to the block in the registry
+			 * @brief Gets a block from the registry based on its registry ID.
+			 * @note The registry ID is only used during runtime, do not try to
+			 * store in a save.
+			 * @param registryID The registry ID for the block.
+			 * @return BlockType* A pointer to the block in the registry.
 			 */
 			BlockType* getFromRegistryID(std::size_t registryID);
 
 			/**
-			 * @brief Get the textures for the block
-			 * 
-			 * @return TextureRegistry* The textures for the block
+			 * @brief Get the textures for the block.
+			 *
+			 * @return TextureRegistry* The registry responsible for handling
+			 * block textures.
 			 */
 			TextureRegistry* getTextures();
 
@@ -84,8 +102,8 @@ namespace phx
 
 		private:
 			/**
-			 * @brief Stores the blockTypes in the registry
-			 * 
+			 * @brief Stores the blockTypes in the registry.
+			 *
 			 * @note We used to use an std::list to prevent invalidating any
 			 * pointers, however, since all blocks will be registered in ONE go
 			 * from a Lua initialisation, these pointers will not be invalidated
@@ -96,9 +114,9 @@ namespace phx
 			std::vector<BlockType> m_blocks;
 			/**
 			 * @brief Stores the unique paths to textures
-			 * 
+			 *
 			 */
-			TextureRegistry        m_textures;
+			TextureRegistry m_textures;
 		};
 	} // namespace voxels
-} // namespace q2
+} // namespace phx

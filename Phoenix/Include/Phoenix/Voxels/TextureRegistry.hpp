@@ -36,28 +36,63 @@ namespace phx
 {
 	namespace voxels
 	{
+		/**
+		 * @brief The Texture Registry
+		 *
+		 * This class stores the textures registered through something like the
+		 * BlockRegistry. This class usually isn't used on it's own, for
+		 * example, Phoenix uses it in the BlockRegistry to hold texture paths.
+		 *
+		 * This class is essentially a wrapper on an unordered_set and
+		 * std::vector, provides very limited and simple functionality, however
+		 * it does all it actually needs to do.
+		 *
+		 * The ``addTexture`` method will filter out duplicates, which is more
+		 * efficient, to prevent multiple registrations of the same texture -
+		 * which further down the line saves on GPU memory (marginally but it
+		 * can add up).
+		 *
+		 * @paragraph Usage
+		 * @code
+		 * TextureRegistry registry;
+		 *
+		 * std::string tex1 = "dirt.png";
+		 * std::string tex2 = "dirt.png";
+		 * std::string tex3 = "grass_side.png";
+		 * std::string tex4 = "grass_top.png";
+		 *
+		 * registry.addTexture(tex1); registry.addTexture(tex2);
+		 * registry.addTexture(tex3); registry.addTexture(tex4);
+		 *
+		 * std::vector<std::string> textures = registry.getTextures();
+		 * for (auto& string : textures)
+		 * {
+		 *     std::cout << string << std::endl;
+		 * }
+		 * @endcode
+		 */
 		class TextureRegistry
 		{
 		public:
 			/**
-			 * @brief 
-			 * 
-			 * @param texture 
+			 * @brief Registers a texture within the texture registry.
+			 * @param texture The texture path to add.
 			 */
-			void                     addTexture(const std::string& texture);
+			void addTexture(const std::string& texture);
+
 			/**
 			 * @brief Get the Textures object
-			 * 
-			 * @return std::vector<std::string> 
+			 * @return An array of strings containing registered textures.
 			 */
 			std::vector<std::string> getTextures();
 
 		private:
 			/**
-			 * @brief beep?
-			 * 
-			 * @note We could have used an std::vector in this case (as done in the BlockRegistry)
-			 * 
+			 * @brief The set of texture paths.
+			 *
+			 * @note We could have used an std::vector in this case (as done in
+			 * the BlockRegistry)
+			 *
 			 * @code
 			 * if (std::find(m_textures.begin(), m_textures.end(), texture) ==
 			 * m_textures.end())
@@ -65,6 +100,7 @@ namespace phx
 			 *   m_textures.push_back(texture);
 			 * }
 			 * @endcode
+			 *
 			 * Here we are performing a search every time we insert an element,
 			 * so each one by itself is upto O(N) complexity, resulting in an
 			 * O(N*N) complexity overall. However, std::unordered_set has a
@@ -74,4 +110,4 @@ namespace phx
 			std::unordered_set<std::string> m_textures;
 		};
 	} // namespace voxels
-} // namespace q2
+} // namespace phx
