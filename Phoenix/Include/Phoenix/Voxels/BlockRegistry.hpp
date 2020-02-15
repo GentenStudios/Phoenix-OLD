@@ -64,7 +64,10 @@ namespace phx
 		class BlockRegistry : public Singleton<BlockRegistry>
 		{
 		public:
-			/// @brief Initializes the registry.
+			/// @brief Registers respective Lua methods.
+			BlockRegistry();
+
+      // @brief Initialises the registry.
 			void initialise();
 
 			/**

@@ -27,11 +27,128 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <Phoenix/Voxels/BlockRegistry.hpp>
+#include <Phoenix/ContentLoader.hpp>
 
 #include <algorithm>
 #include <cstring>
 
 using namespace phx::voxels;
+
+BlockRegistry::BlockRegistry()
+{
+	ContentManager::get()->lua["voxel"] = ContentManager::get()->lua.create_table();
+	/**
+	 * @addtogroup luaapi
+	 *
+	 * ---
+	 * ---
+	 * @section voxel voxel
+	 * @brief The voxel API for interacting voxels
+	 */
+	ContentManager::get()->lua["voxel"]["block"] = ContentManager::get()->lua.create_table();
+	/**
+	 * @addtogroup luaapi
+	 *
+	 * ---
+	 * @subsection voxelblock voxel.block
+	 * @brief Interfaces with blocks
+	 */
+	ContentManager::get()->lua["voxel"]["block"]["register"] =
+	    /**
+	     * @addtogroup luaapi
+	     *
+	     * @subsubsection voxelblockreg voxel.block.register(luaBlock)
+	     * @brief Sets the value of a setting based on its unique key
+	     *
+	     * @param luaBlock a table storing the data used to create a block
+	     *
+	     * @details The luaBlock table stores the following values: \n
+	     * Required:
+	     * - @b name: The display name for the block
+	     * - @b id: The unique id for the block usually in the form module:block
+	     *
+	     * Optional:
+	     * - @b category: The category of the block chosen from "Air", "Liquid",
+	     * or "Solid" \n If not specified, the default is "Solid"
+	     * - @b onPlace: A function that is run when the block is placed
+	     * - @b onBreak: A function that is run when the block is broken
+	     * - @b onInteract: A function that is run when the block is interacted
+	     * with
+	     * - @b textures: A table of filepaths where textures are located \n
+	     * 			   Filepaths are relative to to the module directory \n
+	     * 			   If only one filepath is specified, that will be used for all
+	     * textures
+	     *
+	     * @b Example:
+	     *
+	     * @code {.lua}
+	     * block = {}
+	     * block.name = "Grass"
+	     * block.id = "core:grass"
+	     * block.textures = {"Assets/grass_side.png", "Assets/grass_side.png",
+	     * "Assets/grass_side.png", "Assets/grass_side.png",
+	     * "Assets/grass_top.png",  "Assets/dirt.png"}
+	     * block.onBreak = function (position)
+	     * 	print("grass broken at" + position)
+	     * end
+	     * voxel.block.register(block)
+	     * @endcode
+	     */
+	    [](sol::table luaBlock) {
+		    BlockType block;
+		    {
+			    block.displayName = luaBlock["name"];
+			    block.id          = luaBlock["id"];
+
+				std::string category = luaBlock["category"];
+			    if (category == "Air")
+			    {
+				    block.category = BlockCategory::AIR;
+			    }
+			    else if (category == "Liquid")
+			    {
+				    block.category = BlockCategory::LIQUID;
+			    }
+			    else
+			    {
+				    block.category = BlockCategory::SOLID;
+			    }
+
+			    if (luaBlock["onPlace"])
+			    {
+				    block.onPlace = luaBlock["onPlace"];
+			    }
+
+			    if (luaBlock["onBreak"])
+			    {
+				    block.onPlace = luaBlock["onPlace"];
+			    }
+
+			    if (luaBlock["onInteract"])
+			    {
+				    block.onPlace = luaBlock["onPlace"];
+			    }
+
+			    if (luaBlock["textures"])
+			    {
+			    	std::array<std::string, 6> textures;
+				    for (int i = 0; i < 6; i++)
+				    {
+					    std::string texture = luaBlock["textures"][i + 1];
+					    if (texture.empty())
+					    {
+						    // If a texture is not supplied, we use the first
+						    // texture in its place
+						    texture = luaBlock["textures"][1];
+					    }
+					    textures[i] = "Modules/" + ContentManager::get()->currentMod + "/" + texture;
+				    }
+			    	block.textures = textures;
+			    }
+		    }
+		    BlockRegistry::get()->registerBlock(block);
+	    };
+}
 
 void BlockRegistry::initialise()
 {

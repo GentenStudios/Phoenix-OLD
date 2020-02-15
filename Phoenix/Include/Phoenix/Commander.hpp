@@ -69,6 +69,8 @@ namespace phx
 		std::vector<std::string>     m_permission;
 		std::vector<CommandFunction> m_functions;
 
+		CommandBook();
+
 		/**
 		 * @brief Registers a command in the command registry
 		 *
