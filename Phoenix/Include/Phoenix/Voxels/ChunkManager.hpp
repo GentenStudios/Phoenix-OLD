@@ -72,8 +72,9 @@ namespace phx::voxels
 			/**
 			 * @brief Constructs the ChunkManager
 			 * @param viewDistance The view distance in every direction.
+			 * @param map The map the ChunkManager loads from
 			 */
-			ChunkManager(int viewDistance, Map map);
+			ChunkManager(int viewDistance, const Map& map);
 			~ChunkManager();
 
 			/**

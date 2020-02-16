@@ -36,7 +36,7 @@
 using namespace phx::voxels;
 using namespace phx;
 
-ChunkManager::ChunkManager(int viewDistance, Map map)
+ChunkManager::ChunkManager(int viewDistance, const Map& map)
     : m_viewDistance(viewDistance), m_map(std::move(map))
 {
 	// calculates the maximum visible chunks.
