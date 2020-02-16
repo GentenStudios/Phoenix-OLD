@@ -71,7 +71,7 @@ namespace phx
 		{
 		public:
 			/**
-			 * @brief Constructs the ChunkManager
+			 * @brief Constructs the ChunkManager.
 			 * @param viewDistance The view distance in every direction.
 			 */
 			ChunkManager(int viewDistance);
@@ -79,9 +79,9 @@ namespace phx
 
 			/**
 			 * @brief Updates visible chunk depending on player position.
-			 * @param playerPos The position of the player, should be straight from the camera - conversion calculations done internally,.
+			 * @param playerPos The position of the player, should be straight from the camera - conversion calculations done internally.
 			 *
-			 * This function will load/unload chunks as required while moving
+			 * This method will load/unload chunks as required while moving
 			 * around as the player. When the player position is sent, it should
 			 * be raw from the camera, since the conversion calculations from
 			 * camera coordinates to voxel coordinates is done internally. This
