@@ -68,8 +68,7 @@ public:
 		m_window = new gfx::Window("Phoenix Game!", 1280, 720);
 		m_window->registerEventListener(this);
 
-		m_ui = gui::Container(m_window->getSize());
-		m_ui.m_pos = {0,0};
+		m_ui = new gui::Container(m_window->getSize());
 
 		m_camera = new gfx::FPSCamera(m_window);
 
@@ -168,8 +167,8 @@ public:
 		// =========================== //
 
 		gui::Button button = gui::Button(math::vec2(50, 50));
-		button.action = [](){std::cout << "Button pressed";};
-		m_ui.addComponent(button, math::vec2(10,10));
+		button.setOnClick([](){std::cout << "Button pressed";});
+		m_ui->addComponent(button, {10,10});
 
 		// =================== //
 		// Some rendering shiz //
@@ -266,8 +265,8 @@ public:
 
 			chat.draw();
 
-			m_ui.m_size = m_window->getSize();
-			m_ui.draw({0, 0});
+			m_ui->size = m_window->getSize();
+			m_ui->draw({0, 0});
 
 			shaderPipeline.setMatrix("u_view", m_camera->calculateViewMatrix());
 			shaderPipeline.setMatrix("u_projection", m_camera->getProjection());
@@ -293,8 +292,8 @@ private:
 	gfx::FPSCamera*       m_camera = nullptr;
 	Player*               m_player = nullptr;
 	voxels::ChunkManager* m_world  = nullptr;
+    gui::Container*       m_ui     = nullptr;
 	int                   m_playerHand = 0;
-	gui::Container        m_ui;
 };
 
 #undef main
