@@ -17,6 +17,9 @@ set(Sources
 	${currentDir}/Actor.cpp
 	${currentDir}/Player.cpp
 
+	${currentDir}/Phoenix.cpp
+	${currentDir}/SplashScreen.cpp
+
 	${currentDir}/Main.cpp
 
 

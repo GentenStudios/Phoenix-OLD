@@ -26,45 +26,37 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Phoenix/Graphics/LayerStack.hpp>
+#pragma once
 
-using namespace phx::gfx;
-using namespace phx;
+#include <Phoenix/Graphics/Layer.hpp>
+#include <Phoenix/Graphics/ShaderPipeline.hpp>
 
-LayerStack::~LayerStack()
+namespace phx
 {
-	for (Layer* layer : m_layers)
+	namespace game
 	{
-		layer->onDetach();
-	}
-}
+		class SplashScreen : public gfx::Layer
+		{
+		public:
+			SplashScreen();
+			~SplashScreen() = default;
 
-void LayerStack::pushLayer(Layer* layer)
-{
-	m_layers.emplace(m_layers.begin() + m_currentInsert, layer);
-	++m_currentInsert;
-	layer->onAttach();
-}
+			void onEvent(events::Event e) override;
+			void onAttach() override;
+			void onDetach() override;
 
-void LayerStack::popLayer(Layer* layer)
-{
-	auto it = std::find(m_layers.begin(), m_layers.end(), layer);
-	if (it != m_layers.end())
-	{
-		layer->onDetach();
-		m_layers.erase(it);
-		--m_currentInsert;
-	}
-}
+			void tick(float dt) override;
 
-void LayerStack::pushOverlay(Layer* overlay) { m_layers.emplace_back(overlay); }
+			bool getStatus() const { return m_removable; };
 
-void LayerStack::popOverlay(Layer* overlay)
-{
-	auto it = std::find(m_layers.begin(), m_layers.end(), overlay);
-	if (it != m_layers.end())
-	{
-		overlay->onDetach();
-		m_layers.erase(it);
-	}
-}
+		private:
+			gfx::ShaderPipeline m_pipeline;
+			unsigned int        m_vao;
+			unsigned int        m_vbo;
+			unsigned int        m_texture;
+			float               m_alpha      = -0.5f;
+			float               m_multiplier = 1.f;
+			bool                m_removable;
+		};
+	} // namespace game
+} // namespace phx

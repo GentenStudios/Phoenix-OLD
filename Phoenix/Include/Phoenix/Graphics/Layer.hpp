@@ -36,6 +36,7 @@ namespace phx
 {
 	namespace gfx
 	{
+		// design of this class heavily inspired by TheCherno.
 		class Layer
 		{
 		public:
@@ -46,7 +47,7 @@ namespace phx
 			virtual void onDetach() = 0;
 			virtual void onEvent(events::Event e)  = 0;
 
-			virtual void tick() = 0;
+			virtual void tick(float dt) = 0;
 
 			const std::string& getName() const { return m_name; };
 

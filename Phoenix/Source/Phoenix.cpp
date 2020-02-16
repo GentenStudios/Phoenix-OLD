@@ -1,4 +1,4 @@
-// Copyright 2019 Genten Studios
+// Copyright 2020 Genten Studios
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -26,45 +26,70 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Phoenix/Graphics/LayerStack.hpp>
+#include <Phoenix/Commander.hpp>
+#include <Phoenix/ContentLoader.hpp>
+#include <Phoenix/Phoenix.hpp>
+#include <Phoenix/Settings.hpp>
+#include <Phoenix/SplashScreen.hpp>
 
-using namespace phx::gfx;
 using namespace phx;
 
-LayerStack::~LayerStack()
+Commander kirk = Commander();
+
+static void rawEcho(const std::string& input, std::ostringstream& cout)
 {
-	for (Layer* layer : m_layers)
-	{
-		layer->onDetach();
-	}
+	kirk.callback(input, cout);
 }
 
-void LayerStack::pushLayer(Layer* layer)
+Phoenix::Phoenix()
+    : m_chat(ui::ChatWindow("Chat Window", 5,
+                            "Type something and hit enter to run a command!\n"))
 {
-	m_layers.emplace(m_layers.begin() + m_currentInsert, layer);
-	++m_currentInsert;
-	layer->onAttach();
+	m_window = new gfx::Window("Phoenix Game!", 1280, 720);
+	m_window->registerEventListener(this);
+
+	m_chat.registerCallback(&rawEcho);
+	/**
+	 * @addtogroup luaapi
+	 *
+	 * @subsubsection coreprint core.print(text)
+	 * @brief Prints text to the players terminal
+	 *
+	 * @param text The text to be outputted to the terminal
+	 *
+	 */
+	ContentManager::get()->lua["core"]["print"] =
+	    [this](const std::string& text) { m_chat.cout << text << "\n"; };
 }
 
-void LayerStack::popLayer(Layer* layer)
+Phoenix::~Phoenix() { delete m_window; }
+
+void Phoenix::onEvent(const events::Event& e)
 {
-	auto it = std::find(m_layers.begin(), m_layers.end(), layer);
-	if (it != m_layers.end())
-	{
-		layer->onDetach();
-		m_layers.erase(it);
-		--m_currentInsert;
-	}
+	m_layerStack.front()->onEvent(e);
 }
 
-void LayerStack::pushOverlay(Layer* overlay) { m_layers.emplace_back(overlay); }
-
-void LayerStack::popOverlay(Layer* overlay)
+void Phoenix::run()
 {
-	auto it = std::find(m_layers.begin(), m_layers.end(), overlay);
-	if (it != m_layers.end())
+	Settings::get()->load();
+
+	game::SplashScreen* splashScreen = new game::SplashScreen();
+	m_layerStack.pushLayer(splashScreen);
+
+	float last = static_cast<float>(SDL_GetTicks());
+	while (m_window->isRunning())
 	{
-		overlay->onDetach();
-		m_layers.erase(it);
+		const float now = static_cast<float>(SDL_GetTicks());
+		const float dt  = (now - last) / 1000.f;
+		last            = now;
+
+		m_window->startFrame();
+
+		for (gfx::Layer* layer : m_layerStack)
+			layer->tick(dt);
+		
+		m_window->endFrame();
 	}
+
+	Settings::get()->save();
 }

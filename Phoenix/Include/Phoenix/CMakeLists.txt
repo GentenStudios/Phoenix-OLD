@@ -23,5 +23,8 @@ set(Headers
 	${currentDir}/Actor.hpp
 	${currentDir}/Player.hpp
 
+	${currentDir}/Phoenix.hpp
+	${currentDir}/SplashScreen.hpp
+
 	PARENT_SCOPE
 )

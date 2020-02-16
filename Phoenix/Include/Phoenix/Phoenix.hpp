@@ -26,45 +26,28 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+#pragma once
+
+#include <Phoenix/Events/IEventListener.hpp>
+#include <Phoenix/Graphics/Window.hpp>
 #include <Phoenix/Graphics/LayerStack.hpp>
+#include <Phoenix/UI.hpp>
 
-using namespace phx::gfx;
-using namespace phx;
-
-LayerStack::~LayerStack()
+namespace phx
 {
-	for (Layer* layer : m_layers)
+	class Phoenix : public events::IEventListener
 	{
-		layer->onDetach();
-	}
-}
+	public:
+		Phoenix();
+		~Phoenix();
+		
+		void onEvent(const events::Event& e) override;
+		void run();
 
-void LayerStack::pushLayer(Layer* layer)
-{
-	m_layers.emplace(m_layers.begin() + m_currentInsert, layer);
-	++m_currentInsert;
-	layer->onAttach();
-}
+	private:
+		gfx::Window* m_window = nullptr;
+		gfx::LayerStack m_layerStack;
 
-void LayerStack::popLayer(Layer* layer)
-{
-	auto it = std::find(m_layers.begin(), m_layers.end(), layer);
-	if (it != m_layers.end())
-	{
-		layer->onDetach();
-		m_layers.erase(it);
-		--m_currentInsert;
-	}
-}
-
-void LayerStack::pushOverlay(Layer* overlay) { m_layers.emplace_back(overlay); }
-
-void LayerStack::popOverlay(Layer* overlay)
-{
-	auto it = std::find(m_layers.begin(), m_layers.end(), overlay);
-	if (it != m_layers.end())
-	{
-		overlay->onDetach();
-		m_layers.erase(it);
-	}
-}
+		ui::ChatWindow m_chat;
+	};
+} // namespace phx

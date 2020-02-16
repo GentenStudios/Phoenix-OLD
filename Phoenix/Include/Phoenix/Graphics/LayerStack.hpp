@@ -31,21 +31,20 @@
 #include <Phoenix/Events/IEventListener.hpp>
 #include <Phoenix/Graphics/Layer.hpp>
 
-#include <deque>
+#include <vector>
 
 namespace phx
 {
 	namespace gfx
 	{
-		class LayerStack : public events::IEventListener
+		// design of this class heavily inspired by TheCherno.
+		class LayerStack
 		{
-			using Storage = std::deque<Layer*>;
+			using Storage = std::vector<Layer*>;
 
 		public:
 			LayerStack() = default;
 			~LayerStack();
-
-			void onEvent(const events::Event& e) override;
 
 			void pushLayer(Layer* layer);
 			void popLayer(Layer* layer);
@@ -53,6 +52,7 @@ namespace phx
 			void pushOverlay(Layer* overlay);
 			void popOverlay(Layer* overlay);
 
+			// iterator methods
 			Storage::iterator         begin() { return m_layers.begin(); }
 			Storage::iterator         end() { return m_layers.end(); }
 			Storage::reverse_iterator rbegin() { return m_layers.rbegin(); }
@@ -74,9 +74,11 @@ namespace phx
 
 			Storage::reference       back() { return m_layers.back(); }
 			Storage::const_reference back() const { return m_layers.back(); }
+			// end iterator methods
 
 		private:
-			std::deque<Layer*> m_layers;
+			Storage m_layers;
+			unsigned int m_currentInsert = 0;
 		};
 	} // namespace gfx
 } // namespace phx

@@ -137,12 +137,20 @@ namespace phx
 			void activate();
 
 			/**
+			 * @brief Sets a uniform location to a float.
+			 * @param location The location being set.
+			 * @param value The value to set provided location.
+			 */
+			void setFloat(std::string location, float value);
+
+			/**
 			 * @brief Sets a uniform location to a 2 component vector.
 			 * @param location The location being set.
 			 * @param value The value to set provided location.
 			 */
 			void setVector2(std::string location, math::vec2 value);
 
+			
 			/**
 			 * @brief Sets a uniform location to a 3 component vector.
 			 * @param location The unique identifier for the uniform.

@@ -103,7 +103,9 @@ Window::Window(const std::string& title, int width, int height)
 
 	GLCheck(glEnable(GL_DEPTH_TEST));
 	GLCheck(glEnable(GL_MULTISAMPLE));
-
+	GLCheck(glEnable(GL_BLEND));
+	GLCheck(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+	
 	m_running = true;
 
 	SDL_SetRelativeMouseMode(SDL_FALSE);
