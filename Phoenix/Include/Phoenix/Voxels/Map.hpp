@@ -43,7 +43,7 @@ namespace phx::voxels
         void save(math::vec3 pos);
     private:
         std::map<math::vec3, Chunk,
-            math::Vector3KeyComparator> m_chunks;
+            math::Vector3Key> m_chunks;
         std::string m_save;
         std::string m_mapName;
     };

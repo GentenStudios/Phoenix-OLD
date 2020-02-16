@@ -41,7 +41,6 @@ Map::Map(std::string save, std::string name)
 
 Chunk Map::getChunk(math::vec3 pos)
 {
-    std::cout << "\n GetChunk: " << pos;
 	if (m_chunks.find(pos) != m_chunks.end())
 	{
 		return m_chunks.at(pos);
@@ -53,26 +52,19 @@ Chunk Map::getChunk(math::vec3 pos)
 		                       std::to_string(int(pos.y)) + "_" +
 		                       std::to_string(int(pos.z));
 		saveFile.open("Save/" + m_save + "/" + m_mapName + position + ".save");
+
 		if (saveFile)
 		{
-		    std::cout << " -> load";
 			std::string saveString;
 			std::getline(saveFile, saveString);
 			auto win = m_chunks.emplace(pos, Chunk(pos, saveString));
-			std::cout << win.second << "at: ";
-			std::cout << win.first->first;
 		}
 		else
 		{
-		    std::cout << " -> new";
 			auto win = m_chunks.emplace(pos, Chunk(pos));
 			m_chunks.at(pos).autoTestFill();
-            std::cout << win.second << "at: ";
-            std::cout << win.first->first;
 			save(pos);
 		}
-		std::cout << " -> Returning: " << pos << "\n";
-		for (auto it: m_chunks){std::cout << it.first;}
 		return m_chunks.at(pos);
 	}
 }
