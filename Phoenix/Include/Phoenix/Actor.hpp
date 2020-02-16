@@ -26,47 +26,48 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+/**
+ * @file Actor.hpp
+ * @brief Header file for the Actor interface.
+ *
+ * @copyright Copyright (c) 2019-2020 Genten Studios
+ */
+
 #pragma once
 
-#include <Phoenix/Singleton.hpp>
-#include <Phoenix/Voxels/Block.hpp>
-#include <Phoenix/Voxels/TextureRegistry.hpp>
-
-#include <vector>
+#include <Phoenix/Math/Math.hpp>
 
 namespace phx
 {
-	namespace voxels
+	class Actor
 	{
-		class BlockRegistry : public Singleton<BlockRegistry>
-		{
-		public:
-			BlockRegistry();
+	public:
+		Actor();
 
-			void initialise();
+		math::vec3 getPosition() const;
+		bool       setPosition(math::vec3 pos);
+		math::vec3 getRotation() const;
+		bool       setRotation(math::vec3 rot);
 
-			void       registerBlock(BlockType blockInfo);
-			BlockType* getFromID(const std::string& id);
+		math::vec3 getDirection() const;
 
-			// registry int is stored in the block, it's a quicker way of
-			// getting a block's data. do NOT store this in chunk data, that is
-			// only valid once the registry table is built.
-			BlockType* getFromRegistryID(std::size_t registryID);
+		/**
+		 * @brief Gets the actor's current speed.
+		 * @return The actor's current speed.
+		 */
+		int getMoveSpeed();
 
-			TextureRegistry* getTextures();
+		/**
+		 * @brief Sets the actors's current speed.
+		 * @param speed The speed to set.
+		 * @return true If the speed was able to be set.
+		 * @return false If the speed was invalid, or unable to set.
+		 */
+		bool setMoveSpeed(int speed);
 
-			static constexpr int UNKNOWN_BLOCK       = 0;
-			static constexpr int OUT_OF_BOUNDS_BLOCK = 1;
-
-		private:
-			// NOTE: We used to use an std::list to prevent invalidating any
-			// pointers, however, since all blocks will be registered in ONE go
-			// from a Lua initialisation, these pointers will not be invalidated
-			// for their whole lifetime, until the block registry is destroyed -
-			// but that will be quite late in the destruction of the program so
-			// this *shouldn't* be an issue. - @beeperdeeper089
-			std::vector<BlockType> m_blocks;
-			TextureRegistry        m_textures;
-		};
-	} // namespace voxels
-} // namespace q2
+	private:
+		math::vec3 m_rotation;
+		math::vec3 m_position;
+		int        m_moveSpeed;
+	};
+} // namespace phx

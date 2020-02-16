@@ -27,7 +27,10 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 /**
- * @file ChunkMesher.hpp Phoenix/Graphics/ChunkMesher.hpp
+ * @file ChunkMesher.hpp
+ * @brief The mesher class for use with chunks.
+ *
+ * @copyright Copyright (c) 2019-20 Genten Studios
  */
 
 #pragma once

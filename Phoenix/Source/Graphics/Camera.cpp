@@ -77,13 +77,21 @@ void FPSCamera::tick(float dt)
 	if (!m_enabled)
 		return;
 
+	// make sure we don't segfault because we haven't set the actor yet.
+	if (m_actor == nullptr)
+		return;
+
 	const math::vec2 mousePos = m_window->getCursorPosition();
 
 	m_window->setCursorPosition(m_windowCentre);
 
 	const float sensitivity = m_settingSensitivity->value() * 0.00001f;
 
-	/// @todo Fix this up since we're having an issue where we turn more/less due to higher/lower frames.
+	m_rotation = m_actor->getRotation();
+	m_position = m_actor->getPosition();
+
+	/// @todo Fix this up since we're having an issue where we turn more/less
+	/// due to higher/lower frames.
 	m_rotation.x += sensitivity * dt * (m_windowCentre.x - mousePos.x);
 	m_rotation.y += sensitivity * dt * (m_windowCentre.y - mousePos.y);
 
@@ -98,7 +106,7 @@ void FPSCamera::tick(float dt)
 
 	m_up = math::vec3::cross(right, m_direction);
 
-	const float moveSpeed = MOVE_SPEED;
+	const float moveSpeed = m_actor->getMoveSpeed() * 0.001f;
 
 	if (m_window->isKeyDown(events::Keys::KEY_W))
 	{
@@ -126,6 +134,9 @@ void FPSCamera::tick(float dt)
 	{
 		m_position.y -= dt * moveSpeed;
 	}
+
+	m_actor->setPosition(m_position);
+	m_actor->setRotation(m_rotation);
 }
 
 void FPSCamera::enable(bool enabled)
@@ -156,3 +167,5 @@ void FPSCamera::onWindowResize(events::Event e)
 	m_windowCentre = {static_cast<float>(static_cast<int>(windowSize.x / 2)),
 	                  static_cast<float>(static_cast<int>(windowSize.y / 2))};
 }
+
+void FPSCamera::setActor(Actor* actor) { m_actor = actor; }

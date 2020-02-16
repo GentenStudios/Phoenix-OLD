@@ -39,8 +39,8 @@ namespace phx
 		enum class MouseButtons : int
 		{
 			LEFT = SDL_BUTTON_LEFT,
-			RIGHT = SDL_BUTTON_MIDDLE,
-			MIDDLE = SDL_BUTTON_RIGHT,
+			RIGHT = SDL_BUTTON_RIGHT,
+			MIDDLE = SDL_BUTTON_MIDDLE,
 		};
 
 		enum class Keys : int

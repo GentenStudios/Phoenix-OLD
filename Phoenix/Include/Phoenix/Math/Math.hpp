@@ -32,6 +32,7 @@
 #include <Phoenix/Math/Matrix4x4.hpp>
 #include <Phoenix/Math/Vector2.hpp>
 #include <Phoenix/Math/Vector3.hpp>
+#include <Phoenix/Math/Ray.hpp>
 
 namespace phx
 {
