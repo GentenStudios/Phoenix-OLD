@@ -1,4 +1,4 @@
-Addresses: #
+Resolves: #
 Authors:
 @author1
 
