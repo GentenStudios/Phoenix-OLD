@@ -29,10 +29,8 @@
 #include <Phoenix/Commander.hpp>
 #include <Phoenix/ContentLoader.hpp>
 #include <Phoenix/Graphics/Camera.hpp>
-#include <Phoenix/Graphics/ChunkMesher.hpp>
 #include <Phoenix/Graphics/ChunkRenderer.hpp>
 #include <Phoenix/Graphics/Window.hpp>
-#include <Phoenix/ImGuiHelpers.hpp>
 #include <Phoenix/Player.hpp>
 #include <Phoenix/Settings.hpp>
 #include <Phoenix/Voxels/BlockRegistry.hpp>
@@ -76,7 +74,7 @@ public:
 	     * @param text The text to be outputted to the terminal
 	     *
 	     */
-	    [](std::string text) { chat.cout << text << "\n"; };
+	    [](const std::string& text) { chat.cout << text << "\n"; };
 	}
 
 	~Phoenix() { delete m_window; }
@@ -148,14 +146,15 @@ public:
 			voxels::BlockRegistry::get()->registerBlock(air);
 		}
 
-		if (!ContentManager::get()->loadModules("save1"))
+		std::string save = "save1";
+
+		if (!ContentManager::get()->loadModules(save))
 		{
 			m_window->close();
 		}
 
 		Settings::get()->load();
-
-		m_world  = new voxels::ChunkManager(3);
+		m_world  = new voxels::ChunkManager(3, voxels::Map(save, "map1"));
 		m_player = new Player(m_world);
 		m_camera = new gfx::FPSCamera(m_window);
 		m_camera->setActor(m_player);

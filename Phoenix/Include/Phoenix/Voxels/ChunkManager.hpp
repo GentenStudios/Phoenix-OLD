@@ -29,94 +29,94 @@
 #pragma once
 
 #include <Phoenix/Graphics/ChunkRenderer.hpp>
-#include <Phoenix/Voxels/Chunk.hpp>
+#include <Phoenix/Voxels/Map.hpp>
 
 #include <vector>
 
-namespace phx
+namespace phx::voxels
 {
-	namespace voxels
+	/**
+	 * @brief Generation and Rendering manager for the "world".
+	 *
+	 * The ChunkManager handles generation of new chunks as you wander
+	 * around as well as the rendering of these chunks using a ChunkRenderer
+	 * object.
+	 *
+	 * The ChunkManager requires a position to be sent in each tick event,
+	 * however it should be kept in mind that the "Camera" position and the
+	 * voxel-world space coordinates are INCOMPATIBLE. This is due to the
+	 * vertices required by the rendering system. The tick function
+	 * currently automates the process of converting the camera position
+	 * into the world space coordinates, however this should be phased out
+	 * in the future and made much more explicit, just to be on the safer
+	 * side.
+	 *
+	 * @paragraph Usage
+	 * @code
+	 * ChunkManager world(viewDistance);
+	 *
+	 * mainGameLoop()
+	 * {
+	 *     camera.tick(dt);
+	 *
+	 *     world.tick(camera.getPosition());
+	 *
+	 *     world.render();
+	 * }
+	 * @endcode
+	 */
+	class ChunkManager
 	{
+	public:
 		/**
-		 * @brief Generation and Rendering manager for the "world".
-		 *
-		 * The ChunkManager handles generation of new chunks as you wander
-		 * around as well as the rendering of these chunks using a ChunkRenderer
-		 * object.
-		 *
-		 * The ChunkManager requires a position to be sent in each tick event,
-		 * however it should be kept in mind that the "Camera" position and the
-		 * voxel-world space coordinates are INCOMPATIBLE. This is due to the
-		 * vertices required by the rendering system. The tick function
-		 * currently automates the process of converting the camera position
-		 * into the world space coordinates, however this should be phased out
-		 * in the future and made much more explicit, just to be on the safer
-		 * side.
-		 *
-		 * @paragraph Usage
-		 * @code
-		 * ChunkManager world(viewDistance);
-		 *
-		 * mainGameLoop()
-		 * {
-		 *     camera.tick(dt);
-		 *
-		 *     world.tick(camera.getPosition());
-		 *
-		 *     world.render();
-		 * }
-		 * @endcode
+		 * @brief Constructs the ChunkManager.
+		 * @param viewDistance The view distance in every direction.
+		 * @param map The map the ChunkManager loads from
 		 */
-		class ChunkManager
-		{
-		public:
-			/**
-			 * @brief Constructs the ChunkManager.
-			 * @param viewDistance The view distance in every direction.
-			 */
-			ChunkManager(int viewDistance);
-			~ChunkManager();
+		ChunkManager(int viewDistance, const Map& map);
+		~ChunkManager();
 
-			/**
-			 * @brief Updates visible chunk depending on player position.
-			 * @param playerPos The position of the player, should be straight from the camera - conversion calculations done internally.
-			 *
-			 * This method will load/unload chunks as required while moving
-			 * around as the player. When the player position is sent, it should
-			 * be raw from the camera, since the conversion calculations from
-			 * camera coordinates to voxel coordinates is done internally. This
-			 * needs to be repaired and done explicitly through external code.
-			 *
-			 * @todo Create classes to solve said issue, decide on whether to rely on explicit or implicit conversion of coordinate systems.
-			 */
-			void tick(math::vec3 playerPos);
+		/**
+		 * @brief Updates visible chunk depending on player position.
+		 * @param playerPos The position of the player, should be straight
+		 * from the camera - conversion calculations done internally.
+		 *
+		 * This method will load/unload chunks as required while moving
+		 * around as the player. When the player position is sent, it should
+		 * be raw from the camera, since the conversion calculations from
+		 * camera coordinates to voxel coordinates is done internally. This
+		 * needs to be repaired and done explicitly through external code.
+		 *
+		 * @todo Create classes to solve said issue, decide on whether to
+		 * rely on explicit or implicit conversion of coordinate systems.
+		 */
+		void tick(math::vec3 playerPos);
 
-			/**
-			 * @brief Renders active chunks.
-			 */
-			void render();
+		/**
+		 * @brief Renders active chunks.
+		 */
+		void render();
 
+		/**
+		 * @brief Gets the block at a specific position.
+		 * @param position The position of the block to get.
+		 * @return The block in said position.
+		 * @return "core:out_of_bounds" if an invalid position is provided.
+		 */
+		BlockType* getBlockAt(math::vec3 position) const;
 
-			/**
-			 * @brief Gets the block at a specific position.
-			 * @param position The position of the block to get.
-			 * @return The block in said position.
-			 * @return "core:out_of_bounds" if an invalid position is provided.
-			 */
-			BlockType* getBlockAt(math::vec3 position) const;
+		/**
+		 * @brief Sets the block at a specific position.
+		 * @param position The position to set a block.
+		 * @param block The block to set.
+		 */
+		void setBlockAt(math::vec3 position, BlockType* block);
 
-			/**
-			 * @brief Sets the block at a specific position.
-			 * @param position The position to set a block.
-			 * @param block The block to set.
-			 */
-			void setBlockAt(math::vec3 position, BlockType* block);
+	private:
+		int m_viewDistance = 1; // 1 chunk
 
-		private:
-			int m_viewDistance = 1; // 1 chunk
-
-			std::vector<Chunk>  m_activeChunks;
-			gfx::ChunkRenderer* m_renderer;
-		};
-	} // namespace voxels
-} // namespace phx
+		std::vector<Chunk>  m_activeChunks;
+		gfx::ChunkRenderer* m_renderer;
+		Map                 m_map;
+	};
+} // namespace phx::voxels

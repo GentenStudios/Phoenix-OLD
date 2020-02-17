@@ -4,6 +4,7 @@ set(voxelSources
 	${currentDir}/TextureRegistry.cpp
 	${currentDir}/Chunk.cpp
 	${currentDir}/ChunkManager.cpp
+	${currentDir}/Map.cpp
 
 	PARENT_SCOPE
 )
