@@ -29,8 +29,8 @@
 #pragma once
 
 #include <cmath>
-#include <ostream>
 #include <iostream>
+#include <ostream>
 
 namespace phx::math
 {
@@ -338,33 +338,39 @@ namespace phx::math
 		}
 	};
 
-    // 'KeyEqual' parameter to use when using Vector3 inside a hash map.
-    struct Vector3KeyComparator
-    {
-        template <typename T>
-        bool operator()(const detail::Vector3<T>& a,
-                        const detail::Vector3<T>& b) const
-        {
-            return a.x == b.x && a.y == b.y && a.z == b.z;
-        }
-    };
+	// 'KeyEqual' parameter to use when using Vector3 inside a hash map.
+	struct Vector3KeyComparator
+	{
+		template <typename T>
+		bool operator()(const detail::Vector3<T>& a,
+		                const detail::Vector3<T>& b) const
+		{
+			return a.x == b.x && a.y == b.y && a.z == b.z;
+		}
+	};
 
-    // 'Key' parameter to use when using Vector3 inside a map.
-    struct Vector3Key
-    {
-        template <typename T>
-        bool operator()(const detail::Vector3<T>& a,
-                        const detail::Vector3<T>& b) const
-        {
-            if(a.x != b.x){return a.x < b.x;}
-            if(a.y != b.y){return a.y < b.y;}
-            if(a.z != b.z){return a.z < b.z;}
-            return false;
-        }
-    };
-
-
-
+	// 'Key' parameter to use when using Vector3 inside a map.
+	struct Vector3Key
+	{
+		template <typename T>
+		bool operator()(const detail::Vector3<T>& a,
+		                const detail::Vector3<T>& b) const
+		{
+			if (a.x != b.x)
+			{
+				return a.x < b.x;
+			}
+			if (a.y != b.y)
+			{
+				return a.y < b.y;
+			}
+			if (a.z != b.z)
+			{
+				return a.z < b.z;
+			}
+			return false;
+		}
+	};
 } // namespace phx::math
 
 template <typename T>

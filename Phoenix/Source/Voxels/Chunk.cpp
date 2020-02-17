@@ -38,24 +38,28 @@ Chunk::Chunk(math::vec3 chunkPos) : m_pos(chunkPos)
 	m_blocks.reserve(CHUNK_WIDTH * CHUNK_HEIGHT * CHUNK_DEPTH);
 }
 
-Chunk::Chunk(math::vec3 chunkPos, const std::string& save) : m_pos(chunkPos){
-    std::string_view search = save;
-    size_t pos;
-    while((pos = search.find_first_of(';')) != std::string_view::npos){
-        std::string result;
-        result = search.substr(0, pos);
-        m_blocks.push_back(BlockRegistry::get()->getFromID(result));
-        search.remove_prefix(pos + 1);
-    }
+Chunk::Chunk(math::vec3 chunkPos, const std::string& save) : m_pos(chunkPos)
+{
+	std::string_view search = save;
+	size_t           pos;
+	while ((pos = search.find_first_of(';')) != std::string_view::npos)
+	{
+		std::string result;
+		result = search.substr(0, pos);
+		m_blocks.push_back(BlockRegistry::get()->getFromID(result));
+		search.remove_prefix(pos + 1);
+	}
 }
 
-std::string Chunk::save(){
-    std::string save;
-    for(BlockType* block: m_blocks){
-        save += block->id;
-        save += ";";
-    }
-    return save;
+std::string Chunk::save()
+{
+	std::string save;
+	for (BlockType* block : m_blocks)
+	{
+		save += block->id;
+		save += ";";
+	}
+	return save;
 }
 
 void Chunk::autoTestFill()

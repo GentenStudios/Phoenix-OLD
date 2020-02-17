@@ -28,23 +28,24 @@
 
 #pragma once
 
+#include <Phoenix/Math/Math.hpp>
 #include <Phoenix/Voxels/Chunk.hpp>
 #include <map>
-#include <Phoenix/Math/Math.hpp>
 
 namespace phx::voxels
 {
-    class Map{
-    public:
-        Map(std::string save, std::string name);
+	class Map
+	{
+	public:
+		Map(std::string save, std::string name);
 
-        Chunk getChunk(math::vec3 pos);
-        void setBlockAt(math::vec3 pos, BlockType* block);
-        void save(math::vec3 pos);
-    private:
-        std::map<math::vec3, Chunk,
-            math::Vector3Key> m_chunks;
-        std::string m_save;
-        std::string m_mapName;
-    };
-}
+		Chunk getChunk(math::vec3 pos);
+		void  setBlockAt(math::vec3 pos, BlockType* block);
+		void  save(math::vec3 pos);
+
+	private:
+		std::map<math::vec3, Chunk, math::Vector3Key> m_chunks;
+		std::string                                   m_save;
+		std::string                                   m_mapName;
+	};
+} // namespace phx::voxels
