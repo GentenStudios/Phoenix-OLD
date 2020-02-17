@@ -28,6 +28,8 @@
 
 #include <Phoenix/Graphics/LayerStack.hpp>
 
+#include <algorithm>
+
 using namespace phx::gfx;
 using namespace phx;
 
