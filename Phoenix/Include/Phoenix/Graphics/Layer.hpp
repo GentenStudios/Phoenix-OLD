@@ -43,16 +43,29 @@ namespace phx
 			Layer(const std::string& name) : m_name(name) {}
 			virtual ~Layer() = default;
 
-			virtual void onAttach() = 0;
-			virtual void onDetach() = 0;
-			virtual void onEvent(events::Event e)  = 0;
+			virtual void onAttach()               = 0;
+			virtual void onDetach()               = 0;
+			virtual void onEvent(events::Event e) = 0;
 
 			virtual void tick(float dt) = 0;
 
 			const std::string& getName() const { return m_name; };
 
+			void signalRemoval() { m_requiresRemoval = true; };
+			bool requiresRemoval() const { return m_requiresRemoval; }
+
+			virtual bool isOverlay() { return false; };
+
 		protected:
 			std::string m_name;
+			bool        m_requiresRemoval = false;
 		};
+
+		class Overlay : public Layer
+		{
+		public:
+			bool isOverlay() { return true; }
+		};
+
 	} // namespace gfx
 } // namespace phx

@@ -47,8 +47,6 @@ namespace phx
 
 			void tick(float dt) override;
 
-			bool getStatus() const { return m_removable; };
-
 		private:
 			gfx::ShaderPipeline m_pipeline;
 			unsigned int        m_vao;
@@ -56,7 +54,6 @@ namespace phx
 			unsigned int        m_texture;
 			float               m_alpha      = -0.5f;
 			float               m_multiplier = 1.f;
-			bool                m_removable;
 		};
 	} // namespace game
 } // namespace phx

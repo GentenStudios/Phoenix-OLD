@@ -94,7 +94,7 @@ void SplashScreen::onAttach()
 	layout.push_back({"a_UV", 1});
 
 	m_pipeline.prepare("Assets/Splashscreen.vert", "Assets/Splashscreen.frag",
-	                 layout);
+	                   layout);
 }
 
 void SplashScreen::onDetach()
@@ -112,10 +112,9 @@ void SplashScreen::tick(float dt)
 	glBindTexture(GL_TEXTURE_2D, m_texture);
 
 	m_alpha += dt * m_multiplier;
-	if (m_alpha >= 1.f)
+	if (m_alpha >= 2.f) // 1 second of fading in, 1 second of wait.
 	{
-		m_multiplier = 0;
-		m_removable  = true;
+		signalRemoval();
 	}
 
 	m_pipeline.setFloat("u_TexAlpha", m_alpha);

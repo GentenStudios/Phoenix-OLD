@@ -28,7 +28,6 @@
 
 #pragma once
 
-#include <Phoenix/Events/IEventListener.hpp>
 #include <Phoenix/Graphics/Layer.hpp>
 
 #include <vector>
@@ -52,6 +51,12 @@ namespace phx
 			void pushOverlay(Layer* overlay);
 			void popOverlay(Layer* overlay);
 
+			void tick(float dt);
+
+			// generic accessor methods.
+			std::size_t size() const { return m_layers.size(); }
+			bool empty() const { return m_layers.empty(); }
+			
 			// iterator methods
 			Storage::iterator         begin() { return m_layers.begin(); }
 			Storage::iterator         end() { return m_layers.end(); }

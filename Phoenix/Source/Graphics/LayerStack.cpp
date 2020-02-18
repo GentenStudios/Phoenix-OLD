@@ -70,3 +70,30 @@ void LayerStack::popOverlay(Layer* overlay)
 		m_layers.erase(it);
 	}
 }
+
+void LayerStack::tick(float dt)
+{
+	auto it = m_layers.begin();
+	while (it != m_layers.end())
+	{
+		if ((*it)->requiresRemoval())
+		{
+			if ((*it)->isOverlay())
+			{
+				(*it)->onDetach();
+				it = m_layers.erase(it);
+			}
+			else
+			{
+				(*it)->onDetach();
+				--m_currentInsert;
+				it = m_layers.erase(it);
+			}
+		}
+		else
+		{
+			(*it)->tick(dt);
+			++it;
+		}
+	}
+}

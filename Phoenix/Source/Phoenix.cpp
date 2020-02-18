@@ -49,6 +49,7 @@ Phoenix::Phoenix()
 	m_window->registerEventListener(this);
 
 	m_chat.registerCallback(&rawEcho);
+
 	/**
 	 * @addtogroup luaapi
 	 *
@@ -66,7 +67,7 @@ Phoenix::~Phoenix() { delete m_window; }
 
 void Phoenix::onEvent(const events::Event& e)
 {
-	m_layerStack.front()->onEvent(e);
+	m_layerStack.back()->onEvent(e);
 }
 
 void Phoenix::run()
@@ -85,9 +86,11 @@ void Phoenix::run()
 
 		m_window->startFrame();
 
-		for (gfx::Layer* layer : m_layerStack)
-			layer->tick(dt);
-		
+		if (!m_layerStack.empty())
+			m_layerStack.tick(dt);
+		else
+			m_window->close();
+
 		m_window->endFrame();
 	}
 
