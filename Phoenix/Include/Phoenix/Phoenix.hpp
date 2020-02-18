@@ -41,7 +41,7 @@ namespace phx
 		Phoenix();
 		~Phoenix();
 		
-		void onEvent(const events::Event& e) override;
+		void onEvent(events::Event e) override;
 		void run();
 
 	private:

@@ -38,7 +38,7 @@ using namespace phx;
 
 SplashScreen::SplashScreen() : Layer("SplashScreen") {}
 
-void SplashScreen::onEvent(events::Event e) {}
+void SplashScreen::onEvent(events::Event& e) {}
 
 void SplashScreen::onAttach()
 {

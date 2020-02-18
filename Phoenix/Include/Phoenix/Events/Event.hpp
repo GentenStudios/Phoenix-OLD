@@ -108,11 +108,14 @@ namespace phx
 				Mouse    mouse;
 			};
 
+			bool handled;
+
 			Event()
 			{
 				// This is to make sure that *everything* in the struct + it's
 				// union is initialized to 0;
 				std::memset(this, 0, sizeof(Event));
+				handled = false;
 			}
 		};
 	} // namespace events

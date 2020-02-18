@@ -40,7 +40,7 @@ namespace phx
 			IEventListener()          = default;
 			virtual ~IEventListener() = default;
 
-			virtual void onEvent(const Event& e) = 0;
+			virtual void onEvent(Event e) = 0;
 		};
 	} // namespace events
 } // namespace q2

@@ -71,6 +71,16 @@ void LayerStack::popOverlay(Layer* overlay)
 	}
 }
 
+void LayerStack::onEvent(events::Event e)
+{
+	for (auto it = m_layers.rbegin(); it != m_layers.rend(); ++it)
+	{
+		(*it)->onEvent(e);
+		if (e.handled)
+			break;
+	}
+}
+
 void LayerStack::tick(float dt)
 {
 	auto it = m_layers.begin();

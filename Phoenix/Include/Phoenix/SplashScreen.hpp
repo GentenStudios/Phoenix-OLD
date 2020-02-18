@@ -41,7 +41,7 @@ namespace phx
 			SplashScreen();
 			~SplashScreen() = default;
 
-			void onEvent(events::Event e) override;
+			void onEvent(events::Event& e) override;
 			void onAttach() override;
 			void onDetach() override;
 

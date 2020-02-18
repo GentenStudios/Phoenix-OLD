@@ -28,6 +28,7 @@
 
 #pragma once
 
+#include <Phoenix/Events/IEventListener.hpp>
 #include <Phoenix/Graphics/Layer.hpp>
 
 #include <vector>
@@ -37,7 +38,7 @@ namespace phx
 	namespace gfx
 	{
 		// design of this class heavily inspired by TheCherno.
-		class LayerStack
+		class LayerStack : public events::IEventListener
 		{
 			using Storage = std::vector<Layer*>;
 
@@ -51,6 +52,7 @@ namespace phx
 			void pushOverlay(Layer* overlay);
 			void popOverlay(Layer* overlay);
 
+			void onEvent(events::Event e) override;
 			void tick(float dt);
 
 			// generic accessor methods.

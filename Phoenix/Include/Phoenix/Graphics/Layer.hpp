@@ -45,7 +45,7 @@ namespace phx
 
 			virtual void onAttach()               = 0;
 			virtual void onDetach()               = 0;
-			virtual void onEvent(events::Event e) = 0;
+			virtual void onEvent(events::Event& e) = 0;
 
 			virtual void tick(float dt) = 0;
 

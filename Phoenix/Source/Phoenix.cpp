@@ -65,9 +65,9 @@ Phoenix::Phoenix()
 
 Phoenix::~Phoenix() { delete m_window; }
 
-void Phoenix::onEvent(const events::Event& e)
+void Phoenix::onEvent(events::Event e)
 {
-	m_layerStack.back()->onEvent(e);
+	m_layerStack.onEvent(e);
 }
 
 void Phoenix::run()
