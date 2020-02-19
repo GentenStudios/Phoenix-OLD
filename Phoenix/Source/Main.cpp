@@ -33,7 +33,7 @@ using namespace phx;
 #undef main
 int main(int argc, char** argv)
 {
-	Phoenix* game = new Phoenix();
+	client::Phoenix* game = new client::Phoenix();
 	game->run();
 
 	return 0;

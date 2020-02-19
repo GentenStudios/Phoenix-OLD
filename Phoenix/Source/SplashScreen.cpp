@@ -27,13 +27,14 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <Phoenix/SplashScreen.hpp>
+#include <Phoenix/Game.hpp>
 
 #include <glad/glad.h>
 #include <stb_image.h>
 
 #include <iostream>
 
-using namespace phx::game;
+using namespace phx::client;
 using namespace phx;
 
 SplashScreen::SplashScreen() : Layer("SplashScreen") {}
@@ -90,8 +91,8 @@ void SplashScreen::onAttach()
 	stbi_image_free(data);
 
 	std::vector<gfx::ShaderLayout> layout;
-	layout.push_back({"a_Vertex", 0});
-	layout.push_back({"a_UV", 1});
+	layout.emplace_back("a_Vertex", 0);
+	layout.emplace_back("a_UV", 1);
 
 	m_pipeline.prepare("Assets/Splashscreen.vert", "Assets/Splashscreen.frag",
 	                   layout);

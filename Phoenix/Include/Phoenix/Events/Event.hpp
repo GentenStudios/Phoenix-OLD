@@ -89,34 +89,30 @@ namespace phx
 			CURSOR_ENTERED        = SDL_WINDOWEVENT_ENTER,
 			KEY_PRESSED           = SDL_KEYDOWN,
 			KEY_RELEASED          = SDL_KEYUP,
+			LAYER_DESTROYED,
 		};
 
 		struct Event
 		{
-			EventType type;
+			EventType type = EventType::NONE;
 
-			// This union MUST be used correctly or shit will go south and you
-			// might end up with corrupted memory :( We're using a union, so
-			// it's sort of like SDLs Event system, and so we don't have a huge
-			// amount of painful polymorphism that will end in us having to
-			// restart anyway.
+			//// This union MUST be used correctly or shit will go south and you
+			//// might end up with corrupted memory :( We're using a union, so
+			//// it's sort of like SDLs Event system, and so we don't have a
+			/// huge amount of painful polymorphism that will end in us having
+			/// to restart anyway.
 			union {
-				Position position;
-				Size     size;
-				Scroll   scroll;
-				Keyboard keyboard;
-				Mouse    mouse;
+				Position    position;
+				Size        size;
+				Scroll      scroll;
+				Keyboard    keyboard;
+				Mouse       mouse;
+				const char* layer;
 			};
 
-			bool handled;
+			bool handled = false;
 
-			Event()
-			{
-				// This is to make sure that *everything* in the struct + it's
-				// union is initialized to 0;
-				std::memset(this, 0, sizeof(Event));
-				handled = false;
-			}
+			Event() { std::memset(this, 0, sizeof(Event)); }
 		};
 	} // namespace events
-} // namespace q2
+} // namespace phx

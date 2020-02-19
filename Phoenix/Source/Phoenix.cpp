@@ -28,10 +28,12 @@
 
 #include <Phoenix/Commander.hpp>
 #include <Phoenix/ContentLoader.hpp>
+#include <Phoenix/Game.hpp>
 #include <Phoenix/Phoenix.hpp>
 #include <Phoenix/Settings.hpp>
 #include <Phoenix/SplashScreen.hpp>
 
+using namespace phx::client;
 using namespace phx;
 
 Commander kirk = Commander();
@@ -48,6 +50,8 @@ Phoenix::Phoenix()
 	m_window = new gfx::Window("Phoenix Game!", 1280, 720);
 	m_window->registerEventListener(this);
 
+	m_layerStack = new gfx::LayerStack(m_window);
+
 	m_chat.registerCallback(&rawEcho);
 
 	/**
@@ -63,19 +67,50 @@ Phoenix::Phoenix()
 	    [this](const std::string& text) { m_chat.cout << text << "\n"; };
 }
 
-Phoenix::~Phoenix() { delete m_window; }
+Phoenix::~Phoenix()
+{
+	delete m_layerStack;
+	delete m_window;
+}
 
 void Phoenix::onEvent(events::Event e)
 {
-	m_layerStack.onEvent(e);
+	using namespace events;
+	switch (e.type)
+	{
+	case EventType::KEY_PRESSED:
+		switch (e.keyboard.key)
+		{
+		case Keys::KEY_Q:
+			m_window->close();
+			e.handled = true;
+			break;
+		default:
+			break;
+		}
+		break;
+	case EventType::LAYER_DESTROYED:
+		if (std::string(e.layer) == "SplashScreen")
+		{
+			Game* game = new Game(m_window);
+			m_layerStack->pushLayer(game);
+			e.handled = true;
+		}
+		break;
+	default:
+		m_layerStack->onEvent(e);
+		break;
+	}
+
+	m_layerStack->onEvent(e);
 }
 
 void Phoenix::run()
 {
 	Settings::get()->load();
 
-	game::SplashScreen* splashScreen = new game::SplashScreen();
-	m_layerStack.pushLayer(splashScreen);
+	SplashScreen* splashScreen = new SplashScreen();
+	m_layerStack->pushLayer(splashScreen);
 
 	float last = static_cast<float>(SDL_GetTicks());
 	while (m_window->isRunning())
@@ -86,10 +121,8 @@ void Phoenix::run()
 
 		m_window->startFrame();
 
-		if (!m_layerStack.empty())
-			m_layerStack.tick(dt);
-		else
-			m_window->close();
+		if (!m_layerStack->empty())
+			m_layerStack->tick(dt);
 
 		m_window->endFrame();
 	}

@@ -376,6 +376,8 @@ void Window::nullifyEventListener(events::IEventListener* listener)
 	m_eventListeners.erase(iterPos);
 }
 
+void Window::dispatchCustomEvent(events::Event e) { dispatchToListeners(e); }
+
 bool Window::isKeyDown(events::Keys key) const
 {
 	return SDL_GetKeyboardState(nullptr)[static_cast<SDL_Scancode>(key)];

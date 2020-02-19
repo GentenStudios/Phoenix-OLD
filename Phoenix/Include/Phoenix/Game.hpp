@@ -28,43 +28,43 @@
 
 #pragma once
 
-#include <string>
-
-#include <Phoenix/Events/Event.hpp>
+#include <Phoenix/Commander.hpp>
+#include <Phoenix/Graphics/Camera.hpp>
+#include <Phoenix/Graphics/Layer.hpp>
+#include <Phoenix/Graphics/ShaderPipeline.hpp>
+#include <Phoenix/Graphics/Window.hpp>
+#include <Phoenix/Player.hpp>
+#include <Phoenix/UI.hpp>
 
 namespace phx
 {
-	namespace gfx
+	namespace client
 	{
-		// design of this class heavily inspired by TheCherno.
-		class Layer
+		class Game : public gfx::Layer
 		{
 		public:
-			Layer(const std::string& name) : m_name(name) {}
-			virtual ~Layer() = default;
+			Game(gfx::Window* window);
+			~Game() override;
 
-			virtual void onAttach()                = 0;
-			virtual void onDetach()                = 0;
-			virtual void onEvent(events::Event& e) = 0;
+			void onAttach() override;
+			void onDetach() override;
 
-			virtual void tick(float dt) = 0;
+			void onEvent(events::Event& e) override;
+			void tick(float dt) override;
 
-			const std::string& getName() const { return m_name; };
+		private:
+			gfx::Window*          m_window;
+			gfx::FPSCamera*       m_camera;
+			Player*               m_player;
+			voxels::ChunkManager* m_world;
 
-			void signalRemoval() { m_requiresRemoval = true; };
-			bool requiresRemoval() const { return m_requiresRemoval; }
-			bool isOverlay() const { return false; };
+			gfx::ShaderPipeline m_renderPipeline;
 
-		protected:
-			std::string m_name;
-			bool        m_requiresRemoval = false;
+			ui::ChatWindow* m_chat;
+			// Commander       m_kirk;
+
+			bool       m_followCam;
+			math::vec3 m_prevPos;
 		};
-
-		class Overlay : public Layer
-		{
-		public:
-			bool isOverlay() const { return true; }
-		};
-
-	} // namespace gfx
+	} // namespace client
 } // namespace phx

@@ -28,8 +28,9 @@
 
 #pragma once
 
-#include <Phoenix/Events/IEventListener.hpp>
 #include <Phoenix/Graphics/Layer.hpp>
+#include <Phoenix/Events/IEventListener.hpp>
+#include <Phoenix/Graphics/Window.hpp>
 
 #include <vector>
 
@@ -37,18 +38,16 @@ namespace phx
 {
 	namespace gfx
 	{
-		// design of this class heavily inspired by TheCherno.
 		class LayerStack : public events::IEventListener
 		{
 			using Storage = std::vector<Layer*>;
 
 		public:
-			LayerStack() = default;
+			LayerStack(gfx::Window* window) : m_window(window) {}
 			~LayerStack();
 
 			void pushLayer(Layer* layer);
 			void popLayer(Layer* layer);
-
 			void pushOverlay(Layer* overlay);
 			void popOverlay(Layer* overlay);
 
@@ -86,6 +85,8 @@ namespace phx
 		private:
 			Storage m_layers;
 			unsigned int m_currentInsert = 0;
+
+			gfx::Window* m_window;
 		};
 	} // namespace gfx
 } // namespace phx

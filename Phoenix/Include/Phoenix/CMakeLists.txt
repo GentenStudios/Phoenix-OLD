@@ -25,6 +25,7 @@ set(Headers
 
 	${currentDir}/Phoenix.hpp
 	${currentDir}/SplashScreen.hpp
+	${currentDir}/Game.hpp
 
 	PARENT_SCOPE
 )

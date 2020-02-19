@@ -30,10 +30,11 @@
 
 #include <Phoenix/Graphics/Layer.hpp>
 #include <Phoenix/Graphics/ShaderPipeline.hpp>
+#include <Phoenix/Graphics/Window.hpp>
 
 namespace phx
 {
-	namespace game
+	namespace client
 	{
 		class SplashScreen : public gfx::Layer
 		{
@@ -55,5 +56,5 @@ namespace phx
 			float               m_alpha      = -0.5f;
 			float               m_multiplier = 1.f;
 		};
-	} // namespace game
+	} // namespace client
 } // namespace phx

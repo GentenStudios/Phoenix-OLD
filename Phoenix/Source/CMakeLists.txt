@@ -19,6 +19,7 @@ set(Sources
 
 	${currentDir}/Phoenix.cpp
 	${currentDir}/SplashScreen.cpp
+	${currentDir}/Game.cpp
 
 	${currentDir}/Main.cpp
 

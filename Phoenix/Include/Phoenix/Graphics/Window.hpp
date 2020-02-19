@@ -73,6 +73,10 @@ namespace phx
 		 * will auto-exit and a user will have to find another computer to use
 		 * that supports OpenGL 3.3.
 		 *
+		 * Note: Event handling **NEEDS** to be blocking otherwise LayerStack
+		 * will have issues with the Layer destroyed event. - @beeperdeeper089
+		 * (19/02/2020)
+		 *
 		 * @paragraph Usage
 		 * @code
 		 * Window* window = new Window("Phoenix!", 1280, 720);
@@ -260,6 +264,12 @@ namespace phx
 			 * @param listener The object to stop sending event events to.
 			 */
 			void nullifyEventListener(events::IEventListener* listener);
+
+			/**
+			 * @brief Dispatches a custom provided event to all listeners.
+			 * @param e The event to send to listeners.
+			 */
+			void dispatchCustomEvent(events::Event e);
 
 			/**
 			 * @brief Queries whether a specific key is pressed.

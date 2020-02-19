@@ -26,6 +26,7 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+#include <Phoenix/Events/Event.hpp>
 #include <Phoenix/Graphics/LayerStack.hpp>
 
 #include <algorithm>
@@ -38,6 +39,7 @@ LayerStack::~LayerStack()
 	for (Layer* layer : m_layers)
 	{
 		layer->onDetach();
+		delete layer;
 	}
 }
 
@@ -53,21 +55,41 @@ void LayerStack::popLayer(Layer* layer)
 	auto it = std::find(m_layers.begin(), m_layers.end(), layer);
 	if (it != m_layers.end())
 	{
+		std::string layerName = layer->getName();
+
 		layer->onDetach();
-		m_layers.erase(it);
+		delete layer;
 		--m_currentInsert;
+		m_layers.erase(it);
+
+		events::Event e;
+		e.type  = events::EventType::LAYER_DESTROYED;
+		e.layer = layerName.c_str();
+		m_window->dispatchCustomEvent(e);
 	}
 }
 
-void LayerStack::pushOverlay(Layer* overlay) { m_layers.emplace_back(overlay); }
+void LayerStack::pushOverlay(Layer* overlay)
+{
+	m_layers.emplace_back(overlay);
+	overlay->onAttach();
+}
 
 void LayerStack::popOverlay(Layer* overlay)
 {
 	auto it = std::find(m_layers.begin(), m_layers.end(), overlay);
 	if (it != m_layers.end())
 	{
+		const std::string layerName = overlay->getName();
+
 		overlay->onDetach();
+		delete overlay;
 		m_layers.erase(it);
+
+		events::Event e;
+		e.type  = events::EventType::LAYER_DESTROYED;
+		e.layer = layerName.c_str();
+		m_window->dispatchCustomEvent(e);
 	}
 }
 
@@ -90,14 +112,69 @@ void LayerStack::tick(float dt)
 		{
 			if ((*it)->isOverlay())
 			{
+				std::string layerName = (*it)->getName();
+
 				(*it)->onDetach();
+				delete *it;
+				const std::size_t pos =
+				    std::distance(m_layers.begin(), it) -
+				    m_currentInsert; // taking away m_currentInsert because we
+				                     // only want the position relative to the
+				                     // overlays; remember: overlays are stored
+				                     // after all the layers to make sure they
+				                     // are rendered on top, and to do so, they
+				                     // are played in the second half of the
+				                     // vector, all overlays are pushed to the
+				                     // back, but new layers are pushed to where
+				                     // the half-way line is - just before the
+				                     // overlays. If this doesn't make sense and
+				                     // for some reason this functionality needs
+				                     // updating, contact @beeperdeeper089
+				                     // (19/02/2020).
 				it = m_layers.erase(it);
+
+				events::Event e;
+				e.type  = events::EventType::LAYER_DESTROYED;
+				e.layer = layerName.c_str();
+				m_window->dispatchCustomEvent(e);
+
+				// the above event could have made another element be pushed to
+				// the array, so all we're doing here is recalculating the
+				// iterator position inside the vector in case something was
+				// added due to the handling of above event. Remember:
+				// adding/removing something from a vector can invalidate the
+				// iterators - so this is to make sure.
+				//
+				// For the overlay's in specific, since they're stored in the
+				// 2nd half of the array, m_currentInsert IS the point at which
+				// the Layers end and Overlays start. We're taking away
+				// m_currentInsert above in the std::distance calculation
+				// because we want the position of the overlay in the 2nd half
+				// of the array, since the size of the first half could change.
+				// If this doesn't make sense and for some reason this
+				// functionality needs updating, contact @beeperdeeper089
+				// (19/02/2020).
+				it = m_layers.begin() + m_currentInsert + pos;
 			}
 			else
 			{
+				std::string layerName = (*it)->getName();
+
 				(*it)->onDetach();
+				delete *it;
 				--m_currentInsert;
-				it = m_layers.erase(it);
+				const std::size_t pos = std::distance(m_layers.begin(), it);
+				it                    = m_layers.erase(it);
+
+				events::Event e;
+				e.type  = events::EventType::LAYER_DESTROYED;
+				e.layer = layerName.c_str();
+				m_window->dispatchCustomEvent(e);
+
+				// as I've said above, but since this is in the first half of
+				// the array, before the m_currentInsert actually matters, we
+				// don't need to deal with that here.
+				it = m_layers.begin() + pos;
 			}
 		}
 		else

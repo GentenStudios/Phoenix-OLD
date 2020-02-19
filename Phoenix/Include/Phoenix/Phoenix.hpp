@@ -29,25 +29,28 @@
 #pragma once
 
 #include <Phoenix/Events/IEventListener.hpp>
-#include <Phoenix/Graphics/Window.hpp>
 #include <Phoenix/Graphics/LayerStack.hpp>
+#include <Phoenix/Graphics/Window.hpp>
 #include <Phoenix/UI.hpp>
 
 namespace phx
 {
-	class Phoenix : public events::IEventListener
+	namespace client
 	{
-	public:
-		Phoenix();
-		~Phoenix();
-		
-		void onEvent(events::Event e) override;
-		void run();
+		class Phoenix : public events::IEventListener
+		{
+		public:
+			Phoenix();
+			~Phoenix();
 
-	private:
-		gfx::Window* m_window = nullptr;
-		gfx::LayerStack m_layerStack;
+			void onEvent(events::Event e) override;
+			void run();
 
-		ui::ChatWindow m_chat;
-	};
+		private:
+			gfx::Window*     m_window;
+			gfx::LayerStack* m_layerStack;
+
+			ui::ChatWindow m_chat;
+		};
+	} // namespace client
 } // namespace phx
