@@ -38,6 +38,12 @@ namespace phx
 {
 	namespace gfx
 	{
+		// when you push a layer, you pass ownership of the data to the
+		// layerstack. When you Pop a layer, you reclaim ownership. If the layer
+		// is removed through itself by calling signalRemoval() - the layer
+		// stack is still in ownership of the data and will delete it.
+		//
+		// UNDERSTAND THIS - very important memory management.
 		class LayerStack : public events::IEventListener
 		{
 			using Storage = std::vector<Layer*>;

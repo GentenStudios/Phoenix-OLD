@@ -40,32 +40,19 @@ namespace phx
 {
 	namespace client
 	{
-		class Game : public gfx::Layer
+		class DebugOverlay : public gfx::Overlay
 		{
 		public:
-			Game(gfx::Window* window);
-			~Game() override;
+			DebugOverlay();
+			~DebugOverlay() override;
 
 			void onAttach() override;
 			void onDetach() override;
-
 			void onEvent(events::Event& e) override;
 			void tick(float dt) override;
 
 		private:
-			gfx::Window*          m_window;
-			gfx::FPSCamera*       m_camera;
-			Player*               m_player;
-			voxels::ChunkManager* m_world;
-
-			gfx::ShaderPipeline m_renderPipeline;
-
-			ui::ChatWindow* m_chat;
-			// Commander       m_kirk;
-
-			bool       m_followCam;
-			math::vec3 m_prevPos;
-			int        m_playerHand = 0;
+			bool m_wireframe = false;
 		};
 	} // namespace client
 } // namespace phx

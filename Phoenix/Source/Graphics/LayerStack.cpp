@@ -58,7 +58,6 @@ void LayerStack::popLayer(Layer* layer)
 		std::string layerName = layer->getName();
 
 		layer->onDetach();
-		delete layer;
 		--m_currentInsert;
 		m_layers.erase(it);
 
@@ -83,7 +82,6 @@ void LayerStack::popOverlay(Layer* overlay)
 		const std::string layerName = overlay->getName();
 
 		overlay->onDetach();
-		delete overlay;
 		m_layers.erase(it);
 
 		events::Event e;

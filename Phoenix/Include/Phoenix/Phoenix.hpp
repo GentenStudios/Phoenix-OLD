@@ -32,6 +32,7 @@
 #include <Phoenix/Graphics/LayerStack.hpp>
 #include <Phoenix/Graphics/Window.hpp>
 #include <Phoenix/UI.hpp>
+#include <Phoenix/DebugOverlay.hpp>
 
 namespace phx
 {
@@ -51,6 +52,9 @@ namespace phx
 			gfx::LayerStack* m_layerStack;
 
 			ui::ChatWindow m_chat;
+
+			bool m_debugOverlayActive = false;
+			client::DebugOverlay* m_debugOverlay = nullptr;
 		};
 	} // namespace client
 } // namespace phx

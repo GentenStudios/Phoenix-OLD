@@ -26,46 +26,58 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#pragma once
+#include <Phoenix/DebugOverlay.hpp>
 
-#include <Phoenix/Commander.hpp>
-#include <Phoenix/Graphics/Camera.hpp>
-#include <Phoenix/Graphics/Layer.hpp>
-#include <Phoenix/Graphics/ShaderPipeline.hpp>
-#include <Phoenix/Graphics/Window.hpp>
-#include <Phoenix/Player.hpp>
-#include <Phoenix/UI.hpp>
+using namespace phx::client;
+using namespace phx;
 
-namespace phx
+DebugOverlay::DebugOverlay() : Overlay("DebugOverlay") {}
+
+DebugOverlay::~DebugOverlay() {}
+
+void DebugOverlay::onAttach() {}
+
+void DebugOverlay::onDetach() {}
+
+void DebugOverlay::onEvent(events::Event& e) {}
+
+void DebugOverlay::tick(float dt)
 {
-	namespace client
+	const float DISTANCE = 10.0f;
+	const int   corner   = 1;
+	static bool p_open   = true;
+
+	ImGuiIO& io = ImGui::GetIO();
+
+	const ImVec2 window_pos =
+	    ImVec2(io.DisplaySize.x - DISTANCE, DISTANCE * 2.5f);
+	const ImVec2 window_pos_pivot = ImVec2(1.0f, 0.0f);
+	ImGui::SetNextWindowPos(window_pos, ImGuiCond_Always, window_pos_pivot);
+
+	ImGui::SetNextWindowBgAlpha(0.3f);
+
+	ImGui::Begin("Debug Overlay Hint", &p_open,
+	             (corner != -1 ? ImGuiWindowFlags_NoMove : 0) |
+	                 ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
+	                 ImGuiWindowFlags_AlwaysAutoResize |
+	                 ImGuiWindowFlags_NoSavedSettings |
+	                 ImGuiWindowFlags_NoFocusOnAppearing |
+	                 ImGuiWindowFlags_NoNav);
+
+
+	ImGui::End();
+
+	ImGui::Begin("Debug Tools");
+	if (ImGui::Checkbox("Wireframe", &m_wireframe))
 	{
-		class Game : public gfx::Layer
-		{
-		public:
-			Game(gfx::Window* window);
-			~Game() override;
+		if (m_wireframe)
+			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		else
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	}
 
-			void onAttach() override;
-			void onDetach() override;
+	ImGui::Text("Frame Time: %f\n", dt);
+	ImGui::Text("Frames Per Second: %d\n", static_cast<int>(1 / dt));
 
-			void onEvent(events::Event& e) override;
-			void tick(float dt) override;
-
-		private:
-			gfx::Window*          m_window;
-			gfx::FPSCamera*       m_camera;
-			Player*               m_player;
-			voxels::ChunkManager* m_world;
-
-			gfx::ShaderPipeline m_renderPipeline;
-
-			ui::ChatWindow* m_chat;
-			// Commander       m_kirk;
-
-			bool       m_followCam;
-			math::vec3 m_prevPos;
-			int        m_playerHand = 0;
-		};
-	} // namespace client
-} // namespace phx
+	ImGui::End();
+}

@@ -63,6 +63,9 @@ namespace phx
 		class Overlay : public Layer
 		{
 		public:
+			Overlay(const std::string& name) : Layer(name) {}
+			virtual ~Overlay() = default;
+			
 			bool isOverlay() const { return true; }
 		};
 

@@ -85,6 +85,22 @@ void Phoenix::onEvent(events::Event e)
 			m_window->close();
 			e.handled = true;
 			break;
+		case Keys::KEY_P:
+			m_debugOverlayActive = !m_debugOverlayActive;
+			if (m_debugOverlayActive)
+			{
+				if (m_debugOverlay == nullptr)
+					m_debugOverlay = new DebugOverlay();
+
+				m_layerStack->pushLayer(m_debugOverlay);
+			}
+			else
+			{
+				m_layerStack->popLayer(m_debugOverlay);
+			}
+			e.handled = true;
+			break;
+
 		default:
 			break;
 		}
@@ -101,8 +117,6 @@ void Phoenix::onEvent(events::Event e)
 		m_layerStack->onEvent(e);
 		break;
 	}
-
-	m_layerStack->onEvent(e);
 }
 
 void Phoenix::run()

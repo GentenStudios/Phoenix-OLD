@@ -105,7 +105,7 @@ Window::Window(const std::string& title, int width, int height)
 	GLCheck(glEnable(GL_MULTISAMPLE));
 	GLCheck(glEnable(GL_BLEND));
 	GLCheck(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
-	
+
 	m_running = true;
 
 	SDL_SetRelativeMouseMode(SDL_FALSE);
@@ -138,6 +138,8 @@ void Window::pollEvents()
 	{
 		ImGui_ImplSDL2_ProcessEvent(&event);
 
+		ImGuiIO& io = ImGui::GetIO();
+
 		using namespace events;
 		Event e;
 
@@ -149,6 +151,8 @@ void Window::pollEvents()
 			m_running = false;
 			break;
 		case SDL_MOUSEBUTTONDOWN:
+			if (io.WantCaptureMouse)
+				break;
 			e.type         = EventType::MOUSE_BUTTON_PRESSED;
 			e.mouse.button = static_cast<MouseButtons>(event.button.button);
 			e.mouse.x      = event.button.x;
@@ -156,17 +160,23 @@ void Window::pollEvents()
 			dispatchToListeners(e);
 			break;
 		case SDL_MOUSEBUTTONUP:
+			if (io.WantCaptureMouse)
+				break;
 			e.type         = EventType::MOUSE_BUTTON_RELEASED;
 			e.mouse.button = static_cast<MouseButtons>(event.button.button);
 			dispatchToListeners(e);
 			break;
 		case SDL_MOUSEMOTION:
+			if (io.WantCaptureMouse)
+				break;
 			e.type       = EventType::CURSOR_MOVED;
 			e.position.x = event.motion.x;
 			e.position.y = event.motion.y;
 			dispatchToListeners(e);
 			break;
 		case SDL_KEYDOWN:
+			if (io.WantCaptureKeyboard)
+				break;
 			e.type          = EventType::KEY_PRESSED;
 			e.keyboard.key  = static_cast<Keys>(event.key.keysym.scancode);
 			e.keyboard.mods = static_cast<Mods>(
@@ -175,6 +185,8 @@ void Window::pollEvents()
 			dispatchToListeners(e);
 			break;
 		case SDL_KEYUP:
+			if (io.WantCaptureKeyboard)
+				break;
 			e.type          = EventType::KEY_RELEASED;
 			e.keyboard.key  = static_cast<Keys>(event.key.keysym.scancode);
 			e.keyboard.mods = static_cast<Mods>(
@@ -185,10 +197,11 @@ void Window::pollEvents()
 		case SDL_WINDOWEVENT:
 			switch (event.window.event)
 			{
-//			case SDL_WINDOWEVENT_RESIZED: <- we don't want this -> https://wiki.libsdl.org/SDL_WindowEventID
+				//			case SDL_WINDOWEVENT_RESIZED: <- we don't want this ->
+				//https://wiki.libsdl.org/SDL_WindowEventID
 			case SDL_WINDOWEVENT_SIZE_CHANGED:
-				e.type       = EventType::WINDOW_RESIZED;
-				e.size.width = event.window.data1;
+				e.type        = EventType::WINDOW_RESIZED;
+				e.size.width  = event.window.data1;
 				e.size.height = event.window.data2;
 				glViewport(0, 0, e.size.width, e.size.height);
 				dispatchToListeners(e);
@@ -246,7 +259,7 @@ void Window::startFrame()
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplSDL2_NewFrame(m_window);
 	ImGui::NewFrame();
-	
+
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 }
@@ -255,7 +268,7 @@ void Window::endFrame()
 {
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-	
+
 	swapBuffers();
 	pollEvents();
 }

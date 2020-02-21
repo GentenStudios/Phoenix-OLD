@@ -74,8 +74,9 @@ void Game::onAttach()
 
 	m_player->setHand(voxels::BlockRegistry::get()->getFromRegistryID(0));
 
-	m_renderPipeline.prepare("Assets/SimpleWorld.vert", "Assets/SimpleWorld.frag",
-	                       gfx::ChunkRenderer::getRequiredShaderLayout());
+	m_renderPipeline.prepare("Assets/SimpleWorld.vert",
+	                         "Assets/SimpleWorld.frag",
+	                         gfx::ChunkRenderer::getRequiredShaderLayout());
 
 	m_renderPipeline.activate();
 
@@ -90,7 +91,63 @@ void Game::onDetach()
 	delete m_camera;
 }
 
-void Game::onEvent(events::Event& e) {}
+void Game::onEvent(events::Event& e)
+{
+	switch (e.type)
+	{
+	case events::EventType::KEY_PRESSED:
+		switch (e.keyboard.key)
+		{
+		case events::Keys::KEY_ESCAPE:
+			m_camera->enable(!m_camera->isEnabled());
+			e.handled = true;
+			break;
+
+		case events::Keys::KEY_Q:
+			m_window->close();
+			e.handled = true;
+			break;
+
+		case events::Keys::KEY_E:
+			m_playerHand++;
+			m_player->setHand(
+			    voxels::BlockRegistry::get()->getFromRegistryID(m_playerHand));
+			e.handled = true;
+			break;
+
+		case events::Keys::KEY_R:
+			m_playerHand--;
+			m_player->setHand(
+			    voxels::BlockRegistry::get()->getFromRegistryID(m_playerHand));
+			e.handled = true;
+			break;
+
+		default:
+			break;
+		}
+		break;
+
+	case events::EventType::MOUSE_BUTTON_PRESSED:
+		switch (e.mouse.button)
+		{
+		case events::MouseButtons::LEFT:
+			m_player->action1();
+			e.handled = true;
+			break;
+
+		case events::MouseButtons::RIGHT:
+			m_player->action2();
+			e.handled = true;
+			break;
+
+		default:
+			break;
+		}
+
+	default:
+		break;
+	}
+}
 
 void Game::tick(float dt)
 {

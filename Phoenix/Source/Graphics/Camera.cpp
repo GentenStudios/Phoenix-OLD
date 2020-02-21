@@ -85,7 +85,7 @@ void FPSCamera::tick(float dt)
 
 	m_window->setCursorPosition(m_windowCentre);
 
-	const float sensitivity = m_settingSensitivity->value();
+	const float sensitivity = static_cast<float>(m_settingSensitivity->value());
 
 	m_rotation = m_actor->getRotation();
 	m_position = m_actor->getPosition();
@@ -106,7 +106,7 @@ void FPSCamera::tick(float dt)
 
 	m_up = math::vec3::cross(right, m_direction);
 
-	const float moveSpeed = m_actor->getMoveSpeed() * 0.001f;
+	const float moveSpeed = static_cast<float>(m_actor->getMoveSpeed());
 
 	if (m_window->isKeyDown(events::Keys::KEY_W))
 	{
