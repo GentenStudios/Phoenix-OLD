@@ -27,7 +27,6 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <Phoenix/SplashScreen.hpp>
-#include <Phoenix/Game.hpp>
 
 #include <glad/glad.h>
 #include <stb_image.h>
