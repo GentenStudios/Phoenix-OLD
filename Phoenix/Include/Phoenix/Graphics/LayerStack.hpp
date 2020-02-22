@@ -124,6 +124,7 @@ namespace phx
 		 */
 		class LayerStack : public events::IEventListener
 		{
+			// scroll down, you'll see why ;)
 			using Storage = std::vector<Layer*>;
 
 		public:
