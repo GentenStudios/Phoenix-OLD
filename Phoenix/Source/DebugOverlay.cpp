@@ -28,12 +28,27 @@
 
 #include <Phoenix/DebugOverlay.hpp>
 
+#include <Phoenix/Graphics/ImGuiExtensions.hpp>
+#include <imgui.h>
+
+#include <glad/glad.h>
+
 using namespace phx::client;
 using namespace phx;
 
-DebugOverlay::DebugOverlay() : Overlay("DebugOverlay") {}
+DebugOverlay::DebugOverlay() : Overlay("DebugOverlay")
+{
+	SDL_DisplayMode current;
 
-DebugOverlay::~DebugOverlay() {}
+	for (int i = 0; i < SDL_GetNumVideoDisplays(); ++i)
+	{
+		if (SDL_GetCurrentDisplayMode(i, &current) == 0)
+		{
+			if (current.refresh_rate > m_maxSampleRate)
+				m_maxSampleRate = current.refresh_rate;
+		}
+	}
+}
 
 void DebugOverlay::onAttach() {}
 
@@ -43,30 +58,6 @@ void DebugOverlay::onEvent(events::Event& e) {}
 
 void DebugOverlay::tick(float dt)
 {
-	const float DISTANCE = 10.0f;
-	const int   corner   = 1;
-	static bool p_open   = true;
-
-	ImGuiIO& io = ImGui::GetIO();
-
-	const ImVec2 window_pos =
-	    ImVec2(io.DisplaySize.x - DISTANCE, DISTANCE * 2.5f);
-	const ImVec2 window_pos_pivot = ImVec2(1.0f, 0.0f);
-	ImGui::SetNextWindowPos(window_pos, ImGuiCond_Always, window_pos_pivot);
-
-	ImGui::SetNextWindowBgAlpha(0.3f);
-
-	ImGui::Begin("Debug Overlay Hint", &p_open,
-	             (corner != -1 ? ImGuiWindowFlags_NoMove : 0) |
-	                 ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
-	                 ImGuiWindowFlags_AlwaysAutoResize |
-	                 ImGuiWindowFlags_NoSavedSettings |
-	                 ImGuiWindowFlags_NoFocusOnAppearing |
-	                 ImGuiWindowFlags_NoNav);
-
-
-	ImGui::End();
-
 	ImGui::Begin("Debug Tools");
 	if (ImGui::Checkbox("Wireframe", &m_wireframe))
 	{
@@ -76,8 +67,24 @@ void DebugOverlay::tick(float dt)
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	}
 
-	ImGui::Text("Frame Time: %f\n", dt);
-	ImGui::Text("Frames Per Second: %d\n", static_cast<int>(1 / dt));
+	ImGui::Text("Frame Time: %.2f ms/frame\n", dt * 1000.f);
+	ImGui::Text("FPS: %d\n", static_cast<int>(1.f / dt));
+
+	ImGui::SliderInt("Debug Sample Rate", &m_sampleRate, 1, 60);
+	ImGui::Checkbox("Pause Debug Graph", &m_pauseSampling);
+
+	if (m_time % m_sampleRate == 0 && !m_pauseSampling)
+	{
+		ImGui::PlotVariable("Frame Time: ", dt * 1000.f);
+	}
+	else
+	{
+		ImGui::PlotVariable("Frame Time: ", FLT_MAX);
+	}
 
 	ImGui::End();
+
+	++m_time;
+	if (m_time >= 3600)
+		m_time = 0;
 }

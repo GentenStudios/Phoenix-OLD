@@ -28,13 +28,8 @@
 
 #pragma once
 
-#include <Phoenix/Commander.hpp>
-#include <Phoenix/Graphics/Camera.hpp>
+#include <Phoenix/Events/Event.hpp>
 #include <Phoenix/Graphics/Layer.hpp>
-#include <Phoenix/Graphics/ShaderPipeline.hpp>
-#include <Phoenix/Graphics/Window.hpp>
-#include <Phoenix/Player.hpp>
-#include <Phoenix/UI.hpp>
 
 namespace phx
 {
@@ -44,7 +39,7 @@ namespace phx
 		{
 		public:
 			DebugOverlay();
-			~DebugOverlay() override;
+			~DebugOverlay() override = default;
 
 			void onAttach() override;
 			void onDetach() override;
@@ -53,6 +48,11 @@ namespace phx
 
 		private:
 			bool m_wireframe = false;
+			int m_sampleRate = 60;
+			int  m_maxSampleRate = 60;
+			bool m_pauseSampling = false;
+
+			unsigned int m_time = 0;
 		};
 	} // namespace client
 } // namespace phx

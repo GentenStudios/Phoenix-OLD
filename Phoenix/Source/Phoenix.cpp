@@ -114,8 +114,12 @@ void Phoenix::onEvent(events::Event e)
 		}
 		break;
 	default:
-		m_layerStack->onEvent(e);
 		break;
+	}
+
+	if (!e.handled)
+	{
+		m_layerStack->onEvent(e);
 	}
 }
 
@@ -126,12 +130,13 @@ void Phoenix::run()
 	SplashScreen* splashScreen = new SplashScreen();
 	m_layerStack->pushLayer(splashScreen);
 
-	float last = static_cast<float>(SDL_GetTicks());
+	std::size_t last = SDL_GetPerformanceCounter();
 	while (m_window->isRunning())
 	{
-		const float now = static_cast<float>(SDL_GetTicks());
-		const float dt  = (now - last) / 1000.f;
-		last            = now;
+		const std::size_t now = SDL_GetPerformanceCounter();
+		const float       dt =
+		    (now - last) / static_cast<float>(SDL_GetPerformanceFrequency());
+		last = now;
 
 		m_window->startFrame();
 

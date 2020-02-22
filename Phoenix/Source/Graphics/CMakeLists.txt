@@ -1,5 +1,7 @@
 set(currentDir ${CMAKE_CURRENT_LIST_DIR})
 set(graphicsSources
+	${currentDir}/ImGuiExtensions.cpp
+
 	${currentDir}/Window.cpp
 	${currentDir}/LayerStack.cpp
 	${currentDir}/Camera.cpp
