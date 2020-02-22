@@ -70,6 +70,11 @@ namespace phx
 			int          y      = {};
 		};
 
+		/**
+		 * @brief The type of event that actually occurs.
+		 *
+		 * Most of these are self explanatory, explanations will be provided for possibly obscure mechanisms.
+		 */
 		enum class EventType : int
 		{
 			NONE                  = 0,
@@ -89,7 +94,9 @@ namespace phx
 			CURSOR_ENTERED        = SDL_WINDOWEVENT_ENTER,
 			KEY_PRESSED           = SDL_KEYDOWN,
 			KEY_RELEASED          = SDL_KEYUP,
-			LAYER_DESTROYED,
+			LAYER_DESTROYED, // this one happens when a layer requests
+			                 // destruction, it does NOT occur when a layer is
+			                 // manually popped from a layer stack.
 		};
 
 		struct Event
