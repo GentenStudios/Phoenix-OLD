@@ -1,6 +1,7 @@
 set(currentDir ${CMAKE_CURRENT_LIST_DIR})
 set(graphicsHeaders
 	${currentDir}/OpenGLTools.hpp
+	${currentDir}/ImGuiExtensions.hpp
 
 	${currentDir}/Window.hpp
 	${currentDir}/Layer.hpp

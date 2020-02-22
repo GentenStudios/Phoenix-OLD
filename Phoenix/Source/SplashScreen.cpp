@@ -89,6 +89,7 @@ void SplashScreen::onAttach()
 		std::cout << "Failed to load texture" << std::endl;
 	}
 	stbi_image_free(data);
+	stbi_set_flip_vertically_on_load(false);
 
 	std::vector<gfx::ShaderLayout> layout;
 	layout.emplace_back("a_Vertex", 0);
