@@ -29,7 +29,7 @@
 #include <Phoenix/Commander.hpp>
 #include <Phoenix/ContentLoader.hpp>
 #include <Phoenix/Game.hpp>
-#include <Phoenix/Phoenix.hpp>
+#include <Phoenix/Client.hpp>
 #include <Phoenix/Settings.hpp>
 #include <Phoenix/SplashScreen.hpp>
 
@@ -43,7 +43,7 @@ static void rawEcho(const std::string& input, std::ostringstream& cout)
 	kirk.callback(input, cout);
 }
 
-Phoenix::Phoenix()
+Client::Client()
     : m_chat(ui::ChatWindow("Chat Window", 5,
                             "Type something and hit enter to run a command!\n"))
 {
@@ -67,13 +67,13 @@ Phoenix::Phoenix()
 	    [this](const std::string& text) { m_chat.cout << text << "\n"; };
 }
 
-Phoenix::~Phoenix()
+Client::~Client()
 {
 	delete m_layerStack;
 	delete m_window;
 }
 
-void Phoenix::onEvent(events::Event e)
+void Client::onEvent(events::Event e)
 {
 	using namespace events;
 	switch (e.type)
@@ -123,7 +123,7 @@ void Phoenix::onEvent(events::Event e)
 	}
 }
 
-void Phoenix::run()
+void Client::run()
 {
 	Settings::get()->load();
 

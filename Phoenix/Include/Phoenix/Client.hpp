@@ -38,11 +38,11 @@ namespace phx
 {
 	namespace client
 	{
-		class Phoenix : public events::IEventListener
+		class Client : public events::IEventListener
 		{
 		public:
-			Phoenix();
-			~Phoenix();
+			Client();
+			~Client();
 
 			void onEvent(events::Event e) override;
 			void run();
@@ -54,7 +54,7 @@ namespace phx
 			ui::ChatWindow m_chat;
 
 			bool m_debugOverlayActive = false;
-			client::DebugOverlay* m_debugOverlay = nullptr;
+			DebugOverlay* m_debugOverlay = nullptr;
 		};
 	} // namespace client
 } // namespace phx

@@ -34,6 +34,81 @@
 using namespace phx::gfx;
 using namespace phx;
 
+LayerStack::LayerStack(gfx::Window* window)
+	: m_window(window)
+{
+}
+
+std::size_t LayerStack::size() const
+{
+	return m_layers.size();
+}
+
+bool LayerStack::empty() const
+{
+	return m_layers.empty();
+}
+
+std::vector<Layer*>::iterator LayerStack::begin()
+{
+	return m_layers.begin();
+}
+
+std::vector<Layer*>::iterator LayerStack::end()
+{
+	return m_layers.end();
+}
+
+std::vector<Layer*>::reverse_iterator LayerStack::rbegin()
+{
+	return m_layers.rbegin();
+}
+
+std::vector<Layer*>::reverse_iterator LayerStack::rend()
+{
+	return m_layers.rend();
+}
+
+std::vector<Layer*>::const_iterator LayerStack::begin() const
+{
+	return m_layers.begin();
+}
+
+std::vector<Layer*>::const_iterator LayerStack::end() const
+{
+	return m_layers.end();
+}
+
+std::vector<Layer*>::const_reverse_iterator LayerStack::rbegin() const
+{
+	return m_layers.rbegin();
+}
+
+std::vector<Layer*>::const_reverse_iterator LayerStack::rend() const
+{
+	return m_layers.rend();
+}
+
+std::vector<Layer*>::reference LayerStack::front()
+{
+	return m_layers.front();
+}
+
+std::vector<Layer*>::const_reference LayerStack::front() const
+{
+	return m_layers.front();
+}
+
+std::vector<Layer*>::reference LayerStack::back()
+{
+	return m_layers.back();
+}
+
+std::vector<Layer*>::const_reference LayerStack::back() const
+{
+	return m_layers.back();
+}
+
 LayerStack::~LayerStack()
 {
 	for (Layer* layer : m_layers)

@@ -26,14 +26,14 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Phoenix/Phoenix.hpp>
+#include <Phoenix/Client.hpp>
 
 using namespace phx;
 
 #undef main
 int main(int argc, char** argv)
 {
-	client::Phoenix* game = new client::Phoenix();
+	client::Client* game = new client::Client();
 	game->run();
 
 	return 0;
