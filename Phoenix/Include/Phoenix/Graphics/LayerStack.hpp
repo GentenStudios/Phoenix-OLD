@@ -132,7 +132,7 @@ namespace phx
 			 * @brief Constructs a LayerStack bound to a window.
 			 * @param window The window this LayerStack is attached to.
 			 */
-			LayerStack(gfx::Window* window);
+			explicit LayerStack(Window* window);
 			~LayerStack();
 
 			/**
@@ -219,7 +219,7 @@ namespace phx
 			Storage      m_layers;
 			unsigned int m_currentInsert = 0;
 
-			gfx::Window* m_window;
+			Window* m_window;
 		};
 	} // namespace gfx
 } // namespace phx

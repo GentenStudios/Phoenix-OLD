@@ -40,10 +40,16 @@ namespace phx
 {
 	namespace client
 	{
+		/**
+		 * @brief The actual game class for the Client.
+		 *
+		 * @see Layer
+		 * @see LayerStack
+		 */
 		class Game : public gfx::Layer
 		{
 		public:
-			Game(gfx::Window* window);
+			explicit Game(gfx::Window* window);
 			~Game() override;
 
 			void onAttach() override;

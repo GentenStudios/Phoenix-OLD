@@ -35,6 +35,12 @@ namespace phx
 {
 	namespace client
 	{
+		/**
+		 * @brief The Debug Overlay for the Client.
+		 *
+		 * @see Layer
+		 * @see LayerStack
+		 */
 		class DebugOverlay : public gfx::Overlay
 		{
 		public:
@@ -47,8 +53,8 @@ namespace phx
 			void tick(float dt) override;
 
 		private:
-			bool m_wireframe = false;
-			int m_sampleRate = 60;
+			bool m_wireframe     = false;
+			int  m_sampleRate    = 60;
 			int  m_maxSampleRate = 60;
 			bool m_pauseSampling = false;
 

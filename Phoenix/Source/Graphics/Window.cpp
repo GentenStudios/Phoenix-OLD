@@ -176,7 +176,9 @@ void Window::pollEvents()
 			break;
 		case SDL_KEYDOWN:
 			if (io.WantCaptureKeyboard)
+			{
 				break;
+			}
 			e.type          = EventType::KEY_PRESSED;
 			e.keyboard.key  = static_cast<Keys>(event.key.keysym.scancode);
 			e.keyboard.mods = static_cast<Mods>(
@@ -186,7 +188,9 @@ void Window::pollEvents()
 			break;
 		case SDL_KEYUP:
 			if (io.WantCaptureKeyboard)
+			{
 				break;
+			}
 			e.type          = EventType::KEY_RELEASED;
 			e.keyboard.key  = static_cast<Keys>(event.key.keysym.scancode);
 			e.keyboard.mods = static_cast<Mods>(
@@ -197,8 +201,8 @@ void Window::pollEvents()
 		case SDL_WINDOWEVENT:
 			switch (event.window.event)
 			{
-				//			case SDL_WINDOWEVENT_RESIZED: <- we don't want this ->
-				//https://wiki.libsdl.org/SDL_WindowEventID
+				//			case SDL_WINDOWEVENT_RESIZED: <- we don't want this
+				//-> https://wiki.libsdl.org/SDL_WindowEventID
 			case SDL_WINDOWEVENT_SIZE_CHANGED:
 				e.type        = EventType::WINDOW_RESIZED;
 				e.size.width  = event.window.data1;

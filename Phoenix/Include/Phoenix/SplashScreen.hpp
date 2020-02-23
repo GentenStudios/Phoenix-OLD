@@ -36,11 +36,17 @@ namespace phx
 {
 	namespace client
 	{
+		/**
+		 * @brief The loading SplashScreen for the client.
+		 * 
+         * @see Layer
+		 * @see LayerStack
+		 */
 		class SplashScreen : public gfx::Layer
 		{
 		public:
 			SplashScreen();
-			~SplashScreen() = default;
+			~SplashScreen() override = default;
 
 			void onEvent(events::Event& e) override;
 			void onAttach() override;
