@@ -23,7 +23,7 @@ set(Headers
 	${currentDir}/Actor.hpp
 	${currentDir}/Player.hpp
 
-	${currentDir}/Phoenix.hpp
+	${currentDir}/Client.hpp
 	${currentDir}/SplashScreen.hpp
 	${currentDir}/Game.hpp
 	${currentDir}/DebugOverlay.hpp
