@@ -5,25 +5,13 @@ add_subdirectory(Voxels)
 set(currentDir ${CMAKE_CURRENT_LIST_DIR})
 set(Sources
 	${mathSources}
-	${graphicsSources}
 	${voxelSources}
 
 	${currentDir}/ContentLoader.cpp
 	${currentDir}/Settings.cpp
-	${currentDir}/ImGuiHelpers.cpp
-	${currentDir}/UI.cpp
 	${currentDir}/Commander.cpp
-
 	${currentDir}/Actor.cpp
 	${currentDir}/Player.cpp
-
-	${currentDir}/Client.cpp
-	${currentDir}/SplashScreen.cpp
-	${currentDir}/Game.cpp
-	${currentDir}/DebugOverlay.cpp
-
-	${currentDir}/Main.cpp
-
 
 	PARENT_SCOPE
 )
