@@ -33,6 +33,13 @@
 using namespace phx::client;
 using namespace phx;
 
+static Commander kirk;
+
+static void rawEcho(const std::string& input, std::ostringstream& cout)
+{
+	kirk.callback(input, cout);
+}
+
 Game::Game(gfx::Window* window) : Layer("Game"), m_window(window)
 {
 	/// @todo fix chat window function pointer callback thingy and reimplement
@@ -59,6 +66,8 @@ void Game::onAttach()
 {
 	m_chat = new ui::ChatWindow("Chat Window", 5,
 	                            "Type /help for a command list and help.");
+
+	m_chat->registerCallback(rawEcho);
 
 	std::string save = "save1";
 
