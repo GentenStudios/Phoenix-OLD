@@ -1,4 +1,4 @@
-// Copyright 2020 Genten Studios
+// Copyright 2019 Genten Studios
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -26,15 +26,41 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Phoenix/Client.hpp>
+#pragma once
 
-using namespace phx;
+#include <Phoenix/Graphics/Layer.hpp>
+#include <Phoenix/Graphics/ShaderPipeline.hpp>
+#include <Phoenix/Graphics/Window.hpp>
 
-#undef main
-int main(int argc, char** argv)
+namespace phx
 {
-	client::Client* game = new client::Client();
-	game->run();
+	namespace client
+	{
+		/**
+		 * @brief The loading SplashScreen for the client.
+		 *
+		 * @see Layer
+		 * @see LayerStack
+		 */
+		class SplashScreen : public gfx::Layer
+		{
+		public:
+			SplashScreen();
+			~SplashScreen() override = default;
 
-	return 0;
-}
+			void onEvent(events::Event& e) override;
+			void onAttach() override;
+			void onDetach() override;
+
+			void tick(float dt) override;
+
+		private:
+			gfx::ShaderPipeline m_pipeline;
+			unsigned int        m_vao;
+			unsigned int        m_vbo;
+			unsigned int        m_texture;
+			float               m_alpha      = -0.5f;
+			float               m_multiplier = 1.f;
+		};
+	} // namespace client
+} // namespace phx

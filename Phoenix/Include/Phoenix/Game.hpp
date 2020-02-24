@@ -28,19 +28,62 @@
 
 #pragma once
 
-#include <Phoenix/Events/Event.hpp>
+#include <Phoenix/Commander.hpp>
+#include <Phoenix/Graphics/Camera.hpp>
+#include <Phoenix/Graphics/Layer.hpp>
+#include <Phoenix/Graphics/ShaderPipeline.hpp>
+#include <Phoenix/Graphics/Window.hpp>
+#include <Phoenix/Player.hpp>
+#include <Phoenix/UI.hpp>
 
 namespace phx
 {
-	namespace events
+	namespace client
 	{
-		class IEventListener
+		/**
+		 * @brief The actual game class for the Client.
+		 *
+		 * This is the class which actually implements the "game". The Client
+		 * class is just a "runner" or an intermediary medium that runs all the
+		 * ticking functions and manages all the layers, but this actually
+		 * renders the voxel world and everything related to it.
+		 *
+		 * The other layers such as SplashScreen are not actually the game, but
+		 * you know... just a SplashScreen - this is the main layer you actually
+		 * interact with and play on.
+		 *
+		 * @see Layer
+		 * @see LayerStack
+		 */
+		class Game : public gfx::Layer
 		{
 		public:
-			IEventListener()          = default;
-			virtual ~IEventListener() = default;
+			explicit Game(gfx::Window* window);
+			~Game() override;
 
-			virtual void onEvent(Event e) = 0;
+			void onAttach() override;
+			void onDetach() override;
+
+			void onEvent(events::Event& e) override;
+			void tick(float dt) override;
+
+		private:
+			gfx::Window*          m_window;
+			gfx::FPSCamera*       m_camera;
+			Player*               m_player;
+			voxels::ChunkManager* m_world;
+
+			gfx::ShaderPipeline m_renderPipeline;
+
+			ui::ChatWindow* m_chat;
+			// Commander       m_kirk;
+
+			bool       m_followCam = true;
+			int        m_currentSensitivity = 1;
+			Setting*   m_sensitivity = nullptr;
+			
+			math::vec3 m_prevPos;
+			int        m_playerHand = 0;
 		};
-	} // namespace events
-} // namespace q2
+	} // namespace client
+} // namespace phx

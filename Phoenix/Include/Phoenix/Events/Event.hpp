@@ -70,6 +70,11 @@ namespace phx
 			int          y      = {};
 		};
 
+		/**
+		 * @brief The type of event that actually occurs.
+		 *
+		 * Most of these are self explanatory, explanations will be provided for possibly obscure mechanisms.
+		 */
 		enum class EventType : int
 		{
 			NONE                  = 0,
@@ -89,31 +94,32 @@ namespace phx
 			CURSOR_ENTERED        = SDL_WINDOWEVENT_ENTER,
 			KEY_PRESSED           = SDL_KEYDOWN,
 			KEY_RELEASED          = SDL_KEYUP,
+			LAYER_DESTROYED, // this one happens when a layer requests
+			                 // destruction, it does NOT occur when a layer is
+			                 // manually popped from a layer stack.
 		};
 
 		struct Event
 		{
-			EventType type;
+			EventType type = EventType::NONE;
 
-			// This union MUST be used correctly or shit will go south and you
-			// might end up with corrupted memory :( We're using a union, so
-			// it's sort of like SDLs Event system, and so we don't have a huge
-			// amount of painful polymorphism that will end in us having to
-			// restart anyway.
+			//// This union MUST be used correctly or shit will go south and you
+			//// might end up with corrupted memory :( We're using a union, so
+			//// it's sort of like SDLs Event system, and so we don't have a
+			/// huge amount of painful polymorphism that will end in us having
+			/// to restart anyway.
 			union {
-				Position position;
-				Size     size;
-				Scroll   scroll;
-				Keyboard keyboard;
-				Mouse    mouse;
+				Position    position;
+				Size        size;
+				Scroll      scroll;
+				Keyboard    keyboard;
+				Mouse       mouse;
+				const char* layer;
 			};
 
-			Event()
-			{
-				// This is to make sure that *everything* in the struct + it's
-				// union is initialized to 0;
-				std::memset(this, 0, sizeof(Event));
-			}
+			bool handled = false;
+
+			Event() { std::memset(this, 0, sizeof(Event)); }
 		};
 	} // namespace events
-} // namespace q2
+} // namespace phx

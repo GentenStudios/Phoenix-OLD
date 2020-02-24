@@ -34,7 +34,8 @@
 using namespace phx::gfx;
 using namespace phx;
 
-void ShaderPipeline::prepare(std::string vertShaderPath, std::string fragShaderPath,
+void ShaderPipeline::prepare(std::string               vertShaderPath,
+                             std::string               fragShaderPath,
                              std::vector<ShaderLayout> layout)
 {
 	std::string vertShaderSource = FileIO::readAllFile(vertShaderPath);
@@ -100,6 +101,11 @@ void ShaderPipeline::prepare(std::string vertShaderPath, std::string fragShaderP
 }
 
 void ShaderPipeline::activate() { glUseProgram(m_program); }
+
+void ShaderPipeline::setFloat(std::string location, float value)
+{
+	glUniform1f(glGetUniformLocation(m_program, location.c_str()), value);
+}
 
 void ShaderPipeline::setVector2(std::string location, math::vec2 value)
 {

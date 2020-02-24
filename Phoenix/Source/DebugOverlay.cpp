@@ -1,4 +1,4 @@
-// Copyright 2020 Genten Studios
+// Copyright 2019 Genten Studios
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -26,15 +26,68 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Phoenix/Client.hpp>
+#include <Phoenix/DebugOverlay.hpp>
 
+#include <Phoenix/Graphics/ImGuiExtensions.hpp>
+#include <imgui.h>
+
+#include <glad/glad.h>
+
+using namespace phx::client;
 using namespace phx;
 
-#undef main
-int main(int argc, char** argv)
+DebugOverlay::DebugOverlay() : Overlay("DebugOverlay")
 {
-	client::Client* game = new client::Client();
-	game->run();
+	SDL_DisplayMode current;
 
-	return 0;
+	for (int i = 0; i < SDL_GetNumVideoDisplays(); ++i)
+	{
+		if (SDL_GetCurrentDisplayMode(i, &current) == 0)
+		{
+			if (current.refresh_rate > m_maxSampleRate)
+				m_maxSampleRate = current.refresh_rate;
+		}
+	}
+}
+
+void DebugOverlay::onAttach() {}
+
+void DebugOverlay::onDetach() {}
+
+void DebugOverlay::onEvent(events::Event& e) {}
+
+void DebugOverlay::tick(float dt)
+{
+	ImGui::Begin("Phoenix");
+
+	if (ImGui::CollapsingHeader("Graphics Information"))
+	{
+		if (ImGui::Checkbox("Wireframe", &m_wireframe))
+		{
+			if (m_wireframe)
+				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+			else
+				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		}
+
+		ImGui::Text("Frame Time: %.2f ms/frame\n", dt * 1000.f);
+		ImGui::Text("FPS: %d\n", static_cast<int>(1.f / dt));
+
+		ImGui::SliderInt("Debug Sample Rate", &m_sampleRate, 1, 60);
+		ImGui::Checkbox("Pause Debug Graph", &m_pauseSampling);
+
+		if (m_time % m_sampleRate == 0 && !m_pauseSampling)
+		{
+			ImGui::PlotVariable("Frame Time: ", dt * 1000.f);
+		}
+		else
+		{
+			ImGui::PlotVariable("Frame Time: ", FLT_MAX);
+		}
+	}
+	ImGui::End();
+
+	++m_time;
+	if (m_time >= 3600)
+		m_time = 0;
 }

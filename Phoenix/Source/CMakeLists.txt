@@ -17,6 +17,11 @@ set(Sources
 	${currentDir}/Actor.cpp
 	${currentDir}/Player.cpp
 
+	${currentDir}/Client.cpp
+	${currentDir}/SplashScreen.cpp
+	${currentDir}/Game.cpp
+	${currentDir}/DebugOverlay.cpp
+
 	${currentDir}/Main.cpp
 
 

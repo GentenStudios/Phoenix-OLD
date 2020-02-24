@@ -1,4 +1,4 @@
-// Copyright 2020 Genten Studios
+// Copyright 2019 Genten Studios
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -26,15 +26,39 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Phoenix/Client.hpp>
+#pragma once
 
-using namespace phx;
+#include <Phoenix/Events/Event.hpp>
+#include <Phoenix/Graphics/Layer.hpp>
 
-#undef main
-int main(int argc, char** argv)
+namespace phx
 {
-	client::Client* game = new client::Client();
-	game->run();
+	namespace client
+	{
+		/**
+		 * @brief The Debug Overlay for the Client.
+		 *
+		 * @see Layer
+		 * @see LayerStack
+		 */
+		class DebugOverlay : public gfx::Overlay
+		{
+		public:
+			DebugOverlay();
+			~DebugOverlay() override = default;
 
-	return 0;
-}
+			void onAttach() override;
+			void onDetach() override;
+			void onEvent(events::Event& e) override;
+			void tick(float dt) override;
+
+		private:
+			bool m_wireframe     = false;
+			int  m_sampleRate    = 60;
+			int  m_maxSampleRate = 60;
+			bool m_pauseSampling = false;
+
+			unsigned int m_time = 0;
+		};
+	} // namespace client
+} // namespace phx
