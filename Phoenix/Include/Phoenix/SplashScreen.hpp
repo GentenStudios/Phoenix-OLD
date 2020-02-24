@@ -38,8 +38,8 @@ namespace phx
 	{
 		/**
 		 * @brief The loading SplashScreen for the client.
-		 * 
-         * @see Layer
+		 *
+		 * @see Layer
 		 * @see LayerStack
 		 */
 		class SplashScreen : public gfx::Layer

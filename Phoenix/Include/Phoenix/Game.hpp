@@ -43,6 +43,15 @@ namespace phx
 		/**
 		 * @brief The actual game class for the Client.
 		 *
+		 * This is the class which actually implements the "game". The Client
+		 * class is just a "runner" or an intermediary medium that runs all the
+		 * ticking functions and manages all the layers, but this actually
+		 * renders the voxel world and everything related to it.
+		 *
+		 * The other layers such as SplashScreen are not actually the game, but
+		 * you know... just a SplashScreen - this is the main layer you actually
+		 * interact with and play on.
+		 *
 		 * @see Layer
 		 * @see LayerStack
 		 */
