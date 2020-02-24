@@ -85,7 +85,6 @@ void DebugOverlay::tick(float dt)
 			ImGui::PlotVariable("Frame Time: ", FLT_MAX);
 		}
 	}
-
 	ImGui::End();
 
 	++m_time;
