@@ -25,6 +25,7 @@ set(Headers
 
 	${currentDir}/Client.hpp
 	${currentDir}/SplashScreen.hpp
+	${currentDir}/Crosshair.hpp
 	${currentDir}/Game.hpp
 	${currentDir}/DebugOverlay.hpp
 

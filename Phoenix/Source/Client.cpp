@@ -32,6 +32,7 @@
 #include <Phoenix/Client.hpp>
 #include <Phoenix/Settings.hpp>
 #include <Phoenix/SplashScreen.hpp>
+#include <Phoenix/Crosshair.hpp>
 
 using namespace phx::client;
 using namespace phx;
@@ -110,6 +111,8 @@ void Client::onEvent(events::Event e)
 		{
 			Game* game = new Game(m_window);
 			m_layerStack->pushLayer(game);
+			Crosshair* crosshair = new Crosshair();
+			m_layerStack->pushLayer(crosshair);
 			e.handled = true;
 		}
 		break;

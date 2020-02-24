@@ -19,6 +19,7 @@ set(Sources
 
 	${currentDir}/Client.cpp
 	${currentDir}/SplashScreen.cpp
+	${currentDir}/Crosshair.cpp
 	${currentDir}/Game.cpp
 	${currentDir}/DebugOverlay.cpp
 
