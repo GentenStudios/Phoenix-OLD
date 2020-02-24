@@ -69,7 +69,10 @@ namespace phx
 			ui::ChatWindow* m_chat;
 			// Commander       m_kirk;
 
-			bool       m_followCam;
+			bool       m_followCam = true;
+			int        m_currentSensitivity = 1;
+			Setting*   m_sensitivity = nullptr;
+			
 			math::vec3 m_prevPos;
 			int        m_playerHand = 0;
 		};

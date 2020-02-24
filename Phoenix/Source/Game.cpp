@@ -91,6 +91,9 @@ void Game::onAttach()
 
 	const math::mat4 model;
 	m_renderPipeline.setMatrix("u_model", model);
+
+	m_sensitivity = Settings::get()->getSetting("camera:sensitivity");
+	m_currentSensitivity = m_sensitivity->value();
 }
 
 void Game::onDetach()
@@ -161,10 +164,31 @@ void Game::onEvent(events::Event& e)
 void Game::tick(float dt)
 {
 	m_camera->tick(dt);
-	m_world->tick(m_camera->getPosition());
+	m_world->tick(m_prevPos);
 
 	m_chat->draw();
 
+	ImGui::Begin("Game Tools");
+
+	ImGui::Checkbox("Follow Camera", &m_followCam);
+	if (m_followCam)
+		m_prevPos = m_player->getPosition();
+
+	int i = m_currentSensitivity;
+	ImGui::SliderInt("cam sensitivity", &i, 0, 100);
+	if (i != m_currentSensitivity)
+	{
+		m_currentSensitivity = i;
+		m_sensitivity->set(m_currentSensitivity);
+	}
+
+	ImGui::Text("X: %f\nY: %f\nZ: %f", m_player->getPosition().x,
+	            m_player->getPosition().y, m_player->getPosition().z);
+
+	ImGui::Text("Block in hand: %i: %s", m_playerHand,
+	            m_player->getHand()->displayName.c_str());
+	ImGui::End();
+	
 	m_renderPipeline.activate();
 	m_renderPipeline.setMatrix("u_view", m_camera->calculateViewMatrix());
 	m_renderPipeline.setMatrix("u_projection", m_camera->getProjection());

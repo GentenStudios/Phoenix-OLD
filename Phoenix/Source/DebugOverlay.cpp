@@ -58,28 +58,32 @@ void DebugOverlay::onEvent(events::Event& e) {}
 
 void DebugOverlay::tick(float dt)
 {
-	ImGui::Begin("Debug Tools");
-	if (ImGui::Checkbox("Wireframe", &m_wireframe))
+	ImGui::Begin("Phoenix");
+
+	if (ImGui::CollapsingHeader("Graphics Information"))
 	{
-		if (m_wireframe)
-			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		if (ImGui::Checkbox("Wireframe", &m_wireframe))
+		{
+			if (m_wireframe)
+				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+			else
+				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		}
+
+		ImGui::Text("Frame Time: %.2f ms/frame\n", dt * 1000.f);
+		ImGui::Text("FPS: %d\n", static_cast<int>(1.f / dt));
+
+		ImGui::SliderInt("Debug Sample Rate", &m_sampleRate, 1, 60);
+		ImGui::Checkbox("Pause Debug Graph", &m_pauseSampling);
+
+		if (m_time % m_sampleRate == 0 && !m_pauseSampling)
+		{
+			ImGui::PlotVariable("Frame Time: ", dt * 1000.f);
+		}
 		else
-			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	}
-
-	ImGui::Text("Frame Time: %.2f ms/frame\n", dt * 1000.f);
-	ImGui::Text("FPS: %d\n", static_cast<int>(1.f / dt));
-
-	ImGui::SliderInt("Debug Sample Rate", &m_sampleRate, 1, 60);
-	ImGui::Checkbox("Pause Debug Graph", &m_pauseSampling);
-
-	if (m_time % m_sampleRate == 0 && !m_pauseSampling)
-	{
-		ImGui::PlotVariable("Frame Time: ", dt * 1000.f);
-	}
-	else
-	{
-		ImGui::PlotVariable("Frame Time: ", FLT_MAX);
+		{
+			ImGui::PlotVariable("Frame Time: ", FLT_MAX);
+		}
 	}
 
 	ImGui::End();
