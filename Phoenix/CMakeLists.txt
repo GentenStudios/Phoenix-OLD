@@ -1,6 +1,6 @@
 add_subdirectory(ThirdParty)
 
-// propagate these variables down the line into the child CMakeLists.
+# propagate these variables down the line into the child CMakeLists.
 set(PHX_THIRD_PARTY_LIBRARIES ${PHX_THIRD_PARTY_LIBRARIES})
 set(PHX_THIRD_PARTY_INCLUDES ${PHX_THIRD_PARTY_INCLUDES})
 set(PHX_COMMON_INCLUDES ${CMAKE_CURRENT_LIST_DIR}/Core/Include)

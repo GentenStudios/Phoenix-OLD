@@ -1,6 +1,6 @@
 project(PhoenixCommon)
 
-add_subdirectory(Include/Phoenix)
+add_subdirectory(Include/Common)
 add_subdirectory(Source)
 
 add_library(${PROJECT_NAME} STATIC ${Headers} ${Sources})

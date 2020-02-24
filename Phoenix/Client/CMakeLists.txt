@@ -17,17 +17,12 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 ## ORGANISE FILES FOR IDEs (Xcode, VS, etc...) ##
 #################################################
 
-source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/Include/Phoenix" PREFIX "Header Files" FILES ${Headers})
+source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/Include/Client" PREFIX "Header Files" FILES ${Headers})
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/Source" PREFIX "Source Files" FILES ${Sources})
 
 #################################################
 ## COPY SAVE, ASSETS, and MODULES TO BUILD DIR ##
 #################################################
 
-add_subdirectory(Assets)
-add_subdirectory(Modules)
-add_subdirectory(Save)
-
 add_dependencies(${PROJECT_NAME} PhoenixAssets)
 add_dependencies(${PROJECT_NAME} PhoenixModules)
-add_dependencies(${PROJECT_NAME} PhoenixSaves)

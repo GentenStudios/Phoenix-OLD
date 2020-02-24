@@ -6,9 +6,11 @@ set(graphicsHeaders
 	${currentDir}/Window.hpp
 	${currentDir}/Layer.hpp
 	${currentDir}/LayerStack.hpp
-	${currentDir}/Camera.hpp
+	${currentDir}/ImGuiHelpers.hpp
+	${currentDir}/UI.hpp
 
 	${currentDir}/ShaderPipeline.hpp
+	${currentDir}/Camera.hpp
 
 	${currentDir}/ChunkMesher.hpp
 	${currentDir}/ChunkRenderer.hpp
