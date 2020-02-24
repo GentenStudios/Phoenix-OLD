@@ -51,7 +51,7 @@ Chunk Map::getChunk(math::vec3 pos)
 		std::string   position = "." + std::to_string(int(pos.x)) + "_" +
 		                       std::to_string(int(pos.y)) + "_" +
 		                       std::to_string(int(pos.z));
-		saveFile.open("Save/" + m_save + "/" + m_mapName + position + ".save");
+		saveFile.open("Saves/" + m_save + "/" + m_mapName + position + ".save");
 
 		if (saveFile)
 		{
@@ -123,7 +123,7 @@ void Map::save(phx::math::vec3 pos)
 	std::string   position = "." + std::to_string(int(pos.x)) + "_" +
 	                       std::to_string(int(pos.y)) + "_" +
 	                       std::to_string(int(pos.z));
-	saveFile.open("Save/" + m_save + "/" + m_mapName + position + ".save");
+	saveFile.open("Saves/" + m_save + "/" + m_mapName + position + ".save");
 	saveFile << m_chunks.at(pos).save();
 
 	saveFile.close();

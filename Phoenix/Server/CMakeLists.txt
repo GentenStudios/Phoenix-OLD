@@ -24,5 +24,5 @@ source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/Source" PREFIX "Source Files" FIL
 ## COPY SAVE, ASSETS, and MODULES TO BUILD DIR ##
 #################################################
 
-add_dependencies(${PROJECT_NAME} PhoenixModules)
-add_dependencies(${PROJECT_NAME} PhoenixSaves)
+add_dependencies(${PROJECT_NAME} PhoenixModules-server)
+add_dependencies(${PROJECT_NAME} PhoenixSaves-server)
