@@ -6,6 +6,7 @@ set(Headers
 	${mathHeaders}
 	${voxelHeaders}
 
+	${currentDir}/CoreIntrinsics.hpp
 	${currentDir}/EnumTools.hpp
 	${currentDir}/Singleton.hpp
 	${currentDir}/FileIO.hpp
@@ -14,7 +15,6 @@ set(Headers
 	${currentDir}/Settings.hpp
 	${currentDir}/Commander.hpp
 	${currentDir}/Actor.hpp
-	${currentDir}/Player.hpp
 
 	PARENT_SCOPE
 )

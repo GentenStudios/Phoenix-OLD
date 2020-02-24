@@ -28,8 +28,8 @@
 
 #pragma once
 
-#include <Phoenix/Math/Math.hpp>
-#include <Phoenix/Voxels/Chunk.hpp>
+#include <Common/Math/Math.hpp>
+#include <Common/Voxels/Chunk.hpp>
 #include <map>
 
 namespace phx::voxels

@@ -28,8 +28,9 @@
 
 #pragma once
 
-#include <Phoenix/Graphics/ChunkRenderer.hpp>
-#include <Phoenix/Voxels/Map.hpp>
+#include <Client/Graphics/ChunkRenderer.hpp>
+
+#include <Common/Voxels/Map.hpp>
 
 #include <vector>
 
@@ -38,11 +39,11 @@ namespace phx::voxels
 	/**
 	 * @brief Generation and Rendering manager for the "world".
 	 *
-	 * The ChunkManager handles generation of new chunks as you wander
+	 * The ChunkView handles generation of new chunks as you wander
 	 * around as well as the rendering of these chunks using a ChunkRenderer
 	 * object.
 	 *
-	 * The ChunkManager requires a position to be sent in each tick event,
+	 * The ChunkView requires a position to be sent in each tick event,
 	 * however it should be kept in mind that the "Camera" position and the
 	 * voxel-world space coordinates are INCOMPATIBLE. This is due to the
 	 * vertices required by the rendering system. The tick function
@@ -53,7 +54,7 @@ namespace phx::voxels
 	 *
 	 * @paragraph Usage
 	 * @code
-	 * ChunkManager world(viewDistance);
+	 * ChunkView world(viewDistance);
 	 *
 	 * mainGameLoop()
 	 * {
@@ -65,16 +66,16 @@ namespace phx::voxels
 	 * }
 	 * @endcode
 	 */
-	class ChunkManager
+	class ChunkView
 	{
 	public:
 		/**
-		 * @brief Constructs the ChunkManager.
+		 * @brief Constructs the ChunkView.
 		 * @param viewDistance The view distance in every direction.
-		 * @param map The map the ChunkManager loads from
+		 * @param map The map the ChunkView loads from
 		 */
-		ChunkManager(int viewDistance, const Map& map);
-		~ChunkManager();
+		ChunkView(int viewDistance, Map&& map);
+		~ChunkView();
 
 		/**
 		 * @brief Updates visible chunk depending on player position.

@@ -26,15 +26,15 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Phoenix/Graphics/ChunkRenderer.hpp>
-#include <Phoenix/Voxels/BlockRegistry.hpp>
+#include <Client/Graphics/ChunkRenderer.hpp>
+#include <Client/Graphics/OpenGLTools.hpp>
 
-#include <glad/glad.h>
+#include <Common/Voxels/BlockRegistry.hpp>
 
 #define STB_IMAGE_IMPLEMENTATION
+#include <glad/glad.h>
 #include <stb_image.h>
 
-#include "Phoenix/Graphics/OpenGLTools.hpp"
 #include <iostream>
 
 using namespace phx;

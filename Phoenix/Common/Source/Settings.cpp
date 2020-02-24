@@ -26,8 +26,8 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Phoenix/Settings.hpp>
-#include <Phoenix/ContentLoader.hpp>
+#include <Common/Settings.hpp>
+#include <Common/ContentLoader.hpp>
 
 #include <climits>
 #include <fstream>

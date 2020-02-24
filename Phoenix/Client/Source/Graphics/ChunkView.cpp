@@ -26,17 +26,17 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Phoenix/Graphics/ChunkMesher.hpp>
-#include <Phoenix/Voxels/BlockRegistry.hpp>
-#include <Phoenix/Voxels/ChunkManager.hpp>
+#include <Client/Graphics/ChunkView.hpp>
+#include <Client/Graphics/ChunkMesher.hpp>
 
-#include <iostream>
+#include <Common/Voxels/BlockRegistry.hpp>
+
 #include <utility>
 
 using namespace phx::voxels;
 using namespace phx;
 
-ChunkManager::ChunkManager(int viewDistance, const Map& map)
+ChunkView::ChunkView(int viewDistance, Map&& map)
     : m_viewDistance(viewDistance), m_map(std::move(map))
 {
 	// calculates the maximum visible chunks.
@@ -47,9 +47,9 @@ ChunkManager::ChunkManager(int viewDistance, const Map& map)
 	m_renderer->buildTextureArray();
 }
 
-ChunkManager::~ChunkManager() { delete m_renderer; }
+ChunkView::~ChunkView() { delete m_renderer; }
 
-void ChunkManager::tick(math::vec3 playerPos)
+void ChunkView::tick(math::vec3 playerPos)
 {
 	// this block converts the raw camera/player position into voxel-world
 	// positions.
@@ -99,9 +99,9 @@ void ChunkManager::tick(math::vec3 playerPos)
 	}
 }
 
-void ChunkManager::render() { m_renderer->render(); }
+void ChunkView::render() { m_renderer->render(); }
 
-BlockType* ChunkManager::getBlockAt(math::vec3 position) const
+BlockType* ChunkView::getBlockAt(math::vec3 position) const
 {
 	int posX = static_cast<int>(position.x / Chunk::CHUNK_WIDTH);
 	int posY = static_cast<int>(position.y / Chunk::CHUNK_HEIGHT);
@@ -153,7 +153,7 @@ BlockType* ChunkManager::getBlockAt(math::vec3 position) const
 	    BlockRegistry::OUT_OF_BOUNDS_BLOCK);
 }
 
-void ChunkManager::setBlockAt(math::vec3 position, BlockType* block)
+void ChunkView::setBlockAt(math::vec3 position, BlockType* block)
 {
 	m_map.setBlockAt(position, block);
 

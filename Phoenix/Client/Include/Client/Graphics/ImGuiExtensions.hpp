@@ -28,7 +28,7 @@
 
 #pragma once
 
-#include <Phoenix/Math/Math.hpp>
+#include <Common/Math/Math.hpp>
 
 namespace ImGui
 {

@@ -8,8 +8,10 @@ set(graphicsSources
 
 	${currentDir}/ShaderPipeline.cpp
 
+	${currentDir}/UI.cpp
 	${currentDir}/ChunkMesher.cpp
 	${currentDir}/ChunkRenderer.cpp
+	${currentDir}/ChunkView.cpp
 
 	PARENT_SCOPE
 )

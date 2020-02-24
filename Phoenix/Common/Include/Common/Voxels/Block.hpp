@@ -36,7 +36,7 @@
 
 #pragma once
 
-#include <Phoenix/Math/Math.hpp>
+#include <Common/Math/Math.hpp>
 
 #include <array>
 #include <functional>

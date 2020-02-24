@@ -28,7 +28,7 @@
 
 #pragma once
 
-#include <Phoenix/Math/Vector3.hpp>
+#include <Common/Math/Vector3.hpp>
 
 namespace phx
 {

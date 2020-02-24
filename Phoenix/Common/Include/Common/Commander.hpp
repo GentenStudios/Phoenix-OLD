@@ -37,7 +37,7 @@
 
 #pragma once
 
-#include <Phoenix/Singleton.hpp>
+#include <Common/Singleton.hpp>
 
 #include <functional>
 #include <ostream>

@@ -28,9 +28,9 @@
 
 #pragma once
 
-#include <Phoenix/CoreIntrinsics.hpp>
-#include <Phoenix/Math/Math.hpp>
-#include <Phoenix/Voxels/Block.hpp>
+#include <Common/CoreIntrinsics.hpp>
+#include <Common/Math/Math.hpp>
+#include <Common/Voxels/Block.hpp>
 
 #include <vector>
 

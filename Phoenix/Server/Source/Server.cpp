@@ -26,15 +26,11 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Phoenix/Client.hpp>
+#include <Server/Server.hpp>
 
+#include <iostream>
+
+using namespace phx::server;
 using namespace phx;
 
-#undef main
-int main(int argc, char** argv)
-{
-	client::Client* game = new client::Client();
-	game->run();
-
-	return 0;
-}
+void Server::run() { std::cout << "Hello, Server!" << std::endl; }

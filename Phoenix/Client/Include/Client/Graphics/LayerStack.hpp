@@ -28,9 +28,9 @@
 
 #pragma once
 
-#include <Phoenix/Events/IEventListener.hpp>
-#include <Phoenix/Graphics/Layer.hpp>
-#include <Phoenix/Graphics/Window.hpp>
+#include <Client/Events/IEventListener.hpp>
+#include <Client/Graphics/Layer.hpp>
+#include <Client/Graphics/Window.hpp>
 
 #include <vector>
 

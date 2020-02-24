@@ -26,14 +26,13 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Phoenix/ImGuiHelpers.hpp>
-
-//#include <vector>
-#include <cmath>
+#include <Client/Graphics/ImGuiHelpers.hpp>
 
 #include <imgui.h>
 #include <imgui_internal.h> // for nav inputs
 #include <misc/cpp/imgui_stdlib.h>
+
+#include <cmath>
 
 using namespace ImGui;
 

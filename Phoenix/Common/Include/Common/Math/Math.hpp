@@ -28,11 +28,11 @@
 
 #pragma once
 
-#include <Phoenix/Math/MathUtils.hpp>
-#include <Phoenix/Math/Matrix4x4.hpp>
-#include <Phoenix/Math/Vector2.hpp>
-#include <Phoenix/Math/Vector3.hpp>
-#include <Phoenix/Math/Ray.hpp>
+#include <Common/Math/MathUtils.hpp>
+#include <Common/Math/Matrix4x4.hpp>
+#include <Common/Math/Vector2.hpp>
+#include <Common/Math/Vector3.hpp>
+#include <Common/Math/Ray.hpp>
 
 namespace phx
 {

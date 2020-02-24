@@ -28,7 +28,7 @@
 
 #pragma once
 
-#include <Phoenix/Events/Event.hpp>
+#include <Client/Events/Event.hpp>
 
 #include <string>
 

@@ -26,16 +26,11 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-// Externals
+#include <Client/Graphics/ImGuiHelpers.hpp>
+#include <Client/Graphics/UI.hpp>
+
 #include <imgui.h>
 #include <imgui_internal.h>
-
-// Internals
-#include <Phoenix/ImGuiHelpers.hpp>
-#include <Phoenix/UI.hpp>
-
-// Standards
-//...
 
 using namespace ui;
 

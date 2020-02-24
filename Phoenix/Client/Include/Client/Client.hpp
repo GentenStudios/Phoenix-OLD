@@ -28,11 +28,11 @@
 
 #pragma once
 
-#include <Phoenix/Events/IEventListener.hpp>
-#include <Phoenix/Graphics/LayerStack.hpp>
-#include <Phoenix/Graphics/Window.hpp>
-#include <Phoenix/UI.hpp>
-#include <Phoenix/DebugOverlay.hpp>
+#include <Client/Events/IEventListener.hpp>
+#include <Client/Graphics/LayerStack.hpp>
+#include <Client/Graphics/Window.hpp>
+#include <Client/Graphics/UI.hpp>
+#include <Client/DebugOverlay.hpp>
 
 namespace phx
 {

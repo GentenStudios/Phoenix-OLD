@@ -26,16 +26,17 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Phoenix/Player.hpp>
-#include <Phoenix/Voxels/BlockRegistry.hpp>
-#include <Phoenix/ContentLoader.hpp>
-#include <Phoenix/Commander.hpp>
+#include <Client/Player.hpp>
+
+#include <Common/Voxels/BlockRegistry.hpp>
+#include <Common/ContentLoader.hpp>
+#include <Common/Commander.hpp>
 
 using namespace phx;
 
 static const float RAY_INCREMENT = 0.5f;
 
-Player::Player(voxels::ChunkManager* world) : m_world(world) 
+Player::Player(voxels::ChunkView* world) : m_world(world) 
 {
 	ContentManager::get()->lua["core"]["player"] = 
 		/**

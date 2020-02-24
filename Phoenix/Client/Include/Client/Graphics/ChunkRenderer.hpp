@@ -35,7 +35,7 @@
 
 #pragma once
 
-#include <Phoenix/Graphics/ShaderPipeline.hpp>
+#include <Client/Graphics/ShaderPipeline.hpp>
 
 #include <unordered_map>
 #include <vector>

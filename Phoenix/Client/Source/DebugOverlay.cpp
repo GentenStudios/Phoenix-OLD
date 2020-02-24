@@ -26,9 +26,9 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Phoenix/DebugOverlay.hpp>
+#include <Client/DebugOverlay.hpp>
 
-#include <Phoenix/Graphics/ImGuiExtensions.hpp>
+#include <Client/Graphics/ImGuiExtensions.hpp>
 #include <imgui.h>
 
 #include <glad/glad.h>

@@ -10,7 +10,6 @@ set(Sources
 	${currentDir}/Settings.cpp
 	${currentDir}/Commander.cpp
 	${currentDir}/Actor.cpp
-	${currentDir}/Player.cpp
 
 	PARENT_SCOPE
 )

@@ -35,9 +35,9 @@
 
 #pragma once
 
-#include <Phoenix/Events/Event.hpp>
-#include <Phoenix/Events/IEventListener.hpp>
-#include <Phoenix/Math/Math.hpp>
+#include <Client/Events/Event.hpp>
+#include <Client/Events/IEventListener.hpp>
+#include <Common/Math/Math.hpp>
 
 #include <SDL.h>
 

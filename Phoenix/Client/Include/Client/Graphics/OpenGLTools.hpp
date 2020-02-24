@@ -28,7 +28,7 @@
 
 #pragma once
 
-#include <Phoenix/CoreIntrinsics.hpp>
+#include <Common/CoreIntrinsics.hpp>
 
 #include <glad/glad.h>
 

@@ -26,9 +26,11 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Phoenix/ContentLoader.hpp>
-#include <Phoenix/Game.hpp>
-#include <Phoenix/Voxels/BlockRegistry.hpp>
+#include <Client/Game.hpp>
+
+#include <Common/ContentLoader.hpp>
+#include <Common/Voxels/BlockRegistry.hpp>
+#include <Common/Commander.hpp>
 
 using namespace phx::client;
 using namespace phx;
@@ -76,7 +78,7 @@ void Game::onAttach()
 		signalRemoval();
 	}
 
-	m_world  = new voxels::ChunkManager(3, voxels::Map(save, "map1"));
+	m_world  = new voxels::ChunkView(3, voxels::Map(save, "map1"));
 	m_player = new Player(m_world);
 	m_camera = new gfx::FPSCamera(m_window);
 	m_camera->setActor(m_player);

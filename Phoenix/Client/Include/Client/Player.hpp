@@ -35,8 +35,9 @@
 
 #pragma once
 
-#include <Phoenix/Actor.hpp>
-#include <Phoenix/Voxels/ChunkManager.hpp>
+#include <Client/Graphics/ChunkView.hpp>
+
+#include <Common/Actor.hpp>
 
 namespace phx
 {
@@ -51,7 +52,7 @@ namespace phx
 	{
 	public:
 		// temporary until a proper management system is put in place.
-		Player(voxels::ChunkManager* world);
+		Player(voxels::ChunkView* world);
 		
 		math::Ray getTarget();
 
@@ -63,7 +64,7 @@ namespace phx
 
 	private:
 		float m_reach = 32.f;
-		voxels::ChunkManager* m_world;
+		voxels::ChunkView* m_world;
         voxels::BlockType* m_hand;
 	};
 } // namespace phx

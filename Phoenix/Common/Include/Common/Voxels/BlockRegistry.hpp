@@ -28,9 +28,9 @@
 
 #pragma once
 
-#include <Phoenix/Singleton.hpp>
-#include <Phoenix/Voxels/Block.hpp>
-#include <Phoenix/Voxels/TextureRegistry.hpp>
+#include <Common/Singleton.hpp>
+#include <Common/Voxels/Block.hpp>
+#include <Common/Voxels/TextureRegistry.hpp>
 
 #include <vector>
 

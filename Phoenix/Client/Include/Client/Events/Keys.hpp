@@ -28,7 +28,7 @@
 
 #pragma once
 
-#include <Phoenix/EnumTools.hpp>
+#include <Common/EnumTools.hpp>
 
 #include <SDL.h>
 

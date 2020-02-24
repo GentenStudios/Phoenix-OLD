@@ -28,8 +28,9 @@
 
 #pragma once
 
+#include <Client/Graphics/ImGuiHelpers.hpp>
+
 #include <imgui.h>
-#include <Phoenix/ImGuiHelpers.hpp>
 
 /// @brief Contains all UI elements specifically designed for Phoenix.
 namespace ui

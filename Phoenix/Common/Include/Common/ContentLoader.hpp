@@ -36,15 +36,12 @@
 
 #pragma once
 
-#include <Phoenix/Singleton.hpp>
+#include <Common/Singleton.hpp>
 
 #include <sol/sol.hpp>
 
 #include <vector>
 #include <string>
-
-//TODO: Replace this with a registry system
-#include <Phoenix/ImGuiHelpers.hpp>
 
 namespace phx
 {

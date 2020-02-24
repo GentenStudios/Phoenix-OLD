@@ -28,8 +28,8 @@
 
 #pragma once
 
-#include <Phoenix/Events/Event.hpp>
-#include <Phoenix/Graphics/Layer.hpp>
+#include <Client/Events/Event.hpp>
+#include <Client/Graphics/Layer.hpp>
 
 namespace phx
 {

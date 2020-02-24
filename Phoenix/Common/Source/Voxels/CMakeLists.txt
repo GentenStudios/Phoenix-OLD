@@ -3,7 +3,6 @@ set(voxelSources
 	${currentDir}/BlockRegistry.cpp
 	${currentDir}/TextureRegistry.cpp
 	${currentDir}/Chunk.cpp
-	${currentDir}/ChunkManager.cpp
 	${currentDir}/Map.cpp
 
 	PARENT_SCOPE

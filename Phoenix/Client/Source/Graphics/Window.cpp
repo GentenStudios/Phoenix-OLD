@@ -26,18 +26,18 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Phoenix/CoreIntrinsics.hpp>
-#include <Phoenix/Graphics/OpenGLTools.hpp>
-#include <Phoenix/Graphics/Window.hpp>
+#include <Client/Graphics/OpenGLTools.hpp>
+#include <Client/Graphics/Window.hpp>
+
+#include <Common/CoreIntrinsics.hpp>
 
 #include <glad/glad.h>
-
-#include <algorithm>
-#include <iostream>
-
 #include <imgui.h>
 #include <imgui_impl_opengl3.h>
 #include <imgui_impl_sdl.h>
+
+#include <algorithm>
+#include <iostream>
 
 using namespace phx;
 using namespace gfx;

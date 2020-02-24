@@ -28,9 +28,9 @@
 
 #pragma once
 
-#include <Phoenix/Graphics/Layer.hpp>
-#include <Phoenix/Graphics/ShaderPipeline.hpp>
-#include <Phoenix/Graphics/Window.hpp>
+#include <Client/Graphics/Layer.hpp>
+#include <Client/Graphics/ShaderPipeline.hpp>
+#include <Client/Graphics/Window.hpp>
 
 namespace phx
 {

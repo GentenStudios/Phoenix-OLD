@@ -11,5 +11,7 @@ set(Headers
 	${currentDir}/Game.hpp
 	${currentDir}/DebugOverlay.hpp
 
+	${currentDir}/Player.hpp
+
 	PARENT_SCOPE
 )

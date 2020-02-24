@@ -26,12 +26,13 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Phoenix/Commander.hpp>
-#include <Phoenix/ContentLoader.hpp>
-#include <Phoenix/Game.hpp>
-#include <Phoenix/Client.hpp>
-#include <Phoenix/Settings.hpp>
-#include <Phoenix/SplashScreen.hpp>
+#include <Client/Game.hpp>
+#include <Client/Client.hpp>
+#include <Client/SplashScreen.hpp>
+
+#include <Common/Commander.hpp>
+#include <Common/ContentLoader.hpp>
+#include <Common/Settings.hpp>
 
 using namespace phx::client;
 using namespace phx;

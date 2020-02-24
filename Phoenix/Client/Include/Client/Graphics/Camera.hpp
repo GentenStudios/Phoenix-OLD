@@ -35,11 +35,11 @@
 
 #pragma once
 
-#include <Phoenix/Math/Math.hpp>
-#include <Phoenix/Graphics/Window.hpp>
-#include <Phoenix/Settings.hpp>
+#include <Client/Graphics/Window.hpp>
 
-#include <Phoenix/Actor.hpp>
+#include <Common/Math/Math.hpp>
+#include <Common/Settings.hpp>
+#include <Common/Actor.hpp>
 
 namespace phx
 {

@@ -30,7 +30,7 @@
 #include <iostream>
 #include <queue>
 
-#include <Phoenix/ContentLoader.hpp>
+#include <Common/ContentLoader.hpp>
 
 using namespace phx;
 

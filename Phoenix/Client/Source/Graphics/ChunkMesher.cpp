@@ -26,8 +26,8 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Phoenix/Graphics/ChunkMesher.hpp>
-#include <Phoenix/Voxels/Chunk.hpp>
+#include <Client/Graphics/ChunkMesher.hpp>
+#include <Common/Voxels/Chunk.hpp>
 
 static const phx::math::vec3 CUBE_VERTS[] = {
     // front

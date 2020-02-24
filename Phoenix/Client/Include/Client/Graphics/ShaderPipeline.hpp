@@ -35,9 +35,7 @@
 
 #pragma once
 
-#include <Phoenix/Math/Math.hpp>
-
-#include <glad/glad.h>
+#include <Common/Math/Math.hpp>
 
 #include <string>
 #include <vector>

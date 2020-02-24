@@ -35,8 +35,8 @@
  *
  */
 
-#include <Phoenix/Commander.hpp>
-#include <Phoenix/ContentLoader.hpp>
+#include <Common/Commander.hpp>
+#include <Common/ContentLoader.hpp>
 
 using namespace phx;
 

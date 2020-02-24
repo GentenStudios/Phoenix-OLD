@@ -28,13 +28,12 @@
 
 #pragma once
 
-#include <Phoenix/Commander.hpp>
-#include <Phoenix/Graphics/Camera.hpp>
-#include <Phoenix/Graphics/Layer.hpp>
-#include <Phoenix/Graphics/ShaderPipeline.hpp>
-#include <Phoenix/Graphics/Window.hpp>
-#include <Phoenix/Player.hpp>
-#include <Phoenix/UI.hpp>
+#include <Client/Graphics/Camera.hpp>
+#include <Client/Graphics/Layer.hpp>
+#include <Client/Graphics/ShaderPipeline.hpp>
+#include <Client/Graphics/Window.hpp>
+#include <Client/Graphics/UI.hpp>
+#include <Client/Player.hpp>
 
 namespace phx
 {
@@ -71,7 +70,7 @@ namespace phx
 			gfx::Window*          m_window;
 			gfx::FPSCamera*       m_camera;
 			Player*               m_player;
-			voxels::ChunkManager* m_world;
+			voxels::ChunkView* m_world;
 
 			gfx::ShaderPipeline m_renderPipeline;
 

@@ -28,7 +28,7 @@
 
 #pragma once
 
-#include <Phoenix/Events/Keys.hpp>
+#include <Client/Events/Keys.hpp>
 
 #include <SDL.h>
 

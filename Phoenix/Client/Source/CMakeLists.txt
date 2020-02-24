@@ -6,10 +6,11 @@ set(Sources
 
 	${currentDir}/Client.cpp
 	${currentDir}/ImGuiHelpers.cpp
-	${currentDir}/UI.cpp
 	${currentDir}/SplashScreen.cpp
 	${currentDir}/Game.cpp
 	${currentDir}/DebugOverlay.cpp
+
+	${currentDir}/Player.cpp
 
 	${currentDir}/Main.cpp
 

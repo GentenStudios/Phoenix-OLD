@@ -36,7 +36,7 @@
 
 #pragma once
 
-#include <Phoenix/Singleton.hpp>
+#include <Common/Singleton.hpp>
 
 #include <string>
 #include <unordered_map>

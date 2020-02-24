@@ -26,8 +26,8 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Phoenix/Voxels/BlockRegistry.hpp>
-#include <Phoenix/Voxels/Chunk.hpp>
+#include <Common/Voxels/BlockRegistry.hpp>
+#include <Common/Voxels/Chunk.hpp>
 #include <iostream>
 
 using namespace phx::voxels;

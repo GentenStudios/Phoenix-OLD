@@ -26,9 +26,9 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Phoenix/Math/Math.hpp>
-#include <Phoenix/Math/MathUtils.hpp>
-#include <Phoenix/Math/Matrix4x4.hpp>
+#include <Common/Math/Math.hpp>
+#include <Common/Math/MathUtils.hpp>
+#include <Common/Math/Matrix4x4.hpp>
 
 #define INDEX_2D(x, y) x + (y * 4)
 

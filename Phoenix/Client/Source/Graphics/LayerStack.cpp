@@ -26,8 +26,8 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Phoenix/Events/Event.hpp>
-#include <Phoenix/Graphics/LayerStack.hpp>
+#include <Client/Events/Event.hpp>
+#include <Client/Graphics/LayerStack.hpp>
 
 #include <algorithm>
 
