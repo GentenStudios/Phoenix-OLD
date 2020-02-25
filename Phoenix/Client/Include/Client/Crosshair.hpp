@@ -45,7 +45,7 @@ namespace phx
 		class Crosshair : public gfx::Overlay
 		{
 		public:
-			Crosshair();
+			Crosshair(gfx::Window* window);
 			~Crosshair() override = default;
 
 			void onEvent(events::Event& e) override;
