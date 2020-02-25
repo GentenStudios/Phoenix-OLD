@@ -36,7 +36,12 @@
 using namespace phx::client;
 using namespace phx;
 
-Crosshair::Crosshair() : Layer("Crosshair") {}
+Crosshair::Crosshair(gfx::Window* window) : Overlay("Crosshair")
+{
+    auto size = window->getSize();
+    m_screenW = size.x;
+    m_screenH = size.y;
+}
 
 void Crosshair::onEvent(events::Event& e)
 {
@@ -80,7 +85,6 @@ void Crosshair::onAttach()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-	stbi_set_flip_vertically_on_load(true);
 	int            width, height, nrChannels;
 	unsigned char* data =
 	    stbi_load("Assets/Crosshair.png", &width, &height, &nrChannels, 0);
@@ -95,7 +99,6 @@ void Crosshair::onAttach()
 		std::cout << "Failed to load texture" << std::endl;
 	}
 	stbi_image_free(data);
-	stbi_set_flip_vertically_on_load(false);
 
 	std::vector<gfx::ShaderLayout> layout;
 	layout.emplace_back("a_Vertex", 0);
@@ -107,8 +110,8 @@ void Crosshair::onAttach()
 	m_pipeline.activate();
 	m_pipeline.setFloat("u_TexW", static_cast<float>(width));
 	m_pipeline.setFloat("u_TexH", static_cast<float>(height));
-	m_pipeline.setFloat("u_ScreenW", 1280.0f);
-	m_pipeline.setFloat("u_ScreenH", 720.0f);
+	m_pipeline.setFloat("u_ScreenW", m_screenW);
+	m_pipeline.setFloat("u_ScreenH", m_screenH);
 }
 
 void Crosshair::onDetach()
@@ -124,12 +127,5 @@ void Crosshair::tick(float dt)
 
 	glBindVertexArray(m_vao);
 	glBindTexture(GL_TEXTURE_2D, m_texture);
-
-    // TODO couldn't get how to retrieve window size, but the idea would be to
-    // be able to send width and height of the window to the shader so that the
-    // crosshair could keep its size when the window is resized
-    // m_pipeline.setFloat("u_ScreenW", ??);
-    // m_pipeline.setFloat("u_ScreenH", ??);
-
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 }

@@ -112,7 +112,7 @@ void Client::onEvent(events::Event e)
 		{
 			Game* game = new Game(m_window);
 			m_layerStack->pushLayer(game);
-			Crosshair* crosshair = new Crosshair();
+			Crosshair* crosshair = new Crosshair(m_window);
 			m_layerStack->pushLayer(crosshair);
 			e.handled = true;
 		}

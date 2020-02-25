@@ -42,7 +42,7 @@ namespace phx
 		 * @see Layer
 		 * @see LayerStack
 		 */
-		class Crosshair : public gfx::Layer
+		class Crosshair : public gfx::Overlay
 		{
 		public:
 			Crosshair();
@@ -59,6 +59,8 @@ namespace phx
 			unsigned int        m_vao;
 			unsigned int        m_vbo;
 			unsigned int        m_texture;
+			unsigned int        m_screenW;
+			unsigned int        m_screenH;
 		};
 	} // namespace client
 } // namespace phx
