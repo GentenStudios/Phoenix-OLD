@@ -38,18 +38,26 @@ using namespace phx;
 
 Crosshair::Crosshair() : Layer("Crosshair") {}
 
-void Crosshair::onEvent(events::Event& e) {}
+void Crosshair::onEvent(events::Event& e)
+{
+	if (e.type == events::EventType::WINDOW_RESIZED)
+	{
+		m_pipeline.activate();
+		m_pipeline.setFloat("u_ScreenW", static_cast<float>(e.size.width));
+		m_pipeline.setFloat("u_ScreenH", static_cast<float>(e.size.height));
+	}
+}
 
 void Crosshair::onAttach()
 {
 	// verts and uvs packed.
 	float vertices[] = {
-	    0.03125f,  0.06250f,  0.0f, 1.0f, 1.0f, // top right
-	    0.03125f,  -0.06250f, 0.0f, 1.0f, 0.0f, // bottom right
-	    -0.03125f, 0.06250f,  0.0f, 0.0f, 1.0f, // top left
-	    0.03125f,  -0.06250f, 0.0f, 1.0f, 0.0f, // bottom right
-	    -0.03125f, -0.06250f, 0.0f, 0.0f, 0.0f, // bottom left
-	    -0.03125f, 0.06250f,  0.0f, 0.0f, 1.0f  // top left
+	    1.0f,  1.0f,  0.0f, 1.0f, 1.0f, // top right
+	    1.0f,  -1.0f, 0.0f, 1.0f, 0.0f, // bottom right
+	    -1.0f, 1.0f,  0.0f, 0.0f, 1.0f, // top left
+	    1.0f,  -1.0f, 0.0f, 1.0f, 0.0f, // bottom right
+	    -1.0f, -1.0f, 0.0f, 0.0f, 0.0f, // bottom left
+	    -1.0f, 1.0f,  0.0f, 0.0f, 1.0f  // top left
 	};
 
 	glGenVertexArrays(1, &m_vao);
@@ -95,6 +103,12 @@ void Crosshair::onAttach()
 
 	m_pipeline.prepare("Assets/Crosshair.vert", "Assets/Crosshair.frag",
 	                   layout);
+	
+	m_pipeline.activate();
+	m_pipeline.setFloat("u_TexW", static_cast<float>(width));
+	m_pipeline.setFloat("u_TexH", static_cast<float>(height));
+	m_pipeline.setFloat("u_ScreenW", 1280.0f);
+	m_pipeline.setFloat("u_ScreenH", 720.0f);
 }
 
 void Crosshair::onDetach()
