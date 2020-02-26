@@ -47,9 +47,8 @@ void Crosshair::onEvent(events::Event& e)
 {
 	if (e.type == events::EventType::WINDOW_RESIZED)
 	{
-		m_pipeline.activate();
-		m_pipeline.setFloat("u_ScreenW", static_cast<float>(e.size.width));
-		m_pipeline.setFloat("u_ScreenH", static_cast<float>(e.size.height));
+		m_screenW = e.size.width;
+		m_screenH = e.size.height;
 	}
 }
 
@@ -124,6 +123,8 @@ void Crosshair::onDetach()
 void Crosshair::tick(float dt)
 {
 	m_pipeline.activate();
+	m_pipeline.setFloat("u_ScreenW", static_cast<float>(m_screenW));
+	m_pipeline.setFloat("u_ScreenH", static_cast<float>(m_screenH));
 
 	glBindVertexArray(m_vao);
 	glBindTexture(GL_TEXTURE_2D, m_texture);
