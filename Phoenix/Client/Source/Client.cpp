@@ -29,6 +29,7 @@
 #include <Client/Game.hpp>
 #include <Client/Client.hpp>
 #include <Client/SplashScreen.hpp>
+#include <Client/Crosshair.hpp>
 
 #include <Common/Commander.hpp>
 #include <Common/ContentLoader.hpp>
@@ -111,6 +112,8 @@ void Client::onEvent(events::Event e)
 		{
 			Game* game = new Game(m_window);
 			m_layerStack->pushLayer(game);
+			Crosshair* crosshair = new Crosshair(m_window);
+			m_layerStack->pushLayer(crosshair);
 			e.handled = true;
 		}
 		break;
