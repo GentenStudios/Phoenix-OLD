@@ -58,7 +58,7 @@ math::vec3 Actor::getDirection() const
 	        std::cos(m_rotation.y) * std::cos(m_rotation.x)};
 }
 
-int Actor::getMoveSpeed() { return m_moveSpeed; }
+int Actor::getMoveSpeed() const { return m_moveSpeed; }
 
 bool Actor::setMoveSpeed(int speed)
 {

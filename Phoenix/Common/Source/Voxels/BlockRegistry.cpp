@@ -26,8 +26,8 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Common/Voxels/BlockRegistry.hpp>
 #include <Common/ContentLoader.hpp>
+#include <Common/Voxels/BlockRegistry.hpp>
 
 #include <algorithm>
 #include <cstring>
@@ -36,7 +36,8 @@ using namespace phx::voxels;
 
 BlockRegistry::BlockRegistry()
 {
-	ContentManager::get()->lua["voxel"] = ContentManager::get()->lua.create_table();
+	ContentManager::get()->lua["voxel"] =
+	    ContentManager::get()->lua.create_table();
 	/**
 	 * @addtogroup luaapi
 	 *
@@ -45,7 +46,8 @@ BlockRegistry::BlockRegistry()
 	 * @section voxel voxel
 	 * @brief The voxel API for interacting voxels
 	 */
-	ContentManager::get()->lua["voxel"]["block"] = ContentManager::get()->lua.create_table();
+	ContentManager::get()->lua["voxel"]["block"] =
+	    ContentManager::get()->lua.create_table();
 	/**
 	 * @addtogroup luaapi
 	 *
@@ -76,8 +78,8 @@ BlockRegistry::BlockRegistry()
 	     * with
 	     * - @b textures: A table of filepaths where textures are located \n
 	     * 			   Filepaths are relative to to the module directory \n
-	     * 			   If only one filepath is specified, that will be used for all
-	     * textures
+	     * 			   If only one filepath is specified, that will be used for
+	     * all textures
 	     *
 	     * @b Example:
 	     *
@@ -100,7 +102,7 @@ BlockRegistry::BlockRegistry()
 			    block.displayName = luaBlock["name"];
 			    block.id          = luaBlock["id"];
 
-				std::string category = luaBlock["category"];
+			    std::string category = luaBlock["category"];
 			    if (category == "Air")
 			    {
 				    block.category = BlockCategory::AIR;
@@ -131,7 +133,7 @@ BlockRegistry::BlockRegistry()
 
 			    if (luaBlock["textures"])
 			    {
-			    	std::array<std::string, 6> textures;
+				    std::array<std::string, 6> textures;
 				    for (int i = 0; i < 6; i++)
 				    {
 					    std::string texture = luaBlock["textures"][i + 1];
@@ -141,9 +143,11 @@ BlockRegistry::BlockRegistry()
 						    // texture in its place
 						    texture = luaBlock["textures"][1];
 					    }
-					    textures[i] = "Modules/" + ContentManager::get()->currentMod + "/" + texture;
+					    textures[i] = "Modules/" +
+					                  ContentManager::get()->currentMod + "/" +
+					                  texture;
 				    }
-			    	block.textures = textures;
+				    block.textures = textures;
 			    }
 		    }
 		    BlockRegistry::get()->registerBlock(block);

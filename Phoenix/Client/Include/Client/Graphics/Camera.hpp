@@ -79,7 +79,7 @@ namespace phx
 		{
 		public:
 			/**
-			 * @brief Constructs the FPS Camera
+			 * @brief Constructs the FPS Camera.
 			 * @param window The window object you want tied to the camera.
 			 *
 			 * The window object is required for requesting mouse position

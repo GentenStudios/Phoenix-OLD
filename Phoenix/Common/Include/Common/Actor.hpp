@@ -55,7 +55,7 @@ namespace phx
 		 * @brief Gets the actor's current speed.
 		 * @return The actor's current speed.
 		 */
-		int getMoveSpeed();
+		int getMoveSpeed() const;
 
 		/**
 		 * @brief Sets the actors's current speed.

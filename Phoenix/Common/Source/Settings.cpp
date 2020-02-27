@@ -26,8 +26,8 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Common/Settings.hpp>
 #include <Common/ContentLoader.hpp>
+#include <Common/Settings.hpp>
 
 #include <climits>
 #include <fstream>
@@ -65,16 +65,17 @@ int Setting::value() const { return m_value; }
 
 int Setting::getDefault() const { return m_default; }
 
-Settings::Settings(){
-	ContentManager::get()->lua["core"]["setting"] = 
-		/**
-		 * @addtogroup luaapi
-		 *
-		 * ---
-		 * @subsection coreset core.setting
-		 * @brief Interfaces with the settings system
-		 */
-		ContentManager::get()->lua.create_table();
+Settings::Settings()
+{
+	ContentManager::get()->lua["core"]["setting"] =
+	    /**
+	     * @addtogroup luaapi
+	     *
+	     * ---
+	     * @subsection coreset core.setting
+	     * @brief Interfaces with the settings system
+	     */
+	    ContentManager::get()->lua.create_table();
 	ContentManager::get()->lua["core"]["setting"]["register"] =
 	    /**
 	     * @addtogroup luaapi

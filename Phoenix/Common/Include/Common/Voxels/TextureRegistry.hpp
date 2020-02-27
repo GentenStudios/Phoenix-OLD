@@ -81,7 +81,7 @@ namespace phx
 			void addTexture(const std::string& texture);
 
 			/**
-			 * @brief Get the Textures object
+			 * @brief Gets the Textures object.
 			 * @return An array of strings containing registered textures.
 			 */
 			std::vector<std::string> getTextures();

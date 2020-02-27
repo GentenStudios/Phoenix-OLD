@@ -47,12 +47,12 @@ namespace phx
 	namespace voxels
 	{
 		/**
-		 * @brief The material state of the block
+		 * @brief The material state of the block.
 		 *
 		 * A block exist in one of three states, either "SOLID", "AIR", or a
 		 * "LIQUID". These states define if the player can walk through the
 		 * block or not in addition to other potential information (like if
-		 * the object flows)
+		 * the object flows).
 		 */
 		enum class BlockCategory : unsigned int
 		{
@@ -118,7 +118,7 @@ namespace phx
 			void setAllTextures(const std::string& tex) { textures.fill(tex); }
 
 			/**
-			 * @brief Get the Registry ID of the blockType
+			 * @brief Gets the Registry ID of the blockType.
 			 *
 			 * The registry ID is a runtime specific int that allows for faster.
 			 * access but is not preserved between runs.
@@ -155,9 +155,9 @@ namespace phx
 			math::vec3 blockPos;
 
 			/**
-			 * @brief serialised data, we can decide how we wanna do this some
-			 * other time (just an implementation attempt to stop pains later in
-			 * life.)
+			 * @brief serialized data, we can decide how we wanna do this some
+			 * other time. (just an implementation attempt to stop pains later in
+			 * life)
 			 */
 			std::string data;
 		};

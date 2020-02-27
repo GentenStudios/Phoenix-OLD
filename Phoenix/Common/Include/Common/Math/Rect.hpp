@@ -44,4 +44,4 @@ namespace phx
 
 		RectAABB() = default;
 	};
-} // namespace q2
+} // namespace phx
