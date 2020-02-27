@@ -26,8 +26,8 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Client/Game.hpp>
 #include <Client/Client.hpp>
+#include <Client/Game.hpp>
 #include <Client/SplashScreen.hpp>
 
 #include <Common/Commander.hpp>
@@ -44,15 +44,9 @@ static void rawEcho(const std::string& input, std::ostringstream& cout)
 	kirk.callback(input, cout);
 }
 
-Client::Client()
-    : m_chat(ui::ChatWindow("Chat Window", 5,
-                            "Type something and hit enter to run a command!\n"))
+Client::Client() : m_window("Phoenix Game!", 1280, 720), m_layerStack(&m_window)
 {
-	m_window = new gfx::Window("Phoenix Game!", 1280, 720);
-	m_window->registerEventListener(this);
-
-	m_layerStack = new gfx::LayerStack(m_window);
-
+	m_window.registerEventListener(this);
 	m_chat.registerCallback(&rawEcho);
 
 	/**
@@ -68,10 +62,28 @@ Client::Client()
 	    [this](const std::string& text) { m_chat.cout << text << "\n"; };
 }
 
-Client::~Client()
+void Client::pushLayer(gfx::Layer* layer)
 {
-	delete m_layerStack;
-	delete m_window;
+	if (layer->isOverlay())
+	{
+		m_layerStack.pushOverlay(layer);
+	}
+	else
+	{
+		m_layerStack.pushLayer(layer);
+	}
+}
+
+void Client::popLayer(gfx::Layer* layer)
+{
+	if (layer->isOverlay())
+	{
+		m_layerStack.popOverlay(layer);
+	}
+	else
+	{
+		m_layerStack.popLayer(layer);
+	}
 }
 
 void Client::onEvent(events::Event e)
@@ -83,7 +95,7 @@ void Client::onEvent(events::Event e)
 		switch (e.keyboard.key)
 		{
 		case Keys::KEY_Q:
-			m_window->close();
+			m_window.close();
 			e.handled = true;
 			break;
 		case Keys::KEY_P:
@@ -93,11 +105,11 @@ void Client::onEvent(events::Event e)
 				if (m_debugOverlay == nullptr)
 					m_debugOverlay = new DebugOverlay();
 
-				m_layerStack->pushLayer(m_debugOverlay);
+				m_layerStack.pushLayer(m_debugOverlay);
 			}
 			else
 			{
-				m_layerStack->popLayer(m_debugOverlay);
+				m_layerStack.popLayer(m_debugOverlay);
 			}
 			e.handled = true;
 			break;
@@ -109,8 +121,8 @@ void Client::onEvent(events::Event e)
 	case EventType::LAYER_DESTROYED:
 		if (std::string(e.layer) == "SplashScreen")
 		{
-			Game* game = new Game(m_window);
-			m_layerStack->pushLayer(game);
+			Game* game = new Game(&m_window);
+			m_layerStack.pushLayer(game);
 			e.handled = true;
 		}
 		break;
@@ -120,7 +132,7 @@ void Client::onEvent(events::Event e)
 
 	if (!e.handled)
 	{
-		m_layerStack->onEvent(e);
+		m_layerStack.onEvent(e);
 	}
 }
 
@@ -129,22 +141,22 @@ void Client::run()
 	Settings::get()->load();
 
 	SplashScreen* splashScreen = new SplashScreen();
-	m_layerStack->pushLayer(splashScreen);
+	m_layerStack.pushLayer(splashScreen);
 
 	std::size_t last = SDL_GetPerformanceCounter();
-	while (m_window->isRunning())
+	while (m_window.isRunning())
 	{
 		const std::size_t now = SDL_GetPerformanceCounter();
 		const float       dt =
 		    (now - last) / static_cast<float>(SDL_GetPerformanceFrequency());
 		last = now;
 
-		m_window->startFrame();
+		m_window.startFrame();
 
-		if (!m_layerStack->empty())
-			m_layerStack->tick(dt);
+		if (!m_layerStack.empty())
+			m_layerStack.tick(dt);
 
-		m_window->endFrame();
+		m_window.endFrame();
 	}
 
 	Settings::get()->save();

@@ -123,6 +123,11 @@ void LayerStack::pushLayer(Layer* layer)
 	m_layers.emplace(m_layers.begin() + m_currentInsert, layer);
 	++m_currentInsert;
 	layer->onAttach();
+
+	events::Event e;
+	e.type  = events::EventType::LAYER_PUSHED;
+	e.layer = layer->getName().c_str();
+	m_window->dispatchCustomEvent(e);
 }
 
 void LayerStack::popLayer(Layer* layer)
@@ -130,15 +135,13 @@ void LayerStack::popLayer(Layer* layer)
 	auto it = std::find(m_layers.begin(), m_layers.end(), layer);
 	if (it != m_layers.end())
 	{
-		std::string layerName = layer->getName();
-
 		layer->onDetach();
 		--m_currentInsert;
 		m_layers.erase(it);
 
 		events::Event e;
 		e.type  = events::EventType::LAYER_DESTROYED;
-		e.layer = layerName.c_str();
+		e.layer = layer->getName().c_str();
 		m_window->dispatchCustomEvent(e);
 	}
 }
@@ -147,6 +150,11 @@ void LayerStack::pushOverlay(Layer* overlay)
 {
 	m_layers.emplace_back(overlay);
 	overlay->onAttach();
+
+	events::Event e;
+	e.type  = events::EventType::LAYER_PUSHED;
+	e.layer = overlay->getName().c_str();
+	m_window->dispatchCustomEvent(e);
 }
 
 void LayerStack::popOverlay(Layer* overlay)
@@ -154,14 +162,12 @@ void LayerStack::popOverlay(Layer* overlay)
 	auto it = std::find(m_layers.begin(), m_layers.end(), overlay);
 	if (it != m_layers.end())
 	{
-		const std::string layerName = overlay->getName();
-
 		overlay->onDetach();
 		m_layers.erase(it);
 
 		events::Event e;
 		e.type  = events::EventType::LAYER_DESTROYED;
-		e.layer = layerName.c_str();
+		e.layer = overlay->getName().c_str();
 		m_window->dispatchCustomEvent(e);
 	}
 }

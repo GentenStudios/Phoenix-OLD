@@ -6,12 +6,14 @@ set(Headers
 	${eventHeaders}
 	${graphicsHeaders}
 
+	${currentDir}/Player.hpp
+
 	${currentDir}/Client.hpp
 	${currentDir}/SplashScreen.hpp
 	${currentDir}/Game.hpp
-	${currentDir}/DebugOverlay.hpp
 
-	${currentDir}/Player.hpp
+	${currentDir}/DebugOverlay.hpp
+	${currentDir}/GameTools.hpp
 
 	PARENT_SCOPE
 )

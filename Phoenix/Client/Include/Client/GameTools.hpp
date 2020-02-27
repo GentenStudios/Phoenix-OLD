@@ -28,39 +28,37 @@
 
 #pragma once
 
-#include <Client/DebugOverlay.hpp>
-#include <Client/Events/IEventListener.hpp>
-#include <Client/Graphics/LayerStack.hpp>
-#include <Client/Graphics/UI.hpp>
-#include <Client/Graphics/Window.hpp>
-
-#include <Common/Singleton.hpp>
+#include <Client/Events/Event.hpp>
+#include <Client/Graphics/Layer.hpp>
 
 namespace phx
 {
 	namespace client
 	{
-		class Client : public events::IEventListener, public Singleton<Client>
+		/**
+		 * @brief The Debug Tool for the Game.
+		 *
+		 * @see Layer
+		 * @see LayerStack
+		 */
+		class GameTools : public gfx::Overlay
 		{
 		public:
-			Client();
-			~Client() = default;
+			GameTools();
+			~GameTools() override = default;
 
-			void pushLayer(gfx::Layer* layer);
-			void popLayer(gfx::Layer* layer);
-			bool isDebugLayerActive() const { return m_debugOverlayActive; }
-
-			void onEvent(events::Event e) override;
-			void run();
+			void onAttach() override;
+			void onDetach() override;
+			void onEvent(events::Event& e) override;
+			void tick(float dt) override;
 
 		private:
-			gfx::Window     m_window;
-			gfx::LayerStack m_layerStack;
-			ui::ChatWindow  m_chat = ui::ChatWindow("Chat Window", 5,
-			                                        "Type something and hit enter to run a command!\n");
+			bool m_wireframe     = false;
+			int  m_sampleRate    = 60;
+			int  m_maxSampleRate = 60;
+			bool m_pauseSampling = false;
 
-			bool          m_debugOverlayActive = false;
-			DebugOverlay* m_debugOverlay       = nullptr;
+			unsigned int m_time = 0;
 		};
 	} // namespace client
 } // namespace phx

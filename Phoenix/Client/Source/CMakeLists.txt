@@ -4,13 +4,14 @@ set(currentDir ${CMAKE_CURRENT_LIST_DIR})
 set(Sources
 	${graphicsSources}
 
+	${currentDir}/Player.cpp
+
 	${currentDir}/Client.cpp
-	${currentDir}/ImGuiHelpers.cpp
 	${currentDir}/SplashScreen.cpp
 	${currentDir}/Game.cpp
-	${currentDir}/DebugOverlay.cpp
 
-	${currentDir}/Player.cpp
+	${currentDir}/DebugOverlay.cpp
+	${currentDir}/GameTools.cpp
 
 	${currentDir}/Main.cpp
 

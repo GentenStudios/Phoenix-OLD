@@ -26,41 +26,30 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#pragma once
+#include <Client/GameTools.hpp>
 
-#include <Client/DebugOverlay.hpp>
-#include <Client/Events/IEventListener.hpp>
-#include <Client/Graphics/LayerStack.hpp>
-#include <Client/Graphics/UI.hpp>
-#include <Client/Graphics/Window.hpp>
+#include <imgui.h>
 
-#include <Common/Singleton.hpp>
+using namespace phx::client;
+using namespace phx;
 
-namespace phx
+GameTools::GameTools() : Overlay("GameTools")
 {
-	namespace client
-	{
-		class Client : public events::IEventListener, public Singleton<Client>
-		{
-		public:
-			Client();
-			~Client() = default;
+	
+}
 
-			void pushLayer(gfx::Layer* layer);
-			void popLayer(gfx::Layer* layer);
-			bool isDebugLayerActive() const { return m_debugOverlayActive; }
+void GameTools::onAttach()
+{
+}
 
-			void onEvent(events::Event e) override;
-			void run();
+void GameTools::onDetach()
+{
+}
 
-		private:
-			gfx::Window     m_window;
-			gfx::LayerStack m_layerStack;
-			ui::ChatWindow  m_chat = ui::ChatWindow("Chat Window", 5,
-			                                        "Type something and hit enter to run a command!\n");
+void GameTools::onEvent(events::Event& e)
+{
+}
 
-			bool          m_debugOverlayActive = false;
-			DebugOverlay* m_debugOverlay       = nullptr;
-		};
-	} // namespace client
-} // namespace phx
+void GameTools::tick(float dt)
+{
+}
