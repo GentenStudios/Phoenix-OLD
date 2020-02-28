@@ -44,7 +44,7 @@
 namespace phx
 {
 	/**
-	 * @brief A settings object to store a single setting
+	 * @brief A settings object to store a single setting.
 	 *
 	 * @description The settings object stores an integer that can be mapped to
 	 * other data. Maximum and minimum values can be set so a settings cant be
@@ -53,66 +53,79 @@ namespace phx
 	 */
 	class Setting
 	{
-		/// @brief Human readable name for setting
+		/// @brief Human readable name for setting.
 		std::string m_name;
-		/// @brief Unique name for key ex: core:volume
+
+		/// @brief Unique name for key ex: core:volume.
 		std::string m_key;
-		/// @brief Value of setting
+
+		/// @brief Value of setting.
 		int m_value;
-		/// @brief Default value for setting
+
+		/// @brief Default value for setting.
 		int m_default;
-		/// @brief Maximim value that the setting can be set to
+
+		/// @brief Maximum value that the setting can be set to.
 		int m_maxValue;
-		/// @brief Minimum value that the setting cab be set to
+
+		/// @brief Minimum value that the setting can be set to.
 		int m_minValue;
 
 	public:
 		Setting();
+
 		/**
-		 * @brief Construct a new Setting object
+		 * @brief Construct a new Setting object.
 		 *
-		 * @param name The human readable name for the setting
-		 * @param key The unique name for the setting in the format core:volume
-		 * @param defaultValue The default value for the setting upon creation
+		 * @param name The human readable name for the setting.
+		 * @param key The unique name for the setting in the format core:volume.
+		 * @param defaultValue The default value for the setting upon creation.
 		 */
 		Setting(std::string name, std::string key, int defaultValue);
+
 		/**
-		 * @brief Sets the value of an already existing setting
+		 * @brief Sets the value of an already existing setting.
 		 *
-		 * @param value The value to be set
-		 * @return true if the setting was set
-		 * @return false if the value was not within the settings max/min
+		 * @param value The value to be set.
+		 * @return true if the setting was set.
+		 * @return false if the value was not within the settings max/min.
 		 */
 		bool set(int value);
+
 		/**
-		 * @brief Resets the value of the setting back to the default
+		 * @brief Resets the value of the setting back to the default.
 		 *
 		 */
 		void reset();
+
 		/**
-		 * @brief Set the maximum value for the setting
+		 * @brief Set the maximum value for the setting.
 		 *
-		 * @param value The maximum value the setting can be
+		 * @param value The maximum value the setting can be.
 		 */
 		void setMax(int value);
+
 		/**
-		 * @brief Set the minimum value for the setting
+		 * @brief Set the minimum value for the setting.
 		 *
-		 * @param value The minimum value the setting can be
+		 * @param value The minimum value the setting can be.
 		 */
 		void setMin(int value);
+
 		/**
-		 * @brief Gets the value of a setting
+		 * @brief Gets the value of a setting.
 		 *
-		 * @return std::string the unique key for the setting
+		 * @return std::string the unique key for the setting.
 		 */
 		std::string getKey() const;
+
 		/**
-		 * @brief Gets the value of a setting
+		 * @brief Gets the value of a setting.
 		 *
-		 * @return std::size_t The value of the setting
+		 * @return std::size_t The value of the setting.
 		 */
 		int value() const;
+
 		/**
 		 * @brief Gets the default of a setting
 		 *
@@ -122,11 +135,11 @@ namespace phx
 	};
 
 	/**
-	 * @brief A setting registry to store settings for universal access
+	 * @brief A setting registry to store settings for universal access.
 	 *
 	 * @description This registry allows us to access any registered setting
 	 * from anywhere in the program just using the settings unique key in the
-	 * format core:volume
+	 * format core:volume.
 	 *
 	 */
 	class Settings : public Singleton<Settings>
@@ -139,34 +152,34 @@ namespace phx
 		Settings();
 		
 		/**
-		 * @brief Adds a new setting
+		 * @brief Adds a new setting.
 		 *
-		 * @param name Human readable name for setting
-		 * @param key Unique Name for key ex: core:volume
-		 * @param defaultValue The value the setting will be initially set to
-		 * @return std::size_t Reuturns the numerical key the setting is stored
-		 * at
+		 * @param name Human readable name for setting.
+		 * @param key Unique Name for key ex: core:volume.
+		 * @param defaultValue The value the setting will be initially set to.
+		 * @return std::size_t Returns the numerical key the setting is stored
+		 * at.
 		 */
 		Setting* add(const std::string& name, const std::string& key,
 		             int defaultValue);
 
 		/**
-		 * @brief Get the Setting object
+		 * @brief Get the Setting object.
 		 *
-		 * @param key Unique Name for key ex: core:volume
-		 * @return Setting* A pointer to the setting object
+		 * @param key Unique Name for key ex: core:volume.
+		 * @return Setting* A pointer to the setting object.
 		 */
 		Setting* getSetting(const std::string& key);
 
 		/**
-		 * @brief Loads settings from file
+		 * @brief Loads settings from file.
 		 *
-		 * @note this must be run after all settings have been registered
+		 * @note this must be run after all settings have been registered.
 		 */
 		void load();
 
 		/**
-		 * @brief Saves settings to file
+		 * @brief Saves settings to file.
 		 */
 		void save();
 	};

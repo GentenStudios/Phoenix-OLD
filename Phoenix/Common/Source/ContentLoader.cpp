@@ -34,7 +34,8 @@
 
 using namespace phx;
 
-ContentManager::ContentManager(){
+ContentManager::ContentManager()
+{
 	currentMod = "";
 	lua.open_libraries(sol::lib::base);
 
@@ -63,7 +64,8 @@ Mod::Mod(std::string modName) : name(std::move(modName))
 	fileStream.open("Modules/" + name + "/Dependencies.txt");
 	if (!fileStream.is_open())
 	{
-		std::cout << "Couldn't find dependencies file for mod: " << name << "\n";
+		std::cout << "Couldn't find dependencies file for mod: " << name
+		          << "\n";
 		return;
 	}
 	while (fileStream.peek() != EOF)

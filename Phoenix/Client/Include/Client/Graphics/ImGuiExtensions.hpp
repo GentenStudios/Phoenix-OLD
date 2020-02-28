@@ -53,7 +53,7 @@ namespace ImGui
 	bool InputVector3(const char* label, phx::math::vec3* vec3);
 
 	/**
-	 * @brief ImGui extension for a GUI representaton of a Vector2
+	 * @brief ImGui extension for a GUI representation of a Vector2
 	 * @param label The label of the GUI element. Follows same rules as normal
 	 * ImGui labels.
 	 * @param vec2 Pointer to the Vector2 that will be written to/read from.

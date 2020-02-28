@@ -67,7 +67,7 @@ namespace phx
 			/// @brief Registers respective Lua methods.
 			BlockRegistry();
 
-      // @brief Initialises the registry.
+			// @brief Initializes the registry.
 			void initialise();
 
 			/**
@@ -115,8 +115,9 @@ namespace phx
 			 * this *shouldn't* be an issue. - @beeperdeeper089
 			 */
 			std::vector<BlockType> m_blocks;
+
 			/**
-			 * @brief Stores the unique paths to textures
+			 * @brief Stores the unique paths to textures.
 			 *
 			 */
 			TextureRegistry m_textures;

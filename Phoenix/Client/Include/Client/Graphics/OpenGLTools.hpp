@@ -48,7 +48,7 @@
 #	define __stdcall
 #endif
 
-// Uncomment this in order to enable detailed OpenGL logging
+// Uncomment this in order to enable detailed OpenGL logging.
 #define OPENGL_DIAGNOSTICS_ENABLED
 
 namespace phx

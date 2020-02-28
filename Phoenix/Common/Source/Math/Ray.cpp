@@ -30,8 +30,7 @@
 
 using namespace phx::math;
 
-Ray::Ray(const Ray::vec3& start,
-         const Ray::vec3& direction)
+Ray::Ray(const Ray::vec3& start, const Ray::vec3& direction)
     : m_start(start), m_direction(direction), m_currentPosition(start),
       m_length(0.f)
 {
@@ -55,7 +54,4 @@ Ray::vec3 Ray::backtrace(float scale)
 
 float Ray::getLength() const { return m_length; }
 
-Ray::vec3 Ray::getCurrentPosition() const
-{
-	return m_currentPosition;
-}
+Ray::vec3 Ray::getCurrentPosition() const { return m_currentPosition; }

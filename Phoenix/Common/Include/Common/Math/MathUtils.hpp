@@ -43,7 +43,7 @@ namespace phx
 		 * @param degrees The number of degrees waiting to be converted.
 		 * @return The converted value, in radians.
 		 */
-		static float degreeToRadians(const float& degrees)
+		static constexpr float degreeToRadians(const float degrees)
 		{
 			return degrees * PI / 180.f;
 		}
@@ -53,7 +53,7 @@ namespace phx
 		 * @param radians The number of radians waiting to be converted.
 		 * @return The converted value, in degrees.
 		 */
-		static float radianToDegrees(const float& radians)
+		static constexpr float radianToDegrees(const float radians)
 		{
 			return radians * 180.f / PI;
 		}
@@ -86,7 +86,7 @@ namespace phx
 		 * @return constexpr T Flattened position
 		 */
 		template <typename T>
-		constexpr T flatten(T x, T y, T z, T lenX, T lenY){
+		static constexpr T flatten(T x, T y, T z, T lenX, T lenY){
 			return x + lenX * (y + lenY * z);
 		}
 
@@ -101,7 +101,7 @@ namespace phx
 		 * @return constexpr T Flattened position
 		 */
 		template <typename T>
-		constexpr T flatten(T x, T y, T z, T len){
+		static constexpr T flatten(T x, T y, T z, T len){
 			return x + len * (y + len * z);
 		}
 	}

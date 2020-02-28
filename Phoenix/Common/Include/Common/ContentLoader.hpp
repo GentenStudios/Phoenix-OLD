@@ -46,17 +46,18 @@
 namespace phx
 {
 	/// @brief A lightweight struct to store a module and the list of
-	/// dependencies that module has
+	/// dependencies that module has.
 	struct Mod
 	{
-		/// @brief The name of the module, should match the folder name
+		/// @brief The name of the module, should match the folder name.
 		std::string name;
-		/// @brief List of dependencies that the module needs inorder to load
+
+		/// @brief List of dependencies that the module needs in order to load.
 		std::vector<std::string> dependencies;
 
 		/**
 		 * @brief Constructor for mod object, folder matching mod name with a
-		 * dependencies.txt inside modules folder must exist
+		 * dependencies.txt inside modules folder must exist.
 		 */
 		explicit Mod(std::string name);
 		~Mod() = default;
@@ -66,17 +67,16 @@ namespace phx
 	{
 	public:
 		/**
-		 * @brief Loads necessary lua modules required to load a save file
+		 * @brief Loads necessary lua modules required to load a save file.
 		 *
-		 * @param save The save file to be loaded
-		 * @param lua The sol state used during runtime
-		 * @return true If the function successfully loaded all modules
+		 * @param save The save file to be loaded.
+		 * @return true If the function successfully loaded all modules.
 		 * @return false If the function failed to load modules, details will
-		 *         be outputted to the terminal
+		 *         be outputted to the terminal.
 		 *
+		 * @todo Add proper error handling instead of returning a boolean.
 		 */
 		bool loadModules(const std::string& save);
-		//TODO : Add proper error handling instead of returning a boolean
 
 		sol::state lua;
 

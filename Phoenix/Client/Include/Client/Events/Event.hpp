@@ -73,7 +73,8 @@ namespace phx
 		/**
 		 * @brief The type of event that actually occurs.
 		 *
-		 * Most of these are self explanatory, explanations will be provided for possibly obscure mechanisms.
+		 * Most of these are self explanatory, explanations will be provided for
+		 * possibly obscure mechanisms.
 		 */
 		enum class EventType : int
 		{

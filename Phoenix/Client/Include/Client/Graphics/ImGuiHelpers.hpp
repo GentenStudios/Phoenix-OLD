@@ -43,7 +43,7 @@
 #include <string>
 #include <vector>
 
-// NOTE: consider transfering to an ANSI.h for submodule context, this code
+// NOTE: consider transferring to an ANSI.h for submodule context, this code
 //   could possibly be used with an alternative GUI API as well and could
 //   benefit from being standalone.
 #define ANSI_RED IM_COL32(255, 0, 0, 255)

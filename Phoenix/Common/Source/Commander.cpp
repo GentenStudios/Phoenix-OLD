@@ -72,7 +72,8 @@ void CommandBook::add(const std::string& command, const std::string& help,
 
 int CommandBook::getPage() { return m_page; }
 
-CommandBook::CommandBook(){
+CommandBook::CommandBook()
+{
 	ContentManager::get()->lua["core"]["command"] =
 	    /**
 	     * @addtogroup luaapi
@@ -152,7 +153,7 @@ bool Commander::help(const std::vector<std::string>& args, std::ostream& out)
 	}
 }
 
-bool Commander::run(const std::string&                              command,
+bool Commander::run(const std::string&              command,
                     const std::vector<std::string>& args, std::ostream& out)
 {
 	// Check for built in functions
@@ -221,15 +222,15 @@ void Commander::callback(const std::string& input, std::ostringstream& cout)
 	// copies the contents of the input string as well we can avoid
 	// directly copying characters for the most part here.
 	std::string_view search = input;
-	std::string command;
+	std::string      command;
 	std::string arg; // Just used to copy the args out of the search string.
 	std::vector<std::string> args;
-	size_t searchLoc;
-	size_t spaceLoc;
+	size_t                   searchLoc;
+	size_t                   spaceLoc;
 
 	// Substring was unnecessary because it creates a duplicate string
 	// to store the memory in when we can just refference it statically.
-	if ( ! search.empty() && search[0] == '/')
+	if (!search.empty() && search[0] == '/')
 
 	{
 		// NOTE:
@@ -240,7 +241,7 @@ void Commander::callback(const std::string& input, std::ostringstream& cout)
 		// if we don't have arguments don't try and populate the args array.
 		if (spaceLoc != std::string_view::npos)
 		{
-			command = search.substr(1, spaceLoc-1);
+			command = search.substr(1, spaceLoc - 1);
 
 			// doesn't create a new string object, just moves the start forward.
 			// negative offset handled by leading char
@@ -248,14 +249,16 @@ void Commander::callback(const std::string& input, std::ostringstream& cout)
 
 			// `first_not_of` space keeps errors from happening if a user
 			// accidentally separates the args with extra whitespace.
-			while ((searchLoc = search.find_first_not_of(' ')) != std::string_view::npos)
+			while ((searchLoc = search.find_first_not_of(' ')) !=
+			       std::string_view::npos)
 			{
 				search.remove_prefix(searchLoc); // strip the leading whitspace
 				spaceLoc = search.find_first_of(' ');
 
 				if (spaceLoc != std::string_view::npos)
 				{
-					arg = search.substr(0, spaceLoc); // gen new string from view
+					arg =
+					    search.substr(0, spaceLoc); // gen new string from view
 					args.push_back(arg);
 				}
 

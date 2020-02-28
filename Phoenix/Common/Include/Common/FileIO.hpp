@@ -33,9 +33,17 @@
 
 namespace phx
 {
+	/**
+	 * @brief Provides basic File Handling functionality.
+	 */
 	class FileIO
 	{
 	public:
+		/**
+		 * @brief Reads all the content of a file.
+		 * @param filepath The path to the file.
+		 * @return The opened and completely read file.
+		 */
 		static std::string readAllFile(const std::string& filepath)
 		{
 			std::fstream fileHandle;
