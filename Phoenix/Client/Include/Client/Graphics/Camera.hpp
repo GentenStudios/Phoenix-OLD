@@ -41,188 +41,186 @@
 #include <Common/Settings.hpp>
 #include <Common/Actor.hpp>
 
-namespace phx
+namespace phx::gfx
 {
-	namespace gfx
+	/**
+	 * @brief Base Camera class following basic FPS Cam principles.
+	 *
+	 * The camera functions as a basic tool for moving around in a 3D
+	 * rendered world. This uses the "tick" function on every iteration of
+	 * the main game loop to determine movement from the user.
+	 *
+	 * The camera moves in the direction the player is facing, this will
+	 * change as more of the game is developed.
+	 *
+	 * @paragraph Usage
+	 * @code
+	 * FPSCamera* camera = new Camera(window);
+	 *
+	 * // this is pure theoretical, this code would not work ever...
+	 * if (windowFocusLost) camera->enable(false);
+	 * if (windowFocusGained) camera->enable(true);
+	 * if (escapeKeyPressed) camera-<enable(!camera->isEnabled());
+	 *
+	 * void mainGameLoop()
+	 * {
+	 *     camera->tick(timeToRenderLastFrame);
+	 *
+	 *     shader.setProjection(camera->getProjection());
+	 *     shader.setViewMatrix(camera->calculateViewMatrix());
+	 *
+	 *     world.render();
+	 * }
+	 * @endcode
+	 */
+	class FPSCamera
 	{
+	public:
 		/**
-		 * @brief Base Camera class following basic FPS Cam principles.
+		 * @brief Constructs the FPS Camera.
+		 * @param window The window object you want tied to the camera.
 		 *
-		 * The camera functions as a basic tool for moving around in a 3D
-		 * rendered world. This uses the "tick" function on every iteration of
-		 * the main game loop to determine movement from the user.
-		 *
-		 * The camera moves in the direction the player is facing, this will
-		 * change as more of the game is developed.
-		 *
-		 * @paragraph Usage
-		 * @code
-		 * FPSCamera* camera = new Camera(window);
-		 *
-		 * // this is pure theoretical, this code would not work ever...
-		 * if (windowFocusLost) camera->enable(false);
-		 * if (windowFocusGained) camera->enable(true);
-		 * if (escapeKeyPressed) camera-<enable(!camera->isEnabled());
-		 *
-		 * void mainGameLoop()
-		 * {
-		 *     camera->tick(timeToRenderLastFrame);
-		 *
-		 *     shader.setProjection(camera->getProjection());
-		 *     shader.setViewMatrix(camera->calculateViewMatrix());
-		 *
-		 *     world.render();
-		 * }
-		 * @endcode
+		 * The window object is required for requesting mouse position
+		 * during the tick function. There is no workaround for this that I
+		 * know of, however this is fine for the most part.
 		 */
-		class FPSCamera
-		{
-		public:
-			/**
-			 * @brief Constructs the FPS Camera.
-			 * @param window The window object you want tied to the camera.
-			 *
-			 * The window object is required for requesting mouse position
-			 * during the tick function. There is no workaround for this that I
-			 * know of, however this is fine for the most part.
-			 */
-			explicit FPSCamera(Window* window);
+		explicit FPSCamera(Window* window);
 
-			/**
-			 * @brief Gets the position of the camera.
-			 * @return The 3-component world-space position.
-			 *
-			 * This camera return is NOT compatible with the voxel world. The
-			 * coordinate system used by the camera and the system used by the
-			 * voxel world are different, because of the way block coordinates
-			 * have been setup.
-			 */
-			math::vec3 getPosition() const;
+		/**
+		 * @brief Gets the position of the camera.
+		 * @return The 3-component world-space position.
+		 *
+		 * This camera return is NOT compatible with the voxel world. The
+		 * coordinate system used by the camera and the system used by the
+		 * voxel world are different, because of the way block coordinates
+		 * have been setup.
+		 */
+		math::vec3 getPosition() const;
 
-			/**
-			 * @brief Gets the direction the camera is facing.
-			 * @return The 3-component vector representing direction.
-			 *
-			 * The direction is always the direction the player is looking, this
-			 * can be used with the Ray object to find what the player is
-			 * actually looking at within the actual world, whether it be voxels
-			 * or something else. Because this is not representative of
-			 * position, and direction cannot be skewed by the world coordinate
-			 * system, this data is compatible with every other layer requiring
-			 * and supporting direction, of course when asking for a 3
-			 * dimensional vector.
-			 */
-			math::vec3 getDirection() const;
+		/**
+		 * @brief Gets the direction the camera is facing.
+		 * @return The 3-component vector representing direction.
+		 *
+		 * The direction is always the direction the player is looking, this
+		 * can be used with the Ray object to find what the player is
+		 * actually looking at within the actual world, whether it be voxels
+		 * or something else. Because this is not representative of
+		 * position, and direction cannot be skewed by the world coordinate
+		 * system, this data is compatible with every other layer requiring
+		 * and supporting direction, of course when asking for a 3
+		 * dimensional vector.
+		 */
+		math::vec3 getDirection() const;
 
-			/**
-			 * @brief Sets the camera perspective projection.
-			 * @param projection The actual projection to set the camera to.
-			 *
-			 * The projection matrix helps the "clipper" represent coordinates
-			 * in a normalized space of -1 to 1. The matrix means the clipper
-			 * can do its work without needing to know screen dimensions and the
-			 * near/far plane.
-			 *
-			 * Reference:
-			 * http://ogldev.atspace.co.uk/www/tutorial12/tutorial12.html
-			 */
-			void setProjection(const math::mat4& projection);
+		/**
+		 * @brief Sets the camera perspective projection.
+		 * @param projection The actual projection to set the camera to.
+		 *
+		 * The projection matrix helps the "clipper" represent coordinates
+		 * in a normalized space of -1 to 1. The matrix means the clipper
+		 * can do its work without needing to know screen dimensions and the
+		 * near/far plane.
+		 *
+		 * Reference:
+		 * http://ogldev.atspace.co.uk/www/tutorial12/tutorial12.html
+		 */
+		void setProjection(const math::mat4& projection);
 
+		/**
+		 * @brief Gets the perspective projection of the camera.
+		 * @return The projection matrix to pass to shaders or anything else
+		 * that might need it (unlikely).
+		 *
+		 * The return of this function is usually passed to the shader - other
+		 * uses are very limited.
+		 */
+		math::mat4 getProjection() const;
 
-			/**
-			 * @brief Gets the perspective projection of the camera.
-			 * @return The projection matrix to pass to shaders or anything else that might need it (unlikely).
-			 *
-			 * The return of this function is usually passed to the shader - other uses are very limited.
-			 */
-			math::mat4 getProjection() const;
-			
-			/**
-			 * @brief Calculates and returns the view matrix.
-			 * @return The view matrix to pass to the shader.
-			 *
-			 * This view matrix, alongside the model and perspective projection
-			 * matrix are the requirements for the shader, as they represent
-			 * position, direction and what is wanted to be seen on screen.
-			 *
-			 * The view matrix will hold the position and the direction of the
-			 * player, and through the MVP (Model View Projection) calculations
-			 * happening in the shader, it will translate everything to screen
-			 * space coordinates.
-			 */
-			math::mat4 calculateViewMatrix() const;
+		/**
+		 * @brief Calculates and returns the view matrix.
+		 * @return The view matrix to pass to the shader.
+		 *
+		 * This view matrix, alongside the model and perspective projection
+		 * matrix are the requirements for the shader, as they represent
+		 * position, direction and what is wanted to be seen on screen.
+		 *
+		 * The view matrix will hold the position and the direction of the
+		 * player, and through the MVP (Model View Projection) calculations
+		 * happening in the shader, it will translate everything to screen
+		 * space coordinates.
+		 */
+		math::mat4 calculateViewMatrix() const;
 
-			/**
-			 * @brief Updates values within the camera.
-			 * @param dt The time it took to render the last frame.
-			 *
-			 * This function updates the camera by reading the mouse position
-			 * and the keys being pressed at that point in time. It calculates
-			 * the amount the mouse has moved from the centre of the screen and
-			 * will warp the mouse TO THE CENTRE of the window. This is
-			 * important as you MUST disable the camera through
-			 * ``camera->enable(false)``, otherwise you will not be able to move
-			 * the mouse from the centre of the screen even if alt-tabbed out.
-			 *
-			 * The delta time is necessary since you want to be able to move the
-			 * same amount whether you have higher frames or lower frames.
-			 * Multiplying the movement factor by the delta time means the
-			 * amount moved within a specific amount of time is normalized and
-			 * will not affect gameplay or create some form of confusion as some
-			 * people go flying around.
-			 */
-			void tick(float dt);
+		/**
+		 * @brief Updates values within the camera.
+		 * @param dt The time it took to render the last frame.
+		 *
+		 * This function updates the camera by reading the mouse position
+		 * and the keys being pressed at that point in time. It calculates
+		 * the amount the mouse has moved from the centre of the screen and
+		 * will warp the mouse TO THE CENTRE of the window. This is
+		 * important as you MUST disable the camera through
+		 * ``camera->enable(false)``, otherwise you will not be able to move
+		 * the mouse from the centre of the screen even if alt-tabbed out.
+		 *
+		 * The delta time is necessary since you want to be able to move the
+		 * same amount whether you have higher frames or lower frames.
+		 * Multiplying the movement factor by the delta time means the
+		 * amount moved within a specific amount of time is normalized and
+		 * will not affect gameplay or create some form of confusion as some
+		 * people go flying around.
+		 */
+		void tick(float dt);
 
-			/**
-			 * @brief Enables or disables the camera.
-			 * @param enabled Whether to enable or disable the camera.
-			 *
-			 * You must use this function, using false, to gain access over the
-			 * cursor, otherwise the tick function will always grab control of
-			 * the mouse and centre it every frame, making it impossible to do
-			 * anything.
-			 */
-			void enable(bool enabled);
+		/**
+		 * @brief Enables or disables the camera.
+		 * @param enabled Whether to enable or disable the camera.
+		 *
+		 * You must use this function, using false, to gain access over the
+		 * cursor, otherwise the tick function will always grab control of
+		 * the mouse and centre it every frame, making it impossible to do
+		 * anything.
+		 */
+		void enable(bool enabled);
 
-			/**
-			 * @brief Tells whether the camera is enabled or not.
-			 * @return If the camera is enabled or not.
-			 */
-			bool isEnabled() const { return m_enabled; }
+		/**
+		 * @brief Tells whether the camera is enabled or not.
+		 * @return If the camera is enabled or not.
+		 */
+		bool isEnabled() const { return m_enabled; }
 
-			/**
-			 * @brief Recalculates the projection if the window is resized.
-			 * @param e The event in which the window resize data is active.
-			 *
-			 * When an event is passed to this function, it should check that
-			 * the event is actually a window resize event. If not checked, this
-			 * function will segfault due to improper memory access, and might
-			 * be difficult to trace.
-			 */
-			void onWindowResize(events::Event e);
+		/**
+		 * @brief Recalculates the projection if the window is resized.
+		 * @param e The event in which the window resize data is active.
+		 *
+		 * When an event is passed to this function, it should check that
+		 * the event is actually a window resize event. If not checked, this
+		 * function will segfault due to improper memory access, and might
+		 * be difficult to trace.
+		 */
+		void onWindowResize(events::Event e);
 
-			/**
-			 * @brief Sets the actor for the camera to "follow".
-			 * @param actor The actor to set the camera to use.
-			 */
-			void setActor(Actor* actor);
+		/**
+		 * @brief Sets the actor for the camera to "follow".
+		 * @param actor The actor to set the camera to use.
+		 */
+		void setActor(Actor* actor);
 
-		private:
-			Window* m_window;
+	private:
+		Window* m_window;
 
-			math::mat4 m_projection;
-			
-			math::vec3 m_rotation;
-			math::vec3 m_position;
-			math::vec3 m_up;
-			math::vec3 m_direction;
+		math::mat4 m_projection;
 
-			math::vec2 m_windowCentre;
+		math::vec3 m_rotation;
+		math::vec3 m_position;
+		math::vec3 m_up;
+		math::vec3 m_direction;
 
-			bool m_enabled = true;
+		math::vec2 m_windowCentre;
 
-			Setting* m_settingSensitivity;
-			Actor*   m_actor = nullptr;
-		};
-	} // namespace gfx
-} // namespace q2
+		bool m_enabled = true;
+
+		Setting* m_settingSensitivity;
+		Actor*   m_actor = nullptr;
+	};
+} // namespace phx::gfx

@@ -34,93 +34,90 @@
 
 #include <cstring>
 
-namespace phx
+namespace phx::events
 {
-	namespace events
+	struct Position
 	{
-		struct Position
-		{
-			int x = {};
-			int y = {};
+		int x = {};
+		int y = {};
+	};
+
+	struct Size
+	{
+		int width  = {};
+		int height = {};
+	};
+
+	struct Scroll
+	{
+		double x = {};
+		double y = {};
+	};
+
+	struct Keyboard
+	{
+		Keys key  = {};
+		Mods mods = {};
+	};
+
+	struct Mouse
+	{
+		MouseButtons button = {};
+		Mods         mods   = {};
+		int          x      = {};
+		int          y      = {};
+	};
+
+	/**
+	 * @brief The type of event that actually occurs.
+	 *
+	 * Most of these are self explanatory, explanations will be provided for
+	 * possibly obscure mechanisms.
+	 */
+	enum class EventType : int
+	{
+		NONE                  = 0,
+		WINDOW_MOVED          = SDL_WINDOWEVENT_MOVED,
+		WINDOW_RESIZED        = SDL_WINDOWEVENT_SIZE_CHANGED,
+		WINDOW_CLOSED         = SDL_QUIT,
+		WINDOW_FOCUSED        = SDL_WINDOWEVENT_FOCUS_GAINED,
+		WINDOW_DEFOCUSED      = SDL_WINDOWEVENT_FOCUS_LOST,
+		WINDOW_MINIMIZED      = SDL_WINDOWEVENT_MINIMIZED,
+		WINDOW_MAXIMIZED      = SDL_WINDOWEVENT_MAXIMIZED,
+		WINDOW_RESTORED       = SDL_WINDOWEVENT_RESTORED,
+		MOUSE_BUTTON_PRESSED  = SDL_MOUSEBUTTONDOWN,
+		MOUSE_BUTTON_RELEASED = SDL_MOUSEBUTTONUP,
+		MOUSE_WHEEL_SCROLLED  = SDL_QUIT,
+		CURSOR_MOVED          = SDL_MOUSEMOTION,
+		CURSOR_LEFT           = SDL_WINDOWEVENT_LEAVE,
+		CURSOR_ENTERED        = SDL_WINDOWEVENT_ENTER,
+		KEY_PRESSED           = SDL_KEYDOWN,
+		KEY_RELEASED          = SDL_KEYUP,
+		LAYER_DESTROYED, // this one happens when a layer requests
+		                 // destruction, it does NOT occur when a layer is
+		                 // manually popped from a layer stack.
+	};
+
+	struct Event
+	{
+		EventType type = EventType::NONE;
+
+		//// This union MUST be used correctly or shit will go south and you
+		//// might end up with corrupted memory :( We're using a union, so
+		//// it's sort of like SDLs Event system, and so we don't have a
+		/// huge amount of painful polymorphism that will end in us having
+		/// to restart anyway.
+		union {
+			Position    position;
+			Size        size;
+			Scroll      scroll;
+			Keyboard    keyboard;
+			Mouse       mouse;
+			const char* layer;
 		};
 
-		struct Size
-		{
-			int width  = {};
-			int height = {};
-		};
+		bool handled = false;
 
-		struct Scroll
-		{
-			double x = {};
-			double y = {};
-		};
-
-		struct Keyboard
-		{
-			Keys key  = {};
-			Mods mods = {};
-		};
-
-		struct Mouse
-		{
-			MouseButtons button = {};
-			Mods         mods   = {};
-			int          x      = {};
-			int          y      = {};
-		};
-
-		/**
-		 * @brief The type of event that actually occurs.
-		 *
-		 * Most of these are self explanatory, explanations will be provided for
-		 * possibly obscure mechanisms.
-		 */
-		enum class EventType : int
-		{
-			NONE                  = 0,
-			WINDOW_MOVED          = SDL_WINDOWEVENT_MOVED,
-			WINDOW_RESIZED        = SDL_WINDOWEVENT_SIZE_CHANGED,
-			WINDOW_CLOSED         = SDL_QUIT,
-			WINDOW_FOCUSED        = SDL_WINDOWEVENT_FOCUS_GAINED,
-			WINDOW_DEFOCUSED      = SDL_WINDOWEVENT_FOCUS_LOST,
-			WINDOW_MINIMIZED      = SDL_WINDOWEVENT_MINIMIZED,
-			WINDOW_MAXIMIZED      = SDL_WINDOWEVENT_MAXIMIZED,
-			WINDOW_RESTORED       = SDL_WINDOWEVENT_RESTORED,
-			MOUSE_BUTTON_PRESSED  = SDL_MOUSEBUTTONDOWN,
-			MOUSE_BUTTON_RELEASED = SDL_MOUSEBUTTONUP,
-			MOUSE_WHEEL_SCROLLED  = SDL_QUIT,
-			CURSOR_MOVED          = SDL_MOUSEMOTION,
-			CURSOR_LEFT           = SDL_WINDOWEVENT_LEAVE,
-			CURSOR_ENTERED        = SDL_WINDOWEVENT_ENTER,
-			KEY_PRESSED           = SDL_KEYDOWN,
-			KEY_RELEASED          = SDL_KEYUP,
-			LAYER_DESTROYED, // this one happens when a layer requests
-			                 // destruction, it does NOT occur when a layer is
-			                 // manually popped from a layer stack.
-		};
-
-		struct Event
-		{
-			EventType type = EventType::NONE;
-
-			//// This union MUST be used correctly or shit will go south and you
-			//// might end up with corrupted memory :( We're using a union, so
-			//// it's sort of like SDLs Event system, and so we don't have a
-			/// huge amount of painful polymorphism that will end in us having
-			/// to restart anyway.
-			union {
-				Position    position;
-				Size        size;
-				Scroll      scroll;
-				Keyboard    keyboard;
-				Mouse       mouse;
-				const char* layer;
-			};
-
-			bool handled = false;
-
-			Event() { std::memset(this, 0, sizeof(Event)); }
-		};
-	} // namespace events
-} // namespace phx
+		Event() { std::memset(this, 0, sizeof(Event)); }
+	};
+} // namespace phx::events

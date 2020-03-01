@@ -28,17 +28,14 @@
 
 #pragma once
 
-namespace phx
+namespace phx::server
 {
-	namespace server
+	class Server
 	{
-		class Server
-		{
-		public:
-			Server() = default;
-			~Server() = default;
+	public:
+		Server()  = default;
+		~Server() = default;
 
-			void run();
-		};
-	} // namespace server
-} // namespace phx
+		void run();
+	};
+} // namespace phx::server

@@ -34,192 +34,189 @@
 
 #include <vector>
 
-namespace phx
+namespace phx::gfx
 {
-	namespace gfx
+	/**
+	 * @brief A stack of layers automagically managed internally.
+	 *
+	 * This class provides the ability to render multiple things at once
+	 * with more ease and modularity. A functional point is to be able to
+	 * push and pop new layers as required, as well as allowing automatic
+	 * removal of layers that mark themselves as finished and request
+	 * removal.
+	 *
+	 * @paragraph Usage
+	 * Usage for this class can get slightly complicated in terms of memory
+	 * management. When you push a layer, you are passing ownership of said
+	 * layer TO the LayerStack. It will remember to delete the dynamically
+	 * allocated memory if automatically popped (through
+	 * Layer::signalRemoval) or on destruction of the LayerStack.
+	 *
+	 * If you manually pop a layer, you RECLAIM ownership, it proves that
+	 * you still have a functional copy to the pointer of the layer, so you
+	 * must manage it's memory - it's best to not delete it until you KNOW
+	 * you don't need it, allocating graphical resources can be expensive
+	 * depending on the use.
+	 *
+	 * @code
+	 * auto window = new Window(...);
+	 * auto layerStack = new LayerStack(window);
+	 *
+	 * class EventHandler : public IEventListener
+	 * {
+	 * public:
+	 *     void onEvent(Event e)
+	 *     {
+	 *         switch (e.type)
+	 *         {
+	 *         case EventType::KEY_PRESSED:
+	 *		       ... (set e.handled to true if you actually handle a key
+	 *                  event)
+	 *
+	 *             if (!e.handled)
+	 *                 layerStack->onEvent(e);
+	 *
+	 *		       break;
+	 *		   case EventType::LAYER_DESTROYED
+	 *		       if (e.layer == "SplashScreen")
+	 *		       {
+	 *                 GameLayer* game = new GameLayer();
+	 *                 layerStack.pushLayer(game); // you've passed
+	 *                                             // ownership of the layer
+	 *                                             // to the stack.
+	 *		           e.handled = true;
+	 *		       }
+	 *
+	 *		       if (!e.handled)
+	 *		           layerStack->onEvent(e);
+	 *
+	 *		       break;
+	 *         default:
+	 *             layerStack->onEvent(e);
+	 *             break;
+	 *         }
+	 *     }
+	 * };
+	 *
+	 * class SplashScreen
+	 * {
+	 * public:
+	 *     void onAttach() { ... }
+	 *     void onDetach() { ... }
+	 *
+	 *     void tick() { ... if (m_finished) { signalRemoval(); } ... }
+	 * };
+	 *
+	 * auto SplashScreen = new SplashScreen();
+	 *
+	 * while (window->isRunning())
+	 * {
+	 *     float dt = *do delta time calculations*;
+	 *     window->startFrame();
+	 *
+	 *     layerStack->tick();
+	 *
+	 *     window->endFrame();
+	 * }
+	 * @endcode
+	 */
+	class LayerStack : public events::IEventListener
 	{
+		// scroll down, you'll see why ;)
+		using Storage = std::vector<Layer*>;
+
+	public:
 		/**
-		 * @brief A stack of layers automagically managed internally.
-		 *
-		 * This class provides the ability to render multiple things at once
-		 * with more ease and modularity. A functional point is to be able to
-		 * push and pop new layers as required, as well as allowing automatic
-		 * removal of layers that mark themselves as finished and request
-		 * removal.
-		 *
-		 * @paragraph Usage
-		 * Usage for this class can get slightly complicated in terms of memory
-		 * management. When you push a layer, you are passing ownership of said
-		 * layer TO the LayerStack. It will remember to delete the dynamically
-		 * allocated memory if automatically popped (through
-		 * Layer::signalRemoval) or on destruction of the LayerStack.
-		 *
-		 * If you manually pop a layer, you RECLAIM ownership, it proves that
-		 * you still have a functional copy to the pointer of the layer, so you
-		 * must manage it's memory - it's best to not delete it until you KNOW
-		 * you don't need it, allocating graphical resources can be expensive
-		 * depending on the use.
-		 *
-		 * @code
-		 * auto window = new Window(...);
-		 * auto layerStack = new LayerStack(window);
-		 *
-		 * class EventHandler : public IEventListener
-		 * {
-		 * public:
-		 *     void onEvent(Event e)
-		 *     {
-		 *         switch (e.type)
-		 *         {
-		 *         case EventType::KEY_PRESSED:
-		 *		       ... (set e.handled to true if you actually handle a key
-		 *                  event)
-		 *
-		 *             if (!e.handled)
-		 *                 layerStack->onEvent(e);
-		 *
-		 *		       break;
-		 *		   case EventType::LAYER_DESTROYED
-		 *		       if (e.layer == "SplashScreen")
-		 *		       {
-		 *                 GameLayer* game = new GameLayer();
-		 *                 layerStack.pushLayer(game); // you've passed
-		 *                                             // ownership of the layer
-		 *                                             // to the stack.
-		 *		           e.handled = true;
-		 *		       }
-		 *
-		 *		       if (!e.handled)
-		 *		           layerStack->onEvent(e);
-		 *
-		 *		       break;
-		 *         default:
-		 *             layerStack->onEvent(e);
-		 *             break;
-		 *         }
-		 *     }
-		 * };
-		 *
-		 * class SplashScreen
-		 * {
-		 * public:
-		 *     void onAttach() { ... }
-		 *     void onDetach() { ... }
-		 *
-		 *     void tick() { ... if (m_finished) { signalRemoval(); } ... }
-		 * };
-		 *
-		 * auto SplashScreen = new SplashScreen();
-		 *
-		 * while (window->isRunning())
-		 * {
-		 *     float dt = *do delta time calculations*;
-		 *     window->startFrame();
-		 *
-		 *     layerStack->tick();
-		 *
-		 *     window->endFrame();
-		 * }
-		 * @endcode
+		 * @brief Constructs a LayerStack bound to a window.
+		 * @param window The window this LayerStack is attached to.
 		 */
-		class LayerStack : public events::IEventListener
-		{
-			// scroll down, you'll see why ;)
-			using Storage = std::vector<Layer*>;
+		explicit LayerStack(Window* window);
+		~LayerStack();
 
-		public:
-			/**
-			 * @brief Constructs a LayerStack bound to a window.
-			 * @param window The window this LayerStack is attached to.
-			 */
-			explicit LayerStack(Window* window);
-			~LayerStack();
+		/**
+		 * @brief Pushes another layer onto the stack.
+		 * @param layer The layer to push onto the stack.
+		 *
+		 * This method assumes control over the Layer's memory lifetime. You
+		 * are **HANDING OWNERSHIP** of the allocated memory to the layer
+		 * stack.
+		 */
+		void pushLayer(Layer* layer);
 
-			/**
-			 * @brief Pushes another layer onto the stack.
-			 * @param layer The layer to push onto the stack.
-			 *
-			 * This method assumes control over the Layer's memory lifetime. You
-			 * are **HANDING OWNERSHIP** of the allocated memory to the layer
-			 * stack.
-			 */
-			void pushLayer(Layer* layer);
+		/**
+		 * @brief Pops a layer from the stack.
+		 * @param layer The layer to remove from the stack.
+		 *
+		 * This method returns memory ownership of the layer to the parent
+		 * class. This is to prevent unintentional deletions when manually
+		 * popping a layer, just in case it is used again so graphics
+		 * resources are not unnecessarily re-allocated.
+		 */
+		void popLayer(Layer* layer);
 
-			/**
-			 * @brief Pops a layer from the stack.
-			 * @param layer The layer to remove from the stack.
-			 *
-			 * This method returns memory ownership of the layer to the parent
-			 * class. This is to prevent unintentional deletions when manually
-			 * popping a layer, just in case it is used again so graphics
-			 * resources are not unnecessarily re-allocated.
-			 */
-			void popLayer(Layer* layer);
+		/**
+		 * @brief Pushes another overlay onto the stack.
+		 * @param overlay The overlay to push onto the stack.
+		 *
+		 * This method assumes control over the Overlay's memory lifetime.
+		 * You are **HANDING OWNERSHIP** of the allocated memory to the
+		 * layer stack.
+		 */
+		void pushOverlay(Layer* overlay);
 
-			/**
-			 * @brief Pushes another overlay onto the stack.
-			 * @param overlay The overlay to push onto the stack.
-			 *
-			 * This method assumes control over the Overlay's memory lifetime.
-			 * You are **HANDING OWNERSHIP** of the allocated memory to the
-			 * layer stack.
-			 */
-			void pushOverlay(Layer* overlay);
+		/**
+		 * @brief Pops an overlay from the stack.
+		 * @param overlay The overlay to remove from the stack.
+		 *
+		 * This method returns memory ownership of the overlay to the parent
+		 * class. This is to prevent unintentional deletions when manually
+		 * popping an overlay, just in case it is used again so graphics
+		 * resources are not unnecessarily re-allocated.
+		 */
+		void popOverlay(Layer* overlay);
 
-			/**
-			 * @brief Pops an overlay from the stack.
-			 * @param overlay The overlay to remove from the stack.
-			 *
-			 * This method returns memory ownership of the overlay to the parent
-			 * class. This is to prevent unintentional deletions when manually
-			 * popping an overlay, just in case it is used again so graphics
-			 * resources are not unnecessarily re-allocated.
-			 */
-			void popOverlay(Layer* overlay);
+		/**
+		 * @brief Processes the event provided.
+		 * @param e The event to process.
+		 *
+		 * This is a virtual function inherited from events::IEventListener,
+		 * so just check that out for more information.
+		 */
+		void onEvent(events::Event e) override;
 
-			/**
-			 * @brief Processes the event provided.
-			 * @param e The event to process.
-			 *
-			 * This is a virtual function inherited from events::IEventListener,
-			 * so just check that out for more information.
-			 */
-			void onEvent(events::Event e) override;
+		/**
+		 * @brief Ticks all layers once, along with internal mechanisms.
+		 * @param dt The delta time.
+		 *
+		 * The delta time is the time it took for the last frame to finish
+		 * completely processing.
+		 */
+		void tick(float dt);
 
-			/**
-			 * @brief Ticks all layers once, along with internal mechanisms.
-			 * @param dt The delta time.
-			 *
-			 * The delta time is the time it took for the last frame to finish
-			 * completely processing.
-			 */
-			void tick(float dt);
+		// generic accessor methods.
+		std::size_t size() const;
+		bool        empty() const;
 
-			// generic accessor methods.
-			std::size_t size() const;
-			bool        empty() const;
+		// iterator methods
+		Storage::iterator       begin();
+		Storage::iterator       end();
+		Storage::const_iterator begin() const;
+		Storage::const_iterator end() const;
 
-			// iterator methods
-			Storage::iterator       begin();
-			Storage::iterator       end();
-			Storage::const_iterator begin() const;
-			Storage::const_iterator end() const;
+		Storage::reverse_iterator       rbegin();
+		Storage::reverse_iterator       rend();
+		Storage::const_reverse_iterator rbegin() const;
+		Storage::const_reverse_iterator rend() const;
 
-			Storage::reverse_iterator       rbegin();
-			Storage::reverse_iterator       rend();
-			Storage::const_reverse_iterator rbegin() const;
-			Storage::const_reverse_iterator rend() const;
+		Storage::reference       front();
+		Storage::reference       back();
+		Storage::const_reference front() const;
+		Storage::const_reference back() const;
 
-			Storage::reference       front();
-			Storage::reference       back();
-			Storage::const_reference front() const;
-			Storage::const_reference back() const;
+	private:
+		Storage      m_layers;
+		unsigned int m_currentInsert = 0;
 
-		private:
-			Storage      m_layers;
-			unsigned int m_currentInsert = 0;
-
-			Window* m_window;
-		};
-	} // namespace gfx
-} // namespace phx
+		Window* m_window;
+	};
+} // namespace phx::gfx

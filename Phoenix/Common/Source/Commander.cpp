@@ -55,7 +55,7 @@ int CommandBook::find(const std::string& command)
 }
 
 void CommandBook::add(const std::string& command, const std::string& help,
-                      const std::string& permission, CommandFunction f)
+                      const std::string& permission, const CommandFunction& f)
 {
 	int j = find(command);
 	// If command does not already exist, enter new command
