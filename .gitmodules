@@ -1,3 +1,6 @@
 [submodule "Engine/ThirdParty/SDL2"]
-	path = Engine/ThirdParty/SDL2
+	path = Phoenix/ThirdParty/SDL2
 	url = https://github.com/spurious/SDL-mirror.git
+[submodule "Engine/ThirdParty/sol2"]
+	path = Phoenix/ThirdParty/sol2
+	url = https://github.com/ThePhD/sol2.git
