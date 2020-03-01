@@ -26,58 +26,51 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#pragma once
-
 #include <Client/GameTools.hpp>
-#include <Client/Graphics/Camera.hpp>
-#include <Client/Graphics/Layer.hpp>
-#include <Client/Graphics/ShaderPipeline.hpp>
-#include <Client/Graphics/UI.hpp>
-#include <Client/Graphics/Window.hpp>
-#include <Client/Player.hpp>
 
-namespace phx::client
+#include <imgui.h>
+
+using namespace phx::client;
+using namespace phx;
+
+GameTools::GameTools(bool* followCam, int* playerHand, Player* player)
+    : Overlay("GameTools")
 {
-	/**
-	 * @brief The actual game class for the Client.
-	 *
-	 * This is the class which actually implements the "game". The Client
-	 * class is just a "runner" or an intermediary medium that runs all the
-	 * ticking functions and manages all the layers, but this actually
-	 * renders the voxel world and everything related to it.
-	 *
-	 * The other layers such as SplashScreen are not actually the game, but
-	 * you know... just a SplashScreen - this is the main layer you actually
-	 * interact with and play on.
-	 *
-	 * @see Layer
-	 * @see LayerStack
-	 */
-	class Game : public gfx::Layer
+	m_followCam  = followCam;
+	m_playerHand = playerHand;
+	m_player     = player;
+}
+
+void GameTools::onAttach()
+{
+	m_sensitivity        = Settings::get()->getSetting("camera:sensitivity");
+	m_currentSensitivity = m_sensitivity->value();
+}
+
+void GameTools::onDetach() {}
+
+void GameTools::onEvent(events::Event& e) {}
+
+void GameTools::tick(float dt)
+{
+	ImGui::Begin("Phoenix");
+	if (ImGui::CollapsingHeader("Game Tools"))
 	{
-	public:
-		explicit Game(gfx::Window* window);
-		~Game() override;
+		ImGui::Checkbox("Follow Camera", m_followCam);
 
-		void onAttach() override;
-		void onDetach() override;
+		int i = m_currentSensitivity;
+		ImGui::SliderInt("cam sensitivity", &i, 0, 100);
+		if (i != m_currentSensitivity)
+		{
+			m_currentSensitivity = i;
+			m_sensitivity->set(m_currentSensitivity);
+		}
 
-		void onEvent(events::Event& e) override;
-		void tick(float dt) override;
+		ImGui::Text("X: %f\nY: %f\nZ: %f", m_player->getPosition().x,
+		            m_player->getPosition().y, m_player->getPosition().z);
 
-	private:
-		gfx::Window*       m_window;
-		gfx::FPSCamera*    m_camera;
-		Player*            m_player;
-		voxels::ChunkView* m_world;
-
-		gfx::ShaderPipeline m_renderPipeline;
-
-		ui::ChatWindow* m_chat;
-
-		GameTools* m_gameDebug = nullptr;
-		bool       m_followCam = true;
-		math::vec3 m_prevPos;
-		int        m_playerHand = 0;
-	};
-} // namespace phx::client
+		ImGui::Text("Block in hand: %i: %s", *m_playerHand,
+		            m_player->getHand()->displayName.c_str());
+	}
+	ImGui::End();
+}

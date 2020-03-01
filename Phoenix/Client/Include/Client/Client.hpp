@@ -28,30 +28,36 @@
 
 #pragma once
 
+#include <Client/DebugOverlay.hpp>
 #include <Client/Events/IEventListener.hpp>
 #include <Client/Graphics/LayerStack.hpp>
-#include <Client/Graphics/Window.hpp>
 #include <Client/Graphics/UI.hpp>
-#include <Client/DebugOverlay.hpp>
+#include <Client/Graphics/Window.hpp>
+
+#include <Common/Singleton.hpp>
 
 namespace phx::client
 {
-	class Client : public events::IEventListener
+	class Client : public events::IEventListener, public Singleton<Client>
 	{
 	public:
 		Client();
-		~Client();
+		~Client() = default;
+
+    void pushLayer(gfx::Layer* layer);
+		void popLayer(gfx::Layer* layer);
+		bool isDebugLayerActive() const { return m_debugOverlayActive; }
 
 		void onEvent(events::Event e) override;
 		void run();
 
 	private:
-		gfx::Window*     m_window;
-		gfx::LayerStack* m_layerStack;
+		gfx::Window     m_window;
+		gfx::LayerStack m_layerStack;
+		ui::ChatWindow  m_chat = ui::ChatWindow("Chat Window", 5,
+		                                        "Type something and hit enter to run a command!\n");
 
-		ui::ChatWindow m_chat;
-
-		bool          m_debugOverlayActive = false;
+    bool          m_debugOverlayActive = false;
 		DebugOverlay* m_debugOverlay       = nullptr;
 	};
 } // namespace phx::client

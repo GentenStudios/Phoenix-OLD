@@ -27,10 +27,11 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <Client/Game.hpp>
+#include <Client/Client.hpp>
 
+#include <Common/Commander.hpp>
 #include <Common/ContentLoader.hpp>
 #include <Common/Voxels/BlockRegistry.hpp>
-#include <Common/Commander.hpp>
 
 using namespace phx::client;
 using namespace phx;
@@ -44,9 +45,6 @@ static void rawEcho(const std::string& input, std::ostringstream& cout)
 
 Game::Game(gfx::Window* window) : Layer("Game"), m_window(window)
 {
-	/// @todo fix chat window function pointer callback thingy and reimplement
-	/// chat window into here.
-
 	ContentManager::get()->lua["core"]["print"] =
 	    /**
 	     * @addtogroup luaapi
@@ -94,8 +92,11 @@ void Game::onAttach()
 	const math::mat4 model;
 	m_renderPipeline.setMatrix("u_model", model);
 
-	m_sensitivity = Settings::get()->getSetting("camera:sensitivity");
-	m_currentSensitivity = m_sensitivity->value();
+	if (Client::get()->isDebugLayerActive())
+	{
+		m_gameDebug = new GameTools(&m_followCam, &m_playerHand, m_player);
+		Client::get()->pushLayer(m_gameDebug);
+	}
 }
 
 void Game::onDetach()
@@ -116,31 +117,46 @@ void Game::onEvent(events::Event& e)
 			m_camera->enable(!m_camera->isEnabled());
 			e.handled = true;
 			break;
-
 		case events::Keys::KEY_Q:
 			m_window->close();
 			e.handled = true;
 			break;
-
 		case events::Keys::KEY_E:
 			m_playerHand++;
 			m_player->setHand(
 			    voxels::BlockRegistry::get()->getFromRegistryID(m_playerHand));
 			e.handled = true;
 			break;
-
 		case events::Keys::KEY_R:
 			m_playerHand--;
 			m_player->setHand(
 			    voxels::BlockRegistry::get()->getFromRegistryID(m_playerHand));
 			e.handled = true;
 			break;
-
+		case events::Keys::KEY_P:
+			if (Client::get()->isDebugLayerActive())
+				if (m_gameDebug == nullptr)
+				{
+					m_gameDebug =
+					    new GameTools(&m_followCam, &m_playerHand, m_player);
+					Client::get()->pushLayer(m_gameDebug);
+				}
+				else
+				{
+					Client::get()->pushLayer(m_gameDebug);
+				}
+			else
+			{
+				Client::get()->popLayer(m_gameDebug);
+			}
+			// don't set this to handled so we can propagate this down the
+			// stack to enable debug overlays.
+			// e.handled = true;
+			break;
 		default:
 			break;
 		}
 		break;
-
 	case events::EventType::MOUSE_BUTTON_PRESSED:
 		switch (e.mouse.button)
 		{
@@ -166,31 +182,16 @@ void Game::onEvent(events::Event& e)
 void Game::tick(float dt)
 {
 	m_camera->tick(dt);
+
+	if (m_followCam)
+	{
+		m_prevPos = m_player->getPosition();
+	}
+
 	m_world->tick(m_prevPos);
 
 	m_chat->draw();
 
-	ImGui::Begin("Game Tools");
-
-	ImGui::Checkbox("Follow Camera", &m_followCam);
-	if (m_followCam)
-		m_prevPos = m_player->getPosition();
-
-	int i = m_currentSensitivity;
-	ImGui::SliderInt("cam sensitivity", &i, 0, 100);
-	if (i != m_currentSensitivity)
-	{
-		m_currentSensitivity = i;
-		m_sensitivity->set(m_currentSensitivity);
-	}
-
-	ImGui::Text("X: %f\nY: %f\nZ: %f", m_player->getPosition().x,
-	            m_player->getPosition().y, m_player->getPosition().z);
-
-	ImGui::Text("Block in hand: %i: %s", m_playerHand,
-	            m_player->getHand()->displayName.c_str());
-	ImGui::End();
-	
 	m_renderPipeline.activate();
 	m_renderPipeline.setMatrix("u_view", m_camera->calculateViewMatrix());
 	m_renderPipeline.setMatrix("u_projection", m_camera->getProjection());

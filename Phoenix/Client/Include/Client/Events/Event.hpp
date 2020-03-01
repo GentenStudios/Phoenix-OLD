@@ -96,6 +96,7 @@ namespace phx::events
 		LAYER_DESTROYED, // this one happens when a layer requests
 		                 // destruction, it does NOT occur when a layer is
 		                 // manually popped from a layer stack.
+		LAYER_PUSHED,
 	};
 
 	struct Event

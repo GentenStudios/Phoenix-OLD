@@ -28,56 +28,40 @@
 
 #pragma once
 
-#include <Client/GameTools.hpp>
-#include <Client/Graphics/Camera.hpp>
+#include <Client/Events/Event.hpp>
 #include <Client/Graphics/Layer.hpp>
-#include <Client/Graphics/ShaderPipeline.hpp>
-#include <Client/Graphics/UI.hpp>
-#include <Client/Graphics/Window.hpp>
 #include <Client/Player.hpp>
 
-namespace phx::client
+#include <Common/Settings.hpp>
+
+namespace phx
 {
-	/**
-	 * @brief The actual game class for the Client.
-	 *
-	 * This is the class which actually implements the "game". The Client
-	 * class is just a "runner" or an intermediary medium that runs all the
-	 * ticking functions and manages all the layers, but this actually
-	 * renders the voxel world and everything related to it.
-	 *
-	 * The other layers such as SplashScreen are not actually the game, but
-	 * you know... just a SplashScreen - this is the main layer you actually
-	 * interact with and play on.
-	 *
-	 * @see Layer
-	 * @see LayerStack
-	 */
-	class Game : public gfx::Layer
+	namespace client
 	{
-	public:
-		explicit Game(gfx::Window* window);
-		~Game() override;
+		/**
+		 * @brief The Debug Tool for the Game.
+		 *
+		 * @see Layer
+		 * @see LayerStack
+		 */
+		class GameTools : public gfx::Overlay
+		{
+		public:
+			GameTools(bool* followCam, int* playerHand, Player* player);
+			~GameTools() override = default;
 
-		void onAttach() override;
-		void onDetach() override;
+			void onAttach() override;
+			void onDetach() override;
+			void onEvent(events::Event& e) override;
+			void tick(float dt) override;
 
-		void onEvent(events::Event& e) override;
-		void tick(float dt) override;
+		private:
+			bool*    m_followCam = nullptr;
+			int      m_currentSensitivity;
+			Setting* m_sensitivity = nullptr;
+			int*     m_playerHand  = nullptr;
 
-	private:
-		gfx::Window*       m_window;
-		gfx::FPSCamera*    m_camera;
-		Player*            m_player;
-		voxels::ChunkView* m_world;
-
-		gfx::ShaderPipeline m_renderPipeline;
-
-		ui::ChatWindow* m_chat;
-
-		GameTools* m_gameDebug = nullptr;
-		bool       m_followCam = true;
-		math::vec3 m_prevPos;
-		int        m_playerHand = 0;
-	};
-} // namespace phx::client
+			Player* m_player;
+		};
+	} // namespace client
+} // namespace phx
