@@ -111,9 +111,10 @@ void Client::onEvent(events::Event e)
 			{
 				m_layerStack.popLayer(m_debugOverlay);
 			}
+			// don't set this to handled so we can propagate this down the stack
+			// to enable debug overlays.
 			e.handled = true;
 			break;
-
 		default:
 			break;
 		}
@@ -121,9 +122,9 @@ void Client::onEvent(events::Event e)
 	case EventType::LAYER_DESTROYED:
 		if (std::string(e.layer) == "SplashScreen")
 		{
-			Game* game = new Game(&m_window);
-			m_layerStack.pushLayer(game);
-			e.handled = true;
+			//Game* game = new Game(&m_window);
+			//m_layerStack.pushLayer(game);
+			//e.handled = true;
 		}
 		break;
 	default:

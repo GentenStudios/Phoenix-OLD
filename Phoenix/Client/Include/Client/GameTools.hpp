@@ -30,6 +30,9 @@
 
 #include <Client/Events/Event.hpp>
 #include <Client/Graphics/Layer.hpp>
+#include <Client/Player.hpp>
+
+#include <Common/Settings.hpp>
 
 namespace phx
 {
@@ -44,7 +47,7 @@ namespace phx
 		class GameTools : public gfx::Overlay
 		{
 		public:
-			GameTools();
+			GameTools(bool* followCam, int* playerHand, Player* player);
 			~GameTools() override = default;
 
 			void onAttach() override;
@@ -53,12 +56,12 @@ namespace phx
 			void tick(float dt) override;
 
 		private:
-			bool m_wireframe     = false;
-			int  m_sampleRate    = 60;
-			int  m_maxSampleRate = 60;
-			bool m_pauseSampling = false;
+			bool*    m_followCam = nullptr;
+			int      m_currentSensitivity;
+			Setting* m_sensitivity = nullptr;
+			int*     m_playerHand  = nullptr;
 
-			unsigned int m_time = 0;
+			Player* m_player;
 		};
 	} // namespace client
 } // namespace phx

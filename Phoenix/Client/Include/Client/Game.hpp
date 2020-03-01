@@ -28,11 +28,12 @@
 
 #pragma once
 
+#include <Client/GameTools.hpp>
 #include <Client/Graphics/Camera.hpp>
 #include <Client/Graphics/Layer.hpp>
 #include <Client/Graphics/ShaderPipeline.hpp>
-#include <Client/Graphics/Window.hpp>
 #include <Client/Graphics/UI.hpp>
+#include <Client/Graphics/Window.hpp>
 #include <Client/Player.hpp>
 
 namespace phx
@@ -67,20 +68,17 @@ namespace phx
 			void tick(float dt) override;
 
 		private:
-			gfx::Window*          m_window;
-			gfx::FPSCamera*       m_camera;
-			Player*               m_player;
+			gfx::Window*       m_window;
+			gfx::FPSCamera*    m_camera;
+			Player*            m_player;
 			voxels::ChunkView* m_world;
 
 			gfx::ShaderPipeline m_renderPipeline;
 
 			ui::ChatWindow* m_chat;
-			// Commander       m_kirk;
 
+			GameTools* m_gameDebug = nullptr;
 			bool       m_followCam = true;
-			int        m_currentSensitivity = 1;
-			Setting*   m_sensitivity = nullptr;
-			
 			math::vec3 m_prevPos;
 			int        m_playerHand = 0;
 		};

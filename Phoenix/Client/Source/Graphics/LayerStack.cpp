@@ -184,6 +184,9 @@ void LayerStack::onEvent(events::Event e)
 
 void LayerStack::tick(float dt)
 {
+	if (m_layers.empty())
+		m_window->close();
+	
 	auto it = m_layers.begin();
 	while (it != m_layers.end())
 	{
