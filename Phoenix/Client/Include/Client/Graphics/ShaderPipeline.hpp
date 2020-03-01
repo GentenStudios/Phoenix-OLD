@@ -118,8 +118,9 @@ namespace phx::gfx
 		 * @param fragShaderPath Path to fragment/pixel shader.
 		 * @param layout The required layout for the shaders to adhere to.
 		 */
-		void prepare(std::string vertShaderPath, std::string fragShaderPath,
-		             std::vector<ShaderLayout> layout);
+		void prepare(const std::string& vertShaderPath, const std::string&
+		             fragShaderPath,
+		             const std::vector<ShaderLayout>& layout);
 
 		/**
 		 * @brief Activates the pipeline, prepared shaders are activated.
@@ -137,14 +138,14 @@ namespace phx::gfx
 		 * @param location The location being set.
 		 * @param value The value to set provided location.
 		 */
-		void setFloat(std::string location, float value);
+		void setFloat(const std::string& location, float value);
 
 		/**
 		 * @brief Sets a uniform location to a 2 component vector.
 		 * @param location The location being set.
 		 * @param value The value to set provided location.
 		 */
-		void setVector2(std::string location, math::vec2 value);
+		void setVector2(const std::string& location, math::vec2 value);
 
 		/**
 		 * @brief Sets a uniform location to a 3 component vector.
@@ -155,7 +156,7 @@ namespace phx::gfx
 		 * provided to identify data specific to this type in the shaders
 		 * themselves.
 		 */
-		void setVector3(std::string location, math::vec3 value);
+		void setVector3(const std::string& location, math::vec3 value);
 
 		/**
 		 * @brief Sets a uniform location to a 4x4 matrix.
@@ -166,14 +167,14 @@ namespace phx::gfx
 		 * provided to identify data specific to this type in the shaders
 		 * themselves.
 		 */
-		void setMatrix(std::string location, math::mat4 value);
+		void setMatrix(const std::string& location, math::mat4 value);
 
 		/**
 		 * @brief Queries the location set for a specific attribute.
 		 * @param attr The layout/attribute name provided in the shader.
 		 * @return The set location for the attribute.
 		 */
-		int queryLayoutOfAttribute(std::string attr);
+		int queryLayoutOfAttribute(const std::string& attr);
 
 	private:
 		unsigned int m_program;

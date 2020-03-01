@@ -67,13 +67,13 @@ namespace phx::client
 
 	private:
 		gfx::Window*       m_window;
-		gfx::FPSCamera*    m_camera;
+		gfx::FPSCamera*    m_camera = nullptr;
 		Player*            m_player;
-		voxels::ChunkView* m_world;
+		voxels::ChunkView* m_world = nullptr;
 
 		gfx::ShaderPipeline m_renderPipeline;
 
-		ui::ChatWindow* m_chat;
+		ui::ChatWindow* m_chat = nullptr;
 
 		GameTools* m_gameDebug = nullptr;
 		bool       m_followCam = true;

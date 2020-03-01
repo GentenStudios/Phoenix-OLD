@@ -57,7 +57,7 @@ namespace phx
 
 		private:
 			bool*    m_followCam = nullptr;
-			int      m_currentSensitivity;
+			int      m_currentSensitivity = 1;
 			Setting* m_sensitivity = nullptr;
 			int*     m_playerHand  = nullptr;
 

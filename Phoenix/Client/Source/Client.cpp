@@ -27,9 +27,9 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <Client/Client.hpp>
+#include <Client/Crosshair.hpp>
 #include <Client/Game.hpp>
 #include <Client/SplashScreen.hpp>
-#include <Client/Crosshair.hpp>
 
 #include <Common/Commander.hpp>
 #include <Common/ContentLoader.hpp>
@@ -38,29 +38,9 @@
 using namespace phx::client;
 using namespace phx;
 
-Commander kirk = Commander();
-
-static void rawEcho(const std::string& input, std::ostringstream& cout)
-{
-	kirk.callback(input, cout);
-}
-
 Client::Client() : m_window("Phoenix Game!", 1280, 720), m_layerStack(&m_window)
 {
 	m_window.registerEventListener(this);
-	m_chat.registerCallback(&rawEcho);
-
-	/**
-	 * @addtogroup luaapi
-	 *
-	 * @subsubsection coreprint core.print(text)
-	 * @brief Prints text to the players terminal
-	 *
-	 * @param text The text to be outputted to the terminal
-	 *
-	 */
-	ContentManager::get()->lua["core"]["print"] =
-	    [this](const std::string& text) { m_chat.cout << text << "\n"; };
 }
 
 void Client::pushLayer(gfx::Layer* layer)
@@ -126,8 +106,8 @@ void Client::onEvent(events::Event e)
 			Game* game = new Game(&m_window);
 			m_layerStack.pushLayer(game);
 			Crosshair* crosshair = new Crosshair(&m_window);
-      // push as layer since we still want it to render beneath other
-      // overlays.
+			// push as layer since we still want it to render beneath other
+			// overlays.
 			m_layerStack.pushLayer(crosshair);
 			e.handled = true;
 		}
@@ -153,8 +133,8 @@ void Client::run()
 	while (m_window.isRunning())
 	{
 		const std::size_t now = SDL_GetPerformanceCounter();
-		const float       dt =
-		    (now - last) / static_cast<float>(SDL_GetPerformanceFrequency());
+		const float       dt  = static_cast<float>(now - last) /
+		                 static_cast<float>(SDL_GetPerformanceFrequency());
 		last = now;
 
 		m_window.startFrame();

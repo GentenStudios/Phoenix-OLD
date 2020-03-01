@@ -108,7 +108,7 @@ void BasicTerminal::flush()
 
 			// Auto cut at one hundredth the targetSize or newline, which ever
 			// it hits first.
-			for (int l = tenthOutputSize; (l > 0) && m_outputBuffer[l] != '\n'; l++)
+			for (std::size_t l = tenthOutputSize; (l > 0) && m_outputBuffer[l] != '\n'; l++)
 			{
 				// NOTE:
 				//   may be faster to use more memory and hope fewer malloc calls

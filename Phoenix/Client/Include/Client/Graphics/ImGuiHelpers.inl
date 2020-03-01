@@ -41,37 +41,29 @@ namespace ImGui
 	{
 		ImGui::Begin(rootWindowName, p_open, flags);
 	}
-	inline void BaseImWindow::end()
-	{
-		ImGui::End();
-	};
-	inline void BaseImWindow::draw(bool* p_open, ImGuiWindowFlags flags)
-	{
-			/*TODO: throw error must override */
+	inline void BaseImWindow::end() { ImGui::End(); };
+	inline void BaseImWindow::draw(bool* p_open, ImGuiWindowFlags flags) {
+	    /*TODO: throw error must override */
 	};
 
-
-
-	inline BasicTerminal::BasicTerminal(const char* name, int outputKiloBytes,
-	                                    const char* initialContents)
-			: BaseImWindow(name), m_inputBuffer(), m_outputBuffer(initialContents),
-			m_targetOutputSize(outputKiloBytes * 1024),
-			cout(std::ios_base::out | std::ios_base::ate)
+	inline BasicTerminal::BasicTerminal(const char*       name,
+	                                    const std::size_t outputKiloBytes,
+	                                    const char*       initialContents)
+	    : BaseImWindow(name), m_targetOutputSize(outputKiloBytes * 1024),
+	      m_outputBuffer(initialContents),
+	      cout(std::ios_base::out | std::ios_base::ate)
 	{
 		m_outputBuffer.reserve(m_targetOutputSize);
 	};
 
-	inline BasicTerminal::~BasicTerminal()
-	{
-		// TODO: Possibly deconstruct the strings, I know I'm missing something.
-	};
+	inline BasicTerminal::~BasicTerminal() = default;
+
 	inline void BasicTerminal::begin(bool* p_open, ImGuiWindowFlags flags)
 	{
 		BaseImWindow::begin(
 		    p_open, ImGuiWindowFlags(ImGuiWindowFlags_NoScrollbar |
 		                             ImGuiWindowFlags_NoScrollWithMouse) |
 		                flags);
-
 	}
 
 	inline void BasicTerminal::draw(bool* p_open, ImGuiWindowFlags extra_flags)
@@ -87,4 +79,4 @@ namespace ImGui
 	{
 		m_callbackRegistry.push_back(callback);
 	}
-};
+}; // namespace ImGui

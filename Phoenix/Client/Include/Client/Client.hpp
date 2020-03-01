@@ -31,7 +31,6 @@
 #include <Client/DebugOverlay.hpp>
 #include <Client/Events/IEventListener.hpp>
 #include <Client/Graphics/LayerStack.hpp>
-#include <Client/Graphics/UI.hpp>
 #include <Client/Graphics/Window.hpp>
 
 #include <Common/Singleton.hpp>
@@ -44,7 +43,7 @@ namespace phx::client
 		Client();
 		~Client() = default;
 
-    void pushLayer(gfx::Layer* layer);
+		void pushLayer(gfx::Layer* layer);
 		void popLayer(gfx::Layer* layer);
 		bool isDebugLayerActive() const { return m_debugOverlayActive; }
 
@@ -54,10 +53,8 @@ namespace phx::client
 	private:
 		gfx::Window     m_window;
 		gfx::LayerStack m_layerStack;
-		ui::ChatWindow  m_chat = ui::ChatWindow("Chat Window", 5,
-		                                        "Type something and hit enter to run a command!\n");
 
-    bool          m_debugOverlayActive = false;
+		bool          m_debugOverlayActive = false;
 		DebugOverlay* m_debugOverlay       = nullptr;
 	};
 } // namespace phx::client

@@ -38,7 +38,7 @@ using namespace phx;
 
 Crosshair::Crosshair(gfx::Window* window) : Overlay("Crosshair")
 {
-    auto size = window->getSize();
+	const auto size = window->getSize();
     m_screenW = size.x;
     m_screenH = size.y;
 }
@@ -109,8 +109,8 @@ void Crosshair::onAttach()
 	m_pipeline.activate();
 	m_pipeline.setFloat("u_TexW", static_cast<float>(width));
 	m_pipeline.setFloat("u_TexH", static_cast<float>(height));
-	m_pipeline.setFloat("u_ScreenW", m_screenW);
-	m_pipeline.setFloat("u_ScreenH", m_screenH);
+	m_pipeline.setFloat("u_ScreenW", static_cast<float>(m_screenW));
+	m_pipeline.setFloat("u_ScreenH", static_cast<float>(m_screenH));
 }
 
 void Crosshair::onDetach()

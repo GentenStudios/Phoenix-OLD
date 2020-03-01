@@ -113,7 +113,7 @@ namespace phx::gfx
 		 * it will become used as I (beeperdeeper089) continue to improve
 		 * this functionality.
 		 */
-		ChunkRenderer(std::size_t visibleChunks);
+		explicit ChunkRenderer(std::size_t visibleChunks);
 		~ChunkRenderer();
 
 		/**
@@ -189,12 +189,10 @@ namespace phx::gfx
 		void render();
 
 	private:
-		std::size_t m_visibleChunks;
-
 		std::unordered_map<math::vec3, ChunkRenderData, math::Vector3Hasher,
 		                   math::Vector3KeyComparator>
 		             m_buffers;
-		unsigned int m_textureArray;
+		unsigned int m_textureArray = 0;
 
 		const int m_vertexAttributeLocation = 0;
 		const int m_uvAttributeLocation     = 1;

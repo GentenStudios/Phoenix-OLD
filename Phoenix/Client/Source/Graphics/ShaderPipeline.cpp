@@ -37,12 +37,12 @@
 using namespace phx::gfx;
 using namespace phx;
 
-void ShaderPipeline::prepare(std::string               vertShaderPath,
-                             std::string               fragShaderPath,
-                             std::vector<ShaderLayout> layout)
+void ShaderPipeline::prepare(const std::string& vertShaderPath,
+                             const std::string& fragShaderPath,
+                             const std::vector<ShaderLayout>& layout)
 {
-	std::string vertShaderSource = FileIO::readAllFile(vertShaderPath);
-	std::string fragShaderSource = FileIO::readAllFile(fragShaderPath);
+	const std::string vertShaderSource = FileIO::readAllFile(vertShaderPath);
+	const std::string fragShaderSource = FileIO::readAllFile(fragShaderPath);
 
 	const char* vertShaderSourceRaw = vertShaderSource.c_str();
 	const char* fragShaderSourceRaw = fragShaderSource.c_str();
@@ -51,28 +51,28 @@ void ShaderPipeline::prepare(std::string               vertShaderPath,
 	char infoLog[512];
 
 	//// Vertex Shader
-	int vertexShader = glCreateShader(GL_VERTEX_SHADER);
+	const int vertexShader = glCreateShader(GL_VERTEX_SHADER);
 	glShaderSource(vertexShader, 1, &vertShaderSourceRaw, nullptr);
 	glCompileShader(vertexShader);
 
 	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
 	if (!success)
 	{
-		glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
+		glGetShaderInfoLog(vertexShader, 512, nullptr, infoLog);
 		std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n"
 		          << infoLog << std::endl;
 	}
 	//// END Vertex Shader
 
 	//// Fragment Shader
-	int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+	const int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
 	glShaderSource(fragmentShader, 1, &fragShaderSourceRaw, nullptr);
 	glCompileShader(fragmentShader);
 
 	glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
 	if (!success)
 	{
-		glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
+		glGetShaderInfoLog(fragmentShader, 512, nullptr, infoLog);
 		std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n"
 		          << infoLog << std::endl;
 	}
@@ -87,7 +87,7 @@ void ShaderPipeline::prepare(std::string               vertShaderPath,
 	glGetProgramiv(m_program, GL_LINK_STATUS, &success);
 	if (!success)
 	{
-		glGetProgramInfoLog(m_program, 512, NULL, infoLog);
+		glGetProgramInfoLog(m_program, 512, nullptr, infoLog);
 		std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n"
 		          << infoLog << std::endl;
 	}
@@ -105,30 +105,30 @@ void ShaderPipeline::prepare(std::string               vertShaderPath,
 
 void ShaderPipeline::activate() { glUseProgram(m_program); }
 
-void ShaderPipeline::setFloat(std::string location, float value)
+void ShaderPipeline::setFloat(const std::string& location, float value)
 {
 	glUniform1f(glGetUniformLocation(m_program, location.c_str()), value);
 }
 
-void ShaderPipeline::setVector2(std::string location, math::vec2 value)
+void ShaderPipeline::setVector2(const std::string& location, math::vec2 value)
 {
 	glUniform2fv(glGetUniformLocation(m_program, location.c_str()), 1,
 	             &value.x);
 }
 
-void ShaderPipeline::setVector3(std::string location, math::vec3 value)
+void ShaderPipeline::setVector3(const std::string& location, math::vec3 value)
 {
 	glUniform3fv(glGetUniformLocation(m_program, location.c_str()), 1,
 	             &value.x);
 }
 
-void ShaderPipeline::setMatrix(std::string location, math::mat4 value)
+void ShaderPipeline::setMatrix(const std::string& location, math::mat4 value)
 {
 	glUniformMatrix4fv(glGetUniformLocation(m_program, location.c_str()), 1,
 	                   GL_FALSE, value.elements);
 }
 
-int ShaderPipeline::queryLayoutOfAttribute(std::string attr)
+int ShaderPipeline::queryLayoutOfAttribute(const std::string& attr)
 {
 	return glGetAttribLocation(m_program, attr.c_str());
 }

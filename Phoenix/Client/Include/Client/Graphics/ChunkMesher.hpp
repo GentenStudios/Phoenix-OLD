@@ -92,7 +92,7 @@ namespace phx::gfx
 		 */
 		ChunkMesher(math::vec3 pos, std::vector<voxels::BlockType*>& blocks,
 		            const ChunkRenderer::AssociativeTextureTable& texTable)
-		    : m_blockRef(blocks), m_pos(pos), m_texTable(texTable)
+		    : m_pos(pos), m_blockRef(blocks), m_texTable(texTable)
 		{
 		}
 		~ChunkMesher() = default;
@@ -106,7 +106,7 @@ namespace phx::gfx
 		 * @brief Returns the mesh as an array of floats.
 		 * @return The mesh as an array of floats.
 		 */
-		const std::vector<float>& getMesh() { return m_mesh; }
+		const std::vector<float>& getMesh() const { return m_mesh; }
 
 	private:
 		// internal function, no need to document.
