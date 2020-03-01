@@ -123,12 +123,12 @@ void Client::onEvent(events::Event e)
 	case EventType::LAYER_DESTROYED:
 		if (std::string(e.layer) == "SplashScreen")
 		{
-			Game* game = new Game(m_window);
-			m_layerStack->pushLayer(game);
-			Crosshair* crosshair = new Crosshair(m_window);
+			Game* game = new Game(&m_window);
+			m_layerStack.pushLayer(game);
+			Crosshair* crosshair = new Crosshair(&m_window);
       // push as layer since we still want it to render beneath other
       // overlays.
-			m_layerStack->pushLayer(crosshair);
+			m_layerStack.pushLayer(crosshair);
 			e.handled = true;
 		}
 		break;
