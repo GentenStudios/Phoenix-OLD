@@ -33,8 +33,7 @@ using namespace phx;
 #undef main
 int main(int argc, char** argv)
 {
-	client::Client* game = new client::Client();
-	game->run();
+	client::Client::get()->run();
 
 	return 0;
 }

@@ -26,8 +26,8 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Client/Client.hpp>
 #include <Client/Game.hpp>
+#include <Client/Client.hpp>
 
 #include <Common/Commander.hpp>
 #include <Common/ContentLoader.hpp>
@@ -45,9 +45,6 @@ static void rawEcho(const std::string& input, std::ostringstream& cout)
 
 Game::Game(gfx::Window* window) : Layer("Game"), m_window(window)
 {
-	/// @todo fix chat window function pointer callback thingy and reimplement
-	/// chat window into here.
-
 	ContentManager::get()->lua["core"]["print"] =
 	    /**
 	     * @addtogroup luaapi
@@ -153,9 +150,8 @@ void Game::onEvent(events::Event& e)
 				Client::get()->popLayer(m_gameDebug);
 			}
 			// don't set this to handled so we can propagate this down the
-			// stack to enable debug overlays, unless you know this is the last
-			// stage of debug layers. (it currently is.)
-			e.handled = true;
+			// stack to enable debug overlays.
+			// e.handled = true;
 			break;
 		default:
 			break;

@@ -53,24 +53,24 @@ void GameTools::onEvent(events::Event& e) {}
 
 void GameTools::tick(float dt)
 {
-	//ImGui::Begin("Phoenix");
-	//if (ImGui::CollapsingHeader("Game Tools"))
-	//{
-	//	ImGui::Checkbox("Follow Camera", m_followCam);
+	ImGui::Begin("Phoenix");
+	if (ImGui::CollapsingHeader("Game Tools"))
+	{
+		ImGui::Checkbox("Follow Camera", m_followCam);
 
-	//	int i = m_currentSensitivity;
-	//	ImGui::SliderInt("cam sensitivity", &i, 0, 100);
-	//	if (i != m_currentSensitivity)
-	//	{
-	//		m_currentSensitivity = i;
-	//		m_sensitivity->set(m_currentSensitivity);
-	//	}
+		int i = m_currentSensitivity;
+		ImGui::SliderInt("cam sensitivity", &i, 0, 100);
+		if (i != m_currentSensitivity)
+		{
+			m_currentSensitivity = i;
+			m_sensitivity->set(m_currentSensitivity);
+		}
 
-	//	ImGui::Text("X: %f\nY: %f\nZ: %f", m_player->getPosition().x,
-	//	            m_player->getPosition().y, m_player->getPosition().z);
+		ImGui::Text("X: %f\nY: %f\nZ: %f", m_player->getPosition().x,
+		            m_player->getPosition().y, m_player->getPosition().z);
 
-	//	ImGui::Text("Block in hand: %i: %s", *m_playerHand,
-	//	            m_player->getHand()->displayName.c_str());
-	//}
-	//ImGui::End();
+		ImGui::Text("Block in hand: %i: %s", *m_playerHand,
+		            m_player->getHand()->displayName.c_str());
+	}
+	ImGui::End();
 }

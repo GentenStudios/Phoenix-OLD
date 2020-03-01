@@ -34,30 +34,15 @@
 using namespace phx::gfx;
 using namespace phx;
 
-LayerStack::LayerStack(gfx::Window* window)
-	: m_window(window)
-{
-}
+LayerStack::LayerStack(gfx::Window* window) : m_window(window) {}
 
-std::size_t LayerStack::size() const
-{
-	return m_layers.size();
-}
+std::size_t LayerStack::size() const { return m_layers.size(); }
 
-bool LayerStack::empty() const
-{
-	return m_layers.empty();
-}
+bool LayerStack::empty() const { return m_layers.empty(); }
 
-std::vector<Layer*>::iterator LayerStack::begin()
-{
-	return m_layers.begin();
-}
+std::vector<Layer*>::iterator LayerStack::begin() { return m_layers.begin(); }
 
-std::vector<Layer*>::iterator LayerStack::end()
-{
-	return m_layers.end();
-}
+std::vector<Layer*>::iterator LayerStack::end() { return m_layers.end(); }
 
 std::vector<Layer*>::reverse_iterator LayerStack::rbegin()
 {
@@ -89,20 +74,14 @@ std::vector<Layer*>::const_reverse_iterator LayerStack::rend() const
 	return m_layers.rend();
 }
 
-std::vector<Layer*>::reference LayerStack::front()
-{
-	return m_layers.front();
-}
+std::vector<Layer*>::reference LayerStack::front() { return m_layers.front(); }
 
 std::vector<Layer*>::const_reference LayerStack::front() const
 {
 	return m_layers.front();
 }
 
-std::vector<Layer*>::reference LayerStack::back()
-{
-	return m_layers.back();
-}
+std::vector<Layer*>::reference LayerStack::back() { return m_layers.back(); }
 
 std::vector<Layer*>::const_reference LayerStack::back() const
 {
@@ -174,9 +153,10 @@ void LayerStack::popOverlay(Layer* overlay)
 
 void LayerStack::onEvent(events::Event e)
 {
-	for (auto it = m_layers.rbegin(); it != m_layers.rend(); ++it)
+	for (std::size_t i = m_layers.size(); i > 0; --i)
 	{
-		(*it)->onEvent(e);
+		// arrays start at 0, hence the -1;
+		m_layers[i - 1]->onEvent(e);
 		if (e.handled)
 			break;
 	}
@@ -186,7 +166,7 @@ void LayerStack::tick(float dt)
 {
 	if (m_layers.empty())
 		m_window->close();
-	
+
 	auto it = m_layers.begin();
 	while (it != m_layers.end())
 	{
@@ -204,14 +184,14 @@ void LayerStack::tick(float dt)
 				                     // only want the position relative to the
 				                     // overlays; remember: overlays are stored
 				                     // after all the layers to make sure they
-				                     // are rendered on top, and to do so, they
-				                     // are played in the second half of the
-				                     // vector, all overlays are pushed to the
-				                     // back, but new layers are pushed to where
-				                     // the half-way line is - just before the
-				                     // overlays. If this doesn't make sense and
-				                     // for some reason this functionality needs
-				                     // updating, contact @beeperdeeper089
+				                     // are rendered "on top", and to do so,
+				                     // they are played in the second half of
+				                     // the vector, all overlays are pushed to
+				                     // the back, but new layers are pushed to
+				                     // where the half-way line is - just before
+				                     // the overlays. If this doesn't make sense
+				                     // and for some reason this functionality
+				                     // needs updating, contact @beeperdeeper089
 				                     // (19/02/2020).
 				it = m_layers.erase(it);
 
