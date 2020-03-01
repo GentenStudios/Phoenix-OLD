@@ -75,7 +75,7 @@ Mod::Mod(std::string modName) : name(std::move(modName))
 		dependencies.push_back(input);
 	}
 	fileStream.close();
-};
+}
 
 bool ContentManager::loadModules(const std::string& save)
 {
@@ -88,16 +88,13 @@ bool ContentManager::loadModules(const std::string& save)
 		std::cout << "Error opening save file";
 		return false;
 	}
-	int i = 0;
-	while (fileStream.peek() != EOF)
+
+	for (int i = 0; fileStream.peek() != EOF && i <= 10; i++)
 	{
 		std::string input;
 		std::getline(fileStream, input);
 		Mod mod = Mod(input);
 		toLoad.push(mod);
-		if (i > 10)
-			break;
-		i++;
 	}
 	fileStream.close();
 
@@ -114,11 +111,11 @@ bool ContentManager::loadModules(const std::string& save)
 			bool satisfied = true;
 
 			// For each dependency the mod has
-			for (int j = 0; j < mod.dependencies.size(); j++)
+			for (const auto& dependency : mod.dependencies)
 			{
 				// If dependency is not satisfied, mark satisfied as false.
 				if (std::find(loadedMods.begin(), loadedMods.end(),
-				              mod.dependencies[j]) == loadedMods.end())
+				              dependency) == loadedMods.end())
 				{
 					satisfied = false;
 				}
@@ -152,9 +149,9 @@ bool ContentManager::loadModules(const std::string& save)
 				toLoad.pop();
 			}
 			std::cout << "Loaded Mods:\n";
-			for (int i = 0; i < loadedMods.size(); i++)
+			for (const auto& loadedMod : loadedMods)
 			{
-				std::cout << "- " + loadedMods[i] + "\n";
+				std::cout << "- " + loadedMod + "\n";
 			}
 			return false;
 		}

@@ -34,27 +34,24 @@
 #include <Client/Graphics/UI.hpp>
 #include <Client/DebugOverlay.hpp>
 
-namespace phx
+namespace phx::client
 {
-	namespace client
+	class Client : public events::IEventListener
 	{
-		class Client : public events::IEventListener
-		{
-		public:
-			Client();
-			~Client();
+	public:
+		Client();
+		~Client();
 
-			void onEvent(events::Event e) override;
-			void run();
+		void onEvent(events::Event e) override;
+		void run();
 
-		private:
-			gfx::Window*     m_window;
-			gfx::LayerStack* m_layerStack;
+	private:
+		gfx::Window*     m_window;
+		gfx::LayerStack* m_layerStack;
 
-			ui::ChatWindow m_chat;
+		ui::ChatWindow m_chat;
 
-			bool m_debugOverlayActive = false;
-			DebugOverlay* m_debugOverlay = nullptr;
-		};
-	} // namespace client
-} // namespace phx
+		bool          m_debugOverlayActive = false;
+		DebugOverlay* m_debugOverlay       = nullptr;
+	};
+} // namespace phx::client

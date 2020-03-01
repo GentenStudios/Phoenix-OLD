@@ -40,146 +40,142 @@
 #include <string>
 #include <vector>
 
-namespace phx
+namespace phx::gfx
 {
-	namespace gfx
+	/**
+	 * @brief The layout for shader vertex locations.
+	 *
+	 * A shader has a layout in which vertices and data in general is sent
+	 * to it in, this makes sure that all renderer objects can specify
+	 * their own layout to allow better compatibility.
+	 *
+	 * @paragraph Usage
+	 * @code
+	 * std::vector<ShaderLayout> attributes;
+	 * attributes.emplace_back("a_Vertex", 0);
+	 * attributes.emplace_back("a_UV", 1);
+	 *
+	 * ShaderPipeline pipeline;
+	 * pipeline.prepare("myvert.shader", "myfrag.shader", attributes);
+	 * @endcode
+	 */
+	struct ShaderLayout
 	{
-		/**
-		 * @brief The layout for shader vertex locations.
-		 *
-		 * A shader has a layout in which vertices and data in general is sent
-		 * to it in, this makes sure that all renderer objects can specify
-		 * their own layout to allow better compatibility.
-		 *
-		 * @paragraph Usage
-		 * @code
-		 * std::vector<ShaderLayout> attributes;
-		 * attributes.emplace_back("a_Vertex", 0);
-		 * attributes.emplace_back("a_UV", 1);
-		 *
-		 * ShaderPipeline pipeline;
-		 * pipeline.prepare("myvert.shader", "myfrag.shader", attributes);
-		 * @endcode
-		 */
-		struct ShaderLayout
+		ShaderLayout(const std::string& attribName, int desiredIndex)
+		    : attribName(attribName), desiredIndex(desiredIndex)
 		{
-			ShaderLayout(const std::string& attribName, int desiredIndex)
-			    : attribName(attribName), desiredIndex(desiredIndex)
-			{
-			}
+		}
 
-			std::string attribName;
-			int         desiredIndex = -1;
-		};
+		std::string attribName;
+		int         desiredIndex = -1;
+	};
+
+	/**
+	 * @brief The Pipeline through which basic rendering occurs.
+	 *
+	 * This class provides the ability to use shaders while rendering - and
+	 * you need shaders to render anything more than a triangle so this is a
+	 * necessity. Shaders must be written with ambiguous location parameters
+	 * on inputs but will be set through this class, to allow for maximum
+	 * compatibility.
+	 *
+	 * The activate method must be called before rendering the system
+	 * associated with this pipeline, otherwise you may render without or
+	 * with the wrong shaders.
+	 *
+	 * The set* methods are to set uniform data, for example the MVP
+	 * matrices from the camera.
+	 *
+	 * @paragraph Usage
+	 * @code
+	 * // using the chunk renderer as an example.
+	 * ShaderPipeline pipeline;
+	 * pipeline.prepare("myvert.shader", "myfrag.shader",
+	 * ChunkRenderer::getRequiredShaderLayout());
+	 *
+	 * mainGameLoop()
+	 * {
+	 *     // individually activate since we have another shader that could be
+	 * active. pipeline.activate(); pipeline.setMatrix(myViewMatrix);
+	 *     pipeline.setMatrix(myProjectionMatrix);
+	 *     world.render();
+	 *
+	 *     // lets say we made this for a ui element
+	 *     pipeline2.activate();
+	 *     ui.render();
+	 * }
+	 * @endcode
+	 */
+	class ShaderPipeline
+	{
+	public:
+		ShaderPipeline()  = default;
+		~ShaderPipeline() = default;
 
 		/**
-		 * @brief The Pipeline through which basic rendering occurs.
-		 *
-		 * This class provides the ability to use shaders while rendering - and
-		 * you need shaders to render anything more than a triangle so this is a
-		 * necessity. Shaders must be written with ambiguous location parameters
-		 * on inputs but will be set through this class, to allow for maximum
-		 * compatibility.
-		 *
-		 * The activate method must be called before rendering the system
-		 * associated with this pipeline, otherwise you may render without or
-		 * with the wrong shaders.
-		 *
-		 * The set* methods are to set uniform data, for example the MVP
-		 * matrices from the camera.
-		 *
-		 * @paragraph Usage
-		 * @code
-		 * // using the chunk renderer as an example.
-		 * ShaderPipeline pipeline;
-		 * pipeline.prepare("myvert.shader", "myfrag.shader", ChunkRenderer::getRequiredShaderLayout());
-		 *
-		 * mainGameLoop()
-		 * {
-		 *     // individually activate since we have another shader that could be active.
-		 *     pipeline.activate();
-		 *     pipeline.setMatrix(myViewMatrix);
-		 *     pipeline.setMatrix(myProjectionMatrix);
-		 *     world.render();
-		 *
-		 *     // lets say we made this for a ui element
-		 *     pipeline2.activate();
-		 *     ui.render();
-		 * }
-		 * @endcode
+		 * @brief Prepares a pipeline with the provided shaders and layout.
+		 * @param vertShaderPath Path to vertex shader.
+		 * @param fragShaderPath Path to fragment/pixel shader.
+		 * @param layout The required layout for the shaders to adhere to.
 		 */
-		class ShaderPipeline
-		{
-		public:
-			ShaderPipeline()  = default;
-			~ShaderPipeline() = default;
+		void prepare(std::string vertShaderPath, std::string fragShaderPath,
+		             std::vector<ShaderLayout> layout);
 
-			/**
-			 * @brief Prepares a pipeline with the provided shaders and layout.
-			 * @param vertShaderPath Path to vertex shader.
-			 * @param fragShaderPath Path to fragment/pixel shader.
-			 * @param layout The required layout for the shaders to adhere to.
-			 */
-			void prepare(std::string vertShaderPath, std::string fragShaderPath,
-			             std::vector<ShaderLayout> layout);
+		/**
+		 * @brief Activates the pipeline, prepared shaders are activated.
+		 *
+		 * This must be called before calling the render method for
+		 * associated objects, otherwise you may render with the wrong
+		 * shader, or just without an active shader. If you don't plan on
+		 * changing shaders at any point, this can be called once beforehand
+		 * and never again.
+		 */
+		void activate();
 
-			/**
-			 * @brief Activates the pipeline, prepared shaders are activated.
-			 *
-			 * This must be called before calling the render method for
-			 * associated objects, otherwise you may render with the wrong
-			 * shader, or just without an active shader. If you don't plan on
-			 * changing shaders at any point, this can be called once beforehand
-			 * and never again.
-			 */
-			void activate();
+		/**
+		 * @brief Sets a uniform location to a float.
+		 * @param location The location being set.
+		 * @param value The value to set provided location.
+		 */
+		void setFloat(std::string location, float value);
 
-			/**
-			 * @brief Sets a uniform location to a float.
-			 * @param location The location being set.
-			 * @param value The value to set provided location.
-			 */
-			void setFloat(std::string location, float value);
+		/**
+		 * @brief Sets a uniform location to a 2 component vector.
+		 * @param location The location being set.
+		 * @param value The value to set provided location.
+		 */
+		void setVector2(std::string location, math::vec2 value);
 
-			/**
-			 * @brief Sets a uniform location to a 2 component vector.
-			 * @param location The location being set.
-			 * @param value The value to set provided location.
-			 */
-			void setVector2(std::string location, math::vec2 value);
+		/**
+		 * @brief Sets a uniform location to a 3 component vector.
+		 * @param location The unique identifier for the uniform.
+		 * @param value The value to set provided location.
+		 *
+		 * The uniform location being set must be equivalent to the name
+		 * provided to identify data specific to this type in the shaders
+		 * themselves.
+		 */
+		void setVector3(std::string location, math::vec3 value);
 
-			
-			/**
-			 * @brief Sets a uniform location to a 3 component vector.
-			 * @param location The unique identifier for the uniform.
-			 * @param value The value to set provided location.
-			 *
-			 * The uniform location being set must be equivalent to the name
-			 * provided to identify data specific to this type in the shaders
-			 * themselves.
-			 */
-			void setVector3(std::string location, math::vec3 value);
+		/**
+		 * @brief Sets a uniform location to a 4x4 matrix.
+		 * @param location The location being set.
+		 * @param value The value to set provided location.
+		 *
+		 * The uniform location being set must be equivalent to the name
+		 * provided to identify data specific to this type in the shaders
+		 * themselves.
+		 */
+		void setMatrix(std::string location, math::mat4 value);
 
-			/**
-			 * @brief Sets a uniform location to a 4x4 matrix.
-			 * @param location The location being set.
-			 * @param value The value to set provided location.
-			 * 
-			 * The uniform location being set must be equivalent to the name
-			 * provided to identify data specific to this type in the shaders
-			 * themselves.
-			 */
-			void setMatrix(std::string location, math::mat4 value);
+		/**
+		 * @brief Queries the location set for a specific attribute.
+		 * @param attr The layout/attribute name provided in the shader.
+		 * @return The set location for the attribute.
+		 */
+		int queryLayoutOfAttribute(std::string attr);
 
-			/**
-			 * @brief Queries the location set for a specific attribute.
-			 * @param attr The layout/attribute name provided in the shader.
-			 * @return The set location for the attribute.
-			 */
-			int queryLayoutOfAttribute(std::string attr);
-
-		private:
-			unsigned int m_program;
-		};
-	} // namespace gfx
-} // namespace phx
+	private:
+		unsigned int m_program;
+	};
+} // namespace phx::gfx

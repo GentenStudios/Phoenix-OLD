@@ -32,35 +32,32 @@
 #include <Client/Graphics/ShaderPipeline.hpp>
 #include <Client/Graphics/Window.hpp>
 
-namespace phx
+namespace phx::client
 {
-	namespace client
+	/**
+	 * @brief The loading SplashScreen for the client.
+	 *
+	 * @see Layer
+	 * @see LayerStack
+	 */
+	class SplashScreen : public gfx::Layer
 	{
-		/**
-		 * @brief The loading SplashScreen for the client.
-		 *
-		 * @see Layer
-		 * @see LayerStack
-		 */
-		class SplashScreen : public gfx::Layer
-		{
-		public:
-			SplashScreen();
-			~SplashScreen() override = default;
+	public:
+		SplashScreen();
+		~SplashScreen() override = default;
 
-			void onEvent(events::Event& e) override;
-			void onAttach() override;
-			void onDetach() override;
+		void onEvent(events::Event& e) override;
+		void onAttach() override;
+		void onDetach() override;
 
-			void tick(float dt) override;
+		void tick(float dt) override;
 
-		private:
-			gfx::ShaderPipeline m_pipeline;
-			unsigned int        m_vao;
-			unsigned int        m_vbo;
-			unsigned int        m_texture;
-			float               m_alpha      = -0.5f;
-			float               m_multiplier = 1.f;
-		};
-	} // namespace client
-} // namespace phx
+	private:
+		gfx::ShaderPipeline m_pipeline;
+		unsigned int        m_vao;
+		unsigned int        m_vbo;
+		unsigned int        m_texture;
+		float               m_alpha      = -0.5f;
+		float               m_multiplier = 1.f;
+	};
+} // namespace phx::client

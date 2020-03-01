@@ -30,60 +30,57 @@
 
 #include <Common/Math/Vector3.hpp>
 
-namespace phx
+namespace phx::math
 {
-	namespace math
+	/**
+	 * @brief Produces a castable ray for helping find things at
+	 * positions/intervals along the ray.
+	 */
+	class Ray
 	{
+		using vec3 = detail::Vector3<float>;
+
+	public:
 		/**
-		 * @brief Produces a castable ray for helping find things at
-		 * positions/intervals along the ray.
+		 * @brief Constructs a Ray object.
+		 * @param start The position of the start of the ray.
+		 * @param direction The direction the ray is "traveling" in.
 		 */
-		class Ray
-		{
-			using vec3 = detail::Vector3<float>;
+		Ray(const vec3& start, const vec3& direction);
 
-		public:
-			/**
-			 * @brief Constructs a Ray object.
-			 * @param start The position of the start of the ray.
-			 * @param direction The direction the ray is "traveling" in.
-			 */
-			Ray(const vec3& start, const vec3& direction);
+		Ray(const Ray& other) = default;
+		~Ray()                = default;
 
-			Ray(const Ray& other) = default;
-			~Ray()                = default;
+		/**
+		 * @brief Advances along a ray.
+		 * @param scale The distance to advance along the ray.
+		 * @return The new position along the ray.
+		 */
+		vec3 advance(float scale);
 
-			/**
-			 * @brief Advances along a ray.
-			 * @param scale The distance to advance along the ray.
-			 * @return The new position along the ray.
-			 */
-			vec3 advance(float scale);
+		/**
+		 * @brief Backtracks (goes backwards) along a ray.
+		 * @param scale The distance to backtrack along the ray.
+		 * @return The new position along the ray.
+		 */
+		vec3 backtrace(float scale);
 
-			/**
-			 * @brief Backtracks (goes backwards) along a ray.
-			 * @param scale The distance to backtrack along the ray.
-			 * @return The new position along the ray.
-			 */
-			vec3 backtrace(float scale);
+		/**
+		 * @brief Gets the current length of the ray.
+		 * @return The length of the ray.
+		 */
+		float getLength() const;
 
-			/**
-			 * @brief Gets the current length of the ray.
-			 * @return The length of the ray.
-			 */
-			float getLength() const;
+		/**
+		 * @brief Gets the current position along the ray.
+		 * @return The current position along the ray.
+		 */
+		vec3 getCurrentPosition() const;
 
-			/**
-			 * @brief Gets the current position along the ray.
-			 * @return The current position along the ray.
-			 */
-			vec3 getCurrentPosition() const;
-
-		private:
-			float m_length;
-			vec3  m_start;
-			vec3  m_direction;
-			vec3  m_currentPosition;
-		};
-	} // namespace math
-} // namespace phx
+	private:
+		float m_length;
+		vec3  m_start;
+		vec3  m_direction;
+		vec3  m_currentPosition;
+	};
+} // namespace phx::math

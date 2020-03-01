@@ -31,34 +31,31 @@
 #include <Client/Events/Event.hpp>
 #include <Client/Graphics/Layer.hpp>
 
-namespace phx
+namespace phx::client
 {
-	namespace client
+	/**
+	 * @brief The Debug Overlay for the Client.
+	 *
+	 * @see Layer
+	 * @see LayerStack
+	 */
+	class DebugOverlay : public gfx::Overlay
 	{
-		/**
-		 * @brief The Debug Overlay for the Client.
-		 *
-		 * @see Layer
-		 * @see LayerStack
-		 */
-		class DebugOverlay : public gfx::Overlay
-		{
-		public:
-			DebugOverlay();
-			~DebugOverlay() override = default;
+	public:
+		DebugOverlay();
+		~DebugOverlay() override = default;
 
-			void onAttach() override;
-			void onDetach() override;
-			void onEvent(events::Event& e) override;
-			void tick(float dt) override;
+		void onAttach() override;
+		void onDetach() override;
+		void onEvent(events::Event& e) override;
+		void tick(float dt) override;
 
-		private:
-			bool m_wireframe     = false;
-			int  m_sampleRate    = 60;
-			int  m_maxSampleRate = 60;
-			bool m_pauseSampling = false;
+	private:
+		bool m_wireframe     = false;
+		int  m_sampleRate    = 60;
+		int  m_maxSampleRate = 60;
+		bool m_pauseSampling = false;
 
-			unsigned int m_time = 0;
-		};
-	} // namespace client
-} // namespace phx
+		unsigned int m_time = 0;
+	};
+} // namespace phx::client

@@ -81,7 +81,7 @@ namespace phx
 		sol::state lua;
 
 		std::string currentMod;
-		
+
 		ContentManager();
 	};
-}; // namespace q2
+}; // namespace phx

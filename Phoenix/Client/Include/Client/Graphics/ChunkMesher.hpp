@@ -42,82 +42,81 @@
 
 #include <vector>
 
-namespace phx
+namespace phx::gfx
 {
-	namespace gfx
+	/**
+	 * @brief Each face of a cube.
+	 *
+	 * This is the order in which textures in Lua MUST be registered. The
+	 * system only understands this format, or textures will be the wrong
+	 * way round and you won't know why.
+	 */
+	enum class BlockFace : unsigned int
 	{
+		FRONT = 0,
+		LEFT,
+		BACK,
+		RIGHT,
+		TOP,
+		BOTTOM
+	};
+
+	/**
+	 * @brief Meshes a chunk.
+	 *
+	 * Once provided with a reference to the blocks within a chunk and a
+	 * ready built texture table gotten from the ChunkRenderer, it can mesh
+	 * the chunks very simply.
+	 *
+	 * This mesher does not understand "smart" meshing, it will mesh only
+	 * this chunk, and will not take neighbor chunks into account as of yet.
+	 * As the project gains maturity and we have more features, this will be
+	 * improved.
+	 *
+	 * @paragraph Usage
+	 * @code
+	 * ChunkMesher mesher(chunkPosition, chunk.getBlocks(),
+	 * renderer->getTextureTable()) mesher.mesh()
+	 * renderer->submitChunk(mesher.getMesh(), chunkPosition);
+	 * @endcode
+	 *
+	 */
+	class ChunkMesher
+	{
+	public:
 		/**
-		 * @brief Each face of a cube.
-		 *
-		 * This is the order in which textures in Lua MUST be registered. The
-		 * system only understands this format, or textures will be the wrong
-		 * way round and you won't know why.
+		 * @brief Constructs the mesher based on a few parameters.
+		 * @param pos The position of the chunk.
+		 * @param blocks A reference to the array of blocks in the chunk.
+		 * @param texTable The texture table values created by the renderer.
 		 */
-		enum class BlockFace : unsigned int
+		ChunkMesher(math::vec3 pos, std::vector<voxels::BlockType*>& blocks,
+		            const ChunkRenderer::AssociativeTextureTable& texTable)
+		    : m_blockRef(blocks), m_pos(pos), m_texTable(texTable)
 		{
-			FRONT = 0,
-			LEFT,
-			BACK,
-			RIGHT,
-			TOP,
-			BOTTOM
-		};
+		}
+		~ChunkMesher() = default;
 
 		/**
-		 * @brief Meshes a chunk.
-		 *
-		 * Once provided with a reference to the blocks within a chunk and a
-		 * ready built texture table gotten from the ChunkRenderer, it can mesh
-		 * the chunks very simply.
-		 *
-		 * This mesher does not understand "smart" meshing, it will mesh only
-		 * this chunk, and will not take neighbor chunks into account as of yet.
-		 * As the project gains maturity and we have more features, this will be
-		 * improved.
-		 *
-		 * @paragraph Usage
-		 * @code
-		 * ChunkMesher mesher(chunkPosition, chunk.getBlocks(), renderer->getTextureTable())
-		 * mesher.mesh()
-		 * renderer->submitChunk(mesher.getMesh(), chunkPosition);
-		 * @endcode
-		 * 
+		 * @brief Meshes the chunk.
 		 */
-		class ChunkMesher
-		{
-		public:
-			/**
-			 * @brief Constructs the mesher based on a few parameters.
-			 * @param pos The position of the chunk.
-			 * @param blocks A reference to the array of blocks in the chunk.
-			 * @param texTable The texture table values created by the renderer.
-			 */
-			ChunkMesher(math::vec3 pos, std::vector<voxels::BlockType*>& blocks, const ChunkRenderer::AssociativeTextureTable& texTable)
-			    : m_blockRef(blocks), m_pos(pos), m_texTable(texTable)
-			{
-			}
-			~ChunkMesher() = default;
+		void mesh();
 
-			/**
-			 * @brief Meshes the chunk.
-			 */
-			void mesh();
-			
-			/**
-			 * @brief Returns the mesh as an array of floats.
-			 * @return The mesh as an array of floats.
-			 */
-			const std::vector<float>& getMesh() { return m_mesh; }
+		/**
+		 * @brief Returns the mesh as an array of floats.
+		 * @return The mesh as an array of floats.
+		 */
+		const std::vector<float>& getMesh() { return m_mesh; }
 
-		private:
-			// internal function, no need to document.
-			void addBlockFace(voxels::BlockType* block, BlockFace face, float x, float y, float z);
+	private:
+		// internal function, no need to document.
+		void addBlockFace(voxels::BlockType* block, BlockFace face, float x,
+		                  float y, float z);
 
-		private:
-			math::vec3                      m_pos;
-			std::vector<float>              m_mesh;
-			std::vector<voxels::BlockType*> m_blockRef;
-			const ChunkRenderer::AssociativeTextureTable& m_texTable;
-		};
-	} // namespace gfx
-} // namespace q2
+	private:
+		math::vec3                                    m_pos;
+		std::vector<float>                            m_mesh;
+		std::vector<voxels::BlockType*>               m_blockRef;
+		const ChunkRenderer::AssociativeTextureTable& m_texTable;
+	};
+} // namespace phx::gfx

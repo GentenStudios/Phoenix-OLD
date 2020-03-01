@@ -72,7 +72,7 @@ namespace phx
 		int m_minValue;
 
 	public:
-		Setting();
+		Setting() = default;
 
 		/**
 		 * @brief Construct a new Setting object.

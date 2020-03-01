@@ -32,35 +32,32 @@
 #include <Client/Graphics/ShaderPipeline.hpp>
 #include <Client/Graphics/Window.hpp>
 
-namespace phx
+namespace phx::client
 {
-	namespace client
+	/**
+	 * @brief The crosshair.
+	 *
+	 * @see Layer
+	 * @see LayerStack
+	 */
+	class Crosshair : public gfx::Overlay
 	{
-		/**
-		 * @brief The crosshair.
-		 *
-		 * @see Layer
-		 * @see LayerStack
-		 */
-		class Crosshair : public gfx::Overlay
-		{
-		public:
-			Crosshair(gfx::Window* window);
-			~Crosshair() override = default;
+	public:
+		Crosshair(gfx::Window* window);
+		~Crosshair() override = default;
 
-			void onEvent(events::Event& e) override;
-			void onAttach() override;
-			void onDetach() override;
+		void onEvent(events::Event& e) override;
+		void onAttach() override;
+		void onDetach() override;
 
-			void tick(float dt) override;
+		void tick(float dt) override;
 
-		private:
-			gfx::ShaderPipeline m_pipeline;
-			unsigned int        m_vao;
-			unsigned int        m_vbo;
-			unsigned int        m_texture;
-			unsigned int        m_screenW;
-			unsigned int        m_screenH;
-		};
-	} // namespace client
-} // namespace phx
+	private:
+		gfx::ShaderPipeline m_pipeline;
+		unsigned int        m_vao;
+		unsigned int        m_vbo;
+		unsigned int        m_texture;
+		unsigned int        m_screenW;
+		unsigned int        m_screenH;
+	};
+} // namespace phx::client
