@@ -34,22 +34,19 @@
 #include <Common/Math/Vector3.hpp>
 #include <Common/Math/Ray.hpp>
 
-namespace phx
+namespace phx::math
 {
-	namespace math
-	{
-		using vec2  = detail::Vector2<float>;
-		using vec2f = detail::Vector2<float>;
-		using vec2d = detail::Vector2<double>;
-		using vec2i = detail::Vector2<int>;
-		using vec2u = detail::Vector2<unsigned int>;
+	using vec2  = detail::Vector2<float>;
+	using vec2f = detail::Vector2<float>;
+	using vec2d = detail::Vector2<double>;
+	using vec2i = detail::Vector2<int>;
+	using vec2u = detail::Vector2<unsigned int>;
 
-		using vec3  = detail::Vector3<float>;
-		using vec3f = detail::Vector3<float>;
-		using vec3d = detail::Vector3<double>;
-		using vec3i = detail::Vector3<int>;
-		using vec3u = detail::Vector3<unsigned int>;
+	using vec3  = detail::Vector3<float>;
+	using vec3f = detail::Vector3<float>;
+	using vec3d = detail::Vector3<double>;
+	using vec3i = detail::Vector3<int>;
+	using vec3u = detail::Vector3<unsigned int>;
 
-		using mat4 = detail::Matrix4x4;
-	} // namespace math
-} // namespace q2
+	using mat4 = detail::Matrix4x4;
+} // namespace phx::math

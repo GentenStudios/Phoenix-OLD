@@ -35,16 +35,16 @@
 namespace phx::client
 {
 	/**
-	 * @brief The loading SplashScreen for the client.
+	 * @brief The crosshair.
 	 *
 	 * @see Layer
 	 * @see LayerStack
 	 */
-	class SplashScreen : public gfx::Layer
+	class Crosshair : public gfx::Overlay
 	{
 	public:
-		SplashScreen();
-		~SplashScreen() override = default;
+		Crosshair(gfx::Window* window);
+		~Crosshair() override = default;
 
 		void onEvent(events::Event& e) override;
 		void onAttach() override;
@@ -57,7 +57,7 @@ namespace phx::client
 		unsigned int        m_vao;
 		unsigned int        m_vbo;
 		unsigned int        m_texture;
-		float               m_alpha      = -0.5f;
-		float               m_multiplier = 1.f;
+		unsigned int        m_screenW;
+		unsigned int        m_screenH;
 	};
 } // namespace phx::client

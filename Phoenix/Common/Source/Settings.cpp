@@ -35,8 +35,6 @@
 
 using namespace phx;
 
-Setting::Setting() {}
-
 Setting::Setting(std::string name, std::string key, int defaultValue)
     : m_name(std::move(name)), m_key(std::move(key)), m_value(defaultValue),
       m_maxValue(SHRT_MAX), m_minValue(SHRT_MIN), m_default(defaultValue)

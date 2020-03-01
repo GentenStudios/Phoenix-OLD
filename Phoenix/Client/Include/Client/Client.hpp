@@ -36,31 +36,28 @@
 
 #include <Common/Singleton.hpp>
 
-namespace phx
+namespace phx::client
 {
-	namespace client
+	class Client : public events::IEventListener, public Singleton<Client>
 	{
-		class Client : public events::IEventListener, public Singleton<Client>
-		{
-		public:
-			Client();
-			~Client() = default;
+	public:
+		Client();
+		~Client() = default;
 
-			void pushLayer(gfx::Layer* layer);
-			void popLayer(gfx::Layer* layer);
-			bool isDebugLayerActive() const { return m_debugOverlayActive; }
+    void pushLayer(gfx::Layer* layer);
+		void popLayer(gfx::Layer* layer);
+		bool isDebugLayerActive() const { return m_debugOverlayActive; }
 
-			void onEvent(events::Event e) override;
-			void run();
+		void onEvent(events::Event e) override;
+		void run();
 
-		private:
-			gfx::Window     m_window;
-			gfx::LayerStack m_layerStack;
-			ui::ChatWindow  m_chat = ui::ChatWindow("Chat Window", 5,
-			                                        "Type something and hit enter to run a command!\n");
+	private:
+		gfx::Window     m_window;
+		gfx::LayerStack m_layerStack;
+		ui::ChatWindow  m_chat = ui::ChatWindow("Chat Window", 5,
+		                                        "Type something and hit enter to run a command!\n");
 
-			bool          m_debugOverlayActive = false;
-			DebugOverlay* m_debugOverlay       = nullptr;
-		};
-	} // namespace client
-} // namespace phx
+    bool          m_debugOverlayActive = false;
+		DebugOverlay* m_debugOverlay       = nullptr;
+	};
+} // namespace phx::client

@@ -79,7 +79,7 @@ namespace phx
 		 * @param f The function that is called when the command is executed.
 		 */
 		void add(const std::string& command, const std::string& help,
-		         const std::string& permission, CommandFunction f);
+		         const std::string& permission, const CommandFunction& f);
 
 		/**
 		 * @brief Searches for a command.

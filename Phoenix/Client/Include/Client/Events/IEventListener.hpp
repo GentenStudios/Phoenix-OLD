@@ -30,17 +30,14 @@
 
 #include <Client/Events/Event.hpp>
 
-namespace phx
+namespace phx::events
 {
-	namespace events
+	class IEventListener
 	{
-		class IEventListener
-		{
-		public:
-			IEventListener()          = default;
-			virtual ~IEventListener() = default;
+	public:
+		IEventListener()          = default;
+		virtual ~IEventListener() = default;
 
-			virtual void onEvent(Event e) = 0;
-		};
-	} // namespace events
-} // namespace q2
+		virtual void onEvent(Event e) = 0;
+	};
+} // namespace phx::events

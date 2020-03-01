@@ -30,7 +30,7 @@
 #include <Common/Math/MathUtils.hpp>
 #include <Common/Math/Matrix4x4.hpp>
 
-#define INDEX_2D(x, y) x + (y * 4)
+#define INDEX_2D(x, y) (x + ((y) *4))
 
 using namespace phx::math::detail;
 
