@@ -171,8 +171,7 @@ void ChunkMesher::mesh()
 void ChunkMesher::addBlockFace(voxels::BlockType* block, BlockFace face,
                                float x, float y, float z)
 {
-	int texLayer = -1;
-	texLayer = m_texTable.at(block->textures[static_cast<std::size_t>(face)]);
+	const std::size_t texLayer = m_texTable.at(block->textures[static_cast<std::size_t>(face)]);
 
 	for (int i = 0; i < NUM_VERTS_IN_FACE; ++i)
 	{

@@ -54,9 +54,9 @@ namespace phx::client
 
 	private:
 		gfx::ShaderPipeline m_pipeline;
-		unsigned int        m_vao;
-		unsigned int        m_vbo;
-		unsigned int        m_texture;
+		unsigned int        m_vao = 0;
+		unsigned int        m_vbo = 0;
+		unsigned int        m_texture = 0;
 		float               m_alpha      = -0.5f;
 		float               m_multiplier = 1.f;
 	};

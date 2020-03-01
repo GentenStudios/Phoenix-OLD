@@ -69,7 +69,7 @@ void Game::onAttach()
 
 	m_chat->registerCallback(rawEcho);
 
-	std::string save = "save1";
+	const std::string save = "save1";
 
 	if (!ContentManager::get()->loadModules(save))
 	{

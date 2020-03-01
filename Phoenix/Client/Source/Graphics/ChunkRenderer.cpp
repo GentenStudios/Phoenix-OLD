@@ -51,9 +51,9 @@ struct Vertex
 	float tex;
 };
 
-ChunkRenderer::ChunkRenderer(std::size_t visibleChunks)
-    : m_visibleChunks(visibleChunks)
+ChunkRenderer::ChunkRenderer(const std::size_t visibleChunks)
 {
+	m_buffers.reserve(visibleChunks);
 }
 
 ChunkRenderer::~ChunkRenderer()
@@ -156,7 +156,7 @@ void ChunkRenderer::submitChunk(const std::vector<float>& mesh, math::vec3 pos)
 
 void ChunkRenderer::updateChunk(const std::vector<float>& mesh, math::vec3 pos)
 {
-	auto it = m_buffers.find(pos);
+	const auto it = m_buffers.find(pos);
 	if (it == m_buffers.end())
 	{
 		submitChunk(mesh, pos);

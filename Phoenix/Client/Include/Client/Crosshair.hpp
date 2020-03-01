@@ -43,7 +43,7 @@ namespace phx::client
 	class Crosshair : public gfx::Overlay
 	{
 	public:
-		Crosshair(gfx::Window* window);
+		explicit Crosshair(gfx::Window* window);
 		~Crosshair() override = default;
 
 		void onEvent(events::Event& e) override;
@@ -54,9 +54,9 @@ namespace phx::client
 
 	private:
 		gfx::ShaderPipeline m_pipeline;
-		unsigned int        m_vao;
-		unsigned int        m_vbo;
-		unsigned int        m_texture;
+		unsigned int        m_vao = 0;
+		unsigned int        m_vbo = 0;
+		unsigned int        m_texture = 0;
 		unsigned int        m_screenW;
 		unsigned int        m_screenH;
 	};

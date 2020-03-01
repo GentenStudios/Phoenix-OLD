@@ -251,6 +251,8 @@ void Window::pollEvents()
 			default:
 				break;
 			}
+		default:
+			break;
 		}
 	}
 }
@@ -376,7 +378,7 @@ void Window::registerEventListener(events::IEventListener* listener)
 
 void Window::nullifyEventListener(events::IEventListener* listener)
 {
-	auto iterPos =
+	const auto iterPos =
 	    std::find(m_eventListeners.begin(), m_eventListeners.end(), listener);
 
 	if (iterPos == m_eventListeners.end())

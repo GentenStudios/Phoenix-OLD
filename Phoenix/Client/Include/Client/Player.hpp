@@ -52,19 +52,19 @@ namespace phx
 	{
 	public:
 		// temporary until a proper management system is put in place.
-		Player(voxels::ChunkView* world);
-		
-		math::Ray getTarget();
+		explicit Player(voxels::ChunkView* world);
+
+		math::Ray getTarget() const;
 
 		bool action1();
 		bool action2();
 
-        void setHand(voxels::BlockType* block);
-        voxels::BlockType* getHand();
+		void               setHand(voxels::BlockType* block);
+		voxels::BlockType* getHand();
 
 	private:
-		float m_reach = 32.f;
+		float              m_reach = 32.f;
 		voxels::ChunkView* m_world;
-        voxels::BlockType* m_hand;
+		voxels::BlockType* m_hand;
 	};
 } // namespace phx

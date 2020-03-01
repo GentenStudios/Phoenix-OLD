@@ -111,7 +111,7 @@ void LayerStack::pushLayer(Layer* layer)
 
 void LayerStack::popLayer(Layer* layer)
 {
-	auto it = std::find(m_layers.begin(), m_layers.end(), layer);
+	const auto it = std::find(m_layers.begin(), m_layers.end(), layer);
 	if (it != m_layers.end())
 	{
 		layer->onDetach();
@@ -138,7 +138,7 @@ void LayerStack::pushOverlay(Layer* overlay)
 
 void LayerStack::popOverlay(Layer* overlay)
 {
-	auto it = std::find(m_layers.begin(), m_layers.end(), overlay);
+	const auto it = std::find(m_layers.begin(), m_layers.end(), overlay);
 	if (it != m_layers.end())
 	{
 		overlay->onDetach();

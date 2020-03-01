@@ -36,9 +36,7 @@
 #pragma once
 
 #include <imgui.h>
-#include <imgui_internal.h>
 
-#include <iostream>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -291,10 +289,11 @@ namespace ImGui
 	 *   //...
 	 *   // In the render loop:
 	 *   term.draw();
+	 *   @endcode
 	 */
 	class BasicTerminal : public BaseImWindow
 	{
-	/// @privatesection
+		/// @privatesection
 	private:
 		// NOTE:
 		//   Because we don't currently have a C++ standard facility for
@@ -319,7 +318,7 @@ namespace ImGui
 		void flush();
 
 		/// @brief Stores the target output display cache size in bytes.
-		const int m_targetOutputSize;
+		const std::size_t m_targetOutputSize;
 
 		/// @brief Stores the text for our display between updates.
 		std::string m_outputBuffer;
@@ -330,7 +329,7 @@ namespace ImGui
 		/// @brief All the callback function pointers registered with the class.
 		std::vector<TerminalCallback> m_callbackRegistry;
 
-	///@protectedsection
+		///@protectedsection
 	protected:
 		/// @brief Draws the terminal input field.
 		void drawInputField();
@@ -344,7 +343,7 @@ namespace ImGui
 		/// @brief Draws the terminal output field.
 		void drawOutputField(ImGuiWindowFlags flags);
 
-	///@publicsection
+		///@publicsection
 	public:
 		/**
 		 * @brief
@@ -388,7 +387,8 @@ namespace ImGui
 		 *   into the output cache, name is uesd to construct outputWindowName,
 		 *   and initialContents is saved for later recall by the flush method.
 		 */
-		explicit BasicTerminal(const char* name, int outputKiloBytes = 5,
+		explicit BasicTerminal(const char* name,
+		                       std::size_t outputKiloBytes = 5,
 		                       const char* initialContents = "");
 
 		///@brief Does nothing for now; this is a todo feature.

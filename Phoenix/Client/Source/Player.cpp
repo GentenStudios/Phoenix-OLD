@@ -121,7 +121,7 @@ Player::Player(voxels::ChunkView* world) : m_world(world)
 		});
 }
 
-math::Ray Player::getTarget()
+math::Ray Player::getTarget() const
 {
 	math::vec3 pos = (getPosition() / 2.f) + .5f;
 

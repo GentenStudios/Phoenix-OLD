@@ -93,6 +93,7 @@ namespace phx::gfx
 	 * }
 	 *
 	 * delete window;
+	 * @endcode
 	 */
 	class Window
 	{
@@ -303,8 +304,8 @@ namespace phx::gfx
 
 		bool m_running;
 
-		bool m_vsync;
-		bool m_fullscreen;
+		bool m_vsync = false;
+		bool m_fullscreen = false;
 
 		math::vec2i m_cachedScreenSize;
 
