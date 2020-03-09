@@ -242,7 +242,7 @@ void Logger::loggerThreadHandle()
 				return;
 			}
 
-			log = std::move(m_messages.front());
+			log = m_messages.front();
 			m_messages.pop_front();
 		}
 
