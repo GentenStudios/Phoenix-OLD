@@ -29,6 +29,7 @@
 #include <Server/Server.hpp>
 
 #include <enet/enet.h>
+#include <Common/Math/Math.hpp>>
 
 #include <iostream>
 #include <utility>
@@ -78,6 +79,7 @@ void Server::run()
 				       m_event.peer->address.host, m_event.peer->address.port);
 				break;
 			case ENET_EVENT_TYPE_RECEIVE:
+			    if(m_event.channelID = 0){parseEvent(m_server, -1, m_event.packet->data)}
 				printf("A packet of length %zu containing %s was received from %s on channel %u.\n",
 				       m_event.packet->dataLength, m_event.packet->data,
 				       m_event.peer->data, m_event.channelID);
@@ -97,4 +99,36 @@ void Server::run()
 Server::~Server()
 {
     enet_host_destroy(m_server);
+}
+void Server::parseState(ENetHost* server, int id, char* data) {
+    math::vec3 pos = m_player.getPosition();
+    const float moveSpeed = static_cast<float>(m_player.getMoveSpeed());
+
+
+    if (data[0])
+    {
+        pos += forward * dt * moveSpeed;
+    }
+    else if (data[1])
+    {
+        pos -= forward * dt * moveSpeed;
+    }
+
+    if (data[2])
+    {
+        pos -= right * dt * moveSpeed;
+    }
+    else if (data[3])
+    {
+        pos += right * dt * moveSpeed;
+    }
+
+    if (data[4])
+    {
+        pos.y += dt * moveSpeed;
+    }
+    else if (data[5])
+    {
+        pos.y -= dt * moveSpeed;
+    }
 }

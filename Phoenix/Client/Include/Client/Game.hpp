@@ -36,6 +36,7 @@
 #include <Client/Graphics/Window.hpp>
 #include <Client/Player.hpp>
 
+#include <deque>
 #include <enet/enet.h>
 
 namespace phx::client
@@ -81,6 +82,10 @@ namespace phx::client
 		bool       m_followCam = true;
 		math::vec3 m_prevPos;
 		int        m_playerHand = 0;
+
+        static constexpr size_t STATE_SIZE = 7;
+        static constexpr size_t LOG_SIZE = 5;
+        std::string stateLog;
 
 		// Networking stuff
 

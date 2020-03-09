@@ -259,6 +259,37 @@ void Game::tick(float dt)
 
 	m_camera->tick(dt);
 
+    /// TODO: Convert this to pull a bitpacked state from an input map?
+    // WASD
+    std::string state = "1";
+    if (m_window->isKeyDown(events::Keys::KEY_W))
+    {state += "1";} else {state += "0";}
+    if (m_window->isKeyDown(events::Keys::KEY_S))
+    {state += "1";} else {state += "0";}
+    if (m_window->isKeyDown(events::Keys::KEY_A))
+    {state += "1";} else {state += "0";}
+    if (m_window->isKeyDown(events::Keys::KEY_D))
+    {state += "1";} else {state += "0";}
+    if (m_window->isKeyDown(events::Keys::KEY_SPACE))
+    {state += "1";} else {state += "0";}
+    if (m_window->isKeyDown(events::Keys::KEY_LEFT_SHIFT))
+    {state += "1";} else {state += "0";}
+    printf("state:%s", state.c_str());
+
+    if (stateLog.size() > STATE_SIZE * LOG_SIZE)
+	{
+		stateLog = stateLog.substr(STATE_SIZE + 1, STATE_SIZE * (LOG_SIZE - 1)) + state;
+	}else{
+        stateLog = stateLog + state;
+    }
+
+    ENetPacket* packet;
+    packet = enet_packet_create(stateLog.c_str(), stateLog.size(),
+                                ENET_PACKET_FLAG_UNRELIABLE_FRAGMENT);
+
+    enet_peer_send(m_peer, 0, packet);
+    enet_host_flush(m_client);
+
 	if (m_followCam)
 	{
 		m_prevPos = m_player->getPosition();

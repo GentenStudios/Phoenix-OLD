@@ -28,6 +28,8 @@
 
 #pragma once
 
+#include <Common/Actor.hpp>
+
 #include <enet/enet.h>
 
 #include <string>
@@ -41,10 +43,14 @@ namespace phx::server
 		~Server();
 
 		void run();
+		void parseState(ENetHost* server, int id, char* data);
+		void parseEvent(ENetHost* server, int id, char* data);
 	private:
 	    bool m_running;
 
 	    std::string m_save;
+
+	    Actor m_player;
 
 	    // Networking stuff
 
