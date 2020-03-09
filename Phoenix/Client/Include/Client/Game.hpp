@@ -36,6 +36,8 @@
 #include <Client/Graphics/Window.hpp>
 #include <Client/Player.hpp>
 
+#include <enet/enet.h>
+
 namespace phx::client
 {
 	/**
@@ -79,5 +81,12 @@ namespace phx::client
 		bool       m_followCam = true;
 		math::vec3 m_prevPos;
 		int        m_playerHand = 0;
+
+		// Networking stuff
+
+        ENetHost*   m_client;
+        ENetEvent   m_event;
+        ENetPeer*   m_peer;
+        ENetAddress m_address;
 	};
 } // namespace phx::client

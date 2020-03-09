@@ -21,6 +21,7 @@ add_subdirectory (Glad)
 add_subdirectory (ImGui)
 add_subdirectory (sol2)
 add_subdirectory (lua)
+add_subdirectory (enet)
 
 set_target_properties(SDL2main SDL2-static uninstall Glad ImGui lua liblua PROPERTIES FOLDER Dependencies)
 
@@ -31,6 +32,7 @@ set(PHX_THIRD_PARTY_INCLUDES
 	${CMAKE_CURRENT_LIST_DIR}/ImGui
 	${CMAKE_CURRENT_LIST_DIR}/ImGui/examples
 	${CMAKE_CURRENT_LIST_DIR}/lua
+	${CMAKE_CURRENT_LIST_DIR}/enet/include
 	${CMAKE_CURRENT_LIST_DIR}/sol2/include
 	${CMAKE_CURRENT_LIST_DIR}/stb_image
 	${CMAKE_CURRENT_LIST_DIR}/stb_rectpack
@@ -43,6 +45,7 @@ set(PHX_THIRD_PARTY_LIBRARIES
 	SDL2main
 	Glad 
 	ImGui
+	enet
 	sol2
 	liblua
 	$<$<PLATFORM_ID:Windows>:opengl32.lib> # link to opengl32.lib if windows.

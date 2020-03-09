@@ -64,9 +64,52 @@ Game::~Game() { delete m_chat; }
 
 void Game::onAttach()
 {
+    if (enet_initialize () != 0)
+    {
+        fprintf (stderr, "An error occurred while initializing ENet.\n");
+        exit(0);
+    }
+    atexit (enet_deinitialize);
+
+//    m_address.host = ENET_HOST_ANY;
+//    m_address.port = 7777;
+    m_client = enet_host_create (NULL /* the address to bind the server host to */,
+                               1      /* connect to a single server */,
+                               2      /* allow up to 2 channels to be used, 0 and 1 */,
+                               0      /* assume any amount of incoming bandwidth */,
+                               0      /* assume any amount of outgoing bandwidth */);
+    if (m_client == NULL)
+    {
+        fprintf (stderr,
+                 "An error occurred while trying to create an ENet client host.\n");
+        exit (EXIT_FAILURE);
+    }
+
+    enet_address_set_host(&m_address, "127.0.0.1");
+    m_address.port = 7777;
+
+    m_peer = enet_host_connect(m_client, &m_address, 1, 0);
+    if (m_peer == NULL)
+    {
+        fprintf (stderr,
+                 "No available peers for initiating an ENet connection\n");
+        exit (EXIT_FAILURE);
+    }
+
+    if(enet_host_service(m_client, &m_event, 5000) > 0 && m_event.type == ENET_EVENT_TYPE_CONNECT)
+    {
+        puts("Connection to 127.0.0.1:7777 made");
+    }
+    else
+    {
+        enet_peer_reset(m_peer);
+        puts("Connection to 127.0.0.1:7777 failed.");
+    }
+
 	m_chat = new ui::ChatWindow("Chat Window", 5,
 	                            "Type /help for a command list and help.");
 
+    /// @TODO replace with network callback
 	m_chat->registerCallback(rawEcho);
 
 	const std::string save = "save1";
@@ -101,6 +144,21 @@ void Game::onAttach()
 
 void Game::onDetach()
 {
+    enet_peer_disconnect(m_peer, 0);
+
+    while(enet_host_service(m_client, &m_event, 3000) > 0)
+    {
+        switch(m_event.type)
+        {
+        case ENET_EVENT_TYPE_RECEIVE:
+            enet_packet_destroy(m_event.packet);
+            break;
+        case ENET_EVENT_TYPE_DISCONNECT:
+            puts("Disconnection succeeded.");
+            break;
+        }
+    }
+
 	delete m_world;
 	delete m_player;
 	delete m_camera;
@@ -181,6 +239,24 @@ void Game::onEvent(events::Event& e)
 
 void Game::tick(float dt)
 {
+    if(enet_host_service(m_client, &m_event, 0))
+    {
+        switch(m_event.type)
+        {
+        case ENET_EVENT_TYPE_RECEIVE:
+            printf ("A packet of length %zu containing %s was received from %u on channel %u|%u.\n",
+                    m_event.packet -> dataLength,
+                    m_event.packet -> data,
+                    m_event.peer -> address.host,
+                    m_event.peer -> address.port,
+                    m_event.channelID);
+            /* Clean up the packet now that we're done using it. */
+            enet_packet_destroy (m_event.packet);
+
+            break;
+        }
+    }
+
 	m_camera->tick(dt);
 
 	if (m_followCam)

@@ -33,7 +33,14 @@ using namespace phx;
 #undef main
 int main(int argc, char** argv)
 {
-	server::Server* server = new server::Server();
+    std::string save;
+    if (argc > 0){
+        save = argv[0];
+    } else {
+        save = "save1";
+    }
+
+	server::Server* server = new server::Server(save);
 	server->run();
 
 	return 0;

@@ -28,14 +28,30 @@
 
 #pragma once
 
+#include <enet/enet.h>
+
+#include <string>
+
 namespace phx::server
 {
 	class Server
 	{
 	public:
-		Server()  = default;
-		~Server() = default;
+		Server(std::string save);
+		~Server();
 
 		void run();
+	private:
+	    bool m_running;
+
+	    std::string m_save;
+
+	    // Networking stuff
+
+        ENetHost*   m_server;
+        ENetEvent   m_event;
+        ENetPeer*   m_peer;
+        ENetAddress m_address;
+
 	};
 } // namespace phx::server

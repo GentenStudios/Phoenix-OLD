@@ -31,10 +31,6 @@
 #include <Client/Game.hpp>
 #include <Client/SplashScreen.hpp>
 
-#include <Common/Commander.hpp>
-#include <Common/ContentLoader.hpp>
-#include <Common/Settings.hpp>
-
 using namespace phx::client;
 using namespace phx;
 
