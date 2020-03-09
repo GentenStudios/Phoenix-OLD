@@ -29,10 +29,28 @@
 #pragma once
 
 #include <condition_variable>
+#include <deque>
 #include <fstream>
 #include <sstream>
 #include <string>
-#include <vector>
+
+#define LOGGER_INTERNAL(verbosity, component)           \
+	if (phx::Logger::get() == nullptr &&                \
+	    verbosity > phx::Logger::get()->getVerbosity()) \
+	{                                                   \
+		;                                               \
+	}                                                   \
+	else                                                \
+		(*phx::Logger::get()) +=                        \
+		    phx::Log(verbosity, __FILE__, __LINE__, component).ref()
+
+#define LOG_DEBUG(component) \
+	LOGGER_INTERNAL(phx::LogVerbosity::DEBUG, component)
+#define LOG_INFO(component) LOGGER_INTERNAL(phx::LogVerbosity::INFO, component)
+#define LOG_WARNING(component) \
+	LOGGER_INTERNAL(phx::LogVerbosity::WARNING, component)
+#define LOG_FATAL(component) \
+	LOGGER_INTERNAL(phx::LogVerbosity::FATAL, component)
 
 namespace phx
 {
@@ -47,24 +65,38 @@ namespace phx
 	struct LoggerConfig
 	{
 		std::string  logFile;
-		LogVerbosity verbosity         = LogVerbosity::INFO;
-		bool         threaded          = false;
-		bool         includeTimestamps = false;
-		bool         logToConsole      = true;
+		LogVerbosity verbosity    = LogVerbosity::INFO;
+		bool         threaded     = false;
+		bool         logToConsole = true;
 	};
 
 	class Log
 	{
 	public:
-		Log(LogVerbosity vb, const std::string& errFile, int errLineNo, const std::string& module)
+		Log() = default;
+		Log(LogVerbosity vb, const std::string& errFile, int errLineNo,
+		    const std::string& module)
 		{
 			verbosity = vb;
 			errorFile = errFile;
 			errorLine = errLineNo;
-			component = component;
+			component = module;
 		}
 
+		Log(const Log& rhs);
+		Log& operator=(const Log& rhs);
+
 		Log& ref() { return *this; }
+
+// im getting fucking pissed here.
+// clang-format off
+		#define OPERATOR_HELPER(type) \
+		Log& operator<<(type msg) \
+		{                         \
+			stream << msg;        \
+			return *this;         \
+		}
+		// clang-format on
 
 		template <typename T>
 		Log& operator<<(T& msg)
@@ -73,10 +105,25 @@ namespace phx
 			return *this;
 		}
 
+		// dont kill me austin
+		// please :(
+		OPERATOR_HELPER(short);
+		OPERATOR_HELPER(unsigned short);
+		OPERATOR_HELPER(int);
+		OPERATOR_HELPER(unsigned int);
+		OPERATOR_HELPER(long int);
+		OPERATOR_HELPER(unsigned long int);
+		OPERATOR_HELPER(long long int);
+		OPERATOR_HELPER(unsigned long long int);
+		OPERATOR_HELPER(float);
+		OPERATOR_HELPER(double);
+
+#undef OPERATOR_HELPER
+
 		std::stringstream stream;
-		LogVerbosity      verbosity;
+		LogVerbosity      verbosity = LogVerbosity::INFO;
 		std::string       errorFile;
-		int               errorLine;
+		int               errorLine = 0;
 		std::string       component;
 	};
 
@@ -84,32 +131,36 @@ namespace phx
 	{
 	public:
 		static void initialize(const LoggerConfig& config);
-		void        teardown();
+		static void teardown();
 
 		static Logger* get() { return m_instance; }
 
-		void log(const Log& log);
+		LogVerbosity getVerbosity() const;
 
+		void log(const Log& log);
 		void operator+=(const Log& stream);
 
 	private:
 		Logger(const LoggerConfig& config);
-		~Logger() = default;
+		~Logger();
 
 		void loggerInternal(const Log& log);
-		void loggerInternalForThreading();
 
 		static Logger* m_instance;
 
 	private:
-		std::vector<std::string> m_messages;
+		std::deque<Log> m_messages;
 
 		LogVerbosity m_verbosity;
 
 		bool                    m_threaded;
+		bool                    m_threadRunning = false;
 		std::condition_variable m_cond;
 		std::mutex              m_mutex;
+		std::thread             m_worker;
+		void                    loggerThreadHandle();
 
+		bool          m_logToConsole;
 		std::ofstream m_file;
 	};
 } // namespace phx

@@ -37,8 +37,6 @@
 
 using namespace phx;
 
-// Logger::m_instance = nullptr;
-
 static const char* g_logVerbToText[] = {"FATAL", "WARNING", "INFO", "DEBUG"};
 
 #ifdef ENGINE_PLATFORM_WINDOWS
@@ -110,18 +108,38 @@ static void setTerminalTextColor(LogVerbosity vb)
 	setTerminalTextColor(color);
 }
 
+Logger* Logger::m_instance = nullptr;
+
+Log::Log(const Log& rhs)
+{
+	stream    = std::stringstream(rhs.stream.str());
+	verbosity = rhs.verbosity;
+	errorFile = rhs.errorFile;
+	errorLine = rhs.errorLine;
+	component = rhs.component;
+}
+
+Log& Log::operator=(const Log& rhs)
+{
+	stream    = std::stringstream(rhs.stream.str());
+	verbosity = rhs.verbosity;
+	errorFile = rhs.errorFile;
+	errorLine = rhs.errorLine;
+	component = rhs.component;
+
+	return *this;
+}
+
 void Logger::initialize(const LoggerConfig& config)
 {
 	m_instance = new Logger(config);
 }
 
-void Logger::teardown()
-{
-	printf("/n");
-	m_file.close();
-}
+void Logger::teardown() { delete m_instance; }
 
-inline void Logger::log(const Log& log)
+LogVerbosity Logger::getVerbosity() const { return m_verbosity; }
+
+void Logger::log(const Log& log)
 {
 	if (log.verbosity > m_verbosity)
 	{
@@ -135,38 +153,99 @@ inline void Logger::log(const Log& log)
 	}
 
 	std::lock_guard<std::mutex> lock(m_mutex);
-	m_messages.emplace_back(log.stream.str());
+	m_messages.push_back(log);
 }
 
 void Logger::operator+=(const Log& stream) { log(stream); }
 
 Logger::Logger(const LoggerConfig& config)
 {
-	m_threaded  = config.threaded;
-	m_verbosity = config.verbosity;
+	m_threaded     = config.threaded;
+	m_verbosity    = config.verbosity;
+	m_logToConsole = config.logToConsole;
+
+	if (m_threaded)
+	{
+		m_threadRunning = true;
+		std::thread thread = std::thread(&Logger::loggerThreadHandle, this);
+		m_worker.swap(thread);
+	}
 
 	m_file.open(config.logFile);
 	if (!m_file.is_open())
 	{
 		printf("Uh Oh! We couldn't open the log file, guess we won't have any "
-		       "file logging for today. :(");
+		       "file logging for today. :(\n");
+	}
+}
+
+Logger::~Logger()
+{
+	printf("\n");
+
+	if (m_threaded)
+	{
+		m_threadRunning = false;
+		m_cond.notify_all();
+
+		if (m_worker.joinable())
+			m_worker.join();
 	}
 }
 
 void Logger::loggerInternal(const Log& log)
 {
-	if (log.verbosity == LogVerbosity::INFO)
+	if (m_logToConsole)
 	{
-		printf("[%s][%s] %s", g_logVerbToText[static_cast<int>(log.verbosity)],
-		       log.component.c_str(), log.stream.str().c_str());
-	}
-	else
-	{
-		printf("[%s] %s:%i [%s] %s",
-		       g_logVerbToText[static_cast<int>(log.verbosity)],
-		       log.errorFile.c_str(), log.errorLine, log.component.c_str(),
-		       log.stream.str().c_str());
+		if (log.verbosity == LogVerbosity::INFO)
+		{
+			setTerminalTextColor(LogVerbosity::INFO);
+			printf("[%s][%s] %s\n",
+			       g_logVerbToText[static_cast<int>(log.verbosity)],
+			       log.component.c_str(), log.stream.str().c_str());
+			setTerminalTextColor(TextColor::WHITE);
+		}
+		else
+		{
+			setTerminalTextColor(log.verbosity);
+#ifdef ENGINE_DEBUG
+			printf("[%s] %s:%i [%s] %s\n",
+			       g_logVerbToText[static_cast<int>(log.verbosity)],
+			       log.errorFile.c_str(), log.errorLine, log.component.c_str(),
+			       log.stream.str().c_str());
+			setTerminalTextColor(TextColor::WHITE);
+#else
+			printf("[%s][%s] %s\n",
+			       g_logVerbToText[static_cast<int>(log.verbosity)],
+			       log.component.c_str(), log.stream.str().c_str());
+			setTerminalTextColor(TextColor::WHITE);
+#endif
+		}
 	}
 }
 
-void Logger::loggerInternalForThreading() {}
+void Logger::loggerThreadHandle()
+{
+	while (true)
+	{
+		Log log;
+
+		{
+			std::unique_lock<std::mutex> lock(m_mutex);
+
+			m_cond.wait(lock, [this] {
+				return !m_threadRunning || !m_messages.empty();
+			});
+
+			if (!m_threadRunning && m_messages.empty())
+			{
+				return;
+			}
+
+			log = std::move(m_messages.front());
+			m_messages.pop_front();
+		}
+
+		loggerInternal(log);
+	}
+}
