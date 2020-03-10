@@ -78,7 +78,7 @@ static void setTerminalTextColor(TextColor color)
 #endif
 
 #if defined(ENGINE_PLATFORM_LINUX) || defined(ENGINE_PLATFORM_APPLE)
-	std::cout << s_linuxTermCol[static_cast<std::size_t>(color)];
+	printf("%s", s_linuxTermCol[static_cast<std::size_t>(color)]);
 #endif
 }
 
