@@ -28,11 +28,13 @@
 
 #pragma once
 
-#include <condition_variable>
 #include <deque>
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <thread>
+#include <mutex>
+#include <condition_variable>
 
 #define LOGGER_INTERNAL(verbosity, component)           \
 	if (phx::Logger::get() == nullptr &&                \
