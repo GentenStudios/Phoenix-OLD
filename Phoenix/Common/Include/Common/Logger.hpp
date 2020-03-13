@@ -35,6 +35,7 @@
 #include <thread>
 #include <mutex>
 #include <condition_variable>
+#include <utility>
 
 #define LOGGER_INTERNAL(verbosity, component)           \
 	if (phx::Logger::get() == nullptr &&                \
@@ -76,29 +77,12 @@ namespace phx
 	{
 	public:
 		Log() = default;
-		Log(LogVerbosity vb, const std::string& errFile, int errLineNo,
-		    const std::string& module)
-		{
-			verbosity = vb;
-			errorFile = errFile;
-			errorLine = errLineNo;
-			component = module;
-		}
-
+		Log(LogVerbosity       vb, const std::string& errFile, int errLineNo,
+		    const std::string& module);
 		Log(const Log& rhs);
 		Log& operator=(const Log& rhs);
 
 		Log& ref() { return *this; }
-
-// im getting fucking pissed here.
-// clang-format off
-		#define OPERATOR_HELPER(type) \
-		Log& operator<<(type msg) \
-		{                         \
-			stream << msg;        \
-			return *this;         \
-		}
-		// clang-format on
 
 		template <typename T>
 		Log& operator<<(T& msg)
@@ -107,21 +91,14 @@ namespace phx
 			return *this;
 		}
 
-		// dont kill me austin
-		// please :(
-		OPERATOR_HELPER(short);
-		OPERATOR_HELPER(unsigned short);
-		OPERATOR_HELPER(int);
-		OPERATOR_HELPER(unsigned int);
-		OPERATOR_HELPER(long int);
-		OPERATOR_HELPER(unsigned long int);
-		OPERATOR_HELPER(long long int);
-		OPERATOR_HELPER(unsigned long long int);
-		OPERATOR_HELPER(float);
-		OPERATOR_HELPER(double);
+		template <typename T>
+		Log& operator<<(T&& msg)
+		{
+			stream << std::forward<T>(msg);
+			return *this;
+		}
 
-#undef OPERATOR_HELPER
-
+		
 		std::stringstream stream;
 		LogVerbosity      verbosity = LogVerbosity::INFO;
 		std::string       errorFile;

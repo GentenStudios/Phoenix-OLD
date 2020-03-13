@@ -110,6 +110,15 @@ static void setTerminalTextColor(LogVerbosity vb)
 
 Logger* Logger::m_instance = nullptr;
 
+Log::Log(LogVerbosity       vb, const std::string& errFile, int errLineNo,
+         const std::string& module)
+{
+	verbosity = vb;
+	errorFile = errFile;
+	errorLine = errLineNo;
+	component = module;
+}
+
 Log::Log(const Log& rhs)
 {
 	stream    = std::stringstream(rhs.stream.str());
