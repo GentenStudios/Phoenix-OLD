@@ -28,9 +28,77 @@
 
 #include <Server/Server.hpp>
 
-#include <iostream>
+#include <Common/Logger.hpp>
+
+#include <SDL.h>
 
 using namespace phx::server;
 using namespace phx;
 
-void Server::run() { std::cout << "Hello, Server!" << std::endl; }
+void Server::run()
+{
+	LoggerConfig config;
+	config.threaded     = true;
+	config.logFile      = "server.log";
+	config.logToConsole = true;
+	config.verbosity    = LogVerbosity::DEBUG;
+
+	Logger::initialize(config);
+
+	float       debugMessageTime   = 0.f;
+	float       infoMessageTime    = 0.f;
+	float       warningMessageTime = 0.f;
+	float       errorMessageTime   = 0.f;
+	std::size_t finish             = 0;
+
+	std::size_t start = SDL_GetPerformanceCounter();
+	for (int i = 0; i < 1000; ++i)
+	{
+		LOG_DEBUG("SERVER") << "This is the " << i << " debug message!";
+	}
+	finish           = SDL_GetPerformanceCounter();
+	debugMessageTime = static_cast<float>(finish - start) /
+	                   static_cast<float>(SDL_GetPerformanceFrequency());
+
+	start = SDL_GetPerformanceCounter();
+	for (int i = 0; i < 1000; ++i)
+	{
+		LOG_INFO("SERVER") << "This is the " << i << " info message!";
+	}
+	finish          = SDL_GetPerformanceCounter();
+	infoMessageTime = static_cast<float>(finish - start) /
+	                  static_cast<float>(SDL_GetPerformanceFrequency());
+
+	start = SDL_GetPerformanceCounter();
+	for (int i = 0; i < 1000; ++i)
+	{
+		LOG_WARNING("SERVER") << "This is the " << i << " warning message!";
+	}
+	finish             = SDL_GetPerformanceCounter();
+	warningMessageTime = static_cast<float>(finish - start) /
+	                     static_cast<float>(SDL_GetPerformanceFrequency());
+
+	start = SDL_GetPerformanceCounter();
+	for (int i = 0; i < 1000; ++i)
+	{
+		LOG_FATAL("SERVER") << "This is the " << i << " error message!";
+	}
+	finish           = SDL_GetPerformanceCounter();
+	errorMessageTime = static_cast<float>(finish - start) /
+	                   static_cast<float>(SDL_GetPerformanceFrequency());
+
+	LOG_INFO("SERVER")
+	    << "=============== BENCHMARK STATISTICS ===============";
+	LOG_INFO("SERVER")
+	    << "== Type    == Per 1000   == Per Message Average  ===";
+	LOG_INFO("SERVER") << "== Debug   ==" << debugMessageTime
+	                   << " == " << debugMessageTime / 1000.f;
+	LOG_INFO("SERVER") << "== Info    ==" << infoMessageTime
+	                   << " == " << infoMessageTime / 1000.f;
+	LOG_INFO("SERVER") << "== Warning ==" << warningMessageTime
+	                   << " == " << warningMessageTime / 1000.f;
+	LOG_INFO("SERVER") << "== Error   ==" << errorMessageTime
+	                   << " == " << errorMessageTime / 1000.f;
+
+	Logger::teardown();
+}
