@@ -110,7 +110,7 @@ static void setTerminalTextColor(LogVerbosity vb)
 
 Logger* Logger::m_instance = nullptr;
 
-Log::Log(LogVerbosity       vb, const std::string& errFile, int errLineNo,
+Log::Log(LogVerbosity vb, const std::string& errFile, int errLineNo,
          const std::string& module)
 {
 	verbosity = vb;
@@ -155,7 +155,7 @@ void Logger::log(const Log& log)
 		return;
 	}
 
-	if (!m_threaded)
+	if (!m_threaded || log.verbosity == LogVerbosity::FATAL)
 	{
 		loggerInternal(log);
 		return;
@@ -175,7 +175,7 @@ Logger::Logger(const LoggerConfig& config)
 
 	if (m_threaded)
 	{
-		m_threadRunning = true;
+		m_threadRunning    = true;
 		std::thread thread = std::thread(&Logger::loggerThreadHandle, this);
 		m_worker.swap(thread);
 	}
