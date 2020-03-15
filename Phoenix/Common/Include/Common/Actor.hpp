@@ -26,6 +26,7 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+
 /**
  * @file Actor.hpp
  * @brief Header file for the Actor interface.
@@ -71,3 +72,4 @@ namespace phx
 		int        m_moveSpeed;
 	};
 } // namespace phx
+
