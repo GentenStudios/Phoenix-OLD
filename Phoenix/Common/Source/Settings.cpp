@@ -183,3 +183,4 @@ void Settings::save()
 	}
 	file.close();
 }
+

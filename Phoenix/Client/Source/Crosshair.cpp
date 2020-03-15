@@ -130,3 +130,4 @@ void Crosshair::tick(float dt)
 	glBindTexture(GL_TEXTURE_2D, m_texture);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 }
+

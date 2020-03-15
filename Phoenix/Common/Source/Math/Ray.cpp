@@ -55,3 +55,4 @@ Ray::vec3 Ray::backtrace(float scale)
 float Ray::getLength() const { return m_length; }
 
 Ray::vec3 Ray::getCurrentPosition() const { return m_currentPosition; }
+

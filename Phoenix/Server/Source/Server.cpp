@@ -1,4 +1,4 @@
-// Copyright 2020 Genten Studios
+// Copyright 2019-20 Genten Studios
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -102,3 +102,4 @@ void Server::run()
 
 	Logger::teardown();
 }
+

@@ -1,4 +1,4 @@
-// Copyright 2019 Genten Studios
+// Copyright 2019-20 Genten Studios
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -99,3 +99,4 @@ void Chunk::setBlockAt(math::vec3 position, BlockType* newBlock)
 		m_blocks[getVectorIndex(position)] = newBlock;
 	}
 }
+
