@@ -1,4 +1,4 @@
-// Copyright 2019 Genten Studios
+// Copyright 2019-20 Genten Studios
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -55,3 +55,4 @@ Ray::vec3 Ray::backtrace(float scale)
 float Ray::getLength() const { return m_length; }
 
 Ray::vec3 Ray::getCurrentPosition() const { return m_currentPosition; }
+
