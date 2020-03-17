@@ -36,7 +36,7 @@
 using namespace phx::client;
 using namespace phx;
 
-Crosshair::Crosshair(gfx::Window* window) : Overlay("Crosshair")
+Crosshair::Crosshair(gfx::Window* window) : Layer("Crosshair")
 {
 	const auto size = window->getSize();
     m_screenW = size.x;

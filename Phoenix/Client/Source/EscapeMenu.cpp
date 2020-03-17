@@ -26,61 +26,55 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#pragma once
-
-#include <Client/GameTools.hpp>
-#include <Client/Graphics/Camera.hpp>
-#include <Client/Graphics/Layer.hpp>
-#include <Client/Graphics/ShaderPipeline.hpp>
-#include <Client/Graphics/UI.hpp>
-#include <Client/Graphics/Window.hpp>
-#include <Client/Player.hpp>
+#include <Client/Client.hpp>
 #include <Client/EscapeMenu.hpp>
 
-namespace phx::client
+#include <imgui.h>
+
+using namespace phx::client;
+using namespace phx;
+
+EscapeMenu::EscapeMenu(gfx::Window* window)
+    : gfx::Overlay("EscapeMenu"), m_window(window)
 {
-	/**
-	 * @brief The actual game class for the Client.
-	 *
-	 * This is the class which actually implements the "game". The Client
-	 * class is just a "runner" or an intermediary medium that runs all the
-	 * ticking functions and manages all the layers, but this actually
-	 * renders the voxel world and everything related to it.
-	 *
-	 * The other layers such as SplashScreen are not actually the game, but
-	 * you know... just a SplashScreen - this is the main layer you actually
-	 * interact with and play on.
-	 *
-	 * @see Layer
-	 * @see LayerStack
-	 */
-	class Game : public gfx::Layer
+	const math::vec2i size = window->getSize();
+	m_windowCentre         = {size.x / 2, size.y / 2};
+}
+
+void EscapeMenu::onEvent(events::Event& e)
+{
+	if (e.type == events::EventType::WINDOW_RESIZED)
 	{
-	public:
-		explicit Game(gfx::Window* window);
-		~Game() override;
+		m_windowCentre = {e.size.width / 2, e.size.height / 2};
+		// dont set handled because we want this to propagate down, this event
+		// isn't being handled, we're just using the data for our own help.
+	}
+}
 
-		void onAttach() override;
-		void onDetach() override;
+void EscapeMenu::onAttach() {}
 
-		void onEvent(events::Event& e) override;
-		void tick(float dt) override;
+void EscapeMenu::onDetach() {}
 
-	private:
-		gfx::Window*       m_window;
-		gfx::FPSCamera*    m_camera = nullptr;
-		Player*            m_player;
-		voxels::ChunkView* m_world = nullptr;
+void EscapeMenu::tick(float dt)
+{
+	static bool p_open = true;
 
-		gfx::ShaderPipeline m_renderPipeline;
+	ImGui::SetNextWindowPos({static_cast<float>(m_windowCentre.x),
+	                         static_cast<float>(m_windowCentre.y)},
+	                        0, ImVec2(0.5f, 0.5f));
+	ImGui::SetNextWindowBgAlpha(0.6f);
 
-		ui::ChatWindow* m_chat = nullptr;
+	if (ImGui::Begin(
+	        "Escape Menu", &p_open,
+	        ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar |
+	            ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize |
+	            ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoNav))
+	{
+		if (ImGui::Button("Exit"))
+		{
+			m_window->close();
+		}
+	}
 
-		EscapeMenu* m_escapeMenu = nullptr;
-		GameTools* m_gameDebug = nullptr;
-		bool       m_followCam = true;
-		math::vec3 m_prevPos;
-		int        m_playerHand = 0;
-	};
-} // namespace phx::client
-
+	ImGui::End();
+}

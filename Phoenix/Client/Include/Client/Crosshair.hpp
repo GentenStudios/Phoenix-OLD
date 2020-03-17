@@ -37,10 +37,12 @@ namespace phx::client
 	/**
 	 * @brief The crosshair.
 	 *
+	 * Using as a layer since we still want overlays to render on top.
+	 *
 	 * @see Layer
 	 * @see LayerStack
 	 */
-	class Crosshair : public gfx::Overlay
+	class Crosshair : public gfx::Layer
 	{
 	public:
 		explicit Crosshair(gfx::Window* window);
