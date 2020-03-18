@@ -28,59 +28,32 @@
 
 #pragma once
 
-#include <Client/GameTools.hpp>
-#include <Client/Graphics/Camera.hpp>
 #include <Client/Graphics/Layer.hpp>
-#include <Client/Graphics/ShaderPipeline.hpp>
-#include <Client/Graphics/UI.hpp>
 #include <Client/Graphics/Window.hpp>
-#include <Client/Player.hpp>
-#include <Client/EscapeMenu.hpp>
 
 namespace phx::client
 {
 	/**
-	 * @brief The actual game class for the Client.
-	 *
-	 * This is the class which actually implements the "game". The Client
-	 * class is just a "runner" or an intermediary medium that runs all the
-	 * ticking functions and manages all the layers, but this actually
-	 * renders the voxel world and everything related to it.
-	 *
-	 * The other layers such as SplashScreen are not actually the game, but
-	 * you know... just a SplashScreen - this is the main layer you actually
-	 * interact with and play on.
+	 * @brief The escape menu within the game.
 	 *
 	 * @see Layer
 	 * @see LayerStack
 	 */
-	class Game : public gfx::Layer
+	class EscapeMenu : public gfx::Overlay
 	{
 	public:
-		explicit Game(gfx::Window* window);
-		~Game() override;
+		EscapeMenu(gfx::Window* window);
+		~EscapeMenu() override = default;
 
+		void onEvent(events::Event& e) override;
 		void onAttach() override;
 		void onDetach() override;
 
-		void onEvent(events::Event& e) override;
 		void tick(float dt) override;
 
 	private:
-		gfx::Window*       m_window;
-		gfx::FPSCamera*    m_camera = nullptr;
-		Player*            m_player;
-		voxels::ChunkView* m_world = nullptr;
-
-		gfx::ShaderPipeline m_renderPipeline;
-
-		ui::ChatWindow* m_chat = nullptr;
-
-		EscapeMenu* m_escapeMenu = nullptr;
-		GameTools* m_gameDebug = nullptr;
-		bool       m_followCam = true;
-		math::vec3 m_prevPos;
-		int        m_playerHand = 0;
+		math::vec2i m_windowCentre;
+		gfx::Window* m_window;
 	};
 } // namespace phx::client
 

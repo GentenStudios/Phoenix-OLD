@@ -10,6 +10,7 @@ set(Sources
 	${currentDir}/SplashScreen.cpp
 	${currentDir}/Crosshair.cpp
 	${currentDir}/Game.cpp
+	${currentDir}/EscapeMenu.cpp
 
 	${currentDir}/DebugOverlay.cpp
 	${currentDir}/GameTools.cpp
