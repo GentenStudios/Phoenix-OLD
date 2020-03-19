@@ -187,7 +187,13 @@ void Game::onEvent(events::Event& e)
 		default:
 			break;
 		}
-
+		break;
+	case events::EventType::WINDOW_DEFOCUSED:
+		m_camera->enable(false);
+		break;
+	case events::EventType::WINDOW_FOCUSED:
+		m_camera->enable(true);
+		break;
 	default:
 		break;
 	}
