@@ -142,4 +142,3 @@ void Client::run()
 
 	Settings::get()->save();
 }
-
