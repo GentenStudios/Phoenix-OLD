@@ -49,7 +49,7 @@ FPSCamera::FPSCamera(Window* window)
 	                  std::floor(windowSize.y / 2.f)};
 
 	m_settingSensitivity =
-	    Settings::get()->add("Sensitivity", "camera:sensitivity", 1);
+	    Settings::get()->add("Sensitivity", "camera:sensitivity", 50);
 	m_settingSensitivity->setMax(100);
 	m_settingSensitivity->setMin(1);
 }
@@ -85,7 +85,7 @@ void FPSCamera::tick(float dt)
 
 	m_window->setCursorPosition(m_windowCentre);
 
-	const float sensitivity = static_cast<float>(m_settingSensitivity->value());
+	const float sensitivity = static_cast<float>(m_settingSensitivity->value()) / 50;
 
 	m_rotation = m_actor->getRotation();
 	m_position = m_actor->getPosition();
