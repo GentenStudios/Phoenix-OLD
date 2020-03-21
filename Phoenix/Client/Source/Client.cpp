@@ -124,7 +124,7 @@ void Client::onEvent(events::Event e)
 
 void Client::run()
 {
-	Settings::get()->load();
+	Settings::get()->load("settings.txt");
 
 	SplashScreen* splashScreen = new SplashScreen();
 	m_layerStack.pushLayer(splashScreen);
@@ -145,5 +145,5 @@ void Client::run()
 		m_window.endFrame();
 	}
 
-	Settings::get()->save();
+	Settings::get()->save("settings.txt");
 }
