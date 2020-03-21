@@ -28,9 +28,25 @@
 
 #include <Server/Server.hpp>
 
+#include <Common/Settings.hpp>
+
 #include <iostream>
 
 using namespace phx::server;
 using namespace phx;
 
-void Server::run() { std::cout << "Hello, Server!" << std::endl; }
+void Server::run() {
+    std::cout << "Hello, Server!\nType \"exit\" to exit" << std::endl;
+    Settings::get()->load("config.txt");
+    m_running = true;
+    while(m_running == true){
+        std::cout << "\n>";
+        std::string input;
+        std::cin >> input;
+        if (input == "exit"){
+            m_running = false;
+        }
+        std::cout << input;
+    }
+    Settings::get()->save("config.txt");
+}

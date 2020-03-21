@@ -37,5 +37,8 @@ namespace phx::server
 		~Server() = default;
 
 		void run();
+
+	private:
+	    bool m_running;
 	};
 } // namespace phx::server
