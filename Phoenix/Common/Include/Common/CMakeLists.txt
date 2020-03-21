@@ -10,6 +10,7 @@ set(Headers
 	${currentDir}/EnumTools.hpp
 	${currentDir}/Singleton.hpp
 	${currentDir}/FileIO.hpp
+	${currentDir}/Logger.hpp
 
 	${currentDir}/ContentLoader.hpp
 	${currentDir}/Settings.hpp

@@ -1,4 +1,4 @@
-// Copyright 2019 Genten Studios
+// Copyright 2019-20 Genten Studios
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -37,10 +37,12 @@ namespace phx::client
 	/**
 	 * @brief The crosshair.
 	 *
+	 * Using as a layer since we still want overlays to render on top.
+	 *
 	 * @see Layer
 	 * @see LayerStack
 	 */
-	class Crosshair : public gfx::Overlay
+	class Crosshair : public gfx::Layer
 	{
 	public:
 		explicit Crosshair(gfx::Window* window);
@@ -61,3 +63,4 @@ namespace phx::client
 		unsigned int        m_screenH;
 	};
 } // namespace phx::client
+

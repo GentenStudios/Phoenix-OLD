@@ -84,3 +84,4 @@ namespace phx::math
 		vec3  m_currentPosition;
 	};
 } // namespace phx::math
+

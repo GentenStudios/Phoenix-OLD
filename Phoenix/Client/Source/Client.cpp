@@ -1,4 +1,4 @@
-// Copyright 2020 Genten Studios
+// Copyright 2019-20 Genten Studios
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -27,7 +27,6 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <Client/Client.hpp>
-#include <Client/Crosshair.hpp>
 #include <Client/Game.hpp>
 #include <Client/SplashScreen.hpp>
 
@@ -105,10 +104,6 @@ void Client::onEvent(events::Event e)
 		{
 			Game* game = new Game(&m_window);
 			m_layerStack.pushLayer(game);
-			Crosshair* crosshair = new Crosshair(&m_window);
-			// push as layer since we still want it to render beneath other
-			// overlays.
-			m_layerStack.pushLayer(crosshair);
 			e.handled = true;
 		}
 		break;

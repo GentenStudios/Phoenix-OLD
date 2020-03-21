@@ -185,3 +185,4 @@ void Settings::save(const std::string& saveFile)
 	}
 	file.close();
 }
+

@@ -121,3 +121,4 @@ void SplashScreen::tick(float dt)
 
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 }
+

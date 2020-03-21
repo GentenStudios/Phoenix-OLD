@@ -8,6 +8,7 @@ set(Sources
 
 	${currentDir}/ContentLoader.cpp
 	${currentDir}/Settings.cpp
+	${currentDir}/Logger.cpp
 	${currentDir}/Commander.cpp
 	${currentDir}/Actor.cpp
 
