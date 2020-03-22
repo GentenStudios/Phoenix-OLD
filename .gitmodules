@@ -6,4 +6,4 @@
 	url = https://github.com/ThePhD/sol2.git
 [submodule "Phoenix/ThirdParty/enet"]
 	path = Phoenix/ThirdParty/enet
-	url = git@github.com:lsalzman/enet.git
+	url = https://github.com/lsalzman/enet.git
