@@ -1,4 +1,4 @@
-// Copyright 2019 Genten Studios
+// Copyright 2019-20 Genten Studios
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -26,8 +26,9 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Client/Game.hpp>
 #include <Client/Client.hpp>
+#include <Client/Crosshair.hpp>
+#include <Client/Game.hpp>
 
 #include <Common/Commander.hpp>
 #include <Common/ContentLoader.hpp>
@@ -135,6 +136,9 @@ void Game::onAttach()
 	const math::mat4 model;
 	m_renderPipeline.setMatrix("u_model", model);
 
+	Client::get()->pushLayer(new Crosshair(m_window));
+	m_escapeMenu = new EscapeMenu(m_window);
+
 	if (Client::get()->isDebugLayerActive())
 	{
 		m_gameDebug = new GameTools(&m_followCam, &m_playerHand, m_player);
@@ -173,6 +177,14 @@ void Game::onEvent(events::Event& e)
 		{
 		case events::Keys::KEY_ESCAPE:
 			m_camera->enable(!m_camera->isEnabled());
+			if (!m_camera->isEnabled())
+			{
+				Client::get()->pushLayer(m_escapeMenu);
+			}
+			else
+			{
+				Client::get()->popLayer(m_escapeMenu);
+			}
 			e.handled = true;
 			break;
 		case events::Keys::KEY_Q:
@@ -216,6 +228,8 @@ void Game::onEvent(events::Event& e)
 		}
 		break;
 	case events::EventType::MOUSE_BUTTON_PRESSED:
+		if (!m_camera->isEnabled())
+			break;
 		switch (e.mouse.button)
 		{
 		case events::MouseButtons::LEFT:
@@ -231,7 +245,13 @@ void Game::onEvent(events::Event& e)
 		default:
 			break;
 		}
-
+		break;
+	case events::EventType::WINDOW_DEFOCUSED:
+		m_camera->enable(false);
+		break;
+	case events::EventType::WINDOW_FOCUSED:
+		m_camera->enable(true);
+		break;
 	default:
 		break;
 	}

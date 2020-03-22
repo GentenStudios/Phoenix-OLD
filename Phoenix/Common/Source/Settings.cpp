@@ -130,50 +130,52 @@ Setting* Settings::add(const std::string& name, const std::string& key,
                        int defaultValue)
 {
 	m_settings[key] = Setting(name, key, defaultValue);
+    const auto& it = m_unused.find(key);
+	if(it != m_unused.end())
+    {
+	    m_settings[key].set(it->second);
+	    m_unused.erase(key);
+	}
 	return &m_settings[key];
 }
 
 Setting* Settings::getSetting(const std::string& key)
 {
 	if (m_settings.find(key) != m_settings.end())
+	{
 		return &m_settings[key];
+	}
 	else
-		return nullptr;
+    {
+        return nullptr;
+	}
 }
 
-void Settings::load()
+void Settings::load(const std::string& saveFile)
 {
 	std::ifstream file;
 	std::string   buffer;
-	file.open("settings");
+	file.open("saveFile");
 	if (file)
 	{
 		while (file >> buffer)
 		{
 			size_t      pointA  = buffer.find(',');
-			std::string key     = buffer.substr(0, pointA);
-			Setting*    setting = getSetting(key);
-			if (setting == nullptr)
-			{
-				m_unused += buffer + "\n";
-			}
-			else
-			{
-				size_t      pointB = buffer.find(';');
-				std::string val =
-				    buffer.substr(pointA + 1, pointB - pointA - 1);
-				setting->set(std::stoi(val));
-			}
+            size_t      pointB = buffer.find(';');
+			m_unused[buffer.substr(0, pointA)] =
+                stoi(buffer.substr(pointA + 1, pointB - pointA - 1));
 		}
 	}
 	file.close();
 }
 
-void Settings::save()
+void Settings::save(const std::string& saveFile)
 {
 	std::ofstream file;
-	file.open("settings");
-	file << m_unused;
+	file.open("saveFile");
+	for (const auto& setting : m_unused){
+        file << setting.first << "," << setting.second << ";\n";
+	}
 	for (const auto& setting : m_settings)
 	{
 		if (setting.second.value() != setting.second.getDefault())
@@ -183,3 +185,4 @@ void Settings::save()
 	}
 	file.close();
 }
+

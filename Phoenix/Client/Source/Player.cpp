@@ -1,4 +1,4 @@
-// Copyright 2019 Genten Studios
+// Copyright 2019-20 Genten Studios
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -114,7 +114,7 @@ Player::Player(voxels::ChunkView* world) : m_world(world)
 
 	CommandBook::get()->add(
 		"tp", 
-		"Teleports player to supplied coordiantes \n /tp <x> <y> <z>", 
+		"Teleports player to supplied coordinates \n /tp <x> <y> <z>", 
 		"all", 
 		[this](const std::vector<std::string>& args){
 			setPosition({std::stoi(args[0]), std::stoi(args[1]), std::stoi(args[2])});
@@ -202,3 +202,4 @@ voxels::BlockType* Player::getHand()
 {
 	return m_hand;
 }
+

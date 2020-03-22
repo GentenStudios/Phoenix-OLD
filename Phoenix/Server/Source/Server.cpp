@@ -27,6 +27,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <Server/Server.hpp>
+#include <Common/Settings.hpp>
 
 #include <enet/enet.h>
 #include <Common/Math/Math.hpp>
@@ -67,6 +68,8 @@ Server::Server(std::string save) : m_save(std::move(save))
 
 void Server::run()
 {
+    std::cout << "Hello, Server!\nType \"exit\" to exit" << std::endl;
+    Settings::get()->load("config.txt");
     m_running = true;
     while(m_running)
 	{
@@ -108,6 +111,7 @@ void Server::run()
 		}
 	}
 
+    Settings::get()->save("config.txt");
     enet_host_destroy(m_server);
 }
 Server::~Server()

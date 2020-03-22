@@ -1,4 +1,4 @@
-// Copyright 2019 Genten Studios
+// Copyright 2019-20 Genten Studios
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -35,6 +35,7 @@
 #include <Client/Graphics/UI.hpp>
 #include <Client/Graphics/Window.hpp>
 #include <Client/Player.hpp>
+#include <Client/EscapeMenu.hpp>
 
 #include <deque>
 #include <enet/enet.h>
@@ -78,6 +79,7 @@ namespace phx::client
 
 		ui::ChatWindow* m_chat = nullptr;
 
+		EscapeMenu* m_escapeMenu = nullptr;
 		GameTools* m_gameDebug = nullptr;
 		bool       m_followCam = true;
 		math::vec3 m_prevPos;
@@ -95,3 +97,4 @@ namespace phx::client
         ENetAddress m_address;
 	};
 } // namespace phx::client
+

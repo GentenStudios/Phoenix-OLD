@@ -26,17 +26,34 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Common/Voxels/TextureRegistry.hpp>
+#pragma once
 
-using namespace phx::voxels;
+#include <Client/Graphics/Layer.hpp>
+#include <Client/Graphics/Window.hpp>
 
-void TextureRegistry::addTexture(const std::string& texture)
+namespace phx::client
 {
-	m_textures.insert(texture);
-}
+	/**
+	 * @brief The escape menu within the game.
+	 *
+	 * @see Layer
+	 * @see LayerStack
+	 */
+	class EscapeMenu : public gfx::Overlay
+	{
+	public:
+		EscapeMenu(gfx::Window* window);
+		~EscapeMenu() override = default;
 
-std::vector<std::string> TextureRegistry::getTextures()
-{
-	return {m_textures.begin(), m_textures.end()};
-}
+		void onEvent(events::Event& e) override;
+		void onAttach() override;
+		void onDetach() override;
+
+		void tick(float dt) override;
+
+	private:
+		math::vec2i m_windowCentre;
+		gfx::Window* m_window;
+	};
+} // namespace phx::client
 

@@ -26,17 +26,55 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Common/Voxels/TextureRegistry.hpp>
+#include <Client/Client.hpp>
+#include <Client/EscapeMenu.hpp>
 
-using namespace phx::voxels;
+#include <imgui.h>
 
-void TextureRegistry::addTexture(const std::string& texture)
+using namespace phx::client;
+using namespace phx;
+
+EscapeMenu::EscapeMenu(gfx::Window* window)
+    : gfx::Overlay("EscapeMenu"), m_window(window)
 {
-	m_textures.insert(texture);
+	const math::vec2i size = window->getSize();
+	m_windowCentre         = {size.x / 2, size.y / 2};
 }
 
-std::vector<std::string> TextureRegistry::getTextures()
+void EscapeMenu::onEvent(events::Event& e)
 {
-	return {m_textures.begin(), m_textures.end()};
+	if (e.type == events::EventType::WINDOW_RESIZED)
+	{
+		m_windowCentre = {e.size.width / 2, e.size.height / 2};
+		// dont set handled because we want this to propagate down, this event
+		// isn't being handled, we're just using the data for our own help.
+	}
 }
 
+void EscapeMenu::onAttach() {}
+
+void EscapeMenu::onDetach() {}
+
+void EscapeMenu::tick(float dt)
+{
+	static bool p_open = true;
+
+	ImGui::SetNextWindowPos({static_cast<float>(m_windowCentre.x),
+	                         static_cast<float>(m_windowCentre.y)},
+	                        0, ImVec2(0.5f, 0.5f));
+	ImGui::SetNextWindowBgAlpha(0.6f);
+
+	if (ImGui::Begin(
+	        "Escape Menu", &p_open,
+	        ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar |
+	            ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize |
+	            ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoNav))
+	{
+		if (ImGui::Button("Exit"))
+		{
+			m_window->close();
+		}
+	}
+
+	ImGui::End();
+}

@@ -12,6 +12,7 @@ set(Headers
 	${currentDir}/SplashScreen.hpp
 	${currentDir}/Crosshair.hpp
 	${currentDir}/Game.hpp
+	${currentDir}/EscapeMenu.hpp
 
 	${currentDir}/DebugOverlay.hpp
 	${currentDir}/GameTools.hpp
