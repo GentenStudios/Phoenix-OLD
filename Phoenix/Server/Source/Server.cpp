@@ -55,7 +55,7 @@ Server::Server(std::string save) : m_save(std::move(save))
     /// @TODO when server config is set up, replace 32 with a max # of clients
     m_server = enet_host_create (&m_address /* the address to bind the server host to */,
                                  32      /* allow up to 32 clients and/or outgoing connections */,
-                                 2      /* allow up to 2 channels to be used, 0 and 1 */,
+                                 3      /* allow up to 3 channels to be used */,
                                  0      /* assume any amount of incoming bandwidth */,
                                  0      /* assume any amount of outgoing bandwidth */);
     if (m_server == NULL)
@@ -81,11 +81,6 @@ void Server::run()
 				       m_event.peer->address.host, m_event.peer->address.port);
 				break;
 			case ENET_EVENT_TYPE_RECEIVE:
-
-				printf("A packet of length %zu containing %s was received from %s on channel %u.\n",
-				       m_event.packet->dataLength, m_event.packet->data,
-				       m_event.peer->data, m_event.channelID);
-
 			    switch(m_event.channelID)
                 {
                 case 0:
@@ -118,11 +113,15 @@ Server::~Server()
     enet_host_destroy(m_server);
 }
 
-void Server::parseEvent(ENetHost *server, int id, unsigned char *data) {
-
+void Server::parseEvent(ENetHost *server, int id, enet_uint8 *data) {
+    printf("Event received");
+    printf("An Event packet containing %s was received from %u\n",
+        data, id);
 }
 
-void Server::parseState(ENetHost* server, int id, unsigned char* data) {
+void Server::parseState(ENetHost *server, int id, enet_uint8 *data) {
+    printf("A State packet containing %s was received from %u\n",
+           data, id);
 //    math::vec3 pos = m_player.getPosition();
 //    const float moveSpeed = static_cast<float>(m_player.getMoveSpeed());
 //
@@ -155,6 +154,7 @@ void Server::parseState(ENetHost* server, int id, unsigned char* data) {
 //    }
 }
 
-void Server::parseMessage(ENetHost *server, int id, unsigned char *data) {
-
+void Server::parseMessage(ENetHost *server, int id, enet_uint8 *data) {
+    printf("A Message packet containing %s was received from %d\n",
+           data, id);
 }

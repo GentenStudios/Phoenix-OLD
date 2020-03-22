@@ -45,9 +45,9 @@ namespace phx::server
 
 		void run();
 
-        void parseEvent(ENetHost* server, int id, unsigned char* data);
-		void parseState(ENetHost* server, int id, unsigned char* data);
-        void parseMessage(ENetHost* server, int id, unsigned char* data);
+        void parseEvent(ENetHost* server, int id, enet_uint8 *data);
+		void parseState(ENetHost* server, int id, enet_uint8 *data);
+        void parseMessage(ENetHost* server, int id, enet_uint8 *data);
 	private:
 	    bool m_running;
 
