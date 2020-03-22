@@ -118,11 +118,11 @@ Server::~Server()
     enet_host_destroy(m_server);
 }
 
-void Server::parseEvent(ENetHost *server, int id, char *data) {
+void Server::parseEvent(ENetHost *server, int id, unsigned char *data) {
 
 }
 
-void Server::parseState(ENetHost* server, int id, char* data) {
+void Server::parseState(ENetHost* server, int id, unsigned char* data) {
 //    math::vec3 pos = m_player.getPosition();
 //    const float moveSpeed = static_cast<float>(m_player.getMoveSpeed());
 //
@@ -155,6 +155,6 @@ void Server::parseState(ENetHost* server, int id, char* data) {
 //    }
 }
 
-void Server::parseMessage(ENetHost *server, int id, char *data) {
+void Server::parseMessage(ENetHost *server, int id, unsigned char *data) {
 
 }
