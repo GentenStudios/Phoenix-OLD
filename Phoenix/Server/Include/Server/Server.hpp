@@ -32,6 +32,7 @@
 
 #include <enet/enet.h>
 
+#include <Common/Commander.hpp>
 #include <string>
 
 namespace phx::server
@@ -43,14 +44,19 @@ namespace phx::server
 		~Server();
 
 		void run();
+
+        void parseEvent(ENetHost* server, int id, char* data);
 		void parseState(ENetHost* server, int id, char* data);
-		void parseEvent(ENetHost* server, int id, char* data);
+        void parseMessage(ENetHost* server, int id, char* data);
 	private:
 	    bool m_running;
 
 	    std::string m_save;
 
 	    Actor m_player;
+
+	    Commander* m_commander;
+
 
 	    // Networking stuff
 
