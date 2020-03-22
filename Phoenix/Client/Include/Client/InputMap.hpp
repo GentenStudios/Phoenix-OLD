@@ -39,80 +39,97 @@
  * mouse and keyboard state and is only used to translate between string or
  * numeral identifiers for an input, and the SDL key it is mapped to.
  *
- * The string identifier "uniqueKey" should only be used when interacting outside
- * of the current execution (where memory is not preserved such as in the save
- * or when hard-coding an input), when working during run-time, we should only
- * use the primaryKey to reference an input to reduce lookup times.
+ * The string identifier "uniqueKey" should only be used when interacting
+ * outside of the current execution (where memory is not preserved such as in
+ * the save or when hard-coding an input), when working during run-time, we
+ * should only use the primaryKey to reference an input to reduce lookup times.
  */
 
 #pragma once
 
 #include <Client/Events/Event.hpp>
 
-namespace phx::client{
-    struct InputMap{
-        /// @brief The Human readable name displayed in menus
-        std::string displayName;
-        /// @brief The unique key used to identify input in save file and mods. In the format core::moveforward
-        std::string uniqueKey;
-        /// @brief The physical kep assigned to this input
-        Event key;
-        /// @brief The default key assigned to this input
-        Event key;
-    };
+#include <string>
 
-    /// @todo @beeper If we handle lua callback registration during initialization, then this does not need to be a singleton as there are only two systems that need to see it. Those can get this system passed as an argument instead.
+namespace phx::client
+{
+	struct Input
+	{
+		/// @brief The Human readable name displayed in menus
+		std::string displayName;
 
-    class InputMapper{
-    public:
-        /**@brief Initializes the InputMapper and loads previously saved data from a file.
-         *
-         * @return
-         */
-        InputMap();
-        ~InputMap() = default;
+		/// @brief The unique key used to identify input in save file and mods.
+		/// In the format core::moveforward
+		std::string uniqueKey;
 
-        /**
-         * @brief Reigsters an input in the input system.
-         *
-         * This checks for a matching input in m_unused to grab a pre-set input
-         * assignment.
-         *
-         * This should only be used by the event system. The event
-         * system will register an input when a new event is registered and use
-         * its primaryKey when polling events to get the associated key.
-         *
-         * @param uniqueKey The unique key for the input in the format core:moveforward
-         * @param displayName The Human readable name displayed in menus
-         * @param key The physical kep assigned to this input
-         * @return The primaryKey location of this input for use by the system that registered the input
-         */
-        size_t registerInputEvent(std::string uniqueKey, std::string displayName, Event key);
-        /// @brief IDK if this is necessary, but I was thinking the state system should have its own function? but IDK why anymore so probably not.
-        size_t registerInputState(std::string uniqueKey, std::string displayName, Event key);
+		/// @brief The physical kep assigned to this input
+		events::Event key;
 
-        ///Or should we just return the actual SDL key?
-        InputMap* getInput(std::string uniqueKey);
-        InputMap* getInput(size_t primaryKey);
-        ///@brief This gets a full list of all inputs for use in the settings menu
-        auto      getInputs();
+		/// @brief The default key assigned to this input
+		events::Event default;
+	};
 
-        void setInput(std::string uniqueKey, Event key);
-        void setInput(size_t primaryKey, Event key);
+	/// @todo @beeper If we handle lua callback registration during
+	/// initialization, then this does not need to be a singleton as there are
+	/// only two systems that need to see it. Those can get this system passed
+	/// as an argument instead.
 
-    private:
-        /**
-         * @brief Load function loads all inputs from input.config
-         */
-         ///@todo @beeper, this should only be called during the construction of the InputMapper. This should take some hints from the settings system and also load a buffer of unregistered inputs
-        void load();
-        /**
-         * @brief Save function saves all non-default inputs to input.config
-         */
-         ///@todo @beeper, this should be called every time an input is edited
-        void save();
+	class InputMap
+	{
+	public:
+		/**
+		 * @brief Initializes the InputMapper and loads previously saved data
+		 * from a file.
+		 */
+		InputMap();
+		~InputMap() = default;
 
-        std::vector<InputMap> m_inputs;
-        std::vector<InputMap> m_unused;
-    };
-}
+		/**
+		 * @brief Registers an input in the input system.
+		 *
+		 * This checks for a matching input in m_unused to grab a pre-set input
+		 * assignment.
+		 *
+		 * This should only be used by the event system. The event
+		 * system will register an input when a new event is registered and use
+		 * its primaryKey when polling events to get the associated key.
+		 *
+		 * @param uniqueKey The unique key for the input in the format
+		 * core:moveforward
+		 * @param displayName The Human readable name displayed in menus
+		 * @param key The physical kep assigned to this input
+		 * @return The primaryKey location of this input for use by the system
+		 * that registered the input
+		 */
+		std::size_t registerInputEvent(std::string uniqueKey,
+		                          std::string displayName, events::Event key);
+
+		/// Or should we just return the actual SDL key?
+		InputMap* getInput(std::string uniqueKey);
+		InputMap* getInput(std::size_t primaryKey);
+		
+		///@brief This gets a full list of all inputs for use in the settings
+		///menu
+		auto getInputs();
+
+		void setInput(std::string uniqueKey, events::Event key);
+		void setInput(std::size_t primaryKey, events::Event key);
+
+	private:
+		/**
+		 * @brief Load function loads all inputs from input.config
+		 */
+		///@todo @beeper, this should only be called during the construction of
+		///the InputMapper. This should take some hints from the settings system
+		///and also load a buffer of unregistered inputs
+		void load();
+		/**
+		 * @brief Save function saves all non-default inputs to input.config
+		 */
+		///@todo @beeper, this should be called every time an input is edited
+		void save();
+
+		std::vector<InputMap> m_inputs;
+		std::vector<InputMap> m_unused;
+	};
+} // namespace phx::client

@@ -73,6 +73,7 @@ namespace phx::voxels
 		 * @param blockInfo The blockType already put together.
 		 */
 		void registerBlock(BlockType blockInfo);
+
 		/**
 		 * @brief Gets a block from the registry based on its unique ID.
 		 * @param id The unique ID of the block, usually in the form

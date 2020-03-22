@@ -4,6 +4,8 @@ set(currentDir ${CMAKE_CURRENT_LIST_DIR})
 set(Sources
 	${graphicsSources}
 
+	${currentDir}/InputMap.cpp
+
 	${currentDir}/Player.cpp
 
 	${currentDir}/Client.cpp
