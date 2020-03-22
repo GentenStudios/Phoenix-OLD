@@ -68,7 +68,6 @@ Server::Server(std::string save) : m_save(std::move(save))
 
 void Server::run()
 {
-    std::cout << "Hello, Server!\nType \"exit\" to exit" << std::endl;
     Settings::get()->load("config.txt");
     m_running = true;
     while(m_running)
