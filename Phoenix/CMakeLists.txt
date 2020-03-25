@@ -8,6 +8,7 @@ set(PHX_COMMON_INCLUDES ${CMAKE_CURRENT_LIST_DIR}/Common/Include)
 add_subdirectory(Client)
 add_subdirectory(Common)
 add_subdirectory(Server)
+add_subdirectory(Sandbox)
 
 add_subdirectory(Assets)
 add_subdirectory(Modules)
