@@ -26,55 +26,60 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Client/Client.hpp>
-#include <Client/EscapeMenu.hpp>
+#include <Client/InputMap.hpp>
 
-#include <imgui.h>
+#include <SDL.h>
 
 using namespace phx::client;
 using namespace phx;
 
-EscapeMenu::EscapeMenu(gfx::Window* window)
-    : gfx::Overlay("EscapeMenu"), m_window(window)
+InputMap::InputMap()
 {
-	const math::vec2i size = window->getSize();
-	m_windowCentre         = {size.x / 2, size.y / 2};
+	// austin write lua stuff here.
 }
 
-void EscapeMenu::onEvent(events::Event& e)
+InputMap::~InputMap() = default;
+
+void InputMap::initialize()
 {
-	if (e.type == events::EventType::WINDOW_RESIZED)
-	{
-		m_windowCentre = {e.size.width / 2, e.size.height / 2};
-		// dont set handled because we want this to propagate down, this event
-		// isn't being handled, we're just using the data for our own help.
-	}
+	// this just exists to make sure someone calls the initialize function.
 }
 
-void EscapeMenu::onAttach() {}
-
-void EscapeMenu::onDetach() {}
-
-void EscapeMenu::tick(float dt)
+void InputMap::onEvent(events::Event e)
 {
-	static bool p_open = true;
-
-	ImGui::SetNextWindowPos({static_cast<float>(m_windowCentre.x),
-	                         static_cast<float>(m_windowCentre.y)},
-	                        0, ImVec2(0.5f, 0.5f));
-	ImGui::SetNextWindowBgAlpha(0.6f);
-
-	if (ImGui::Begin(
-	        "Escape Menu", &p_open,
-	        ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar |
-	            ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize |
-	            ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoNav))
-	{
-		if (ImGui::Button("Exit"))
-		{
-			m_window->close();
-		}
-	}
-
-	ImGui::End();
+	
 }
+
+InputMap::InputRef InputMap::registerInput(const std::string& uniqueName,
+                                           const std::string& displayName,
+                                           events::Keys       defaultKey)
+{
+}
+
+void InputMap::attachCallbackToInput(const std::string&    uniqueName,
+                                     std::function<void()> func)
+{
+}
+
+void InputMap::attachCallbackToInput(InputRef              primaryKey,
+                                     std::function<void()> func)
+{
+}
+
+Input* InputMap::getInput(const std::string& uniqueName) {}
+
+Input* InputMap::getInput(InputRef primaryKey) {}
+
+void InputMap::setInput(const std::string& uniqueName, events::Keys key) {}
+
+void InputMap::setInput(InputRef primaryKey, events::Keys key) {}
+
+bool InputMap::getState(const std::string& uniqueName) {}
+
+bool InputMap::getState(InputRef primaryKey) {}
+
+bool InputMap::getState(Input* input) {}
+
+void InputMap::load() {}
+
+void InputMap::save() {}

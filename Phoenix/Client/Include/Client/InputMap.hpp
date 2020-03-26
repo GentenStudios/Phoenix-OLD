@@ -26,30 +26,17 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-/**
- * I kinda roughed this one, @beeper I will leave it up to your best judgement.
- * Either we can try to leave an Input as a pure struct to store data, or we can
- * turn it into a full class nearly mimicking the settings system. There will be
- * a lot of learning as we build this so no rush on making it perfect. I didn't
- * put a ton of effort making sure this matched the event system, it also would
- * likely do better inside the Events space itself? Maybe?
- *
- * This system is purely a smart data storage, it itself should have no clue
- * what an event, callback, or state is. Its simply an abstraction on top of the
- * mouse and keyboard state and is only used to translate between string or
- * numeral identifiers for an input, and the SDL key it is mapped to.
- *
- * The string identifier "uniqueKey" should only be used when interacting
- * outside of the current execution (where memory is not preserved such as in
- * the save or when hard-coding an input), when working during run-time, we
- * should only use the primaryKey to reference an input to reduce lookup times.
- */
-
 #pragma once
 
 #include <Client/Events/Event.hpp>
+#include <Client/Events/IEventListener.hpp>
+
+#include <Common/Singleton.hpp>
 
 #include <string>
+#include <vector>
+#include <unordered_map>
+#include <functional>
 
 namespace phx::client
 {
@@ -62,74 +49,59 @@ namespace phx::client
 		/// In the format core::moveforward
 		std::string uniqueKey;
 
-		/// @brief The physical kep assigned to this input
-		events::Event key;
+		/// @brief The physical key assigned to this input
+		events::Keys key = events::Keys::NONE;
 
 		/// @brief The default key assigned to this input
-		events::Event default;
+		events::Keys default = events::Keys::NONE;
 	};
 
-	/// @todo @beeper If we handle lua callback registration during
-	/// initialization, then this does not need to be a singleton as there are
-	/// only two systems that need to see it. Those can get this system passed
-	/// as an argument instead.
-
-	class InputMap
+	class InputMap : public Singleton<InputMap>, public events::IEventListener
 	{
 	public:
-		/**
-		 * @brief Initializes the InputMapper and loads previously saved data
-		 * from a file.
-		 */
+		using InputRef = int;
+
 		InputMap();
-		~InputMap() = default;
+		~InputMap();
 
-		/**
-		 * @brief Registers an input in the input system.
-		 *
-		 * This checks for a matching input in m_unused to grab a pre-set input
-		 * assignment.
-		 *
-		 * This should only be used by the event system. The event
-		 * system will register an input when a new event is registered and use
-		 * its primaryKey when polling events to get the associated key.
-		 *
-		 * @param uniqueKey The unique key for the input in the format
-		 * core:moveforward
-		 * @param displayName The Human readable name displayed in menus
-		 * @param key The physical kep assigned to this input
-		 * @return The primaryKey location of this input for use by the system
-		 * that registered the input
-		 */
-		std::size_t registerInputEvent(std::string uniqueKey,
-		                          std::string displayName, events::Event key);
+		void initialize();
 
-		/// Or should we just return the actual SDL key?
-		InputMap* getInput(std::string uniqueKey);
-		InputMap* getInput(std::size_t primaryKey);
-		
-		///@brief This gets a full list of all inputs for use in the settings
-		///menu
-		auto getInputs();
+		void onEvent(events::Event e) override;
 
-		void setInput(std::string uniqueKey, events::Event key);
-		void setInput(std::size_t primaryKey, events::Event key);
+		InputRef registerInput(const std::string& uniqueName,
+		                       const std::string& displayName,
+		                       events::Keys       defaultKey);
+
+		void attachCallbackToInput(const std::string& uniqueName, std::function<void()> func);
+		void attachCallbackToInput(InputRef primaryKey, std::function<void()> func);
+
+		// if input does not exist, will reply with key unknown.
+		Input* getInput(const std::string& uniqueName);
+		Input* getInput(InputRef primaryKey);
+
+		void setInput(const std::string& uniqueName, events::Keys key);
+		void setInput(InputRef primaryKey, events::Keys key);
+
+		// try to not use this, inefficient.
+		bool getState(const std::string& uniqueName);
+		bool getState(InputRef primaryKey);
+		bool getState(Input* input);
 
 	private:
 		/**
 		 * @brief Load function loads all inputs from input.config
 		 */
-		///@todo @beeper, this should only be called during the construction of
-		///the InputMapper. This should take some hints from the settings system
-		///and also load a buffer of unregistered inputs
 		void load();
+
 		/**
 		 * @brief Save function saves all non-default inputs to input.config
 		 */
-		///@todo @beeper, this should be called every time an input is edited
 		void save();
 
-		std::vector<InputMap> m_inputs;
-		std::vector<InputMap> m_unused;
+		std::unordered_map<std::string, InputRef> m_uniqueInputs;
+		std::unordered_map<InputRef, Input>       m_inputs;
+
+		// remember, input ref is just an int.
+		std::unordered_map<InputRef, std::function<void()>> m_callbacks;
 	};
 } // namespace phx::client
