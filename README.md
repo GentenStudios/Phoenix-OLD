@@ -21,10 +21,8 @@ If you already cloned you can run `git submodule update --init` to do the same t
 
 Once cloned, navigate to the projects root directory and execute the following commands in a terminal.
 
-  1. `mkdir Build`
-  2. `cd Build`
-  3. `cmake ..`
-  4. `cmake --build . --target Phoenix`
+  1. `cmake -H. -BBuild`
+  2. `cmake --build Build`
 
 Now follow the platform specific instructions detailed below.
 
