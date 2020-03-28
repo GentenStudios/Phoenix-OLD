@@ -22,6 +22,7 @@ add_subdirectory (ImGui)
 add_subdirectory (sol2)
 add_subdirectory (lua)
 add_subdirectory (enet)
+add_subdirectory (entt)
 
 set_target_properties(SDL2main SDL2-static uninstall Glad ImGui lua liblua PROPERTIES FOLDER Dependencies)
 

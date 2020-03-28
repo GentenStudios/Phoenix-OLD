@@ -52,12 +52,7 @@ Server::Server(std::string save) : m_save(std::move(save))
     m_address.host = ENET_HOST_ANY;
     m_address.port = 7777;
 
-    /// @TODO when server config is set up, replace 32 with a max # of clients
-    m_server = enet_host_create (&m_address /* the address to bind the server host to */,
-                                 32      /* allow up to 32 clients and/or outgoing connections */,
-                                 3      /* allow up to 3 channels to be used */,
-                                 0      /* assume any amount of incoming bandwidth */,
-                                 0      /* assume any amount of outgoing bandwidth */);
+    m_server = enet_host_create (&m_address, maxUsers, 3, 0, 0);
     if (m_server == NULL)
     {
         fprintf (stderr,
@@ -74,23 +69,32 @@ void Server::run()
 	{
 		while (enet_host_service(m_server, &m_event, 1000) > 0)
 		{
+            User user;
 			switch (m_event.type)
 			{
 			case ENET_EVENT_TYPE_CONNECT:
-				printf("A new client connected from %x:%u.\n",
-				       m_event.peer->address.host, m_event.peer->address.port);
+				printf("A new client connected from %x:%u.\n", m_event.peer->address.host, m_event.peer->address.port);
+                auto entity = m_registry.create();
+                m_registry.emplace<User>(entity, "toby", m_event.peer);
+                m_event.peer -> data = &entity;
 				break;
 			case ENET_EVENT_TYPE_RECEIVE:
-			    switch(m_event.channelID)
+//                printf ("A packet of length %u containing %s was received from %s on channel %u.\n",
+//                        m_event.packet -> dataLength,
+//                        m_event.packet -> data,
+//                        m_event.peer -> data -> userName,
+//                        m_event.channelID);
+
+                switch(m_event.channelID)
                 {
                 case 0:
-                    parseEvent(m_server, -1, m_event.packet->data);
+                    parseEvent(m_server,m_event.peer->data, m_event.packet->data);
                     break;
                 case 1:
-                    parseState(m_server, -1, m_event.packet->data);
+                    parseState(m_server,m_event.peer->data), m_event.packet->data);
                     break;
                 case 2:
-                    parseMessage(m_server, -1, m_event.packet->data);
+                    parseMessage(m_server,m_event.peer->data, m_event.packet->data);
                     break;
                 }
 
@@ -101,6 +105,9 @@ void Server::run()
 
 			case ENET_EVENT_TYPE_DISCONNECT:
 				printf("%s disconnected.\n", m_event.peer->data);
+				break;
+			case ENET_EVENT_TYPE_NONE:
+				break;
 			}
 		}
 	}
@@ -113,15 +120,15 @@ Server::~Server()
     enet_host_destroy(m_server);
 }
 
-void Server::parseEvent(ENetHost *server, int id, enet_uint8 *data) {
+void Server::parseEvent(ENetHost *server, entt::entity userRef, enet_uint8 *data) {
     printf("Event received");
-    printf("An Event packet containing %s was received from %u\n",
-        data, id);
+    printf("An Event packet containing %s was received from %s\n",
+        data, user.userName.c_str());
 }
 
-void Server::parseState(ENetHost *server, int id, enet_uint8 *data) {
-    printf("A State packet containing %s was received from %u\n",
-           data, id);
+void Server::parseState(ENetHost *server, entt::entity userRef, enet_uint8 *data) {
+    printf("A State packet containing %s was received from %s\n",
+           data, user.userName.c_str());
 //    math::vec3 pos = m_player.getPosition();
 //    const float moveSpeed = static_cast<float>(m_player.getMoveSpeed());
 //
@@ -154,7 +161,22 @@ void Server::parseState(ENetHost *server, int id, enet_uint8 *data) {
 //    }
 }
 
-void Server::parseMessage(ENetHost *server, int id, enet_uint8 *data) {
-    printf("A Message packet containing %s was received from %d\n",
-           data, id);
+void Server::parseMessage(ENetHost *server, entt::entity userRef, enet_uint8 *data) {
+    User user = m_registry.get<User>(userRef);
+    if (data[0] == '/'){
+        printf("Received command %s from %s.", data, user.userName.c_str());
+    } else {
+        unsigned char message[sizeof(data) + 1 + user.userName.size()];
+        std::memcpy(message, user.userName.c_str(), user.userName.size());
+        std::memcpy(message, ":", 1);
+        std::memcpy(message, data, sizeof(data));
+        //std::string message = user.userName + ":" + std::string(data);
+        printf("%s", message);
+        ENetPacket * packet = enet_packet_create (message, sizeof(message), ENET_PACKET_FLAG_RELIABLE);
+        auto view = m_registry.view<User>();
+        for(auto entity: view){
+            enet_peer_send (entity.peer, 2, packet);
+        }
+        enet_host_flush(m_server);
+    }
 }

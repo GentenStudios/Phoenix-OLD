@@ -28,46 +28,13 @@
 
 #pragma once
 
-#include <Server/User.hpp>
-
-//#include <Server/Commander.hpp>
-
-#include <entt/entt.hpp>
-
+#include <string>
 #include <enet/enet.h>
 
-#include <string>
-#include <array>
-
-namespace phx::server
-{
-
-	class Server
-	{
-	public:
-		Server(std::string save);
-		~Server();
-
-		void run();
-
-        void parseEvent(ENetHost* server, entt::entity userRef, enet_uint8 *data);
-		void parseState(ENetHost* server, entt::entity userRef, enet_uint8 *data);
-        void parseMessage(ENetHost* server, entt::entity userRef, enet_uint8 *data);
-
-        static const int maxUsers = 32;
-	private:
-	    bool m_running;
-
-        entt::registry m_registry;
-
-	    std::string m_save;
-
-	    // Networking stuff
-	    //std::array<User, maxUsers> m_users;
-
-        ENetHost*   m_server;
-        ENetEvent   m_event;
-        ENetAddress m_address;
-
-	};
-} // namespace phx::server
+namespace phx::server{
+    struct User{
+        User() = default;
+        std::string userName;
+        ENetPeer*   peer;
+    };
+}

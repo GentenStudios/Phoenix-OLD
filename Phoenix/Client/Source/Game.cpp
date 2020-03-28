@@ -39,9 +39,18 @@ using namespace phx;
 
 static Commander kirk;
 
+///@todo This needs refactored to play nicely
+/**
+ * This exists so we can call the message function from the chat client,
+ * we definitely need to just clean that up so it all plays nicely. If
+ * a second instance of the game is created, this entire system will break
+ * (but so will a few others . . . )
+ */
+static Game* myGame = nullptr;
+
 static void rawEcho(const std::string& input, std::ostringstream& cout)
 {
-	kirk.callback(input, cout);
+	myGame->sendMessage(input, cout);
 }
 
 Game::Game(gfx::Window* window) : Layer("Game"), m_window(window)
@@ -59,6 +68,8 @@ Game::Game(gfx::Window* window) : Layer("Game"), m_window(window)
 	    [=](const std::string& text) { m_chat->cout << text << "\n"; };
 
 	voxels::BlockRegistry::get()->initialise();
+
+	myGame = this;
 }
 
 Game::~Game() { delete m_chat; }
@@ -89,7 +100,7 @@ void Game::onAttach()
     enet_address_set_host(&m_address, "127.0.0.1");
     m_address.port = 7777;
 
-    m_peer = enet_host_connect(m_client, &m_address, 1, 0);
+    m_peer = enet_host_connect(m_client, &m_address, 3, 0);
     if (m_peer == NULL)
     {
         fprintf (stderr,
@@ -279,36 +290,36 @@ void Game::tick(float dt)
 
 	m_camera->tick(dt);
 
-    /// TODO: Convert this to pull a bitpacked state from an input map?
-    // WASD
-    std::string state = "1";
-    if (m_window->isKeyDown(events::Keys::KEY_W))
-    {state += "1";} else {state += "0";}
-    if (m_window->isKeyDown(events::Keys::KEY_S))
-    {state += "1";} else {state += "0";}
-    if (m_window->isKeyDown(events::Keys::KEY_A))
-    {state += "1";} else {state += "0";}
-    if (m_window->isKeyDown(events::Keys::KEY_D))
-    {state += "1";} else {state += "0";}
-    if (m_window->isKeyDown(events::Keys::KEY_SPACE))
-    {state += "1";} else {state += "0";}
-    if (m_window->isKeyDown(events::Keys::KEY_LEFT_SHIFT))
-    {state += "1";} else {state += "0";}
-    printf("state:%s", state.c_str());
-
-    if (stateLog.size() > STATE_SIZE * LOG_SIZE)
-	{
-		stateLog = stateLog.substr(STATE_SIZE + 1, STATE_SIZE * (LOG_SIZE - 1)) + state;
-	}else{
-        stateLog = stateLog + state;
-    }
-
-    ENetPacket* packet;
-    packet = enet_packet_create(stateLog.c_str(), stateLog.size(),
-                                ENET_PACKET_FLAG_UNRELIABLE_FRAGMENT);
-
-    enet_peer_send(m_peer, 0, packet);
-    enet_host_flush(m_client);
+//    /// TODO: Convert this to pull a bitpacked state from an input map?
+//    // WASD
+//    std::string state = "1";
+//    if (m_window->isKeyDown(events::Keys::KEY_W))
+//    {state += "1";} else {state += "0";}
+//    if (m_window->isKeyDown(events::Keys::KEY_S))
+//    {state += "1";} else {state += "0";}
+//    if (m_window->isKeyDown(events::Keys::KEY_A))
+//    {state += "1";} else {state += "0";}
+//    if (m_window->isKeyDown(events::Keys::KEY_D))
+//    {state += "1";} else {state += "0";}
+//    if (m_window->isKeyDown(events::Keys::KEY_SPACE))
+//    {state += "1";} else {state += "0";}
+//    if (m_window->isKeyDown(events::Keys::KEY_LEFT_SHIFT))
+//    {state += "1";} else {state += "0";}
+//    printf("state:%s", state.c_str());
+//
+//    if (stateLog.size() > STATE_SIZE * LOG_SIZE)
+//	{
+//		stateLog = stateLog.substr(STATE_SIZE + 1, STATE_SIZE * (LOG_SIZE - 1)) + state;
+//	}else{
+//        stateLog = stateLog + state;
+//    }
+//
+//    ENetPacket* packet;
+//    packet = enet_packet_create(stateLog.c_str(), stateLog.size(),
+//                                ENET_PACKET_FLAG_UNRELIABLE_FRAGMENT);
+//
+//    enet_peer_send(m_peer, 0, packet);
+//    enet_host_flush(m_client);
 
 	if (m_followCam)
 	{
@@ -324,4 +335,13 @@ void Game::tick(float dt)
 	m_renderPipeline.setMatrix("u_projection", m_camera->getProjection());
 
 	m_world->render();
+}
+
+void Game::sendMessage(const std::string& input, std::ostringstream& cout)
+{
+    ENetPacket* packet;
+    packet = enet_packet_create(input.c_str(), input.size(),
+                                ENET_PACKET_FLAG_RELIABLE);
+    enet_peer_send(m_peer, 2, packet);
+    enet_host_flush(m_client);
 }

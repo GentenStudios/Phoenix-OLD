@@ -1,6 +1,7 @@
 set(currentDir ${CMAKE_CURRENT_LIST_DIR})
 set(Sources
 	${currentDir}/Server.cpp
+	${currentDir}/Commander.cpp
 
 	${currentDir}/Main.cpp
 

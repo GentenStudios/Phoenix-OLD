@@ -69,6 +69,14 @@ namespace phx::client
 		void onEvent(events::Event& e) override;
 		void tick(float dt) override;
 
+		/** @brief Sends a message packet to the server for the commander to
+		 * interpret.
+		 *
+		 * @param input The message sent to the server
+		 * @param cout Needs to be depreciated, unused (but required by terminal)
+		 */
+        void sendMessage(const std::string& input, std::ostringstream& cout);
+
 	private:
 		gfx::Window*       m_window;
 		gfx::FPSCamera*    m_camera = nullptr;
@@ -89,7 +97,7 @@ namespace phx::client
         static constexpr size_t LOG_SIZE = 5;
         std::string stateLog;
 
-		// Networking stuff
+        // Networking stuff
 
         ENetHost*   m_client;
         ENetEvent   m_event;
