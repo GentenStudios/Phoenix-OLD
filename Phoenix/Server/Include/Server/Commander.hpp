@@ -39,6 +39,7 @@
 
 #include <Common/Singleton.hpp>
 
+#include <entt/entity/registry.hpp>
 #include <functional>
 #include <istream>
 #include <ostream>
@@ -59,6 +60,7 @@ namespace phx
 	typedef std::function<void(std::vector<std::string> args)> CommandFunction;
 
 	struct Command{
+	    std::string command;
 	    std::string help;
 	    CommandFunction callback;
 	};
@@ -69,6 +71,14 @@ namespace phx
 	 */
 	class Commander
 	{
+        /**
+         * @brief Searches for a command.
+         *
+         * @param command The command to search for.
+         * @return index command is located at or -1 if its not found.
+         */
+        static int find(entt::registry &registry, const std::string& command);
+
 		/**
 		 * @brief Registers a command in the command registry.
 		 *
@@ -77,23 +87,8 @@ namespace phx
 		 * @param permission What permission is required to run this command.
 		 * @param f The function that is called when the command is executed.
 		 */
-		static void add(const std::string& command, const std::string& help,
-		         const CommandFunction& f);
-
-		/**
-		 * @brief Searches for a command.
-		 *
-		 * @param command The command to search for.
-		 * @return index command is located at or -1 if its not found.
-		 */
-		static int find(const std::string& command);
-
-		/**
-		 * @brief Gets next open space in book.
-		 *
-		 * @return Returns the next open space in arrays as an integer.
-		 */
-		static int getPage();
+		static void add(entt::registry &registry, const std::string& command,
+		    const std::string& help, const CommandFunction& f);
 
         /**
          * @brief Calls a command.
@@ -105,8 +100,8 @@ namespace phx
          * @return Returns True if the function was called and False if the
          * function could not be found
          */
-        static bool run(int user, const std::string& command,
-                 const std::vector<std::string>& args);
+        static bool run(entt::registry &registry, auto user,
+            const std::string& command, const std::vector<std::string>& args);
 
         /**
          * @brief Returns helpstring for command.
@@ -117,14 +112,14 @@ namespace phx
          * @return Returns True if successful and False if it could not find
          * the inputted command.
          */
-        static bool help(int user, const std::vector<std::string>& args);
+        static bool help(entt::registry &registry, auto user, const std::vector<std::string>& args);
 
         /**
          * @brief Outputs a string listing available commands.
          *
          * @param out The output stream the list of commands is sent to.
          */
-        static void list(std::ostream& out);
+        static void list(entt::registry &registry);
 
         /**
          * @brief Terminal interface to listen for and execute commands.
@@ -144,14 +139,8 @@ namespace phx
          * ran.
          * @param cout The output stream any output goes to.
          */
-        static void callback(const std::string& input, std::ostringstream& cout);
+        static void callback(entt::registry &registry, const std::string& input);
 
-	private:
-		/**
-		 * @brief Counter that keeps track of next space in the arrays (eg
-		 * next page in the book).
-		 */
-		static std::unordered_map<std::string, Command> m_commands;
 	};
 } // namespace phx
 

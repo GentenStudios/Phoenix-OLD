@@ -35,40 +35,60 @@
  *
  */
 
-#include <Common/Commander.hpp>
+#include <Server/Commander.hpp>
 #include <Common/ContentLoader.hpp>
 
 using namespace phx;
 
-int CommandBook::find(const std::string& command)
+void Commander::add(entt::registry &registry, const std::string& command,
+    const std::string& help, const CommandFunction& f)
 {
-	for (int j = 0; j < m_page; j++)
-	{
-		if (m_command[j] == command)
-		{
-			return j;
-		}
-	}
-	return -1;
+    auto view = registry.view<Command>();
+    for (auto entity: view)
+    {
+        auto &com = view.get<Command>(entity);
+        if (com.command == command)
+        {
+            com.help = help;
+            com.callback = f;
+            return;
+        }
+    }
+    auto entity = registry.create();
+    registry.emplace<Command>(entity, command, help, f);
 }
 
-void CommandBook::add(const std::string& command, const std::string& help,
-                      const std::string& permission, const CommandFunction& f)
+void Commander::run(entt::registry &registry, auto user,
+                    const std::string& command, const std::vector<std::string>& args)
 {
-	int j = find(command);
-	// If command does not already exist, enter new command
-	if (j == -1)
-	{
-		j = m_page;
-		++m_page;
-	}
-	m_command.push_back(command);
-	m_help.push_back(help);
-	m_permission.push_back(permission);
-	m_functions.push_back(f);
+    // Check for built in functions
+    if (command == "help")
+    {
+        return help(args);
+    }
+    else if (command == "list")
+    {
+        list();
+        return true;
+    }
+
+    // If no built in functions match, search library
+    auto view = registry.view<Command>();
+    for (auto entity: view)
+    {
+        auto &com = view.get<Command>(entity);
+        if (com.command == command)
+        {
+            com.callback(args);
+            return;
+        }
+    }
 }
 
-int CommandBook::getPage() { return m_page; }
+
+
+
+
 
 CommandBook::CommandBook()
 {
@@ -153,32 +173,7 @@ bool Commander::help(const std::vector<std::string>& args, std::ostream& out)
 	}
 }
 
-bool Commander::run(const std::string&              command,
-                    const std::vector<std::string>& args, std::ostream& out)
-{
-	// Check for built in functions
-	if (command == "help")
-	{
-		return this->help(args, out);
-	}
-	else if (command == "list")
-	{
-		this->list(out);
-		return true;
-	}
-	// If no built in functions match, search library
-	const int j = m_book->find(command);
-	if (j == -1)
-	{
-		out << "Command \"" + command + "\" not found \n";
-		return false;
-	}
-	else
-	{
-		m_book->m_functions[j](args);
-		return true;
-	}
-}
+
 
 void Commander::list(std::ostream& out)
 {
