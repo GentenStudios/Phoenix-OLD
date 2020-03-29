@@ -50,9 +50,9 @@ namespace phx::server
 
 		void run();
 
-        void parseEvent(ENetHost* server, entt::entity userRef, enet_uint8 *data);
-		void parseState(ENetHost* server, entt::entity userRef, enet_uint8 *data);
-        void parseMessage(ENetHost* server, entt::entity userRef, enet_uint8 *data);
+        void parseEvent(ENetHost* server, entt::entity* userRef, enet_uint8* data);
+		void parseState(ENetHost* server, entt::entity* userRef, enet_uint8* data);
+        void parseMessage(ENetHost* server, entt::entity* userRef, enet_uint8* data);
 
         static const int maxUsers = 32;
 	private:
@@ -68,6 +68,5 @@ namespace phx::server
         ENetHost*   m_server;
         ENetEvent   m_event;
         ENetAddress m_address;
-
 	};
 } // namespace phx::server

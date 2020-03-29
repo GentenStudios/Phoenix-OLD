@@ -33,7 +33,6 @@
 
 namespace phx::server{
     struct User{
-        User() = default;
         std::string userName;
         ENetPeer*   peer;
     };

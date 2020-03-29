@@ -69,14 +69,15 @@ void Server::run()
 	{
 		while (enet_host_service(m_server, &m_event, 1000) > 0)
 		{
-            User user;
 			switch (m_event.type)
 			{
 			case ENET_EVENT_TYPE_CONNECT:
 				printf("A new client connected from %x:%u.\n", m_event.peer->address.host, m_event.peer->address.port);
-                auto entity = m_registry.create();
-                m_registry.emplace<User>(entity, "toby", m_event.peer);
-                m_event.peer -> data = &entity;
+                {
+                    auto entity = m_registry.create();
+                    m_registry.emplace<User>(entity, "toby", m_event.peer);
+                    m_event.peer->data = static_cast<void*>(&entity);
+                }
 				break;
 			case ENET_EVENT_TYPE_RECEIVE:
 //                printf ("A packet of length %u containing %s was received from %s on channel %u.\n",
@@ -88,13 +89,13 @@ void Server::run()
                 switch(m_event.channelID)
                 {
                 case 0:
-                    parseEvent(m_server,m_event.peer->data, m_event.packet->data);
+                    parseEvent(m_server, static_cast<entt::entity*>(m_event.peer->data), m_event.packet->data);
                     break;
                 case 1:
-                    parseState(m_server,m_event.peer->data), m_event.packet->data);
+                    parseState(m_server, static_cast<entt::entity*>(m_event.peer->data), m_event.packet->data);
                     break;
                 case 2:
-                    parseMessage(m_server,m_event.peer->data, m_event.packet->data);
+                    parseMessage(m_server, static_cast<entt::entity*>(m_event.peer->data), m_event.packet->data);
                     break;
                 }
 
@@ -120,15 +121,15 @@ Server::~Server()
     enet_host_destroy(m_server);
 }
 
-void Server::parseEvent(ENetHost *server, entt::entity userRef, enet_uint8 *data) {
+void Server::parseEvent(ENetHost *server, entt::entity* userRef, enet_uint8 *data) {
     printf("Event received");
     printf("An Event packet containing %s was received from %s\n",
-        data, user.userName.c_str());
+        data, "toby");
 }
 
-void Server::parseState(ENetHost *server, entt::entity userRef, enet_uint8 *data) {
+void Server::parseState(ENetHost *server, entt::entity* userRef, enet_uint8 *data) {
     printf("A State packet containing %s was received from %s\n",
-           data, user.userName.c_str());
+           data, "toby");
 //    math::vec3 pos = m_player.getPosition();
 //    const float moveSpeed = static_cast<float>(m_player.getMoveSpeed());
 //
@@ -161,8 +162,8 @@ void Server::parseState(ENetHost *server, entt::entity userRef, enet_uint8 *data
 //    }
 }
 
-void Server::parseMessage(ENetHost *server, entt::entity userRef, enet_uint8 *data) {
-    User user = m_registry.get<User>(userRef);
+void Server::parseMessage(ENetHost* server, entt::entity* userRef, enet_uint8 *data) {
+    User user = m_registry.get<User>(*userRef);
     if (data[0] == '/'){
         printf("Received command %s from %s.", data, user.userName.c_str());
     } else {
@@ -174,8 +175,9 @@ void Server::parseMessage(ENetHost *server, entt::entity userRef, enet_uint8 *da
         printf("%s", message);
         ENetPacket * packet = enet_packet_create (message, sizeof(message), ENET_PACKET_FLAG_RELIABLE);
         auto view = m_registry.view<User>();
-        for(auto entity: view){
-            enet_peer_send (entity.peer, 2, packet);
+        for(auto entity : view)
+        {
+            enet_peer_send (view.get<User>(entity).peer, 2, packet);
         }
         enet_host_flush(m_server);
     }
