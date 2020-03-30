@@ -3,7 +3,7 @@
 ## Introduction
 Project Phoenix is an open world sandbox style voxel game with a twist. The program itself does not provide any content but gets that content entirely from modules written in Lua. An easy to use Lua API provides the capability to define all of the games content in addition to some functional features. This allows content to be quickly created by someone with little to no programming experience while still retaining the power of C++. 
 
-More information on this project and its mission can be found [here](https://docs.google.com/document/d/1vwmE24GTWhpxHRwjLutI63bD4uRy_4bxJ21YoKZWDv8/edit#).
+More information on this project and its mission can be found [here](https://docs.google.com/document/d/1vwmE24GTWhpxHRwjLutI63bD4uRy_4bxJ21YoKZWDv8).
 
 ## Community
 [Here's a link to our public discord server](https://discord.gg/XRttqAm), where we collaborate and discuss the development of the Phoenix.
