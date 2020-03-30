@@ -31,6 +31,7 @@
 #include <Common/Voxels/BlockRegistry.hpp>
 #include <Common/ContentLoader.hpp>
 #include <Common/Commander.hpp>
+#include <cstring>
 
 using namespace phx;
 
@@ -203,3 +204,43 @@ voxels::BlockType* Player::getHand()
 	return m_hand;
 }
 
+char* Player::getBitPackedState()
+{
+	char* state = new char[32];
+
+	std::size_t i = 0;
+
+	// hand
+	std::size_t block_id = m_hand->getRegistryID();
+	std::memcpy(state + i, &block_id, sizeof(block_id));
+	i += sizeof(block_id);
+
+	// position
+	auto d = getPosition().x;
+	std::memcpy(state + i, &d, sizeof(d));
+	i += sizeof(d);
+	d = getPosition().y;
+	std::memcpy(state + i, &d, sizeof(d));
+	i += sizeof(d);
+	d = getPosition().z;
+	std::memcpy(state + i, &d, sizeof(d));
+	i += sizeof(d);
+
+	// rotation
+	d = getRotation().x;
+	std::memcpy(state + i, &d, sizeof(d));
+	i += sizeof(d);
+	d = getRotation().y;
+	std::memcpy(state + i, d, sizeof(d));
+	i += sizeof(d);
+	d = getRotation().z;
+	std::memcpy(state + i, &d, sizeof(d));
+	i += sizeof(d);
+
+	// speed
+	auto f = getMoveSpeed();
+	std::memcpy(state + i, &f, sizeof(f));
+	i += sizeof(f);
+
+	return state;
+}

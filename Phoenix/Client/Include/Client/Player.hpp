@@ -62,6 +62,9 @@ namespace phx
 		void               setHand(voxels::BlockType* block);
 		voxels::BlockType* getHand();
 
+		// don't forget to free the ressource afterward
+		char* getBitPackedState();
+
 	private:
 		float              m_reach = 32.f;
 		voxels::ChunkView* m_world;

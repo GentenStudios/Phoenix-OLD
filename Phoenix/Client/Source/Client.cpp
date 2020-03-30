@@ -29,6 +29,7 @@
 #include <Client/Client.hpp>
 #include <Client/Game.hpp>
 #include <Client/SplashScreen.hpp>
+#include <cstring>
 
 using namespace phx::client;
 using namespace phx;

@@ -75,7 +75,7 @@ namespace phx::client
 		 * @param input The message sent to the server
 		 * @param cout Needs to be depreciated, unused (but required by terminal)
 		 */
-        void sendMessage(const std::string& input, std::ostringstream& cout);
+		void sendMessage(const std::string& input, std::ostringstream& cout);
 
 	private:
 		gfx::Window*       m_window;
@@ -93,16 +93,16 @@ namespace phx::client
 		math::vec3 m_prevPos;
 		int        m_playerHand = 0;
 
-        static constexpr size_t STATE_SIZE = 7;
-        static constexpr size_t LOG_SIZE = 5;
-        std::string stateLog;
+		static constexpr size_t STATE_SIZE = 7;
+		static constexpr size_t LOG_SIZE = 5;
+		std::string stateLog;
 
-        // Networking stuff
+		// Networking stuff
 
-        ENetHost*   m_client;
-        ENetEvent   m_event;
-        ENetPeer*   m_peer;
-        ENetAddress m_address;
+		ENetHost*   m_client;
+		ENetEvent   m_event;
+		ENetPeer*   m_peer;
+		ENetAddress m_address;
 	};
 } // namespace phx::client
 
