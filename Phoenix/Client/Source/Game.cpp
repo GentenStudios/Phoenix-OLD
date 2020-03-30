@@ -293,17 +293,17 @@ void Game::tick(float dt)
 	// WASD
 	char cstate = 0;
 	if (m_window->isKeyDown(events::Keys::KEY_W))
-		cstate &= 1 << 7;
+		cstate |= 1 << 7;
 	if (m_window->isKeyDown(events::Keys::KEY_S))
-		cstate &= 1 << 6;
+		cstate |= 1 << 6;
 	if (m_window->isKeyDown(events::Keys::KEY_A))
-		cstate &= 1 << 5;
+		cstate |= 1 << 5;
 	if (m_window->isKeyDown(events::Keys::KEY_D))
-		cstate &= 1 << 4;
+		cstate |= 1 << 4;
 	if (m_window->isKeyDown(events::Keys::KEY_SPACE))
-		cstate &= 1 << 3;
+		cstate |= 1 << 3;
 	if (m_window->isKeyDown(events::Keys::KEY_LEFT_SHIFT))
-		cstate &= 1 << 2;
+		cstate |= 1 << 2;
 	std::string state(1, cstate);
 
 	if (stateLog.size() > STATE_SIZE * LOG_SIZE)
