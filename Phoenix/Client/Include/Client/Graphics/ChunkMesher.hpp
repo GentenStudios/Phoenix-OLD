@@ -41,6 +41,7 @@
 #include <Common/Voxels/Block.hpp>
 
 #include <vector>
+#include <glm/glm.hpp>
 
 namespace phx::gfx
 {
@@ -107,11 +108,11 @@ namespace phx::gfx
 		 * @return The mesh as an array of floats.
 		 */
 		const std::vector<float>& getMesh() const { return m_mesh; }
-
+		
 	private:
 		// internal function, no need to document.
 		void addBlockFace(voxels::BlockType* block, BlockFace face, float x,
-		                  float y, float z);
+		                  float y, float z,  glm::vec3 normals);
 
 	private:
 		math::vec3                                    m_pos;

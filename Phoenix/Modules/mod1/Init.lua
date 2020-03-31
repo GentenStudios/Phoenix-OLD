@@ -32,3 +32,6 @@ block.name = "Air"
 block.id = "core:air"
 block.category = "Air"
 voxel.block.register(block)
+
+-- strength, size, octaves, persistence, height
+world_params.setWorldParams(32, 0.4, 4, 1, 0.1)

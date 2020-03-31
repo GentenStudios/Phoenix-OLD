@@ -40,15 +40,15 @@
 using namespace phx;
 using namespace gfx;
 
+#include <glm/glm.hpp>
+
 // struct to help with laying out the data inside the buffers.
 struct Vertex
 {
-	float x;
-	float y;
-	float z;
-	float u;
-	float v;
+	float posx, poxy, posz;
+	float uvu, uvv;
 	float tex;
+	float normalx, normaly, normalz;
 };
 
 ChunkRenderer::ChunkRenderer(const std::size_t visibleChunks)
@@ -130,6 +130,7 @@ void ChunkRenderer::submitChunk(const std::vector<float>& mesh, math::vec3 pos)
 
 	unsigned int vao;
 	unsigned int buf;
+	unsigned int buf0;
 
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
@@ -141,15 +142,23 @@ void ChunkRenderer::submitChunk(const std::vector<float>& mesh, math::vec3 pos)
 
 	glVertexAttribPointer(m_vertexAttributeLocation, 3, GL_FLOAT, GL_FALSE,
 	                      sizeof(Vertex),
-	                      reinterpret_cast<void*>(offsetof(Vertex, x)));
+	                      reinterpret_cast<void*>(offsetof(Vertex, posx)));
 
 	// we're gonna pack texLayer into this cos why not.
 	glVertexAttribPointer(m_uvAttributeLocation, 3, GL_FLOAT, GL_FALSE,
 	                      sizeof(Vertex),
-	                      reinterpret_cast<void*>(offsetof(Vertex, u)));
+	                      reinterpret_cast<void*>(offsetof(Vertex, uvu)));
 
-	glEnableVertexAttribArray(m_vertexAttributeLocation);
-	glEnableVertexAttribArray(m_uvAttributeLocation);
+	glVertexAttribPointer(
+		m_normalAttribLoc,
+		3,
+		GL_FLOAT,
+		GL_TRUE,
+		sizeof(Vertex),
+	    reinterpret_cast<void*>(offsetof(Vertex, normalx))
+	);
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	m_buffers.insert({pos, {vao, buf, mesh.size()}});
 }
@@ -194,7 +203,21 @@ void ChunkRenderer::render()
 	for (auto& buffer : m_buffers)
 	{
 		glBindVertexArray(buffer.second.vao);
+
+		glEnableVertexAttribArray(m_vertexAttributeLocation);
+		glEnableVertexAttribArray(m_uvAttributeLocation);
+		glEnableVertexAttribArray(m_normalAttribLoc);
+
 		glDrawArrays(GL_TRIANGLES, 0, buffer.second.vertexCount);
+
+		glDisableVertexAttribArray(m_vertexAttributeLocation);
+		glDisableVertexAttribArray(m_uvAttributeLocation);
+		glDisableVertexAttribArray(m_normalAttribLoc);
+
+		glBindVertexArray(0);
+		
 	}
+
+	
 }
 

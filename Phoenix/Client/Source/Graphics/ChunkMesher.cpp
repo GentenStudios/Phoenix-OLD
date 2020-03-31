@@ -28,6 +28,7 @@
 
 #include <Client/Graphics/ChunkMesher.hpp>
 #include <Common/Voxels/Chunk.hpp>
+#include <glm/glm.hpp>
 
 static const phx::math::vec3 CUBE_VERTS[] = {
     // front
@@ -137,39 +138,39 @@ void ChunkMesher::mesh()
 		    m_blockRef[Chunk::getVectorIndex(x - 1, y, z)]->category !=
 		        BlockCategory::SOLID)
 			addBlockFace(block, BlockFace::LEFT, static_cast<float>(x),
-			             static_cast<float>(y), static_cast<float>(z));
+			             static_cast<float>(y), static_cast<float>(z), glm::vec3(-1, 0, 0));
 		if (x == Chunk::CHUNK_WIDTH - 1 ||
 		    m_blockRef[Chunk::getVectorIndex(x + 1, y, z)]->category !=
 		        BlockCategory::SOLID)
 			addBlockFace(block, BlockFace::RIGHT, static_cast<float>(x),
-			             static_cast<float>(y), static_cast<float>(z));
+			             static_cast<float>(y), static_cast<float>(z), glm::vec3(1, 0, 0));
 
 		if (y == 0 ||
 		    m_blockRef[Chunk::getVectorIndex(x, y - 1, z)]->category !=
 		        BlockCategory::SOLID)
 			addBlockFace(block, BlockFace::BOTTOM, static_cast<float>(x),
-			             static_cast<float>(y), static_cast<float>(z));
+			             static_cast<float>(y), static_cast<float>(z), glm::vec3(0, -1, 0));
 		if (y == Chunk::CHUNK_WIDTH - 1 ||
 		    m_blockRef[Chunk::getVectorIndex(x, y + 1, z)]->category !=
 		        BlockCategory::SOLID)
 			addBlockFace(block, BlockFace::TOP, static_cast<float>(x),
-			             static_cast<float>(y), static_cast<float>(z));
+			             static_cast<float>(y), static_cast<float>(z), glm::vec3(0, 1, 0));
 
 		if (z == 0 ||
 		    m_blockRef[Chunk::getVectorIndex(x, y, z - 1)]->category !=
 		        BlockCategory::SOLID)
 			addBlockFace(block, BlockFace::FRONT, static_cast<float>(x),
-			             static_cast<float>(y), static_cast<float>(z));
+			             static_cast<float>(y), static_cast<float>(z), glm::vec3(0, 0, -1));
 		if (z == Chunk::CHUNK_DEPTH - 1 ||
 		    m_blockRef[Chunk::getVectorIndex(x, y, z + 1)]->category !=
 		        BlockCategory::SOLID)
 			addBlockFace(block, BlockFace::BACK, static_cast<float>(x),
-			             static_cast<float>(y), static_cast<float>(z));
+			             static_cast<float>(y), static_cast<float>(z), glm::vec3(0, 0, 1));
 	}
 }
 
 void ChunkMesher::addBlockFace(voxels::BlockType* block, BlockFace face,
-                               float x, float y, float z)
+                               float x, float y, float z, glm::vec3 normals)
 {
 	const std::size_t texLayer = m_texTable.at(block->textures[static_cast<std::size_t>(face)]);
 
@@ -190,6 +191,12 @@ void ChunkMesher::addBlockFace(voxels::BlockType* block, BlockFace face,
 		m_mesh.push_back(cubeUVs.y);
 
 		m_mesh.push_back(static_cast<float>(texLayer));
+
+        m_mesh.push_back(normals.x);
+        m_mesh.push_back(normals.y);
+        m_mesh.push_back(normals.z);
+
 	}
+
 }
 

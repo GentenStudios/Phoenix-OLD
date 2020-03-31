@@ -34,6 +34,8 @@
 #include <Common/ContentLoader.hpp>
 #include <Common/Voxels/BlockRegistry.hpp>
 
+#include <Common/Voxels/WorldGenerator.hpp>
+
 using namespace phx::client;
 using namespace phx;
 
@@ -44,8 +46,12 @@ static void rawEcho(const std::string& input, std::ostringstream& cout)
 	kirk.callback(input, cout);
 }
 
+
+
 Game::Game(gfx::Window* window) : Layer("Game"), m_window(window)
 {
+
+
 	ContentManager::get()->lua["core"]["print"] =
 	    /**
 	     * @addtogroup luaapi
@@ -59,6 +65,13 @@ Game::Game(gfx::Window* window) : Layer("Game"), m_window(window)
 	    [=](const std::string& text) { m_chat->cout << text << "\n"; };
 
 	voxels::BlockRegistry::get()->initialise();
+
+	ContentManager::get()->lua["world_params"] =
+	    ContentManager::get()->lua.create_table();
+
+	ContentManager::get()->lua["world_params"]["setWorldParams"] = [&] (float strength, float size, int octaves, float persistence, float height) {
+		WorldGenerator::setParams(WorldGenerator::Params{strength, size, octaves, persistence, height});
+	};
 }
 
 Game::~Game() { delete m_chat; }

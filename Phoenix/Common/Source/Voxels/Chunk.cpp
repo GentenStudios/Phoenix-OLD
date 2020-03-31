@@ -30,6 +30,11 @@
 #include <Common/Voxels/Chunk.hpp>
 #include <iostream>
 
+#include <Common/ContentLoader.hpp>
+#include <Common/Voxels/FastNoise.h>
+
+#include <Common/Voxels/WorldGenerator.hpp>
+
 using namespace phx::voxels;
 using namespace phx;
 
@@ -62,6 +67,23 @@ std::string Chunk::save()
 	return save;
 }
 
+const FastNoise noise;
+
+double getNoise(float x, float y, float z, float strength, float size, int octaves, double persistence, float height) {
+	double total = 0;
+    double maxValue = 0;  // Used for normalizing result to 0.0 - 1.0
+    for(int i=0;i<octaves;i++) {
+        total += noise.GetSimplex(x * size, y * size, z * size) * strength;
+        
+        maxValue += strength;
+        
+        strength *= persistence;
+        size *= 2;
+    }
+    
+    return (total/maxValue) * strength + height * strength;
+}
+
 void Chunk::autoTestFill()
 {
 	BlockType* block = BlockRegistry::get()->getFromID("core:air");
@@ -70,9 +92,28 @@ void Chunk::autoTestFill()
 		block = BlockRegistry::get()->getFromID("core:grass");
 	}
 
-	for (std::size_t i = 0; i < CHUNK_WIDTH * CHUNK_HEIGHT * CHUNK_DEPTH; ++i)
+	for (std::size_t i = 0; i < CHUNK_WIDTH * CHUNK_DEPTH * CHUNK_HEIGHT; ++i)
 	{
 		m_blocks.push_back(block);
+	}
+
+	for (std::size_t i = 0; i < CHUNK_WIDTH; ++i)
+	{
+		for (std::size_t j = 0; j < CHUNK_HEIGHT; ++j)
+		{
+			for (std::size_t k = 0; k < CHUNK_DEPTH; ++k)
+			{
+				//x, y, z, strength, size, octaves, persistence, height
+				//32, 0.4, 4, 1, 0.1
+
+				WorldGenerator::Params worldParams = WorldGenerator::getParams();
+
+				if(m_pos.y+j < getNoise(m_pos.x+i, m_pos.y+j, m_pos.z+k, worldParams.strength, worldParams.size, worldParams.octaves, worldParams.persistence, worldParams.height))
+					setBlockAt(math::vec3(i,j,k), BlockRegistry::get()->getFromID("core:grass"));
+				else
+					setBlockAt(math::vec3(i,j,k), BlockRegistry::get()->getFromID("core:air"));
+			}
+		}
 	}
 }
 
@@ -99,4 +140,5 @@ void Chunk::setBlockAt(math::vec3 position, BlockType* newBlock)
 		m_blocks[getVectorIndex(position)] = newBlock;
 	}
 }
+
 

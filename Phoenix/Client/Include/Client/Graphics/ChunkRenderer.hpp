@@ -40,6 +40,8 @@
 #include <unordered_map>
 #include <vector>
 
+#include <glm/glm.hpp>
+
 namespace phx::gfx
 {
 	// forward declaration
@@ -196,6 +198,7 @@ namespace phx::gfx
 
 		const int m_vertexAttributeLocation = 0;
 		const int m_uvAttributeLocation     = 1;
+		const int m_normalAttribLoc	        = 2;
 
 		AssociativeTextureTable m_textureTable;
 	};

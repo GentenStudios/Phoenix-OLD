@@ -5,6 +5,9 @@ set(voxelHeaders
 	${currentDir}/TextureRegistry.hpp
 	${currentDir}/Chunk.hpp
 	${currentDir}/Map.hpp
+	${currentDir}/FastNoise.h
+	${currentDir}/WorldGenerator.hpp
+
 
 	PARENT_SCOPE
 )

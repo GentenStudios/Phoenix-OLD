@@ -4,6 +4,9 @@ set(voxelSources
 	${currentDir}/TextureRegistry.cpp
 	${currentDir}/Chunk.cpp
 	${currentDir}/Map.cpp
+	${currentDir}/FastNoise.cpp
+	${currentDir}/WorldGenerator.cpp
+
 
 	PARENT_SCOPE
 )

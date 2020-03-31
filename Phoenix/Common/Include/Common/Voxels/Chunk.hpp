@@ -74,9 +74,11 @@ namespace phx::voxels
 	 * //renderer->dropChunk(chunk.getChunkPos());
 	 * @endcode
 	 */
+
 	class Chunk
 	{
 	public:
+
 		Chunk() = delete;
 
 		explicit Chunk(math::vec3 chunkPos);
