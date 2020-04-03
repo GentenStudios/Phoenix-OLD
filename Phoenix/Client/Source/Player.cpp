@@ -36,7 +36,8 @@ using namespace phx;
 
 static const float RAY_INCREMENT = 0.5f;
 
-Player::Player(voxels::ChunkView* world) : m_world(world) 
+Player::Player(voxels::ChunkView* world, entt::registry& registry)
+    : m_world(world), m_registry(registry)
 {
 	ContentManager::get()->lua["core"]["player"] = 
 		/**
@@ -57,7 +58,7 @@ Player::Player(voxels::ChunkView* world) : m_world(world)
 		 * @return The players speed
 	     */
 	    [this]() {
-		    return getMoveSpeed();
+		    return m_registry.get<Actor>(m_entity).moveSpeed;
 	    };
 	ContentManager::get()->lua["core"]["player"]["setSpeed"] =
 	    /**
@@ -70,7 +71,7 @@ Player::Player(voxels::ChunkView* world) : m_world(world)
 	     *
 	     */
 	    [this](int speed) {
-		   setMoveSpeed(speed);
+          m_registry.get<Actor>(m_entity).moveSpeed = speed;
 	    };
 	ContentManager::get()->lua["core"]["player"]["getPosition"] =
 	    /**
@@ -91,9 +92,9 @@ Player::Player(voxels::ChunkView* world) : m_world(world)
 	     */
 	    [this]() {
 			sol::table pos = ContentManager::get()->lua.create_table();
-			pos["x"] = getPosition().x;
-			pos["y"] = getPosition().y;
-			pos["z"] = getPosition().z;
+			pos["x"] = m_registry.get<Actor>(m_entity).position.x;
+			pos["y"] = m_registry.get<Actor>(m_entity).position.y;
+			pos["z"] = m_registry.get<Actor>(m_entity).position.z;
 		    return pos;
 	    };
 	ContentManager::get()->lua["core"]["player"]["setPosition"] =
@@ -109,23 +110,23 @@ Player::Player(voxels::ChunkView* world) : m_world(world)
 	     *
 	     */
 	    [this](int posx, int posy, int posz) {
-		   setPosition({posx, posy, posz});
+          m_registry.get<Actor>(m_entity).position = {posx, posy, posz};
 	    };
 
-	CommandBook::get()->add(
-		"tp", 
-		"Teleports player to supplied coordinates \n /tp <x> <y> <z>", 
-		"all", 
-		[this](const std::vector<std::string>& args){
-			setPosition({std::stoi(args[0]), std::stoi(args[1]), std::stoi(args[2])});
-		});
+	CommandBook::get()->add("tp",
+                            "Teleports player to supplied coordinates \n /tp <x> <y> <z>",
+                            "all",
+                            [this](const std::vector<std::string>& args){
+                              m_registry.get<Actor>(m_entity).position =
+                                  {std::stoi(args[0]), std::stoi(args[1]), std::stoi(args[2])};
+                            });
 }
 
 math::Ray Player::getTarget() const
 {
-	math::vec3 pos = (getPosition() / 2.f) + .5f;
+	math::vec3 pos = (m_registry.get<Actor>(m_entity).position / 2.f) + .5f;
 
-	math::Ray ray(pos, getDirection());
+	math::Ray ray(pos, rotToDir(m_registry.get<Actor>(m_entity).rotation));
 
 	while (ray.getLength() < m_reach)
 	{
@@ -144,9 +145,9 @@ math::Ray Player::getTarget() const
 
 bool Player::action1()
 {
-	math::vec3 pos = (getPosition() / 2.f) + .5f;
+	math::vec3 pos = (m_registry.get<Actor>(m_entity).position / 2.f) + .5f;
 
-	math::Ray ray(pos, getDirection());
+	math::Ray ray(pos, rotToDir(m_registry.get<Actor>(m_entity).rotation));
 
 	while (ray.getLength() < m_reach)
 	{
@@ -168,9 +169,9 @@ bool Player::action1()
 
 bool Player::action2()
 {
-	math::vec3 pos = (getPosition() / 2.f) + .5f;
+	math::vec3 pos = (m_registry.get<Actor>(m_entity).position / 2.f) + .5f;
 
-	math::Ray ray(pos, getDirection());
+	math::Ray ray(pos, rotToDir(m_registry.get<Actor>(m_entity).rotation));
 
 	while (ray.getLength() < m_reach)
 	{
@@ -203,3 +204,8 @@ voxels::BlockType* Player::getHand()
 	return m_hand;
 }
 
+math::vec3 Player::rotToDir(math::vec3 m_rotation){
+    return {std::cos(m_rotation.y) * std::sin(m_rotation.x),
+            std::sin(m_rotation.y),
+            std::cos(m_rotation.y) * std::cos(m_rotation.x)};
+}
