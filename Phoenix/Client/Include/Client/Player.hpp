@@ -63,6 +63,8 @@ namespace phx
 		void               setHand(voxels::BlockType* block);
 		voxels::BlockType* getHand();
 
+		entt::entity getEntity() {return m_entity;};
+
 
         static math::vec3 rotToDir(math::vec3 m_rotation);
 

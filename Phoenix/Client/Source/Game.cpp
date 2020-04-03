@@ -78,9 +78,9 @@ void Game::onAttach()
 	}
 
 	m_world  = new voxels::ChunkView(3, voxels::Map(save, "map1"));
-	m_player = new Player(m_world);
-	m_camera = new gfx::FPSCamera(m_window);
-	m_camera->setActor(m_player);
+	m_player = new Player(m_world, m_registry);
+	m_camera = new gfx::FPSCamera(m_window, m_registry);
+	m_camera->setActor(m_player->getEntity());
 
 	m_player->setHand(voxels::BlockRegistry::get()->getFromRegistryID(0));
 
@@ -98,7 +98,7 @@ void Game::onAttach()
 
 	if (Client::get()->isDebugLayerActive())
 	{
-		m_gameDebug = new GameTools(&m_followCam, &m_playerHand, m_player);
+		m_gameDebug = new GameTools(&m_followCam, &m_playerHand, m_player, m_registry);
 		Client::get()->pushLayer(m_gameDebug);
 	}
 }
@@ -150,7 +150,7 @@ void Game::onEvent(events::Event& e)
 				if (m_gameDebug == nullptr)
 				{
 					m_gameDebug =
-					    new GameTools(&m_followCam, &m_playerHand, m_player);
+					    new GameTools(&m_followCam, &m_playerHand, m_player, m_registry);
 					Client::get()->pushLayer(m_gameDebug);
 				}
 				else
@@ -205,7 +205,7 @@ void Game::tick(float dt)
 
 	if (m_followCam)
 	{
-		m_prevPos = m_player->getPosition();
+		m_prevPos = m_registry.get<Actor>(m_player->getEntity()).position;
 	}
 
 	m_world->tick(m_prevPos);

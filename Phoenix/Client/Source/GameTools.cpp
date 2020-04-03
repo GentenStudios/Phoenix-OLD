@@ -33,8 +33,8 @@
 using namespace phx::client;
 using namespace phx;
 
-GameTools::GameTools(bool* followCam, int* playerHand, Player* player)
-    : Overlay("GameTools")
+GameTools::GameTools(bool* followCam, int* playerHand, Player* player, entt::registry& registry)
+    : Overlay("GameTools"), m_registry(registry)
 {
 	m_followCam  = followCam;
 	m_playerHand = playerHand;
@@ -66,8 +66,10 @@ void GameTools::tick(float dt)
 			m_sensitivity->set(m_currentSensitivity);
 		}
 
-		ImGui::Text("X: %f\nY: %f\nZ: %f", m_player->getPosition().x,
-		            m_player->getPosition().y, m_player->getPosition().z);
+		ImGui::Text("X: %f\nY: %f\nZ: %f",
+		            m_registry.get<Actor>(m_player->getEntity()).position.x,
+                    m_registry.get<Actor>(m_player->getEntity()).position.y,
+                    m_registry.get<Actor>(m_player->getEntity()).position.z);
 
 		ImGui::Text("Block in hand: %i: %s", *m_playerHand,
 		            m_player->getHand()->displayName.c_str());

@@ -69,7 +69,8 @@ namespace phx::client
 	private:
 		gfx::Window*       m_window;
 		gfx::FPSCamera*    m_camera = nullptr;
-		Player*            m_player;
+        entt::registry     m_registry;
+        Player*            m_player;
 		voxels::ChunkView* m_world = nullptr;
 
 		gfx::ShaderPipeline m_renderPipeline;
