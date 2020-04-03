@@ -42,44 +42,87 @@ InputMap::~InputMap() = default;
 
 void InputMap::initialize()
 {
-	// this just exists to make sure someone calls the initialize function.
+	m_uniqueInputs["core:none"] = m_currentInputRef;
+	m_inputs[m_currentInputRef] = {"None", "core:none"};
+	++m_currentInputRef;
 }
 
 void InputMap::onEvent(events::Event e)
 {
-	
+	if (e.type == events::EventType::KEY_PRESSED)
+	{
+		auto it = m_inputs.begin();
+		while (it != m_inputs.end())
+		{
+			if (it->second.key == e.keyboard.key)
+			{
+				// calls the std::function. we don't need to check if it's
+				// "nullptr" (std::function will compare to nullptr if empty.)
+				// because it literally cannot get there if it's empty.
+				m_callbacks[it->first]();
+				break;
+			}
+
+			++it;
+		}
+	}
 }
 
-InputMap::InputRef InputMap::registerInput(const std::string& uniqueName,
-                                           const std::string& displayName,
-                                           events::Keys       defaultKey)
+Input* InputMap::registerInput(const std::string& uniqueName,
+                               const std::string& displayName,
+                               events::Keys       defaultKey)
 {
+	m_uniqueInputs[uniqueName] = m_currentInputRef;
+	m_inputs[m_currentInputRef] = {displayName, uniqueName, defaultKey, defaultKey};
+	++m_currentInputRef;
 }
 
-void InputMap::attachCallbackToInput(const std::string&    uniqueName,
-                                     std::function<void()> func)
+void InputMap::attachCallbackToInput(const std::string&           uniqueName,
+                                     const std::function<void()>& func)
 {
+	m_callbacks[m_uniqueInputs.at(uniqueName)] = func;
 }
 
-void InputMap::attachCallbackToInput(InputRef              primaryKey,
-                                     std::function<void()> func)
+void InputMap::attachCallbackToInput(InputRef                     primaryKey,
+                                     const std::function<void()>& func)
 {
+	m_callbacks[primaryKey] = func;
 }
 
-Input* InputMap::getInput(const std::string& uniqueName) {}
+Input* InputMap::getInput(const std::string& uniqueName)
+{
+	return &m_inputs[m_uniqueInputs.at(uniqueName)];
+}
 
-Input* InputMap::getInput(InputRef primaryKey) {}
+Input* InputMap::getInput(InputRef primaryKey)
+{
+	return &m_inputs.at(primaryKey);
+}
 
-void InputMap::setInput(const std::string& uniqueName, events::Keys key) {}
+void InputMap::setInput(const std::string& uniqueName, events::Keys key)
+{
+	getInput(uniqueName)->key = key;
+}
 
-void InputMap::setInput(InputRef primaryKey, events::Keys key) {}
+void InputMap::setInput(InputRef primaryKey, events::Keys key)
+{
+	getInput(primaryKey)->key = key;
+}
 
-bool InputMap::getState(const std::string& uniqueName) {}
+bool InputMap::getState(const std::string& uniqueName)
+{
+	return SDL_GetKeyboardState(
+	    nullptr)[static_cast<SDL_Scancode>(getInput(uniqueName)->key)];
+}
 
-bool InputMap::getState(InputRef primaryKey) {}
+bool InputMap::getState(InputRef primaryKey)
+{
+	return SDL_GetKeyboardState(
+	    nullptr)[static_cast<SDL_Scancode>(getInput(primaryKey)->key)];
+}
 
-bool InputMap::getState(Input* input) {}
-
-void InputMap::load() {}
-
-void InputMap::save() {}
+bool InputMap::getState(Input* input)
+{
+	return SDL_GetKeyboardState(
+	    nullptr)[static_cast<SDL_Scancode>(input->key)];
+}

@@ -33,10 +33,10 @@
 
 #include <Common/Singleton.hpp>
 
-#include <string>
-#include <vector>
-#include <unordered_map>
 #include <functional>
+#include <string>
+#include <unordered_map>
+#include <vector>
 
 namespace phx::client
 {
@@ -68,36 +68,32 @@ namespace phx::client
 
 		void onEvent(events::Event e) override;
 
-		InputRef registerInput(const std::string& uniqueName,
-		                       const std::string& displayName,
-		                       events::Keys       defaultKey);
+		Input* registerInput(const std::string& uniqueName,
+		                     const std::string& displayName,
+		                     events::Keys       defaultKey);
 
-		void attachCallbackToInput(const std::string& uniqueName, std::function<void()> func);
-		void attachCallbackToInput(InputRef primaryKey, std::function<void()> func);
+		void attachCallbackToInput(const std::string&    uniqueName,
+		                           const std::function<void()>& func);
+		void attachCallbackToInput(InputRef              primaryKey,
+		                           const std::function<void()>& func);
 
 		// if input does not exist, will reply with key unknown.
 		Input* getInput(const std::string& uniqueName);
 		Input* getInput(InputRef primaryKey);
 
+		// no need for a Input* overload since it's a pointer so you can just
+		// change the key directly.
 		void setInput(const std::string& uniqueName, events::Keys key);
 		void setInput(InputRef primaryKey, events::Keys key);
 
 		// try to not use this, inefficient.
 		bool getState(const std::string& uniqueName);
+
 		bool getState(InputRef primaryKey);
 		bool getState(Input* input);
 
 	private:
-		/**
-		 * @brief Load function loads all inputs from input.config
-		 */
-		void load();
-
-		/**
-		 * @brief Save function saves all non-default inputs to input.config
-		 */
-		void save();
-
+		unsigned int                              m_currentInputRef = 0;
 		std::unordered_map<std::string, InputRef> m_uniqueInputs;
 		std::unordered_map<InputRef, Input>       m_inputs;
 
