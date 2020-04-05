@@ -53,7 +53,7 @@ namespace phx::client
 		events::Keys key = events::Keys::NONE;
 
 		/// @brief The default key assigned to this input
-		events::Keys default = events::Keys::NONE;
+		events::Keys defaultKey = events::Keys::NONE;
 	};
 
 	class InputMap : public Singleton<InputMap>, public events::IEventListener
