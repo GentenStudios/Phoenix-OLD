@@ -39,7 +39,8 @@
 
 #include <Common/Math/Math.hpp>
 #include <Common/Settings.hpp>
-#include <Common/Actor.hpp>
+
+#include <entt/entt.hpp>
 
 namespace phx::gfx
 {
@@ -84,7 +85,7 @@ namespace phx::gfx
 		 * during the tick function. There is no workaround for this that I
 		 * know of, however this is fine for the most part.
 		 */
-		explicit FPSCamera(Window* window);
+		explicit FPSCamera(Window* window, entt::registry& registry);
 
 		/**
 		 * @brief Gets the position of the camera.
@@ -204,7 +205,7 @@ namespace phx::gfx
 		 * @brief Sets the actor for the camera to "follow".
 		 * @param actor The actor to set the camera to use.
 		 */
-		void setActor(Actor* actor);
+		void setActor(entt::entity actor);
 
 	private:
 		Window* m_window;
@@ -221,7 +222,9 @@ namespace phx::gfx
 		bool m_enabled = true;
 
 		Setting* m_settingSensitivity;
-		Actor*   m_actor = nullptr;
+
+        entt::registry&    m_registry;
+        entt::entity   m_actor;
 	};
 } // namespace phx::gfx
 

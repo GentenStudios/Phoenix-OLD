@@ -26,51 +26,15 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-
-/**
- * @file Actor.hpp
- * @brief Header file for the Actor interface.
- *
- * @copyright Copyright (c) 2019-2020 Genten Studios
- */
-
 #pragma once
-
-#include <Common/Math/Math.hpp>
 
 namespace phx
 {
-	class Actor
-	{
-	public:
-		Actor();
+    static const int DEFAULT_MOVE_SPEED = 10;
+    static const int MAX_MOVE_SPEED     = 500;
 
-		math::vec3 getPosition() const;
-		bool       setPosition(math::vec3 pos);
-		math::vec3 getRotation() const;
-		bool       setRotation(math::vec3 rot);
-
-		math::vec3 getDirection() const;
-
-		/**
-		 * @brief Gets the actor's current speed.
-		 * @return The actor's current speed.
-		 */
-		int getMoveSpeed() const;
-
-		/**
-		 * @brief Sets the actors's current speed.
-		 * @param speed The speed to set.
-		 * @return true If the speed was able to be set.
-		 * @return false If the speed was invalid, or unable to set.
-		 */
-		bool setMoveSpeed(int speed);
-
-	private:
-		math::vec3 m_rotation;
-		math::vec3 m_position;
-		int        m_moveSpeed;
-	};
+    struct Movement
+    {
+        int moveSpeed;
+    };
 } // namespace phx
-
-

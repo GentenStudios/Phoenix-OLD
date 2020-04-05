@@ -47,7 +47,7 @@ namespace phx
 		class GameTools : public gfx::Overlay
 		{
 		public:
-			GameTools(bool* followCam, int* playerHand, Player* player);
+			GameTools(bool* followCam, int* playerHand, Player* player, entt::registry& registry);
 			~GameTools() override = default;
 
 			void onAttach() override;
@@ -56,6 +56,8 @@ namespace phx
 			void tick(float dt) override;
 
 		private:
+            entt::registry& m_registry;
+
 			bool*    m_followCam = nullptr;
 			int      m_currentSensitivity = 1;
 			Setting* m_sensitivity = nullptr;
