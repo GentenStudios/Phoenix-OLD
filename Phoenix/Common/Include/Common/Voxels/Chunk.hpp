@@ -78,7 +78,6 @@ namespace phx::voxels
 	class Chunk
 	{
 	public:
-
 		Chunk() = delete;
 
 		explicit Chunk(math::vec3 chunkPos);

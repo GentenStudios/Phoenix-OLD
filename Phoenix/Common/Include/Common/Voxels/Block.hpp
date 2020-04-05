@@ -41,6 +41,7 @@
 #include <array>
 #include <functional>
 #include <string>
+#include <glm/glm.hpp>
 
 namespace phx::voxels
 {
@@ -82,6 +83,8 @@ namespace phx::voxels
 	public:
 		BlockType()  = default;
 		~BlockType() = default;
+
+		glm::vec3 color;
 
 		/// @brief The name of the block as displayed to the player.
 		std::string displayName;
@@ -144,6 +147,7 @@ namespace phx::voxels
 	 */
 	struct BlockMetadata
 	{
+
 		/**
 		 * @brief The position of the block in the world.
 		 */

@@ -49,6 +49,7 @@ struct Vertex
 	float uvu, uvv;
 	float tex;
 	float normalx, normaly, normalz;
+	float colorx, colory, colorz;
 };
 
 ChunkRenderer::ChunkRenderer(const std::size_t visibleChunks)
@@ -158,6 +159,15 @@ void ChunkRenderer::submitChunk(const std::vector<float>& mesh, math::vec3 pos)
 	    reinterpret_cast<void*>(offsetof(Vertex, normalx))
 	);
 
+	glVertexAttribPointer(
+		m_colorAttribLoc,
+		3,
+		GL_FLOAT,
+		GL_TRUE,
+		sizeof(Vertex),
+	    reinterpret_cast<void*>(offsetof(Vertex, colorx))
+	);
+
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	m_buffers.insert({pos, {vao, buf, mesh.size()}});
@@ -207,12 +217,15 @@ void ChunkRenderer::render()
 		glEnableVertexAttribArray(m_vertexAttributeLocation);
 		glEnableVertexAttribArray(m_uvAttributeLocation);
 		glEnableVertexAttribArray(m_normalAttribLoc);
+		glEnableVertexAttribArray(m_colorAttribLoc);
+
 
 		glDrawArrays(GL_TRIANGLES, 0, buffer.second.vertexCount);
 
 		glDisableVertexAttribArray(m_vertexAttributeLocation);
 		glDisableVertexAttribArray(m_uvAttributeLocation);
 		glDisableVertexAttribArray(m_normalAttribLoc);
+		glDisableVertexAttribArray(m_colorAttribLoc);
 
 		glBindVertexArray(0);
 		

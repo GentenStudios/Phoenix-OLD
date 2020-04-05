@@ -17,6 +17,30 @@ block.textures = {"Assets/dirt.png"}
 voxel.block.register(block)
 
 block = {}
+block.name = "Water"
+block.id = "core:water"
+block.textures = {"Assets/water.png"}
+voxel.block.register(block)
+
+block = {}
+block.name = "Sand"
+block.id = "core:sand"
+block.textures = {"Assets/sand.png"}
+voxel.block.register(block)
+
+block = {}
+block.name = "Ice"
+block.id = "core:ice"
+block.textures = {"Assets/ice.png"}
+voxel.block.register(block)
+
+block = {}
+block.name = "Snow"
+block.id = "core:snow"
+block.textures = {"Assets/snow.png"}
+voxel.block.register(block)
+
+block = {}
 block.name = "Grass"
 block.id = "core:grass"
 block.textures = {"Assets/grass_side.png", "Assets/grass_side.png",

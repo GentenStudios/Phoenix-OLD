@@ -46,8 +46,6 @@ static void rawEcho(const std::string& input, std::ostringstream& cout)
 	kirk.callback(input, cout);
 }
 
-
-
 Game::Game(gfx::Window* window) : Layer("Game"), m_window(window)
 {
 
@@ -70,8 +68,9 @@ Game::Game(gfx::Window* window) : Layer("Game"), m_window(window)
 	    ContentManager::get()->lua.create_table();
 
 	ContentManager::get()->lua["world_params"]["setWorldParams"] = [&] (float strength, float size, int octaves, float persistence, float height) {
-		WorldGenerator::setParams(WorldGenerator::Params{strength, size, octaves, persistence, height});
+		WorldGenerator::params = (WorldGenerator::Params{strength, size, octaves, persistence, height});
 	};
+	Voronoi::init();
 }
 
 Game::~Game() { delete m_chat; }
@@ -90,7 +89,7 @@ void Game::onAttach()
 		signalRemoval();
 	}
 
-	m_world  = new voxels::ChunkView(3, voxels::Map(save, "map1"));
+	m_world  = new voxels::ChunkView(4, voxels::Map(save, "map1"));
 	m_player = new Player(m_world);
 	m_camera = new gfx::FPSCamera(m_window);
 	m_camera->setActor(m_player);

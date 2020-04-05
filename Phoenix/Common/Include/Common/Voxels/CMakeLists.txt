@@ -7,7 +7,7 @@ set(voxelHeaders
 	${currentDir}/Map.hpp
 	${currentDir}/FastNoise.h
 	${currentDir}/WorldGenerator.hpp
-
+	${currentDir}/Voronoi.h
 
 	PARENT_SCOPE
 )

@@ -68,13 +68,6 @@ int Setting::getDefault() const { return m_default; }
 Settings::Settings()
 {
 
-	ContentManager::get()->lua["world_params"] =
-	    ContentManager::get()->lua.create_table();
-
-	ContentManager::get()->lua["world_params"]["setWorldParams"] = [&] (float strength, float size, int octaves, float persistence, float height) {
-		WorldGenerator::setParams(WorldGenerator::Params{strength, size, octaves, persistence, height});
-	};
-
 	ContentManager::get()->lua["core"]["setting"] =
 	    /**
 	     * @addtogroup luaapi

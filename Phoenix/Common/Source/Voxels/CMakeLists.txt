@@ -7,6 +7,5 @@ set(voxelSources
 	${currentDir}/FastNoise.cpp
 	${currentDir}/WorldGenerator.cpp
 
-
 	PARENT_SCOPE
 )

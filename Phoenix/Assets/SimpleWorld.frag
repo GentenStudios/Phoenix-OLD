@@ -2,6 +2,7 @@
 
 in vec3 pass_UV;
 in vec3 pass_normal;
+in vec3 pass_Color;
 
 uniform sampler2DArray u_TexArray;
 
@@ -18,4 +19,6 @@ void main()
 		out_FragColor = texture(u_TexArray, pass_UV) * vec4(vec3(1), 1);
 	if(normZ > 0.9 && normZ < 1.1)
 		out_FragColor = texture(u_TexArray, pass_UV) * vec4(vec3(0.7), 1);
+
+	out_FragColor.rgb *= pass_Color;
 }
