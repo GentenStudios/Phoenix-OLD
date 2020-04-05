@@ -26,53 +26,15 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-/**
- * @file Player.hpp
- * @brief Header file for the Player derivation of Actor.
- *
- * @copyright Copyright (c) 2019-2020 Genten Studios
- */
-
 #pragma once
-
-#include <Client/Graphics/ChunkView.hpp>
-
-#include <entt/entt.hpp>
 
 namespace phx
 {
-	/**
-	 * @brief An object representing the player in a game
-	 *
-	 * Objects created by this class represent any player in the game, the
-	 * player can be controlled by a camera object.
-	 *
-	 */
-	class Player
-	{
-	public:
-		// temporary until a proper management system is put in place.
-		explicit Player(voxels::ChunkView* world, entt::registry& registry);
+    static const int DEFAULT_MOVE_SPEED = 10;
+    static const int MAX_MOVE_SPEED     = 500;
 
-		math::Ray getTarget() const;
-
-		bool action1();
-		bool action2();
-
-		void               setHand(voxels::BlockType* block);
-		voxels::BlockType* getHand();
-
-		entt::entity getEntity() {return m_entity;};
-
-
-        static math::vec3 rotToDir(math::vec3 m_rotation);
-
-	private:
-		float              m_reach = 32.f;
-		voxels::ChunkView* m_world;
-		voxels::BlockType* m_hand;
-		entt::registry&    m_registry;
-		entt::entity       m_entity;
-	};
+    struct Movement
+    {
+        int moveSpeed;
+    };
 } // namespace phx
-

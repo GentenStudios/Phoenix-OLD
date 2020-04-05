@@ -28,6 +28,9 @@
 
 #include <Client/Graphics/Camera.hpp>
 
+#include <Common/Position.hpp>
+#include <Common/Movement.hpp>
+
 const float MOVE_SPEED = 0.01f;
 
 using namespace phx;
@@ -88,8 +91,8 @@ void FPSCamera::tick(float dt)
 
 	const float sensitivity = static_cast<float>(m_settingSensitivity->value()) / 50;
 
-	m_rotation = m_registry.get<Actor>(m_actor).rotation;
-	m_position = m_registry.get<Actor>(m_actor).position;
+	m_rotation = m_registry.get<Position>(m_actor).rotation;
+	m_position = m_registry.get<Position>(m_actor).position;
 
 	/// @todo Fix this up since we're having an issue where we turn more/less
 	/// due to higher/lower frames.
@@ -109,7 +112,7 @@ void FPSCamera::tick(float dt)
 
 	m_up = math::vec3::cross(right, m_direction);
 
-	const float moveSpeed = static_cast<float>(m_registry.get<Actor>(m_actor).moveSpeed);
+	const float moveSpeed = static_cast<float>(m_registry.get<Movement>(m_actor).moveSpeed);
 
 	if (m_window->isKeyDown(events::Keys::KEY_W))
 	{
@@ -138,8 +141,8 @@ void FPSCamera::tick(float dt)
 		m_position.y -= dt * moveSpeed;
 	}
 
-    m_registry.get<Actor>(m_actor).position = m_position;
-    m_registry.get<Actor>(m_actor).rotation = m_rotation;
+    m_registry.get<Position>(m_actor).position = m_position;
+    m_registry.get<Position>(m_actor).rotation = m_rotation;
 }
 
 void FPSCamera::enable(bool enabled)

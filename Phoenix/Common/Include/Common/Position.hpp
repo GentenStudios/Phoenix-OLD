@@ -26,29 +26,20 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-
-/**
- * @file Actor.hpp
- * @brief Header file for the Actor interface.
- *
- * @copyright Copyright (c) 2019-2020 Genten Studios
- */
-
 #pragma once
 
 #include <Common/Math/Math.hpp>
 
 namespace phx
 {
-    static const int DEFAULT_MOVE_SPEED = 10;
-    static const int MAX_MOVE_SPEED     = 500;
-
-    struct Actor
+    /**
+     * @brief The positioning for an entity
+     */
+    struct Position
     {
+        /// @brief The direction the entity is facing
         math::vec3 rotation;
+        /// @brief The cardinal position of the entity
         math::vec3 position;
-        int        moveSpeed;
     };
 } // namespace phx
-
-

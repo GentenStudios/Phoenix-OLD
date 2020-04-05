@@ -28,6 +28,8 @@
 
 #include <Client/GameTools.hpp>
 
+#include <Common/Position.hpp>
+
 #include <imgui.h>
 
 using namespace phx::client;
@@ -67,9 +69,9 @@ void GameTools::tick(float dt)
 		}
 
 		ImGui::Text("X: %f\nY: %f\nZ: %f",
-		            m_registry.get<Actor>(m_player->getEntity()).position.x,
-                    m_registry.get<Actor>(m_player->getEntity()).position.y,
-                    m_registry.get<Actor>(m_player->getEntity()).position.z);
+		            m_registry.get<Position>(m_player->getEntity()).position.x,
+                    m_registry.get<Position>(m_player->getEntity()).position.y,
+                    m_registry.get<Position>(m_player->getEntity()).position.z);
 
 		ImGui::Text("Block in hand: %i: %s", *m_playerHand,
 		            m_player->getHand()->displayName.c_str());

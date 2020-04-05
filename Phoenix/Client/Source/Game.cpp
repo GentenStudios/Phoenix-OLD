@@ -30,10 +30,12 @@
 #include <Client/Crosshair.hpp>
 #include <Client/Game.hpp>
 
+#include <Common/Voxels/BlockRegistry.hpp>
+
 #include <Common/Commander.hpp>
 #include <Common/ContentLoader.hpp>
-#include <Common/Logger.hpp>
-#include <Common/Voxels/BlockRegistry.hpp>
+
+#include <Common/Position.hpp>
 
 using namespace phx::client;
 using namespace phx;
@@ -213,7 +215,7 @@ void Game::tick(float dt)
 
 	if (m_followCam)
 	{
-		m_prevPos = m_registry.get<Actor>(m_player->getEntity()).position;
+		m_prevPos = m_registry.get<Position>(m_player->getEntity()).position;
 	}
 
 	m_world->tick(m_prevPos);
