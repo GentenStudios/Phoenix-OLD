@@ -40,8 +40,6 @@
 #include <unordered_map>
 #include <vector>
 
-#include <glm/glm.hpp>
-
 namespace phx::gfx
 {
 	// forward declaration

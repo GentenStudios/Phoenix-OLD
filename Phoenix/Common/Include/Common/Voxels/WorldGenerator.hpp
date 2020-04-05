@@ -1,6 +1,7 @@
 #include <Common/Voxels/Block.hpp>
-#include <glm/glm.hpp>
 #include <Common/Voxels/Voronoi.h>
+#include <Common/Math/Math.hpp>
+
 #define JC_VORONOI_IMPLEMENTATION
 
 using namespace phx::voxels;
@@ -21,8 +22,8 @@ class Voronoi {
     public:
         static std::vector<Cell> cells;
         static void init();
-        static bool get(glm::vec2 pos, int id);
-        static int get(glm::vec2 pos);
+        static bool get(phx::math::vec2 pos, int id);
+        static int get(phx::math::vec2 pos);
 
 
 };
@@ -41,6 +42,6 @@ class WorldGenerator {
 
         static Params params;
 
-        static BlockType* getTerrainBlockAt(glm::vec3 pos);
+        static BlockType* getTerrainBlockAt(phx::math::vec3 pos);
 
 };

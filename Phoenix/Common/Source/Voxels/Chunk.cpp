@@ -87,7 +87,7 @@ void Chunk::autoTestFill()
 			{
 				//x, y, z, strength, size, octaves, persistence, height
 				//32, 0.4, 4, 1, 0.1
-				setBlockAt(math::vec3(i,j,k), WorldGenerator::getTerrainBlockAt(glm::vec3(m_pos.x+i, m_pos.y+j, m_pos.z+k)));
+				setBlockAt(math::vec3(i,j,k), WorldGenerator::getTerrainBlockAt(math::vec3(m_pos.x+i, m_pos.y+j, m_pos.z+k)));
 			}
 		}
 	}

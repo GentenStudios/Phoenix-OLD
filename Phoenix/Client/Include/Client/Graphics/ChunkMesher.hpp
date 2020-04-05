@@ -41,7 +41,6 @@
 #include <Common/Voxels/Block.hpp>
 
 #include <vector>
-#include <glm/glm.hpp>
 
 namespace phx::gfx
 {
@@ -112,7 +111,7 @@ namespace phx::gfx
 	private:
 		// internal function, no need to document.
 		void addBlockFace(voxels::BlockType* block, BlockFace face, float x,
-		                  float y, float z,  glm::vec3 normals);
+		                  float y, float z,  math::vec3 normals);
 
 	private:
 		math::vec3                                    m_pos;

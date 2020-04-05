@@ -40,8 +40,6 @@
 using namespace phx;
 using namespace gfx;
 
-#include <glm/glm.hpp>
-
 // struct to help with laying out the data inside the buffers.
 struct Vertex
 {

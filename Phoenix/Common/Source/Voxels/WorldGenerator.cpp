@@ -49,7 +49,7 @@ double getHeightmap(float x, float y, float z, float strength, float size, int o
 
 double max = 0;
 
-BlockType* WorldGenerator::getTerrainBlockAt(glm::vec3 pos) {
+BlockType* WorldGenerator::getTerrainBlockAt(math::vec3 pos) {
     WorldGenerator::Params worldParams = WorldGenerator::params;
 
     double noiseV = getHeightmap(pos.x, pos.y, pos.z, worldParams.strength, worldParams.size, worldParams.octaves, worldParams.persistence, worldParams.height);
@@ -68,7 +68,7 @@ BlockType* WorldGenerator::getTerrainBlockAt(glm::vec3 pos) {
         }
     }*/
 
-    block->color = glm::vec3(1,1,1);
+    block->color = math::vec3(1,1,1);
     
     if(pos.y < noiseV) {
         //if(Voronoi::get(glm::vec2(pos.x, pos.z), 68))
@@ -153,7 +153,7 @@ void print(int toPrint) {
     std::cout << toPrint << std::endl;
 }
 
-bool Voronoi::get(glm::vec2 pos, int id) {
+bool Voronoi::get(math::vec2 pos, int id) {
 
     for(int i = 0; i < Voronoi::cells.size(); ++i) {
         Voronoi::Cell cell = Voronoi::cells[i];
@@ -170,7 +170,7 @@ bool Voronoi::get(glm::vec2 pos, int id) {
     return false;
 }
 
-int Voronoi::get(glm::vec2 pos) {
+int Voronoi::get(math::vec2 pos) {
 
     for(int i = 0; i < Voronoi::cells.size(); ++i) {
         Voronoi::Cell cell = Voronoi::cells[i];
