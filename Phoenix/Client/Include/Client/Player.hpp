@@ -52,7 +52,7 @@ namespace phx
 	{
 	public:
 		// temporary until a proper management system is put in place.
-		explicit Player(voxels::ChunkView* world, entt::registry& registry);
+		explicit Player(voxels::ChunkView* world, entt::registry* registry);
 
 		math::Ray getTarget() const;
 
@@ -71,7 +71,7 @@ namespace phx
 		float              m_reach = 32.f;
 		voxels::ChunkView* m_world;
 		voxels::BlockType* m_hand;
-		entt::registry&    m_registry;
+		entt::registry*    m_registry;
 		entt::entity       m_entity;
 	};
 } // namespace phx

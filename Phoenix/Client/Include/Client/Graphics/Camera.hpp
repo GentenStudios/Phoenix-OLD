@@ -85,7 +85,7 @@ namespace phx::gfx
 		 * during the tick function. There is no workaround for this that I
 		 * know of, however this is fine for the most part.
 		 */
-		explicit FPSCamera(Window* window, entt::registry& registry);
+		explicit FPSCamera(Window* window, entt::registry* registry);
 
 		/**
 		 * @brief Gets the position of the camera.
@@ -223,7 +223,7 @@ namespace phx::gfx
 
 		Setting* m_settingSensitivity;
 
-        entt::registry&    m_registry;
+        entt::registry*    m_registry;
         entt::entity   m_actor;
 	};
 } // namespace phx::gfx

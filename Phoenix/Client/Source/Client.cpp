@@ -102,7 +102,7 @@ void Client::onEvent(events::Event e)
 	case EventType::LAYER_DESTROYED:
 		if (std::string(e.layer) == "SplashScreen")
 		{
-			Game* game = new Game(&m_window);
+			Game* game = new Game(&m_window, &m_registry);
 			m_layerStack.pushLayer(game);
 			e.handled = true;
 		}

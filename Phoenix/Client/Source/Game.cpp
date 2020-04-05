@@ -47,7 +47,8 @@ static void rawEcho(const std::string& input, std::ostringstream& cout)
 	kirk.callback(input, cout);
 }
 
-Game::Game(gfx::Window* window) : Layer("Game"), m_window(window)
+Game::Game(gfx::Window* window, entt::registry* registry)
+: Layer("Game"), m_window(window), m_registry(registry)
 {
 	ContentManager::get()->lua["core"]["print"] =
 	    /**
@@ -215,7 +216,7 @@ void Game::tick(float dt)
 
 	if (m_followCam)
 	{
-		m_prevPos = m_registry.get<Position>(m_player->getEntity()).position;
+		m_prevPos = m_registry->get<Position>(m_player->getEntity()).position;
 	}
 
 	m_world->tick(m_prevPos);
