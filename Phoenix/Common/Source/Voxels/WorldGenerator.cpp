@@ -58,7 +58,7 @@ BlockType* WorldGenerator::getTerrainBlockAt(glm::vec3 pos) {
 
     BlockType* block = BlockRegistry::get()->getFromID("core:grass");
 
-    if(pos.x > 0 && pos.z > 0 && false) {
+    /*if(pos.x > 0 && pos.z > 0 && false) {
 
         int id =  Voronoi::get(glm::vec2(pos.x, pos.z));
         glm::vec3 col = glm::vec3(((float) id)/256.);
@@ -66,9 +66,9 @@ BlockType* WorldGenerator::getTerrainBlockAt(glm::vec3 pos) {
             block->color = col;
             //std::cout << id << std::endl;
         }
-    }
+    }*/
 
-    block->color = glm::vec3(1,0,1);
+    block->color = glm::vec3(1,1,1);
     
     if(pos.y < noiseV) {
         //if(Voronoi::get(glm::vec2(pos.x, pos.z), 68))
