@@ -45,8 +45,6 @@ namespace phx
 
     struct Actor
     {
-        Actor() : moveSpeed(DEFAULT_MOVE_SPEED) {}
-
         math::vec3 rotation;
         math::vec3 position;
         int        moveSpeed;

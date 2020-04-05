@@ -39,6 +39,13 @@ static const float RAY_INCREMENT = 0.5f;
 Player::Player(voxels::ChunkView* world, entt::registry& registry)
     : m_world(world), m_registry(registry)
 {
+    m_entity = m_registry.create();
+    m_registry.emplace<Actor>(
+        m_entity,
+        math::vec3{0, 0, 0},
+        math::vec3{0, 0, 0},
+        DEFAULT_MOVE_SPEED);
+
 	ContentManager::get()->lua["core"]["player"] = 
 		/**
 		 * @addtogroup luaapi
