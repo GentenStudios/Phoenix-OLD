@@ -75,7 +75,7 @@ Input* InputMap::registerInput(const std::string& uniqueName,
 	m_uniqueInputs[uniqueName] = m_currentInputRef;
 	m_inputs[m_currentInputRef] = {displayName, uniqueName, defaultKey, defaultKey};
 	++m_currentInputRef;
-	return m_inputs[m_currentInputRef - 1];
+	return &m_inputs[m_currentInputRef - 1];
 }
 
 void InputMap::attachCallbackToInput(const std::string&           uniqueName,
