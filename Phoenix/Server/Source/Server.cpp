@@ -168,13 +168,10 @@ void Server::parseMessage(ENetHost* server, entt::entity* userRef, enet_uint8 *d
     if (data[0] == '/'){
         printf("Received command %s from %s.", data, user.userName.c_str());
     } else {
-        unsigned char message = new char[sizeof(data) + 1 + user.userName.size()];
-        std::memcpy(message, user.userName.c_str(), user.userName.size());
-        std::memcpy(message, ":", 1);
-        std::memcpy(message, data, sizeof(data));
-        //std::string message = user.userName + ":" + std::string(data);
-        printf("%s", message);
-        ENetPacket * packet = enet_packet_create (message, sizeof(message), ENET_PACKET_FLAG_RELIABLE);
+        std::string message = user.userName + ": " + reinterpret_cast<char*>(data);
+
+        printf("%s", message.c_str());
+        ENetPacket * packet = enet_packet_create (message.c_str(), message.size(), ENET_PACKET_FLAG_RELIABLE);
         auto view = m_registry.view<User>();
         for(auto entity : view)
         {
