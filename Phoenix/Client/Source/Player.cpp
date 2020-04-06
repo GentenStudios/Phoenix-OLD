@@ -238,7 +238,7 @@ char* Player::getBitPackedState()
 	std::memcpy(state + i, &d, sizeof(d));
 	i += sizeof(d);
 	d = m_registry->get<Position>(m_entity).rotation.y;
-	std::memcpy(state + i, d, sizeof(d));
+	std::memcpy(state + i, &d, sizeof(d));
 	i += sizeof(d);
 	d = m_registry->get<Position>(m_entity).rotation.z;
 	std::memcpy(state + i, &d, sizeof(d));
