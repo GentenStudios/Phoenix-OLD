@@ -168,7 +168,7 @@ void Server::parseMessage(ENetHost* server, entt::entity* userRef, enet_uint8 *d
     if (data[0] == '/'){
         printf("Received command %s from %s.", data, user.userName.c_str());
     } else {
-        unsigned char message[sizeof(data) + 1 + user.userName.size()];
+        unsigned char message = new char[sizeof(data) + 1 + user.userName.size()];
         std::memcpy(message, user.userName.c_str(), user.userName.size());
         std::memcpy(message, ":", 1);
         std::memcpy(message, data, sizeof(data));
