@@ -36,6 +36,7 @@
 #include <Common/ContentLoader.hpp>
 
 #include <Common/Position.hpp>
+#include <Common/Actor.hpp>
 
 using namespace phx::client;
 using namespace phx;
@@ -47,7 +48,8 @@ static void rawEcho(const std::string& input, std::ostringstream& cout)
 	kirk.callback(input, cout);
 }
 
-Game::Game(gfx::Window* window) : Layer("Game"), m_window(window)
+Game::Game(gfx::Window* window, entt::registry* registry)
+: Layer("Game"), m_window(window), m_registry(registry)
 {
 	ContentManager::get()->lua["core"]["print"] =
 	    /**
@@ -89,7 +91,7 @@ void Game::onAttach()
 	m_camera = new gfx::FPSCamera(m_window, m_registry);
 	m_camera->setActor(m_player->getEntity());
 
-	m_player->setHand(voxels::BlockRegistry::get()->getFromRegistryID(0));
+    m_registry->emplace<Hand>(m_player->getEntity(), voxels::BlockRegistry::get()->getFromRegistryID(0));
 
     printf("%s", "Prepare rendering\n");
 	m_renderPipeline.prepare("Assets/SimpleWorld.vert",
@@ -145,14 +147,14 @@ void Game::onEvent(events::Event& e)
 			break;
 		case events::Keys::KEY_E:
 			m_playerHand++;
-			m_player->setHand(
-			    voxels::BlockRegistry::get()->getFromRegistryID(m_playerHand));
+            m_registry->get<Hand>(m_player->getEntity()).hand =
+			    voxels::BlockRegistry::get()->getFromRegistryID(m_playerHand);
 			e.handled = true;
 			break;
 		case events::Keys::KEY_R:
 			m_playerHand--;
-			m_player->setHand(
-			    voxels::BlockRegistry::get()->getFromRegistryID(m_playerHand));
+            m_registry->get<Hand>(m_player->getEntity()).hand =
+			    voxels::BlockRegistry::get()->getFromRegistryID(m_playerHand);
 			e.handled = true;
 			break;
 		case events::Keys::KEY_P:
@@ -215,7 +217,7 @@ void Game::tick(float dt)
 
 	if (m_followCam)
 	{
-		m_prevPos = m_registry.get<Position>(m_player->getEntity()).position;
+		m_prevPos = m_registry->get<Position>(m_player->getEntity()).position;
 	}
 
 	m_world->tick(m_prevPos);

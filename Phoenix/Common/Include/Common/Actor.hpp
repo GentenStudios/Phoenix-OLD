@@ -26,42 +26,15 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#pragma once
+/**
+ * @file Actor.hpp
+ * @brief Header file for various components unique to Actors
+ *
+ * @copyright Copyright (c) 2019-2020 Genten Studios
+ */
 
-#include <Client/Events/Event.hpp>
-#include <Client/Graphics/Layer.hpp>
-#include <Client/Player.hpp>
-
-#include <Common/Settings.hpp>
-
-namespace phx::client
-{
-    /**
-     * @brief The Debug Tool for the Game.
-     *
-     * @see Layer
-     * @see LayerStack
-     */
-    class GameTools : public gfx::Overlay
-    {
-    public:
-        GameTools(bool* followCam, int* playerHand, Player* player, entt::registry* registry);
-        ~GameTools() override = default;
-
-        void onAttach() override;
-        void onDetach() override;
-        void onEvent(events::Event& e) override;
-        void tick(float dt) override;
-
-    private:
-        entt::registry* m_registry;
-
-        bool*    m_followCam = nullptr;
-        int      m_currentSensitivity = 1;
-        Setting* m_sensitivity = nullptr;
-        int*     m_playerHand  = nullptr;
-
-        Player* m_player;
+namespace phx{
+    struct Hand{
+        voxels::BlockType* hand;
     };
-} // namespace phx::client
-
+}
