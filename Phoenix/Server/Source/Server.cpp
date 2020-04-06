@@ -34,6 +34,7 @@
 
 #include <iostream>
 #include <utility>
+#include <cstring>
 
 using namespace phx::server;
 using namespace phx;
