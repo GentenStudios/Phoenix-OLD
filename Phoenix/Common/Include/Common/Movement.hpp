@@ -28,40 +28,13 @@
 
 #pragma once
 
-#include <Client/Events/Event.hpp>
-#include <Client/Graphics/Layer.hpp>
-#include <Client/Player.hpp>
-
-#include <Common/Settings.hpp>
-
-namespace phx::client
+namespace phx
 {
-    /**
-     * @brief The Debug Tool for the Game.
-     *
-     * @see Layer
-     * @see LayerStack
-     */
-    class GameTools : public gfx::Overlay
+    static const int DEFAULT_MOVE_SPEED = 10;
+    static const int MAX_MOVE_SPEED     = 500;
+
+    struct Movement
     {
-    public:
-        GameTools(bool* followCam, int* playerHand, Player* player, entt::registry* registry);
-        ~GameTools() override = default;
-
-        void onAttach() override;
-        void onDetach() override;
-        void onEvent(events::Event& e) override;
-        void tick(float dt) override;
-
-    private:
-        entt::registry* m_registry;
-
-        bool*    m_followCam = nullptr;
-        int      m_currentSensitivity = 1;
-        Setting* m_sensitivity = nullptr;
-        int*     m_playerHand  = nullptr;
-
-        Player* m_player;
+        int moveSpeed;
     };
-} // namespace phx::client
-
+} // namespace phx

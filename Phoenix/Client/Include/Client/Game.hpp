@@ -60,7 +60,7 @@ namespace phx::client
 	class Game : public gfx::Layer
 	{
 	public:
-		explicit Game(gfx::Window* window);
+		explicit Game(gfx::Window* window, entt::registry* registry);
 		~Game() override;
 
 		void onAttach() override;
@@ -80,7 +80,8 @@ namespace phx::client
 	private:
 		gfx::Window*       m_window;
 		gfx::FPSCamera*    m_camera = nullptr;
-		Player*            m_player;
+        entt::registry*    m_registry;
+        Player*            m_player;
 		voxels::ChunkView* m_world = nullptr;
 
 		gfx::ShaderPipeline m_renderPipeline;

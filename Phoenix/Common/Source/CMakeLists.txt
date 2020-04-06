@@ -10,7 +10,6 @@ set(Sources
 	${currentDir}/Settings.cpp
 	${currentDir}/Logger.cpp
 	${currentDir}/Commander.cpp
-	${currentDir}/Actor.cpp
 
 	PARENT_SCOPE
 )

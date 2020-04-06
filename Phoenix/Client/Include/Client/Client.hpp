@@ -35,6 +35,8 @@
 
 #include <Common/Singleton.hpp>
 
+#include <entt/entt.hpp>
+
 namespace phx::client
 {
 	class Client : public events::IEventListener, public Singleton<Client>
@@ -51,6 +53,8 @@ namespace phx::client
 		void run();
 
 	private:
+	    entt::registry  m_registry;
+
 		gfx::Window     m_window;
 		gfx::LayerStack m_layerStack;
 

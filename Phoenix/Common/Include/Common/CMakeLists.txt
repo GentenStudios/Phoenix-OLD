@@ -15,7 +15,8 @@ set(Headers
 	${currentDir}/ContentLoader.hpp
 	${currentDir}/Settings.hpp
 	${currentDir}/Commander.hpp
-	${currentDir}/Actor.hpp
+	${currentDir}/Position.hpp
+	${currentDir}/Movement.hpp
 
 	PARENT_SCOPE
 )
