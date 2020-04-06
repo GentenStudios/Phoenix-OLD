@@ -26,57 +26,15 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Client/GameTools.hpp>
+/**
+ * @file Actor.hpp
+ * @brief Header file for various components unique to Actors
+ *
+ * @copyright Copyright (c) 2019-2020 Genten Studios
+ */
 
-#include <Common/Position.hpp>
-#include <Common/Actor.hpp>
-
-#include <imgui.h>
-
-using namespace phx::client;
-using namespace phx;
-
-GameTools::GameTools(bool* followCam, int* playerHand, Player* player, entt::registry* registry)
-    : Overlay("GameTools"), m_registry(registry)
-{
-	m_followCam  = followCam;
-	m_playerHand = playerHand;
-	m_player     = player;
+namespace phx{
+    struct Hand{
+        voxels::BlockType* hand;
+    };
 }
-
-void GameTools::onAttach()
-{
-	m_sensitivity        = Settings::get()->getSetting("camera:sensitivity");
-	m_currentSensitivity = m_sensitivity->value();
-}
-
-void GameTools::onDetach() {}
-
-void GameTools::onEvent(events::Event& e) {}
-
-void GameTools::tick(float dt)
-{
-	ImGui::Begin("Phoenix");
-	if (ImGui::CollapsingHeader("Game Tools"))
-	{
-		ImGui::Checkbox("Follow Camera", m_followCam);
-
-		int i = m_currentSensitivity;
-		ImGui::SliderInt("cam sensitivity", &i, 0, 100);
-		if (i != m_currentSensitivity)
-		{
-			m_currentSensitivity = i;
-			m_sensitivity->set(m_currentSensitivity);
-		}
-
-		ImGui::Text("X: %f\nY: %f\nZ: %f",
-		            m_registry->get<Position>(m_player->getEntity()).position.x,
-                    m_registry->get<Position>(m_player->getEntity()).position.y,
-                    m_registry->get<Position>(m_player->getEntity()).position.z);
-
-		ImGui::Text("Block in hand: %i: %s", *m_playerHand,
-                    m_registry->get<Hand>(m_player->getEntity()).hand->displayName.c_str());
-	}
-	ImGui::End();
-}
-

@@ -28,12 +28,13 @@
 
 #include <Client/Player.hpp>
 
-#include <Common/Movement.hpp>
-#include <Common/Position.hpp>
-
 #include <Common/Voxels/BlockRegistry.hpp>
 #include <Common/ContentLoader.hpp>
 #include <Common/Commander.hpp>
+
+#include <Common/Movement.hpp>
+#include <Common/Position.hpp>
+#include <Common/Actor.hpp>
 
 using namespace phx;
 
@@ -191,7 +192,7 @@ bool Player::action2()
 			back.floor();
 
 			m_world->setBlockAt(
-			    back, m_hand);
+			    back, m_registry->get<Hand>(getEntity()).hand);
 
 			return true;
 		}
@@ -200,16 +201,6 @@ bool Player::action2()
 	}
 
 	return false;
-}
-
-void Player::setHand(voxels::BlockType* block)
-{
-	m_hand = block;
-}
-
-voxels::BlockType* Player::getHand()
-{
-	return m_hand;
 }
 
 math::vec3 Player::rotToDir(math::vec3 m_rotation){
