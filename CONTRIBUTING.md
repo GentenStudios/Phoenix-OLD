@@ -152,9 +152,9 @@ Currently the code is separated by function, eg all the code for rendering is in
 ## TODO: FORMATTING, USAGE OF C++ FEATURES
 
 # THIRD PARTIES
-We use many third party libraries to support the functionality of Pour projects. While working with third parties there are a couple of things to keep in mind:
+We use many third party libraries to support the functionality of our projects. While working with third parties there are a couple things to keep in mind:
 ### 1. Qualifications
-When choosing a third party, we need to make sure the third party is right for our needs. You need to consider the license, how maintained the library is, how stable the library is, and if there are any alternatives better suited for what we need. It's best to reach out in #programming on Discord to discuss the viability of a third party before selecting one. You don't want to have these questions unanswered when making your PR request.
+When choosing a third party, we need to make sure the third party is right for our needs. You need to consider the license, how maintained the library is, how stable the library is, and if there are any alternatives better suited for what we need. It's best to reach out in #programming on our Discord to discuss the viability of a third party before selecting one. You don't want to have these questions unanswered when making your PR request.
 ### 2. Install
 When working with C++ code, we should use a submodule for third parties if possible. We also want to keep the third party code seperate from our own source code so it should be placed in the ThirdParties folder of the project.
 ### 3. Never modify the third party
