@@ -30,9 +30,13 @@
 #include <Client/Crosshair.hpp>
 #include <Client/Game.hpp>
 
+#include <Common/Voxels/BlockRegistry.hpp>
+
 #include <Common/Commander.hpp>
 #include <Common/ContentLoader.hpp>
-#include <Common/Voxels/BlockRegistry.hpp>
+
+#include <Common/Position.hpp>
+#include <Common/Actor.hpp>
 
 using namespace phx::client;
 using namespace phx;
@@ -44,7 +48,8 @@ static void rawEcho(const std::string& input, std::ostringstream& cout)
 	kirk.callback(input, cout);
 }
 
-Game::Game(gfx::Window* window) : Layer("Game"), m_window(window)
+Game::Game(gfx::Window* window, entt::registry* registry)
+: Layer("Game"), m_window(window), m_registry(registry)
 {
 	ContentManager::get()->lua["core"]["print"] =
 	    /**
@@ -65,6 +70,8 @@ Game::~Game() { delete m_chat; }
 
 void Game::onAttach()
 {
+    /// @todo Replace this with logger
+    printf("%s", "Attaching game layer\n");
 	m_chat = new ui::ChatWindow("Chat Window", 5,
 	                            "Type /help for a command list and help.");
 
@@ -72,18 +79,21 @@ void Game::onAttach()
 
 	const std::string save = "save1";
 
+    printf("%s", "Loading Modules\n");
 	if (!ContentManager::get()->loadModules(save))
 	{
 		signalRemoval();
 	}
 
+    printf("%s", "Registering world\n");
 	m_world  = new voxels::ChunkView(3, voxels::Map(save, "map1"));
-	m_player = new Player(m_world);
-	m_camera = new gfx::FPSCamera(m_window);
-	m_camera->setActor(m_player);
+	m_player = new Player(m_world, m_registry);
+	m_camera = new gfx::FPSCamera(m_window, m_registry);
+	m_camera->setActor(m_player->getEntity());
 
-	m_player->setHand(voxels::BlockRegistry::get()->getFromRegistryID(0));
+    m_registry->emplace<Hand>(m_player->getEntity(), voxels::BlockRegistry::get()->getFromRegistryID(0));
 
+    printf("%s", "Prepare rendering\n");
 	m_renderPipeline.prepare("Assets/SimpleWorld.vert",
 	                         "Assets/SimpleWorld.frag",
 	                         gfx::ChunkRenderer::getRequiredShaderLayout());
@@ -93,14 +103,16 @@ void Game::onAttach()
 	const math::mat4 model;
 	m_renderPipeline.setMatrix("u_model", model);
 
+    printf("%s", "Register GUI\n");
 	Client::get()->pushLayer(new Crosshair(m_window));
 	m_escapeMenu = new EscapeMenu(m_window);
 
 	if (Client::get()->isDebugLayerActive())
 	{
-		m_gameDebug = new GameTools(&m_followCam, &m_playerHand, m_player);
+		m_gameDebug = new GameTools(&m_followCam, &m_playerHand, m_player, m_registry);
 		Client::get()->pushLayer(m_gameDebug);
 	}
+    printf("%s", "Game layer attached");
 }
 
 void Game::onDetach()
@@ -135,14 +147,14 @@ void Game::onEvent(events::Event& e)
 			break;
 		case events::Keys::KEY_E:
 			m_playerHand++;
-			m_player->setHand(
-			    voxels::BlockRegistry::get()->getFromRegistryID(m_playerHand));
+            m_registry->get<Hand>(m_player->getEntity()).hand =
+			    voxels::BlockRegistry::get()->getFromRegistryID(m_playerHand);
 			e.handled = true;
 			break;
 		case events::Keys::KEY_R:
 			m_playerHand--;
-			m_player->setHand(
-			    voxels::BlockRegistry::get()->getFromRegistryID(m_playerHand));
+            m_registry->get<Hand>(m_player->getEntity()).hand =
+			    voxels::BlockRegistry::get()->getFromRegistryID(m_playerHand);
 			e.handled = true;
 			break;
 		case events::Keys::KEY_P:
@@ -150,7 +162,7 @@ void Game::onEvent(events::Event& e)
 				if (m_gameDebug == nullptr)
 				{
 					m_gameDebug =
-					    new GameTools(&m_followCam, &m_playerHand, m_player);
+					    new GameTools(&m_followCam, &m_playerHand, m_player, m_registry);
 					Client::get()->pushLayer(m_gameDebug);
 				}
 				else
@@ -205,7 +217,7 @@ void Game::tick(float dt)
 
 	if (m_followCam)
 	{
-		m_prevPos = m_player->getPosition();
+		m_prevPos = m_registry->get<Position>(m_player->getEntity()).position;
 	}
 
 	m_world->tick(m_prevPos);

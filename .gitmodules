@@ -4,3 +4,6 @@
 [submodule "Engine/ThirdParty/sol2"]
 	path = Phoenix/ThirdParty/sol2
 	url = https://github.com/ThePhD/sol2.git
+[submodule "Phoenix/ThirdParty/entt"]
+	path = Phoenix/ThirdParty/entt
+	url = https://github.com/skypjack/entt.git
