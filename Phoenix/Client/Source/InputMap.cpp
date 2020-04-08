@@ -94,7 +94,7 @@ InputMap::InputMap()
 	     *
 	     * @return The reference of the input
 	     */
-	    [this](int input) { return getReference(input); };
+	    [this](std::string uniqueName) { return getReference(uniqueName); };
 	ContentManager::get()->lua["core"]["input"]["registerCallback"] =
 	    /**
 	     * @addtogroup luaapi
