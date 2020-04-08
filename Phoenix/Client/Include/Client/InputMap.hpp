@@ -92,6 +92,8 @@ namespace phx::client
 		bool getState(InputRef primaryKey);
 		bool getState(Input* input);
 
+		InputRef getReference(const std::string& uniqueName);
+
 	private:
 		unsigned int                              m_currentInputRef = 0;
 		std::unordered_map<std::string, InputRef> m_uniqueInputs;
