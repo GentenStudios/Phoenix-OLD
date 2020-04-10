@@ -150,8 +150,9 @@ void Server::parseState(ENetHost* server, entt::entity* userRef,
 	auto&       pos      = m_registry.get<Position>(actorRef);
 	const float moveSpeed =
 	    static_cast<float>(m_registry.get<Movement>(actorRef).moveSpeed);
-	const float dt = 1 / 20;
-	math::vec3  direction;
+	const float       dt = 1.f / 20.f;
+	math::vec3        direction;
+	static math::vec3 pos2;
 	direction.x = std::cos(pos.rotation.y) * std::sin(pos.rotation.x);
 	direction.y = std::sin(pos.rotation.y);
 	direction.z = std::cos(pos.rotation.y) * std::cos(pos.rotation.x);
@@ -159,39 +160,31 @@ void Server::parseState(ENetHost* server, entt::entity* userRef,
                               std::cos(direction.x - math::PIDIV2)};
 	const math::vec3 forward = {std::sin(direction.x), 0.f,
 	                            std::cos(direction.x)};
-	std::cout << "Direction:" << direction << "Right:" << right
-	          << "Left:" << forward << "MoveSpeed:" << moveSpeed;
 	if (data[0] & static_cast<char>(1 << 7))
 	{
 		pos.position += forward * dt * moveSpeed;
-		printf("W");
 	}
 	else if (data[0] & static_cast<char>(1 << 6))
 	{
 		pos.position -= forward * dt * moveSpeed;
-		printf("S");
 	}
 
 	if (data[0] & static_cast<char>(1 << 5))
 	{
 		pos.position -= right * dt * moveSpeed;
-		printf("A");
 	}
 	else if (data[0] & static_cast<char>(1 << 4))
 	{
 		pos.position += right * dt * moveSpeed;
-		printf("D");
 	}
 
 	if (data[0] & static_cast<char>(1 << 3))
 	{
 		pos.position.y += dt * moveSpeed;
-		printf("Space");
 	}
 	else if (data[0] & static_cast<char>(1 << 2))
 	{
 		pos.position.y -= dt * moveSpeed;
-		printf("Shift");
 	}
 
 	std::cout << pos.position << "\n";
