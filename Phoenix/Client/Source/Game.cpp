@@ -316,20 +316,11 @@ void Game::tick(float dt)
 		cstate |= 1 << 2;
 	std::string state(1, cstate);
 
-	if (stateLog.size() > STATE_SIZE * LOG_SIZE)
-	{
-		stateLog = stateLog.substr(STATE_SIZE + 1, STATE_SIZE * (LOG_SIZE - 1)) + state;
-	}
-	else
-	{
-		stateLog = stateLog + state;
-	}
-
 	ENetPacket* packet;
-	packet = enet_packet_create(stateLog.c_str(), stateLog.size(),
-								ENET_PACKET_FLAG_UNRELIABLE_FRAGMENT);
+	packet = enet_packet_create(&cstate, sizeof(cstate),
+	                            ENET_PACKET_FLAG_UNRELIABLE_FRAGMENT);
 
-	enet_peer_send(m_peer, 0, packet);
+	enet_peer_send(m_peer, 1, packet);
 	enet_host_flush(m_client);
 
 	if (m_followCam)

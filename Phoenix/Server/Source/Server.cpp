@@ -26,40 +26,44 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Server/Server.hpp>
 #include <Common/Settings.hpp>
+#include <Server/Server.hpp>
 
-#include <enet/enet.h>
 #include <Common/Math/Math.hpp>
+#include <enet/enet.h>
 
+#include <Common/Actor.hpp>
+#include <Common/Movement.hpp>
+#include <Common/Position.hpp>
+#include <cstring>
 #include <iostream>
 #include <utility>
-#include <cstring>
 
 using namespace phx::server;
 using namespace phx;
 
 Server::Server(std::string save) : m_save(std::move(save))
 {
-    std::cout << "Hello, Server!" << std::endl;
-    if (enet_initialize () != 0)
-    {
-        /// @TODO replace this with the logger
-        fprintf (stderr, "An error occurred while initializing ENet.\n");
-        exit(0);
-    }
-    atexit (enet_deinitialize);
+	std::cout << "Hello, Server!" << std::endl;
+	if (enet_initialize() != 0)
+	{
+		/// @TODO replace this with the logger
+		fprintf(stderr, "An error occurred while initializing ENet.\n");
+		exit(0);
+	}
+	atexit(enet_deinitialize);
 
-    m_address.host = ENET_HOST_ANY;
-    m_address.port = 7777;
+	m_address.host = ENET_HOST_ANY;
+	m_address.port = 7777;
 
-    m_server = enet_host_create (&m_address, maxUsers, 3, 0, 0);
-    if (m_server == NULL)
-    {
-        fprintf (stderr,
-                 "An error occurred while trying to create an ENet server host.\n");
-        exit (EXIT_FAILURE);
-    }
+	m_server = enet_host_create(&m_address, maxUsers, 3, 0, 0);
+	if (m_server == NULL)
+	{
+		fprintf(
+		    stderr,
+		    "An error occurred while trying to create an ENet server host.\n");
+		exit(EXIT_FAILURE);
+	}
 }
 
 void Server::run()
@@ -73,23 +77,27 @@ void Server::run()
 			switch (m_event.type)
 			{
 			case ENET_EVENT_TYPE_CONNECT:
-				printf("A new client connected from %x:%u.\n", m_event.peer->address.host, m_event.peer->address.port);
-                {
-                    auto entity = m_registry.create();
-                    m_registry.emplace<User>(entity, "toby", m_event.peer);
-                    m_event.peer->data = static_cast<void*>(&entity);
-                }
+				printf("A new client connected from %x:%u.\n",
+				       m_event.peer->address.host, m_event.peer->address.port);
+				{
+					auto entity = m_registry.create();
+					m_registry.emplace<User>(entity, "toby", m_event.peer);
+					m_event.peer->data = static_cast<void*>(&entity);
+					m_registry.emplace<Player>(
+					    entity, ActorSystem::registerActor(&m_registry));
+				}
 				break;
 			case ENET_EVENT_TYPE_RECEIVE:
-//                printf ("A packet of length %u containing %s was received from %s on channel %u.\n",
-//                        m_event.packet -> dataLength,
-//                        m_event.packet -> data,
-//                        m_event.peer -> data -> userName,
-//                        m_event.channelID);
+				//                printf ("A packet of length %u containing %s
+				//                was received from %s on channel %u.\n",
+				//                        m_event.packet -> dataLength,
+				//                        m_event.packet -> data,
+				//                        m_event.peer -> data -> userName,
+				//                        m_event.channelID);
 
-                switch(m_event.channelID)
-                {
-                case 0:
+				switch (m_event.channelID)
+				{
+				case 0:
                     parseEvent(m_server, static_cast<entt::entity*>(m_event.peer->data), m_event.packet->data);
                     break;
                 case 1:
@@ -117,50 +125,76 @@ void Server::run()
     Settings::get()->save("config.txt");
     enet_host_destroy(m_server);
 }
+
 Server::~Server()
 {
     enet_host_destroy(m_server);
 }
 
-void Server::parseEvent(ENetHost *server, entt::entity* userRef, enet_uint8 *data) {
-    printf("Event received");
-    printf("An Event packet containing %s was received from %s\n",
-        data, "toby");
+void Server::parseEvent(ENetHost* server, entt::entity* userRef,
+                        enet_uint8* data)
+{
+	User user = m_registry.get<User>(*userRef);
+	printf("Event received");
+	printf("An Event packet containing %s was received from %s\n", data,
+	       user.userName.c_str());
 }
 
-void Server::parseState(ENetHost *server, entt::entity* userRef, enet_uint8 *data) {
-    printf("A State packet containing %s was received from %s\n",
-           data, "toby");
-//    math::vec3 pos = m_player.getPosition();
-//    const float moveSpeed = static_cast<float>(m_player.getMoveSpeed());
-//
-//
-//    if (data[0])
-//    {
-//        pos += forward * dt * moveSpeed;
-//    }
-//    else if (data[1])
-//    {
-//        pos -= forward * dt * moveSpeed;
-//    }
-//
-//    if (data[2])
-//    {
-//        pos -= right * dt * moveSpeed;
-//    }
-//    else if (data[3])
-//    {
-//        pos += right * dt * moveSpeed;
-//    }
-//
-//    if (data[4])
-//    {
-//        pos.y += dt * moveSpeed;
-//    }
-//    else if (data[5])
-//    {
-//        pos.y -= dt * moveSpeed;
-//    }
+void Server::parseState(ENetHost* server, entt::entity* userRef,
+                        enet_uint8* data)
+{
+	User user = m_registry.get<User>(*userRef);
+	printf("A State packet containing %s was received from %s\n", data,
+	       user.userName.c_str());
+	auto        actorRef = m_registry.get<Player>(*userRef).actor;
+	auto&       pos      = m_registry.get<Position>(actorRef);
+	const float moveSpeed =
+	    static_cast<float>(m_registry.get<Movement>(actorRef).moveSpeed);
+	const float dt = 1 / 20;
+	math::vec3  direction;
+	direction.x = std::cos(pos.rotation.y) * std::sin(pos.rotation.x);
+	direction.y = std::sin(pos.rotation.y);
+	direction.z = std::cos(pos.rotation.y) * std::cos(pos.rotation.x);
+	const math::vec3 right   = {std::sin(direction.x - math::PIDIV2), 0.f,
+                              std::cos(direction.x - math::PIDIV2)};
+	const math::vec3 forward = {std::sin(direction.x), 0.f,
+	                            std::cos(direction.x)};
+	std::cout << "Direction:" << direction << "Right:" << right
+	          << "Left:" << forward << "MoveSpeed:" << moveSpeed;
+	if (data[0] & static_cast<char>(1 << 7))
+	{
+		pos.position += forward * dt * moveSpeed;
+		printf("W");
+	}
+	else if (data[0] & static_cast<char>(1 << 6))
+	{
+		pos.position -= forward * dt * moveSpeed;
+		printf("S");
+	}
+
+	if (data[0] & static_cast<char>(1 << 5))
+	{
+		pos.position -= right * dt * moveSpeed;
+		printf("A");
+	}
+	else if (data[0] & static_cast<char>(1 << 4))
+	{
+		pos.position += right * dt * moveSpeed;
+		printf("D");
+	}
+
+	if (data[0] & static_cast<char>(1 << 3))
+	{
+		pos.position.y += dt * moveSpeed;
+		printf("Space");
+	}
+	else if (data[0] & static_cast<char>(1 << 2))
+	{
+		pos.position.y -= dt * moveSpeed;
+		printf("Shift");
+	}
+
+	std::cout << pos.position << "\n";
 }
 
 void Server::parseMessage(ENetHost* server, entt::entity* userRef, enet_uint8 *data) {

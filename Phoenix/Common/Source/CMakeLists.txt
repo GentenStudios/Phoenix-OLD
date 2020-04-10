@@ -3,13 +3,15 @@ add_subdirectory(Voxels)
 
 set(currentDir ${CMAKE_CURRENT_LIST_DIR})
 set(Sources
-	${mathSources}
-	${voxelSources}
+		${mathSources}
+		${voxelSources}
 
-	${currentDir}/ContentLoader.cpp
-	${currentDir}/Settings.cpp
-	${currentDir}/Logger.cpp
-	${currentDir}/Commander.cpp
+		${currentDir}/Actor.cpp
 
-	PARENT_SCOPE
-)
+		${currentDir}/ContentLoader.cpp
+		${currentDir}/Settings.cpp
+		${currentDir}/Logger.cpp
+		${currentDir}/Commander.cpp
+
+		PARENT_SCOPE
+		)

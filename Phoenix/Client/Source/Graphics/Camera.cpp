@@ -175,4 +175,3 @@ void FPSCamera::onWindowResize(events::Event e)
 }
 
 void FPSCamera::setActor(entt::entity actor) { m_actor = actor;}
-
