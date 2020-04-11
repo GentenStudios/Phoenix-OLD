@@ -26,7 +26,7 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Client/InputMap.hpp>
+#include <Common/InputMap.hpp>
 
 #include <Common/ContentLoader.hpp>
 

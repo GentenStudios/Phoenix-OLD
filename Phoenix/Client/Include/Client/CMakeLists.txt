@@ -6,8 +6,6 @@ set(Headers
 	${eventHeaders}
 	${graphicsHeaders}
 
-	${currentDir}/InputMap.hpp
-
 	${currentDir}/Player.hpp
 
 	${currentDir}/Client.hpp
