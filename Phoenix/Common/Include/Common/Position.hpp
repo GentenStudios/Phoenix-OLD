@@ -32,14 +32,21 @@
 
 namespace phx
 {
-    /**
-     * @brief The positioning for an entity
-     */
-    struct Position
-    {
-        /// @brief The direction the entity is facing
-        math::vec3 rotation;
-        /// @brief The cardinal position of the entity
-        math::vec3 position;
-    };
+	/**
+	 * @brief The positioning for an entity
+	 */
+	struct Position
+	{
+		/// @brief The direction the entity is facing
+		math::vec3 rotation;
+		/// @brief The cardinal position of the entity
+		math::vec3 position;
+
+		math::vec3 getDirection()
+		{
+			return math::vec3 {std::cos(rotation.y) * std::sin(rotation.x),
+			                   std::sin(rotation.y),
+			                   std::cos(rotation.y) * std::cos(rotation.x)};
+		};
+	};
 } // namespace phx

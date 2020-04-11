@@ -150,16 +150,12 @@ void Server::parseState(ENetHost* server, entt::entity* userRef,
 	auto&       pos      = m_registry.get<Position>(actorRef);
 	const float moveSpeed =
 	    static_cast<float>(m_registry.get<Movement>(actorRef).moveSpeed);
-	const float       dt = 1.f / 20.f;
-	math::vec3        direction;
-	static math::vec3 pos2;
-	direction.x = std::cos(pos.rotation.y) * std::sin(pos.rotation.x);
-	direction.y = std::sin(pos.rotation.y);
-	direction.z = std::cos(pos.rotation.y) * std::cos(pos.rotation.x);
-	const math::vec3 right   = {std::sin(direction.x - math::PIDIV2), 0.f,
+	const float      dt        = 1.f / 20.f;
+	math::vec3       direction = pos.getDirection();
+	const math::vec3 right     = {std::sin(direction.x - math::PIDIV2), 0.f,
                               std::cos(direction.x - math::PIDIV2)};
-	const math::vec3 forward = {std::sin(direction.x), 0.f,
-	                            std::cos(direction.x)};
+	const math::vec3 forward   = {std::sin(direction.x), 0.f,
+                                std::cos(direction.x)};
 	if (data[0] & static_cast<char>(1 << 7))
 	{
 		pos.position += forward * dt * moveSpeed;
