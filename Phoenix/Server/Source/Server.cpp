@@ -149,8 +149,8 @@ void Server::parseState(ENetHost* server, entt::entity* userRef,
 	auto  actorRef = m_registry.get<Player>(*userRef).actor;
 	auto& pos      = m_registry.get<Position>(actorRef);
 
-	std::memcpy(&pos.rotation.x, &data[1], 4);
-	std::memcpy(&pos.rotation.y, &data[5], 4);
+	std::memcpy(&pos.rotation.x, &data[2], 4);
+	std::memcpy(&pos.rotation.y, &data[6], 4);
 
 	const float moveSpeed =
 	    static_cast<float>(m_registry.get<Movement>(actorRef).moveSpeed);
@@ -160,29 +160,29 @@ void Server::parseState(ENetHost* server, entt::entity* userRef,
                               std::cos(direction.x - math::PIDIV2)};
 	const math::vec3 forward   = {std::sin(direction.x), 0.f,
                                 std::cos(direction.x)};
-	if (data[0] & static_cast<char>(1 << 7))
+	if (data[1] & static_cast<char>(1 << 7))
 	{
 		pos.position += forward * dt * moveSpeed;
 	}
-	else if (data[0] & static_cast<char>(1 << 6))
+	else if (data[1] & static_cast<char>(1 << 6))
 	{
 		pos.position -= forward * dt * moveSpeed;
 	}
 
-	if (data[0] & static_cast<char>(1 << 5))
+	if (data[1] & static_cast<char>(1 << 5))
 	{
 		pos.position -= right * dt * moveSpeed;
 	}
-	else if (data[0] & static_cast<char>(1 << 4))
+	else if (data[1] & static_cast<char>(1 << 4))
 	{
 		pos.position += right * dt * moveSpeed;
 	}
 
-	if (data[0] & static_cast<char>(1 << 3))
+	if (data[1] & static_cast<char>(1 << 3))
 	{
 		pos.position.y += dt * moveSpeed;
 	}
-	else if (data[0] & static_cast<char>(1 << 2))
+	else if (data[1] & static_cast<char>(1 << 2))
 	{
 		pos.position.y -= dt * moveSpeed;
 	}

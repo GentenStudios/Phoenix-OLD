@@ -290,7 +290,7 @@ void Game::tick(float dt)
 					m_event.packet -> data,
 					m_event.peer -> address.host,
 					m_event.peer -> address.port,
-					m_event.channelID);
+			       m_event.channelID);
 			/* Clean up the packet now that we're done using it. */
 			enet_packet_destroy(m_event.packet);
 
@@ -300,27 +300,31 @@ void Game::tick(float dt)
 
 	m_camera->tick(dt);
 
-	// WASD
-	char inputState = 0;
-	if (m_window->isKeyDown(events::Keys::KEY_W))
-		inputState |= 1 << 7;
-	if (m_window->isKeyDown(events::Keys::KEY_S))
-		inputState |= 1 << 6;
-	if (m_window->isKeyDown(events::Keys::KEY_A))
-		inputState |= 1 << 5;
-	if (m_window->isKeyDown(events::Keys::KEY_D))
-		inputState |= 1 << 4;
-	if (m_window->isKeyDown(events::Keys::KEY_SPACE))
-		inputState |= 1 << 3;
-	if (m_window->isKeyDown(events::Keys::KEY_LEFT_SHIFT))
-		inputState |= 1 << 2;
+	char state[10];
 
-	char state[9];
-	state[0] = inputState;
-	std::memcpy(state + 1,
+	static std::size_t sequence;
+	sequence++;
+	state[0] = sequence;
+
+	// WASD
+	state[1] = 0;
+	if (m_window->isKeyDown(events::Keys::KEY_W))
+		state[1] |= 1 << 7;
+	if (m_window->isKeyDown(events::Keys::KEY_S))
+		state[1] |= 1 << 6;
+	if (m_window->isKeyDown(events::Keys::KEY_A))
+		state[1] |= 1 << 5;
+	if (m_window->isKeyDown(events::Keys::KEY_D))
+		state[1] |= 1 << 4;
+	if (m_window->isKeyDown(events::Keys::KEY_SPACE))
+		state[1] |= 1 << 3;
+	if (m_window->isKeyDown(events::Keys::KEY_LEFT_SHIFT))
+		state[1] |= 1 << 2;
+
+	std::memcpy(state + 2,
 	            &m_registry->get<Position>(m_player->getEntity()).rotation.x,
 	            4);
-	std::memcpy(state + 5,
+	std::memcpy(state + 6,
 	            &m_registry->get<Position>(m_player->getEntity()).rotation.y,
 	            4);
 
