@@ -14,7 +14,6 @@ set(Headers
 
 		${currentDir}/ContentLoader.hpp
 		${currentDir}/Settings.hpp
-		${currentDir}/InputMap.hpp
 		${currentDir}/Commander.hpp
 		${currentDir}/Position.hpp
 		${currentDir}/Movement.hpp
