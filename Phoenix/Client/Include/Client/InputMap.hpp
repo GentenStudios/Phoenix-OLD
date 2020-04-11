@@ -64,34 +64,108 @@ namespace phx::client
 		InputMap();
 		~InputMap();
 
+		/**
+		 * @brief Initializes the Lua API for the inputMap
+		 */
 		void initialize();
 
+		/**
+		 * @brief Forwards call to any matching registered callbacks
+		 *
+		 * @param e The event that occured
+		 */
 		void onEvent(events::Event e) override;
 
+		/**
+		 * @brief Registers a new input in the registry
+		 *
+		 * @param uniqueName The unique name for the input in the format
+		 * module.input
+		 * @param displayName The name displayed to the user in the edit menu
+		 * @param defaultKey The default key that is registered when the input
+		 * is registered, this gets overridden if the user has defined the key
+		 * or another input registers with the same key
+		 * @return A pointer to the input
+		 */
 		Input* registerInput(const std::string& uniqueName,
 		                     const std::string& displayName,
 		                     events::Keys       defaultKey);
 
-		void attachCallbackToInput(const std::string&    uniqueName,
+		/**
+		 * @brief Attaches a callback to an input that is called when the key is
+		 * pressed
+		 *
+		 * @param uniqueName The uniqueName of the input
+		 * @param func The function that gets called on keypress
+		 */
+		void attachCallbackToInput(const std::string&           uniqueName,
 		                           const std::function<void()>& func);
-		void attachCallbackToInput(InputRef              primaryKey,
+		/**
+		 * @brief Attaches a callback to an input that is called when the key is
+		 * pressed
+		 *
+		 * @param primaryKey The InputRef of the input
+		 * @param func The function that gets called on keypress
+		 */
+		void attachCallbackToInput(InputRef                     primaryKey,
 		                           const std::function<void()>& func);
 
-		// if input does not exist, will reply with key unknown.
+		/**
+		 * @brief Gets a pointer to an input
+		 *
+		 * @param uniqueName The uniqueName of the input
+		 * @return A pointer to the input, if the input does not exist, will
+		 * reply with key unknown.
+		 */
 		Input* getInput(const std::string& uniqueName);
+
+		/**
+		 * @brief Gets a pointer to an input
+		 *
+		 * @param primaryKey The InputRef of the input
+		 * @return A pointer to the input, if the input does not exist, will
+		 * reply with key unknown.
+		 */
 		Input* getInput(InputRef primaryKey);
 
-		// no need for a Input* overload since it's a pointer so you can just
-		// change the key directly.
+		/**
+		 * @brief Changes the key for the input
+		 *
+		 * @note Using the uniqueName is inefficient, if possible use the
+		 * InputRef instead
+		 *
+		 * @param uniqueName The uniqueName of the key being modified
+		 * @param key The new key being set
+		 */
 		void setInput(const std::string& uniqueName, events::Keys key);
+		/**
+		 * @brief Changes the key for the input
+		 *
+		 * @param primaryKey The InputRef of the key being modified
+		 * @param key The new key being set
+		 */
 		void setInput(InputRef primaryKey, events::Keys key);
 
 		// try to not use this, inefficient.
 		bool getState(const std::string& uniqueName);
-
+		/**
+		 * @brief Gets the state of an input
+		 * @param primaryKey The InputRef of the input
+		 * @return Whether the key is pressed or not
+		 */
 		bool getState(InputRef primaryKey);
+		/**
+		 * @brief Gets the state of an input
+		 * @param input A pointer to the input
+		 * @return Whether the key is pressed or not
+		 */
 		bool getState(Input* input);
 
+		/**
+		 * @brief Gets the InputRef of a key based on its uniqueName
+		 * @param uniqueName The uniqueName of the key
+		 * @return The InputRef of the key
+		 */
 		InputRef getReference(const std::string& uniqueName);
 
 	private:
