@@ -88,8 +88,6 @@ void Game::onAttach()
 	}
 	atexit (enet_deinitialize);
 
-//    m_address.host = ENET_HOST_ANY;
-//    m_address.port = 7777;
 	m_client = enet_host_create (NULL /* the address to bind the server host to */,
 							1      /* connect to a single server */,
 							3      /* allow up to 3 channels to be used */,
