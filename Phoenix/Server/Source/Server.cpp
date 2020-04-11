@@ -146,8 +146,12 @@ void Server::parseState(ENetHost* server, entt::entity* userRef,
 	User user = m_registry.get<User>(*userRef);
 	printf("A State packet containing %s was received from %s\n", data,
 	       user.userName.c_str());
-	auto        actorRef = m_registry.get<Player>(*userRef).actor;
-	auto&       pos      = m_registry.get<Position>(actorRef);
+	auto  actorRef = m_registry.get<Player>(*userRef).actor;
+	auto& pos      = m_registry.get<Position>(actorRef);
+
+	std::memcpy(&pos.rotation.x, &data[1], 4);
+	std::memcpy(&pos.rotation.y, &data[5], 4);
+
 	const float moveSpeed =
 	    static_cast<float>(m_registry.get<Movement>(actorRef).moveSpeed);
 	const float      dt        = 1.f / 20.f;

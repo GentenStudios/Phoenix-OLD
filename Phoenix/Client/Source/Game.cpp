@@ -292,7 +292,7 @@ void Game::tick(float dt)
 					m_event.peer -> address.port,
 					m_event.channelID);
 			/* Clean up the packet now that we're done using it. */
-			enet_packet_destroy (m_event.packet);
+			enet_packet_destroy(m_event.packet);
 
 			break;
 		}
@@ -301,23 +301,31 @@ void Game::tick(float dt)
 	m_camera->tick(dt);
 
 	// WASD
-	char cstate = 0;
+	char inputState = 0;
 	if (m_window->isKeyDown(events::Keys::KEY_W))
-		cstate |= 1 << 7;
+		inputState |= 1 << 7;
 	if (m_window->isKeyDown(events::Keys::KEY_S))
-		cstate |= 1 << 6;
+		inputState |= 1 << 6;
 	if (m_window->isKeyDown(events::Keys::KEY_A))
-		cstate |= 1 << 5;
+		inputState |= 1 << 5;
 	if (m_window->isKeyDown(events::Keys::KEY_D))
-		cstate |= 1 << 4;
+		inputState |= 1 << 4;
 	if (m_window->isKeyDown(events::Keys::KEY_SPACE))
-		cstate |= 1 << 3;
+		inputState |= 1 << 3;
 	if (m_window->isKeyDown(events::Keys::KEY_LEFT_SHIFT))
-		cstate |= 1 << 2;
-	std::string state(1, cstate);
+		inputState |= 1 << 2;
+
+	char state[9];
+	state[0] = inputState;
+	std::memcpy(state + 1,
+	            &m_registry->get<Position>(m_player->getEntity()).rotation.x,
+	            4);
+	std::memcpy(state + 5,
+	            &m_registry->get<Position>(m_player->getEntity()).rotation.y,
+	            4);
 
 	ENetPacket* packet;
-	packet = enet_packet_create(&cstate, sizeof(cstate),
+	packet = enet_packet_create(&state, sizeof(state),
 	                            ENET_PACKET_FLAG_UNRELIABLE_FRAGMENT);
 
 	enet_peer_send(m_peer, 1, packet);
