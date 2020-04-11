@@ -37,8 +37,6 @@
 
 #include <Client/Graphics/Window.hpp>
 
-#include <Client/InputMap.hpp>
-
 #include <Common/Math/Math.hpp>
 #include <Common/Settings.hpp>
 
@@ -225,16 +223,8 @@ namespace phx::gfx
 
 		Setting* m_settingSensitivity;
 
-		entt::registry* m_registry;
-		entt::entity    m_actor;
-
-		/// @todo Relocate player movement to player instead of camera
-		client::Input* m_forward;
-		client::Input* m_backward;
-		client::Input* m_left;
-		client::Input* m_right;
-		client::Input* m_fly;
-		client::Input* m_down;
+        entt::registry*    m_registry;
+        entt::entity   m_actor;
 	};
 } // namespace phx::gfx
 

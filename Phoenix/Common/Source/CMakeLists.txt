@@ -6,6 +6,8 @@ set(Sources
 		${mathSources}
 		${voxelSources}
 
+		${currentDir}/Actor.cpp
+
 		${currentDir}/ContentLoader.cpp
 		${currentDir}/Settings.cpp
 		${currentDir}/Logger.cpp

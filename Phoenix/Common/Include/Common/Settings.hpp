@@ -144,9 +144,13 @@ namespace phx
 	 */
 	class Settings : public Singleton<Settings>
 	{
-	public:
-		Settings();
+		std::unordered_map<std::string, Setting>     m_settings;
+		std::unordered_map<std::string, int> m_unused;
 
+	public:
+
+		Settings();
+		
 		/**
 		 * @brief Adds a new setting.
 		 *
@@ -178,9 +182,5 @@ namespace phx
 		 * @brief Saves settings to file.
 		 */
 		void save(const std::string& saveFile);
-
-	private:
-		std::unordered_map<std::string, Setting> m_settings;
-		std::unordered_map<std::string, int>     m_unused;
 	};
 }; // namespace phx

@@ -1,4 +1,4 @@
-// Copyright 2019-20 Genten Studios
+// Copyright 2020 Genten Studios
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -26,27 +26,18 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#pragma once
+#include <Common/Actor.hpp>
 
-#include <Common/Math/Math.hpp>
+#include <Common/Movement.hpp>
+#include <Common/Position.hpp>
 
-namespace phx
+using namespace phx;
+
+entt::entity ActorSystem::registerActor(entt::registry* registry)
 {
-	/**
-	 * @brief The positioning for an entity
-	 */
-	struct Position
-	{
-		/// @brief The direction the entity is facing
-		math::vec3 rotation;
-		/// @brief The cardinal position of the entity
-		math::vec3 position;
-
-		math::vec3 getDirection()
-		{
-			return math::vec3 {std::cos(rotation.y) * std::sin(rotation.x),
-			                   std::sin(rotation.y),
-			                   std::cos(rotation.y) * std::cos(rotation.x)};
-		};
-	};
-} // namespace phx
+	auto entity = registry->create();
+	registry->emplace<Position>(entity, math::vec3 {0, 0, 0},
+	                            math::vec3 {0, 0, 0});
+	registry->emplace<Movement>(entity, DEFAULT_MOVE_SPEED);
+	return entity;
+}

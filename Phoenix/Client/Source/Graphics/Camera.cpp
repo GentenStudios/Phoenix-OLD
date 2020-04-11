@@ -56,19 +56,6 @@ m_registry(registry)
 	    Settings::get()->add("Sensitivity", "camera:sensitivity", 50);
 	m_settingSensitivity->setMax(100);
 	m_settingSensitivity->setMin(1);
-
-	m_forward = client::InputMap::get()->registerInput(
-	    "core.move.forward", "Move Forward", events::Keys::KEY_W);
-	m_backward = client::InputMap::get()->registerInput(
-	    "core.move.backward", "Move Backward", events::Keys::KEY_S);
-	m_left = client::InputMap::get()->registerInput(
-	    "core.move.left", "Strafe Left", events::Keys::KEY_A);
-	m_right = client::InputMap::get()->registerInput(
-	    "core.move.right", "Strafe Right", events::Keys::KEY_D);
-	m_fly  = client::InputMap::get()->registerInput("core.move.up", "Fly Up",
-                                                   events::Keys::KEY_SPACE);
-	m_down = client::InputMap::get()->registerInput(
-	    "core.move.down", "Fly Down", events::Keys::KEY_LEFT_SHIFT);
 }
 
 math::vec3 FPSCamera::getPosition() const { return m_position; }
@@ -125,38 +112,37 @@ void FPSCamera::tick(float dt)
 
 	m_up = math::vec3::cross(right, m_direction);
 
-	const float moveSpeed =
-	    static_cast<float>(m_registry->get<Movement>(m_actor).moveSpeed);
+	const float moveSpeed = static_cast<float>(m_registry->get<Movement>(m_actor).moveSpeed);
 
-	if (m_window->isKeyDown(m_forward->key))
+	if (m_window->isKeyDown(events::Keys::KEY_W))
 	{
 		m_position += forward * dt * moveSpeed;
 	}
-	else if (m_window->isKeyDown(m_backward->key))
+	else if (m_window->isKeyDown(events::Keys::KEY_S))
 	{
 		m_position -= forward * dt * moveSpeed;
 	}
 
-	if (m_window->isKeyDown(m_left->key))
+	if (m_window->isKeyDown(events::Keys::KEY_A))
 	{
 		m_position -= right * dt * moveSpeed;
 	}
-	else if (m_window->isKeyDown(m_right->key))
+	else if (m_window->isKeyDown(events::Keys::KEY_D))
 	{
 		m_position += right * dt * moveSpeed;
 	}
 
-	if (m_window->isKeyDown(m_fly->key))
+	if (m_window->isKeyDown(events::Keys::KEY_SPACE))
 	{
 		m_position.y += dt * moveSpeed;
 	}
-	else if (m_window->isKeyDown(m_down->key))
+	else if (m_window->isKeyDown(events::Keys::KEY_LEFT_SHIFT))
 	{
 		m_position.y -= dt * moveSpeed;
 	}
 
-	m_registry->get<Position>(m_actor).position = m_position;
-	m_registry->get<Position>(m_actor).rotation = m_rotation;
+    m_registry->get<Position>(m_actor).position = m_position;
+    m_registry->get<Position>(m_actor).rotation = m_rotation;
 }
 
 void FPSCamera::enable(bool enabled)
@@ -189,4 +175,3 @@ void FPSCamera::onWindowResize(events::Event e)
 }
 
 void FPSCamera::setActor(entt::entity actor) { m_actor = actor;}
-

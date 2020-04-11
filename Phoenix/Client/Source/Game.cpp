@@ -88,8 +88,6 @@ void Game::onAttach()
 	}
 	atexit (enet_deinitialize);
 
-//    m_address.host = ENET_HOST_ANY;
-//    m_address.port = 7777;
 	m_client = enet_host_create (NULL /* the address to bind the server host to */,
 							1      /* connect to a single server */,
 							3      /* allow up to 3 channels to be used */,
@@ -290,9 +288,9 @@ void Game::tick(float dt)
 					m_event.packet -> data,
 					m_event.peer -> address.host,
 					m_event.peer -> address.port,
-					m_event.channelID);
+			       m_event.channelID);
 			/* Clean up the packet now that we're done using it. */
-			enet_packet_destroy (m_event.packet);
+			enet_packet_destroy(m_event.packet);
 
 			break;
 		}
@@ -300,36 +298,39 @@ void Game::tick(float dt)
 
 	m_camera->tick(dt);
 
-	// WASD
-	char cstate = 0;
-	if (m_window->isKeyDown(events::Keys::KEY_W))
-		cstate |= 1 << 7;
-	if (m_window->isKeyDown(events::Keys::KEY_S))
-		cstate |= 1 << 6;
-	if (m_window->isKeyDown(events::Keys::KEY_A))
-		cstate |= 1 << 5;
-	if (m_window->isKeyDown(events::Keys::KEY_D))
-		cstate |= 1 << 4;
-	if (m_window->isKeyDown(events::Keys::KEY_SPACE))
-		cstate |= 1 << 3;
-	if (m_window->isKeyDown(events::Keys::KEY_LEFT_SHIFT))
-		cstate |= 1 << 2;
-	std::string state(1, cstate);
+	char state[10];
 
-	if (stateLog.size() > STATE_SIZE * LOG_SIZE)
-	{
-		stateLog = stateLog.substr(STATE_SIZE + 1, STATE_SIZE * (LOG_SIZE - 1)) + state;
-	}
-	else
-	{
-		stateLog = stateLog + state;
-	}
+	static std::size_t sequence;
+	sequence++;
+	state[0] = sequence;
+
+	// WASD
+	state[1] = 0;
+	if (m_window->isKeyDown(events::Keys::KEY_W))
+		state[1] |= 1 << 7;
+	if (m_window->isKeyDown(events::Keys::KEY_S))
+		state[1] |= 1 << 6;
+	if (m_window->isKeyDown(events::Keys::KEY_A))
+		state[1] |= 1 << 5;
+	if (m_window->isKeyDown(events::Keys::KEY_D))
+		state[1] |= 1 << 4;
+	if (m_window->isKeyDown(events::Keys::KEY_SPACE))
+		state[1] |= 1 << 3;
+	if (m_window->isKeyDown(events::Keys::KEY_LEFT_SHIFT))
+		state[1] |= 1 << 2;
+
+	std::memcpy(state + 2,
+	            &m_registry->get<Position>(m_player->getEntity()).rotation.x,
+	            4);
+	std::memcpy(state + 6,
+	            &m_registry->get<Position>(m_player->getEntity()).rotation.y,
+	            4);
 
 	ENetPacket* packet;
-	packet = enet_packet_create(stateLog.c_str(), stateLog.size(),
-								ENET_PACKET_FLAG_UNRELIABLE_FRAGMENT);
+	packet = enet_packet_create(&state, sizeof(state),
+	                            ENET_PACKET_FLAG_UNRELIABLE_FRAGMENT);
 
-	enet_peer_send(m_peer, 0, packet);
+	enet_peer_send(m_peer, 1, packet);
 	enet_host_flush(m_client);
 
 	if (m_followCam)

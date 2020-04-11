@@ -43,8 +43,8 @@ All Branches:
 - Accomplish the feature(s) it was designed to accomplish
 - Has the branch it's merging into merged onto itself and all conflicts are resolved
 - Clean of all binaries and other non-source material
-- Code is documented with doxygen style comments
-- Complies with style guide and other contributing guidelines
+- Code is documented
+- Complies with style guide
 - All Developer reviewer comments are resolved
 - Code is formatted with cLang
 
@@ -150,12 +150,3 @@ Multiline Doxygen comments should start with a /** and end with a normal */. The
 ## MODULARISATION
 Currently the code is separated by function, eg all the code for rendering is in one spot. Each module should sport a easy-to-use public API. This API should be as generic as possible in order to make the replacing, and use of code easier.
 ## TODO: FORMATTING, USAGE OF C++ FEATURES
-
-# THIRD PARTIES
-We use many third party libraries to support the functionality of our projects. While working with third parties there are a couple things to keep in mind:
-### 1. Qualifications
-When choosing a third party, we need to make sure the third party is right for our needs. You need to consider the license, how maintained the library is, how stable the library is, and if there are any alternatives better suited for what we need. It's best to reach out in #programming on our Discord to discuss the viability of a third party before selecting one. You don't want to have these questions unanswered when making your PR request.
-### 2. Install
-When working with C++ code, we should use a submodule for third parties if possible. We also want to keep the third party code seperate from our own source code so it should be placed in the ThirdParties folder of the project.
-### 3. Never modify the third party
-To help with maintainability, third parties should have no modified code in them. When it comes to updating the third party it should be as easy as replacing the current version with the new version.

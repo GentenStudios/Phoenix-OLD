@@ -28,12 +28,20 @@
 
 #pragma once
 
-#include <string>
 #include <enet/enet.h>
+#include <entt/entt.hpp>
+#include <string>
 
-namespace phx::server{
-    struct User{
-        std::string userName;
-        ENetPeer*   peer;
-    };
-}
+namespace phx::server
+{
+	struct User
+	{
+		std::string userName;
+		ENetPeer*   peer;
+	};
+
+	struct Player
+	{
+		entt::entity actor;
+	};
+} // namespace phx::server
