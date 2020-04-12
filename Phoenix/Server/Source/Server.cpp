@@ -146,48 +146,27 @@ void Server::parseState(ENetHost* server, entt::entity* userRef,
 	User user = m_registry.get<User>(*userRef);
 	printf("A State packet containing %s was received from %s\n", data,
 	       user.userName.c_str());
-	auto  actorRef = m_registry.get<Player>(*userRef).actor;
-	auto& pos      = m_registry.get<Position>(actorRef);
 
-	std::memcpy(&pos.rotation.x, &data[2], 4);
-	std::memcpy(&pos.rotation.y, &data[6], 4);
+	const float dt = 1.f / 20.f;
 
-	const float moveSpeed =
-	    static_cast<float>(m_registry.get<Movement>(actorRef).moveSpeed);
-	const float      dt        = 1.f / 20.f;
-	math::vec3       direction = pos.getDirection();
-	const math::vec3 right     = {std::sin(direction.x - math::PIDIV2), 0.f,
-                              std::cos(direction.x - math::PIDIV2)};
-	const math::vec3 forward   = {std::sin(direction.x), 0.f,
-                                std::cos(direction.x)};
-	if (data[1] & static_cast<char>(1 << 7))
-	{
-		pos.position += forward * dt * moveSpeed;
-	}
-	else if (data[1] & static_cast<char>(1 << 6))
-	{
-		pos.position -= forward * dt * moveSpeed;
-	}
+	InputState input;
 
-	if (data[1] & static_cast<char>(1 << 5))
-	{
-		pos.position -= right * dt * moveSpeed;
-	}
-	else if (data[1] & static_cast<char>(1 << 4))
-	{
-		pos.position += right * dt * moveSpeed;
-	}
+	std::memcpy(&input.rotation.x, &data[2], 4);
+	std::memcpy(&input.rotation.y, &data[6], 4);
 
-	if (data[1] & static_cast<char>(1 << 3))
-	{
-		pos.position.y += dt * moveSpeed;
-	}
-	else if (data[1] & static_cast<char>(1 << 2))
-	{
-		pos.position.y -= dt * moveSpeed;
-	}
+	input.forward  = data[1] & static_cast<char>(1 << 7);
+	input.backward = data[1] & static_cast<char>(1 << 6);
+	input.left     = data[1] & static_cast<char>(1 << 5);
+	input.right    = data[1] & static_cast<char>(1 << 4);
+	input.up       = data[1] & static_cast<char>(1 << 3);
+	input.down     = data[1] & static_cast<char>(1 << 2);
 
-	std::cout << pos.position << "\n";
+	ActorSystem::tick(&m_registry, m_registry.get<Player>(*userRef).actor, dt,
+	                  input);
+	std::cout << m_registry
+	                 .get<Position>(m_registry.get<Player>(*userRef).actor)
+	                 .position
+	          << "\n";
 }
 
 void Server::parseMessage(ENetHost* server, entt::entity* userRef, enet_uint8 *data) {

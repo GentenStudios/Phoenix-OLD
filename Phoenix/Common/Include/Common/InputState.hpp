@@ -1,4 +1,4 @@
-// Copyright 2020 Genten Studios
+// Copyright 2019-20 Genten Studios
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -26,61 +26,20 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Common/Actor.hpp>
+#pragma once
 
-#include <Common/Movement.hpp>
-#include <Common/Position.hpp>
+#include <Common/Math/Math.hpp>
 
-using namespace phx;
-
-entt::entity ActorSystem::registerActor(entt::registry* registry)
+namespace phx
 {
-	auto entity = registry->create();
-	registry->emplace<Position>(entity, math::vec3 {0, 0, 0},
-	                            math::vec3 {0, 0, 0});
-	registry->emplace<Movement>(entity, DEFAULT_MOVE_SPEED);
-	return entity;
-}
-void ActorSystem::tick(entt::registry* registry, entt::entity entity,
-                       const float dt, InputState input)
-{
-	auto& pos = registry->get<Position>(entity);
-
-	pos.rotation.x = input.rotation.x;
-	pos.rotation.y = input.rotation.y;
-	const auto moveSpeed =
-	    static_cast<float>(registry->get<Movement>(entity).moveSpeed);
-
-	math::vec3       direction = pos.getDirection();
-	const math::vec3 right     = {std::sin(direction.x - math::PIDIV2), 0.f,
-                              std::cos(direction.x - math::PIDIV2)};
-	const math::vec3 forward   = {std::sin(direction.x), 0.f,
-                                std::cos(direction.x)};
-
-	if (input.forward)
+	struct InputState
 	{
-		pos.position += forward * dt * moveSpeed;
-	}
-	else if (input.backward)
-	{
-		pos.position -= forward * dt * moveSpeed;
-	}
-
-	if (input.left)
-	{
-		pos.position -= right * dt * moveSpeed;
-	}
-	else if (input.right)
-	{
-		pos.position += right * dt * moveSpeed;
-	}
-
-	if (input.up)
-	{
-		pos.position.y += dt * moveSpeed;
-	}
-	else if (input.down)
-	{
-		pos.position.y -= dt * moveSpeed;
-	}
-}
+		bool       forward;
+		bool       backward;
+		bool       left;
+		bool       right;
+		bool       up;
+		bool       down;
+		math::vec2 rotation;
+	};
+} // namespace phx

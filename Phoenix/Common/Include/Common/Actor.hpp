@@ -33,6 +33,7 @@
  * @copyright Copyright (c) 2019-2020 Genten Studios
  */
 
+#include <Common/InputState.hpp>
 #include <Common/Voxels/Block.hpp>
 #include <entt/entt.hpp>
 
@@ -43,14 +44,11 @@ namespace phx
 		voxels::BlockType* hand;
 	};
 
-	struct Actor
-	{
-		std::string displayName;
-	};
-
 	class ActorSystem
 	{
 	public:
 		static entt::entity registerActor(entt::registry* registry);
+		static void         tick(entt::registry* registry, entt::entity entity,
+		                         const float dt, InputState input);
 	};
 } // namespace phx
