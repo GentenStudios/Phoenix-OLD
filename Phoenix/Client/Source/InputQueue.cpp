@@ -32,12 +32,48 @@
 using namespace phx::client;
 using namespace phx;
 
+InputQueue::InputQueue()
+{
+	m_forward  = InputMap::get()->getInput("core.move.forward");
+	m_backward = InputMap::get()->getInput("core.move.backward");
+	m_left     = InputMap::get()->getInput("core.move.left");
+	m_right    = InputMap::get()->getInput("core.move.right");
+	m_up       = InputMap::get()->getInput("core.move.up");
+	m_down     = InputMap::get()->getInput("core.move.down");
+}
+
 void InputQueue::run(float dt)
 {
 	m_running = true;
 	while (m_running)
 	{
 		InputState input;
+		if (InputMap::get()->getState(m_forward))
+		{
+			input.forward = true;
+		}
+		if (InputMap::get()->getState(m_backward))
+		{
+			input.backward = true;
+		}
+		if (InputMap::get()->getState(m_left))
+		{
+			input.left = true;
+		}
+		if (InputMap::get()->getState(m_right))
+		{
+			input.right = true;
+		}
+		if (InputMap::get()->getState(m_up))
+		{
+			input.up = true;
+		}
+		if (InputMap::get()->getState(m_down))
+		{
+			input.down = true;
+		}
+		input.sequence = currentSequence() + 1;
+		m_queue.push_back(input);
 	}
 }
 

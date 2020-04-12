@@ -36,6 +36,8 @@ namespace phx::client
 	class InputQueue
 	{
 	public:
+		InputQueue();
+
 		/**
 		 * @brief Thread to capture and queue input states
 		 * @param dt How frequently in seconds a state should be captured
@@ -68,5 +70,12 @@ namespace phx::client
 	private:
 		std::list<InputState> m_queue;
 		bool                  m_running;
+
+		client::Input* m_forward;
+		client::Input* m_backward;
+		client::Input* m_left;
+		client::Input* m_right;
+		client::Input* m_up;
+		client::Input* m_down;
 	};
 } // namespace phx::client
