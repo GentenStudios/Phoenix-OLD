@@ -86,7 +86,7 @@ BlockRegistry::BlockRegistry()
 	     * @code {.lua}
 	     * block = {}
 	     * block.name = "Grass"
-	     * block.id = "core:grass"
+	     * block.id = "core.grass"
 	     * block.textures = {"Assets/grass_side.png", "Assets/grass_side.png",
 	     * "Assets/grass_side.png", "Assets/grass_side.png",
 	     * "Assets/grass_top.png",  "Assets/dirt.png"}
@@ -158,14 +158,14 @@ void BlockRegistry::initialise()
 {
 	BlockType unknownBlock;
 	unknownBlock.displayName = "Unknown Block";
-	unknownBlock.id          = "core:unknown";
+	unknownBlock.id          = "core.unknown";
 	unknownBlock.category    = BlockCategory::SOLID;
 	unknownBlock.setAllTextures("Assets/unknown.png");
 	registerBlock(unknownBlock);
 
 	BlockType outOfBoundsBlock;
 	outOfBoundsBlock.displayName = "Out Of Bounds";
-	outOfBoundsBlock.id          = "core:out_of_bounds";
+	outOfBoundsBlock.id          = "core.out_of_bounds";
 	outOfBoundsBlock.category    = BlockCategory::AIR;
 	registerBlock(outOfBoundsBlock);
 }
