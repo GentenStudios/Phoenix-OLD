@@ -28,6 +28,8 @@
 
 #include <Client/Graphics/Camera.hpp>
 
+#include <iostream>
+
 const float MOVE_SPEED = 0.01f;
 
 using namespace phx;
