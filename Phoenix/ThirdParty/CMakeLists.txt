@@ -16,6 +16,9 @@ set(SDL_SHARED_ENABLED_BY_DEFAULT OFF)
 # stop SDL trying to control our main function.
 add_definitions(-DSDL_MAIN_HANDLED)
 
+# turn off the JSON tests
+set(JSON_BuildTests OFF CACHE INTERNAL "")
+
 add_subdirectory (SDL2)
 add_subdirectory (Glad)
 add_subdirectory (ImGui)
@@ -23,6 +26,7 @@ add_subdirectory (sol2)
 add_subdirectory (lua)
 add_subdirectory (enet)
 add_subdirectory (entt)
+add_subdirectory (json)
 
 set_target_properties(SDL2main SDL2-static uninstall Glad ImGui lua liblua PROPERTIES FOLDER Dependencies)
 
@@ -38,6 +42,7 @@ set(PHX_THIRD_PARTY_INCLUDES
 	${CMAKE_CURRENT_LIST_DIR}/stb_image
 	${CMAKE_CURRENT_LIST_DIR}/stb_rectpack
 	${CMAKE_CURRENT_LIST_DIR}/entt/src
+	${CMAKE_CURRENT_LIST_DIR}/json/include
 
 	PARENT_SCOPE
 )
@@ -50,6 +55,7 @@ set(PHX_THIRD_PARTY_LIBRARIES
 	enet
 	sol2
 	liblua
+	nlohmann_json::nlohmann_json
 	$<$<PLATFORM_ID:Windows>:opengl32.lib> # link to opengl32.lib if windows.
 	$<$<PLATFORM_ID:Windows>:ws2_32.lib> # link to ws2_32.lib if windows.
 	$<$<PLATFORM_ID:Windows>:winmm.lib> # link to winmm.lib if windows.
