@@ -165,7 +165,7 @@ bool Player::action1()
 		if (m_world->getBlockAt(pos)->category == voxels::BlockCategory::SOLID)
 		{
 			m_world->setBlockAt(
-			    pos, voxels::BlockRegistry::get()->getFromID("core:air"));
+			    pos, voxels::BlockRegistry::get()->getFromID("core.air"));
 
 			return true;
 		}

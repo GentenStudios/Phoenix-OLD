@@ -64,10 +64,10 @@ std::string Chunk::save()
 
 void Chunk::autoTestFill()
 {
-	BlockType* block = BlockRegistry::get()->getFromID("core:air");
+	BlockType* block = BlockRegistry::get()->getFromID("core.air");
 	if (m_pos.y < 16 && m_pos.y >= 0.f)
 	{
-		block = BlockRegistry::get()->getFromID("core:grass");
+		block = BlockRegistry::get()->getFromID("core.grass");
 	}
 
 	for (std::size_t i = 0; i < CHUNK_WIDTH * CHUNK_HEIGHT * CHUNK_DEPTH; ++i)

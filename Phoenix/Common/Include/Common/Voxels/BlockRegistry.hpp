@@ -50,12 +50,12 @@ namespace phx::voxels
 	 *
 	 * BlockType dirtBlock;
 	 *     dirtBlock.displayName = "Air";
-	 *     dirtBlock.id = "core:air";
+	 *     dirtBlock.id = "core.air";
 	 *     dirtBlock.category = BlockCategory::AIR;
 	 *
 	 * BlockRegistry::get()->registerBlock(dirtBlock);
 	 *
-	 * std::cout << BlockRegistry::get()->getFromID("core:air") <<
+	 * std::cout << BlockRegistry::get()->getFromID("core.air") <<
 	 * std::endl;
 	 * @endcode
 	 */
@@ -77,7 +77,7 @@ namespace phx::voxels
 		/**
 		 * @brief Gets a block from the registry based on its unique ID.
 		 * @param id The unique ID of the block, usually in the form
-		 * core::dirt.
+		 * core.dirt.
 		 * @return BlockType* A pointer to the block in the registry.
 		 */
 		BlockType* getFromID(const std::string& id);
