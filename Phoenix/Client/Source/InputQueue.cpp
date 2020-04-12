@@ -26,29 +26,40 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-/**
- * @file Actor.hpp
- * @brief Header file for various components unique to Actors
- *
- * @copyright Copyright (c) 2019-2020 Genten Studios
- */
+#include <Client/InputMap.hpp>
+#include <Client/InputQueue.hpp>
 
-#include <Common/Input.hpp>
-#include <Common/Voxels/Block.hpp>
-#include <entt/entt.hpp>
+using namespace phx::client;
+using namespace phx;
 
-namespace phx
+void InputQueue::run(float dt)
 {
-	struct Hand
+	m_running = true;
+	while (m_running)
 	{
-		voxels::BlockType* hand;
-	};
+		InputState input;
+	}
+}
 
-	class ActorSystem
+void InputQueue::kill() { m_running = false; }
+
+InputState InputQueue::getState(std::size_t sequence)
+{
+	for (const auto& state : m_queue)
 	{
-	public:
-		static entt::entity registerActor(entt::registry* registry);
-		static void         tick(entt::registry* registry, entt::entity entity,
-		                         const float dt, InputState input);
-	};
-} // namespace phx
+		if (state.sequence == sequence)
+		{
+			return state;
+		}
+	}
+}
+
+void InputQueue::clearState(std::size_t sequence)
+{
+	while (m_queue.front().sequence <= sequence)
+	{
+		m_queue.pop_front();
+	}
+}
+
+std::size_t InputQueue::currentSequence() { return m_queue.back().sequence; }

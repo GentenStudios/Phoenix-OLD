@@ -26,29 +26,47 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-/**
- * @file Actor.hpp
- * @brief Header file for various components unique to Actors
- *
- * @copyright Copyright (c) 2019-2020 Genten Studios
- */
+#pragma once
 
 #include <Common/Input.hpp>
-#include <Common/Voxels/Block.hpp>
-#include <entt/entt.hpp>
+#include <list>
 
-namespace phx
+namespace phx::client
 {
-	struct Hand
-	{
-		voxels::BlockType* hand;
-	};
-
-	class ActorSystem
+	class InputQueue
 	{
 	public:
-		static entt::entity registerActor(entt::registry* registry);
-		static void         tick(entt::registry* registry, entt::entity entity,
-		                         const float dt, InputState input);
+		/**
+		 * @brief Thread to capture and queue input states
+		 * @param dt How frequently in seconds a state should be captured
+		 */
+		void run(float dt);
+
+		/**
+		 * @brief Stops the current thread
+		 */
+		void kill();
+
+		/**
+		 * @brief Gets a state for processing
+		 * @param sequence The sequence number for the desired state
+		 * @return The input state
+		 */
+		InputState getState(std::size_t sequence);
+		/**
+		 * @brief Clears all states equal to or older than the supplied sequence
+		 * @param sequence The sequence number to clear through
+		 */
+		void clearState(std::size_t sequence);
+		/**
+		 * @brief Gets the current sequence number, this is the most recent
+		 * InputState that was queued
+		 * @return A numerical identifier for the sequence
+		 */
+		std::size_t currentSequence();
+
+	private:
+		std::list<InputState> m_queue;
+		bool                  m_running;
 	};
-} // namespace phx
+} // namespace phx::client

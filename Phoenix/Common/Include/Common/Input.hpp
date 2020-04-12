@@ -29,17 +29,19 @@
 #pragma once
 
 #include <Common/Math/Math.hpp>
+#include <stdlib.h>
 
 namespace phx
 {
 	struct InputState
 	{
-		bool       forward;
-		bool       backward;
-		bool       left;
-		bool       right;
-		bool       up;
-		bool       down;
-		math::vec2 rotation;
+		bool        forward;
+		bool        backward;
+		bool        left;
+		bool        right;
+		bool        up;
+		bool        down;
+		math::vec2  rotation;
+		std::size_t sequence;
 	};
 } // namespace phx

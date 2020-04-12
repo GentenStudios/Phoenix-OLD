@@ -17,7 +17,7 @@ set(Headers
         ${currentDir}/Commander.hpp
         ${currentDir}/Position.hpp
         ${currentDir}/Movement.hpp
-        ${currentDir}/InputState.hpp
+        ${currentDir}/Input.hpp
 
         PARENT_SCOPE
         )
