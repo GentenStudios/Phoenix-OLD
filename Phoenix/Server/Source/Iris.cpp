@@ -34,6 +34,8 @@
 #include <Common/Movement.hpp>
 #include <Common/Position.hpp>
 
+#include <cstring> //For std::memcpy on non-mac machines
+
 using namespace phx;
 using namespace phx::server::networking;
 
