@@ -28,6 +28,10 @@
 
 #pragma once
 
+#ifndef NOMINMAX
+#	define NOMINMAX
+#endif
+
 #include <enet/enet.h>
 #include <entt/entt.hpp>
 
