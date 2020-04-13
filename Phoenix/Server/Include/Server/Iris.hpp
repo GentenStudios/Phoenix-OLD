@@ -28,6 +28,7 @@
 
 #pragma once
 
+// This is needed because Windows https://github.com/skypjack/entt/issues/96
 #ifndef NOMINMAX
 #	define NOMINMAX
 #endif
