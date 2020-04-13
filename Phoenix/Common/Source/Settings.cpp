@@ -32,12 +32,14 @@
 #include <climits>
 #include <fstream>
 #include <iostream>
+#include <iomanip>
 
 using namespace phx;
 
-Setting::Setting(std::string name, std::string key, int defaultValue)
+Setting::Setting(std::string name, std::string key, int defaultValue, json* json_)
     : m_name(std::move(name)), m_key(std::move(key)), m_value(defaultValue),
-      m_maxValue(SHRT_MAX), m_minValue(SHRT_MIN), m_default(defaultValue)
+      m_maxValue(SHRT_MAX), m_minValue(SHRT_MIN), m_default(defaultValue),
+      m_json(json_)
 {
 }
 
@@ -46,12 +48,13 @@ bool Setting::set(int value)
 	if (value >= m_minValue && value <= m_maxValue)
 	{
 		m_value = value;
+		(*m_json)[m_key] = value;
 		return true;
 	}
 	return false;
 }
 
-void Setting::reset() { m_value = m_default; }
+void Setting::reset() { set(m_default); }
 
 void Setting::setMax(int value) { m_maxValue = value; }
 
@@ -63,7 +66,8 @@ int Setting::value() const { return m_value; }
 
 int Setting::getDefault() const { return m_default; }
 
-Settings::Settings()
+Settings::Settings() :
+	m_data(json::object())
 {
 	ContentManager::get()->lua["core"]["setting"] =
 	    /**
@@ -129,42 +133,34 @@ Settings::Settings()
 Setting* Settings::add(const std::string& name, const std::string& key,
                        int defaultValue)
 {
-	m_settings[key] = Setting(name, key, defaultValue);
-    const auto& it = m_unused.find(key);
-	if(it != m_unused.end())
-    {
-	    m_settings[key].set(it->second);
-	    m_unused.erase(key);
-	}
+	m_settings[key] = Setting(name, key, defaultValue, &m_data);
 	return &m_settings[key];
 }
 
 Setting* Settings::getSetting(const std::string& key)
 {
-	if (m_settings.find(key) != m_settings.end())
+	if (m_data.find(key) != m_data.end())
 	{
+		if (m_settings.find(key) == m_settings.end())
+		{
+			add(key, key, m_data[key].get<int>());
+		}
 		return &m_settings[key];
 	}
 	else
-    {
-        return nullptr;
+	{
+		m_data[key] = 0;
+		return add(key, key, 0);
 	}
 }
 
 void Settings::load(const std::string& saveFile)
 {
 	std::ifstream file;
-	std::string   buffer;
-	file.open("saveFile");
+	file.open(saveFile);
 	if (file)
 	{
-		while (file >> buffer)
-		{
-			size_t      pointA  = buffer.find(',');
-            size_t      pointB = buffer.find(';');
-			m_unused[buffer.substr(0, pointA)] =
-                stoi(buffer.substr(pointA + 1, pointB - pointA - 1));
-		}
+		file >> m_data;
 	}
 	file.close();
 }
@@ -172,17 +168,8 @@ void Settings::load(const std::string& saveFile)
 void Settings::save(const std::string& saveFile)
 {
 	std::ofstream file;
-	file.open("saveFile");
-	for (const auto& setting : m_unused){
-        file << setting.first << "," << setting.second << ";\n";
-	}
-	for (const auto& setting : m_settings)
-	{
-		if (setting.second.value() != setting.second.getDefault())
-		{
-			file << setting.first << "," << setting.second.value() << ";\n";
-		}
-	}
+	file.open(saveFile);
+	file << std::setw(4) << m_data << std::endl;
 	file.close();
 }
 
