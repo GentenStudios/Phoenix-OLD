@@ -29,6 +29,10 @@
 #include <Client/InputMap.hpp>
 #include <Client/InputQueue.hpp>
 
+#include <chrono>
+#include <ctime>
+#include <thread>
+
 using namespace phx::client;
 using namespace phx;
 
@@ -44,6 +48,10 @@ InputQueue::InputQueue()
 
 void InputQueue::run(float dt)
 {
+	//    using std::chrono::system_clock;
+	//    std::time_t wait = system_clock::to_time_t (system_clock::now());
+	//    wait.tm_sec + dt;
+	//    std::this_thread::sleep_until (system_clock)
 	m_running = true;
 	while (m_running)
 	{
