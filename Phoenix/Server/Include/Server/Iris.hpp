@@ -28,37 +28,37 @@
 
 #pragma once
 
-#include <Server/Iris.hpp>
-
-#include <Server/User.hpp>
-
-//#include <Server/Commander.hpp>
-
+#include <enet/enet.h>
 #include <entt/entt.hpp>
 
-#include <enet/enet.h>
-
-#include <array>
-#include <string>
-
-namespace phx::server
+namespace phx::server::networking
 {
-
-	class Server
+	class Iris
 	{
 	public:
-		Server(std::string save);
-		~Server();
+		Iris(entt::registry* registry, bool* running);
+		~Iris();
 
 		void run();
 
+		void auth();
+		void disconnect();
+
+		void parseEvent(entt::entity* userRef, enet_uint8* data);
+		void parseState(entt::entity* userRef, enet_uint8* data);
+		void parseMessage(entt::entity* userRef, enet_uint8* data);
+
+		void sendEvent(entt::entity* userRef, enet_uint8* data);
+		void sendState(std::size_t sequence);
+		void sendMessage(entt::entity* userRef, enet_uint8* data);
+
 	private:
-		bool m_running;
+		bool* m_running;
 
-		networking::Iris* m_iris;
+		entt::registry* m_registry;
 
-		entt::registry m_registry;
-
-		std::string m_save;
+		ENetHost*   m_server;
+		ENetEvent   m_event;
+		ENetAddress m_address;
 	};
-} // namespace phx::server
+} // namespace phx::server::networking

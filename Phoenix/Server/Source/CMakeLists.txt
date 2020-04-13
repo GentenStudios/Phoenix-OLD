@@ -1,9 +1,10 @@
 set(currentDir ${CMAKE_CURRENT_LIST_DIR})
 set(Sources
-	${currentDir}/Server.cpp
-	${currentDir}/Commander.cpp
+		${currentDir}/Server.cpp
+		${currentDir}/Iris.cpp
+		${currentDir}/Commander.cpp
 
-	${currentDir}/Main.cpp
+		${currentDir}/Main.cpp
 
-	PARENT_SCOPE
-)
+		PARENT_SCOPE
+		)

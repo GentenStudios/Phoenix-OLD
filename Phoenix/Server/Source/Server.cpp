@@ -29,14 +29,8 @@
 #include <Common/Settings.hpp>
 #include <Server/Server.hpp>
 
-#include <Common/Math/Math.hpp>
-#include <enet/enet.h>
-
-#include <Common/Actor.hpp>
-#include <Common/Movement.hpp>
-#include <Common/Position.hpp>
-#include <cstring>
 #include <iostream>
+#include <thread>
 #include <utility>
 
 using namespace phx::server;
@@ -44,145 +38,30 @@ using namespace phx;
 
 Server::Server(std::string save) : m_save(std::move(save))
 {
-	std::cout << "Hello, Server!" << std::endl;
-	if (enet_initialize() != 0)
-	{
-		/// @TODO replace this with the logger
-		fprintf(stderr, "An error occurred while initializing ENet.\n");
-		exit(0);
-	}
-	atexit(enet_deinitialize);
-
-	m_address.host = ENET_HOST_ANY;
-	m_address.port = 7777;
-
-	m_server = enet_host_create(&m_address, maxUsers, 3, 0, 0);
-	if (m_server == NULL)
-	{
-		fprintf(
-		    stderr,
-		    "An error occurred while trying to create an ENet server host.\n");
-		exit(EXIT_FAILURE);
-	}
+	m_iris = new networking::Iris(&m_registry, &m_running);
 }
 
 void Server::run()
 {
-    Settings::get()->load("config.txt");
-    m_running = true;
-    while(m_running)
+	std::cout << "Hello, Server!" << std::endl;
+	Settings::get()->load("config.txt");
+	m_running = true;
+
+	std::thread t_iris(&networking::Iris::run, m_iris);
+
+	std::string input;
+	while (m_running)
 	{
-		while (enet_host_service(m_server, &m_event, 1000) > 0)
+		/// @todo Replace simple loop with commander
+		std::cin >> input;
+		if (input == "q")
 		{
-			switch (m_event.type)
-			{
-			case ENET_EVENT_TYPE_CONNECT:
-				printf("A new client connected from %x:%u.\n",
-				       m_event.peer->address.host, m_event.peer->address.port);
-				{
-					auto entity = m_registry.create();
-					m_registry.emplace<User>(entity, "toby", m_event.peer);
-					m_event.peer->data = static_cast<void*>(&entity);
-					m_registry.emplace<Player>(
-					    entity, ActorSystem::registerActor(&m_registry));
-				}
-				break;
-			case ENET_EVENT_TYPE_RECEIVE:
-				//                printf ("A packet of length %u containing %s
-				//                was received from %s on channel %u.\n",
-				//                        m_event.packet -> dataLength,
-				//                        m_event.packet -> data,
-				//                        m_event.peer -> data -> userName,
-				//                        m_event.channelID);
-
-				switch (m_event.channelID)
-				{
-				case 0:
-                    parseEvent(m_server, static_cast<entt::entity*>(m_event.peer->data), m_event.packet->data);
-                    break;
-                case 1:
-                    parseState(m_server, static_cast<entt::entity*>(m_event.peer->data), m_event.packet->data);
-                    break;
-                case 2:
-                    parseMessage(m_server, static_cast<entt::entity*>(m_event.peer->data), m_event.packet->data);
-                    break;
-                }
-
-				/* Clean up the packet now that we're done using it. */
-				enet_packet_destroy(m_event.packet);
-
-				break;
-
-			case ENET_EVENT_TYPE_DISCONNECT:
-				printf("%s disconnected.\n", m_event.peer->data);
-				break;
-			case ENET_EVENT_TYPE_NONE:
-				break;
-			}
+			m_running = false;
 		}
 	}
 
-    Settings::get()->save("config.txt");
-    enet_host_destroy(m_server);
+	Settings::get()->save("config.txt");
 }
 
 Server::~Server()
-{
-    enet_host_destroy(m_server);
-}
-
-void Server::parseEvent(ENetHost* server, entt::entity* userRef,
-                        enet_uint8* data)
-{
-	User user = m_registry.get<User>(*userRef);
-	printf("Event received");
-	printf("An Event packet containing %s was received from %s\n", data,
-	       user.userName.c_str());
-}
-
-void Server::parseState(ENetHost* server, entt::entity* userRef,
-                        enet_uint8* data)
-{
-	User user = m_registry.get<User>(*userRef);
-	printf("A State packet containing %s was received from %s\n", data,
-	       user.userName.c_str());
-
-	const float dt = 1.f / 20.f;
-
-	InputState input;
-
-	std::memcpy(&input.rotation.x, &data[2], 4);
-	std::memcpy(&input.rotation.y, &data[6], 4);
-
-	input.forward  = data[1] & static_cast<char>(1 << 7);
-	input.backward = data[1] & static_cast<char>(1 << 6);
-	input.left     = data[1] & static_cast<char>(1 << 5);
-	input.right    = data[1] & static_cast<char>(1 << 4);
-	input.up       = data[1] & static_cast<char>(1 << 3);
-	input.down     = data[1] & static_cast<char>(1 << 2);
-
-	ActorSystem::tick(&m_registry, m_registry.get<Player>(*userRef).actor, dt,
-	                  input);
-	std::cout << m_registry
-	                 .get<Position>(m_registry.get<Player>(*userRef).actor)
-	                 .position
-	          << "\n";
-}
-
-void Server::parseMessage(ENetHost* server, entt::entity* userRef, enet_uint8 *data) {
-    User user = m_registry.get<User>(*userRef);
-    if (data[0] == '/'){
-        printf("Received command %s from %s.", data, user.userName.c_str());
-    } else {
-        std::string message = user.userName + ": " + reinterpret_cast<char*>(data);
-
-        printf("%s", message.c_str());
-        ENetPacket * packet = enet_packet_create (message.c_str(), message.size(), ENET_PACKET_FLAG_RELIABLE);
-        auto view = m_registry.view<User>();
-        for(auto entity : view)
-        {
-            enet_peer_send (view.get<User>(entity).peer, 2, packet);
-        }
-        enet_host_flush(m_server);
-    }
-}
+{ delete m_iris; }
