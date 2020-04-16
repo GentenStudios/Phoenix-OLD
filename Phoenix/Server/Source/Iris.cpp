@@ -159,7 +159,7 @@ void Iris::parseState(entt::entity* userRef, enet_uint8* data)
 
 	/// @todo This is going to error out when the size_t loops, we can get
 	/// around this with some logic checking for that.
-	if (input.sequence < stateQueue.front()->sequence)
+	if (input.sequence < stateQueue.front().sequence)
 	{
 		// Discard if we have already processed this sequence
 	}

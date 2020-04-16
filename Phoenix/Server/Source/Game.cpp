@@ -43,6 +43,8 @@ Game::Game(entt::registry* registry, bool* running, networking::Iris* iris)
 
 void Game::run()
 {
+	static const float dt = 1.f / 20.f;
+
 	while (m_running)
 	{
 		// @todo @beeper is this efficient? we process a state 20 times a second
@@ -50,15 +52,19 @@ void Game::run()
 		{ /* Waiting */
 		}
 
-		InputState m_currentState = m_iris->stateQueue.front();
+		networking::StateBundle m_currentState = m_iris->stateQueue.front();
 		m_iris->stateQueue.pop_front();
 
-		ActorSystem::tick(m_registry, m_registry->get<Player>(*userRef).actor,
-		                  dt, input);
-		std::cout << m_registry
-		                 ->get<Position>(
-		                     m_registry->get<Player>(*userRef).actor)
-		                 .position
-		          << "\n";
+		for (auto state : m_currentState.states)
+		{
+			ActorSystem::tick(m_registry,
+			                  m_registry->get<Player>(*state.first).actor, dt,
+			                  state.second);
+			std::cout << m_registry
+			                 ->get<Position>(
+			                     m_registry->get<Player>(*state.first).actor)
+			                 .position
+			          << "\n";
+		}
 	}
 }

@@ -37,7 +37,7 @@ namespace phx::server
 	class Game
 	{
 	public:
-		Game(entt::registry* registry, bool* running, networking::Iris iris);
+		Game(entt::registry* registry, bool* running, networking::Iris* iris);
 
 		void run();
 
