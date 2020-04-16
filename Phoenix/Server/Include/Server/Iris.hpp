@@ -33,11 +33,32 @@
 #	define NOMINMAX
 #endif
 
+#include <Common/Input.hpp>
+
 #include <enet/enet.h>
 #include <entt/entt.hpp>
 
 namespace phx::server::networking
 {
+	struct StateBundle
+	{
+		bool                                          ready;
+		std::size_t                                   users;
+		std::size_t                                   sequence;
+		std::unordered_map<entt::entity*, InputState> states;
+	};
+
+	struct EventBundle
+	{
+		entt::entity* userRef;
+	};
+
+	struct MessageBundle
+	{
+		entt::entity* userRef;
+		std::string   message;
+	};
+
 	class Iris
 	{
 	public:
@@ -56,6 +77,10 @@ namespace phx::server::networking
 		void sendEvent(entt::entity* userRef, enet_uint8* data);
 		void sendState(std::size_t sequence);
 		void sendMessage(entt::entity* userRef, enet_uint8* data);
+
+		std::list<StateBundle>   stateQueue;
+		std::list<EventBundle>   eventQueue;
+		std::list<MessageBundle> messageQueue;
 
 	private:
 		bool* m_running;

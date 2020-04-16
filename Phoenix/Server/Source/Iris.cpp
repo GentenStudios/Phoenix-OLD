@@ -30,7 +30,6 @@
 #include <Server/User.hpp>
 
 #include <Common/Actor.hpp>
-#include <Common/Input.hpp>
 #include <Common/Movement.hpp>
 #include <Common/Position.hpp>
 
@@ -72,7 +71,7 @@ void Iris::run()
 {
 	while (m_running)
 	{
-		while (enet_host_service(m_server, &m_event, 1000) > 0)
+		while (enet_host_service(m_server, &m_event, 1000 / 20) > 0)
 		{
 			switch (m_event.type)
 			{
@@ -158,13 +157,53 @@ void Iris::parseState(entt::entity* userRef, enet_uint8* data)
 	input.up       = data[1] & static_cast<char>(1 << 3);
 	input.down     = data[1] & static_cast<char>(1 << 2);
 
-	ActorSystem::tick(m_registry, m_registry->get<Player>(*userRef).actor, dt,
-	                  input);
-	std::cout << m_registry
-	                 ->get<Position>(m_registry->get<Player>(*userRef).actor)
-	                 .position
-	          << "\n";
+	/// @todo This is going to error out when the size_t loops, we can get
+	/// around this with some logic checking for that.
+	if (input.sequence < stateQueue.front()->sequence)
+	{
+		// Discard if we have already processed this sequence
+	}
+	else if (input.sequence > stateQueue.end()->sequence)
+	{
+		// Insert a new bundle if this is the first packet in this sequence
+		StateBundle bundle;
+		bundle.sequence        = input.sequence;
+		bundle.ready           = false;
+		bundle.states[userRef] = input;
+		bundle.users = 1; ///@todo We need to capture how many users we are
+		                  ///expecting packets from
+		stateQueue.push_back(bundle);
+	}
+	else
+	{
+		for (auto bundle : stateQueue)
+		{
+			if (bundle.sequence == input.sequence)
+			{
+				// Thread safety! If we said a bundle is ready, were too late
+				if (bundle.ready != true)
+				{
+					bundle.states[userRef] = input;
+					// If we have all the states we need, then the bundle is
+					// ready
+					if (bundle.states.size() >= bundle.users)
+					{
+						bundle.ready = true;
+					}
+				}
+				break;
+			}
+		}
+	}
 
+	// If we have more than 10 states enqueued, assume we lost a packet
+	if (stateQueue.size() > 10)
+	{
+		stateQueue.front().ready = true;
+	}
+
+	// @todo this needs triggered by the game loop after all states have been
+	// received.
 	sendState(input.sequence);
 }
 void Iris::parseMessage(entt::entity* userRef, enet_uint8* data)
