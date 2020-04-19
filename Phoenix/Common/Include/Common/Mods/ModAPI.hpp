@@ -53,7 +53,7 @@ namespace phx::mods
 	class CommandBook
 	{
 	public:
-		using CommandFunction = std::function<void(std::vector<std::string>)>;
+		using CommandFunction = std::function<std::string(std::vector<std::string>)>;
 
 		struct Command
 		{
@@ -64,7 +64,7 @@ namespace phx::mods
 
 	public:
 		CommandBook();
-		~CommandBook();
+		~CommandBook() = default;
 
 		// will allow for a command to work from multiple different privileges.
 		void registerCommand(const std::string&     command,
@@ -72,8 +72,8 @@ namespace phx::mods
 		                     const std::string&     privilege,
 		                     const CommandFunction& func);
 
-		bool           commandExists(const std::string& command);
-		const Command* getCommand(const std::string& command);
+		bool           commandExists(const std::string& command) const;
+		const Command* getCommand(const std::string& command) const;
 
 	private:
 		// key is the actual command.

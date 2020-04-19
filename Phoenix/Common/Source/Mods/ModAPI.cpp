@@ -26,6 +26,7 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+#include <Common/Logger.hpp>
 #include <Common/Mods/ModAPI.hpp>
 
 #include <algorithm>
@@ -48,6 +49,11 @@ void Privileges::registerPrivilege(const std::string& priv)
 bool Privileges::hasPrivilege(const std::string& privList,
                               const std::string  priv) const
 {
+	if (priv.length() == 0)
+	{
+		return true;
+	}
+
 	// split comma delimited list into array.
 	std::vector<std::string> privs;
 	std::stringstream        sstream(privList);
@@ -65,4 +71,62 @@ bool Privileges::hasPrivilege(const std::string& privList,
 	}
 
 	return true;
+}
+
+CommandBook::CommandBook()
+{
+	m_commands["help"] = {"Type /help [command] to learn more about a command.",
+	                      "", [=](std::vector<std::string> args) {
+		                      if (args.empty())
+		                      {
+			                      return m_commands["help"].help;
+		                      }
+
+		                      return m_commands[args[0]].help;
+	                      }};
+
+	m_commands["list"] = {
+	    "Type /list to list every command, use a privilege as a parameter to "
+	    "see what commands are available to that role.",
+	    "", [=](std::vector<std::string> args) {
+		    if (args.empty())
+		    {
+			    std::string commands;
+			    for (auto& command : m_commands)
+			    {
+				    commands += command.first + "\n";
+			    }
+
+			    return commands;
+		    }
+	    }};
+}
+
+void CommandBook::registerCommand(const std::string&     command,
+                                  const std::string&     help,
+                                  const std::string&     privilege,
+                                  const CommandFunction& func)
+{
+	auto it = m_commands.find(command);
+	if (it == m_commands.end())
+	{
+		LOG_DEBUG("[MODDING]")
+		    << "The command \" " << command
+		    << "\" has already been defined by another mod, the formally "
+		       "registered command shall be used.";
+	}
+	else
+	{
+		m_commands[command] = {help, privilege, func};
+	}
+}
+
+bool CommandBook::commandExists(const std::string& command) const
+{
+	return m_commands.find(command) != m_commands.end();
+}
+
+const CommandBook::Command* CommandBook::getCommand(const std::string& command) const
+{
+	
 }
