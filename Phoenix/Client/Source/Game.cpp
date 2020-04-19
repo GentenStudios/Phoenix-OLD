@@ -302,29 +302,43 @@ void Game::tick(float dt)
 
 	static std::size_t sequence;
 	sequence++;
+
+	// Build input state
+	// @todo move this to inputQueue.cpp @beeper
+
+	InputState inputState;
+	inputState.sequence = sequence;
+	inputState.forward  = m_window->isKeyDown(events::Keys::KEY_W);
+	inputState.backward = m_window->isKeyDown(events::Keys::KEY_S);
+	inputState.left     = m_window->isKeyDown(events::Keys::KEY_A);
+	inputState.right    = m_window->isKeyDown(events::Keys::KEY_D);
+	inputState.up       = m_window->isKeyDown(events::Keys::KEY_SPACE);
+	inputState.down     = m_window->isKeyDown(events::Keys::KEY_LEFT_SHIFT);
+	inputState.rotation.x =
+	    m_registry->get<Position>(m_player->getEntity()).rotation.x;
+	inputState.rotation.y =
+	    m_registry->get<Position>(m_player->getEntity()).rotation.y;
+
+	// @todo replace with bit packer
 	state[0] = sequence;
 
 	// WASD
 	state[1] = 0;
-	if (m_window->isKeyDown(events::Keys::KEY_W))
+	if (inputState.forward)
 		state[1] |= 1 << 7;
-	if (m_window->isKeyDown(events::Keys::KEY_S))
+	if (inputState.backward)
 		state[1] |= 1 << 6;
-	if (m_window->isKeyDown(events::Keys::KEY_A))
+	if (inputState.left)
 		state[1] |= 1 << 5;
-	if (m_window->isKeyDown(events::Keys::KEY_D))
+	if (inputState.right)
 		state[1] |= 1 << 4;
-	if (m_window->isKeyDown(events::Keys::KEY_SPACE))
+	if (inputState.up)
 		state[1] |= 1 << 3;
-	if (m_window->isKeyDown(events::Keys::KEY_LEFT_SHIFT))
+	if (inputState.down)
 		state[1] |= 1 << 2;
 
-	std::memcpy(state + 2,
-	            &m_registry->get<Position>(m_player->getEntity()).rotation.x,
-	            4);
-	std::memcpy(state + 6,
-	            &m_registry->get<Position>(m_player->getEntity()).rotation.y,
-	            4);
+	std::memcpy(state + 2, &inputState.rotation.x, 4);
+	std::memcpy(state + 6, &inputState.rotation.y, 4);
 
 	ENetPacket* packet;
 	packet = enet_packet_create(&state, sizeof(state),
