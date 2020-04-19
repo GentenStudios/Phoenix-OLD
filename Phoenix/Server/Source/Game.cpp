@@ -66,5 +66,6 @@ void Game::run()
 			                 .position
 			          << "\n";
 		}
+		m_iris::sendState(stateQueue.sequence);
 	}
 }

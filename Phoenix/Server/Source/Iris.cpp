@@ -201,10 +201,6 @@ void Iris::parseState(entt::entity* userRef, enet_uint8* data)
 	{
 		stateQueue.front().ready = true;
 	}
-
-	// @todo this needs triggered by the game loop after all states have been
-	// received.
-	sendState(input.sequence);
 }
 void Iris::parseMessage(entt::entity* userRef, enet_uint8* data)
 {
