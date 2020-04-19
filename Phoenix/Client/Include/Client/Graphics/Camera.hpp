@@ -37,9 +37,12 @@
 
 #include <Client/Graphics/Window.hpp>
 
+#include <Client/InputMap.hpp>
+
 #include <Common/Math/Math.hpp>
 #include <Common/Settings.hpp>
-#include <Common/Actor.hpp>
+
+#include <entt/entt.hpp>
 
 namespace phx::gfx
 {
@@ -84,7 +87,7 @@ namespace phx::gfx
 		 * during the tick function. There is no workaround for this that I
 		 * know of, however this is fine for the most part.
 		 */
-		explicit FPSCamera(Window* window);
+		explicit FPSCamera(Window* window, entt::registry* registry);
 
 		/**
 		 * @brief Gets the position of the camera.
@@ -204,7 +207,7 @@ namespace phx::gfx
 		 * @brief Sets the actor for the camera to "follow".
 		 * @param actor The actor to set the camera to use.
 		 */
-		void setActor(Actor* actor);
+		void setActor(entt::entity actor);
 
 	private:
 		Window* m_window;
@@ -221,7 +224,17 @@ namespace phx::gfx
 		bool m_enabled = true;
 
 		Setting* m_settingSensitivity;
-		Actor*   m_actor = nullptr;
+
+		entt::registry* m_registry;
+		entt::entity    m_actor;
+
+		/// @todo Relocate player movement to player instead of camera
+		client::Input* m_forward;
+		client::Input* m_backward;
+		client::Input* m_left;
+		client::Input* m_right;
+		client::Input* m_fly;
+		client::Input* m_down;
 	};
 } // namespace phx::gfx
 

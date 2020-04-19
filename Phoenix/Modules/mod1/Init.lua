@@ -12,13 +12,13 @@ core.command.register("Hello", "Master the arts of the Jedi you must", hello)
 
 block = {}
 block.name = "Dirt"
-block.id = "core:dirt"
+block.id = "core.dirt"
 block.textures = {"Assets/dirt.png"}
 voxel.block.register(block)
 
 block = {}
 block.name = "Grass"
-block.id = "core:grass"
+block.id = "core.grass"
 block.textures = {"Assets/grass_side.png", "Assets/grass_side.png",
 "Assets/grass_side.png", "Assets/grass_side.png",
 "Assets/grass_top.png",  "Assets/dirt.png"}
@@ -29,6 +29,6 @@ voxel.block.register(block)
 
 block = {}
 block.name = "Air"
-block.id = "core:air"
+block.id = "core.air"
 block.category = "Air"
 voxel.block.register(block)

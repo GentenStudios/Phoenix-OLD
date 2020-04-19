@@ -26,48 +26,20 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Common/Actor.hpp>
+#pragma once
 
-using namespace phx;
+#include <Common/Math/Math.hpp>
 
-static const int MAX_MOVE_SPEED     = 500;
-static const int DEFAULT_MOVE_SPEED = 10;
-
-Actor::Actor() : m_moveSpeed(DEFAULT_MOVE_SPEED) {}
-
-math::vec3 Actor::getPosition() const { return m_position; }
-
-bool Actor::setPosition(math::vec3 pos)
+namespace phx
 {
-	m_position = pos;
-	return true;
-}
-
-math::vec3 Actor::getRotation() const { return m_rotation; }
-
-bool Actor::setRotation(math::vec3 rot)
-{
-	m_rotation = rot;
-	return true;
-}
-
-math::vec3 Actor::getDirection() const
-{
-	return {std::cos(m_rotation.y) * std::sin(m_rotation.x),
-	        std::sin(m_rotation.y),
-	        std::cos(m_rotation.y) * std::cos(m_rotation.x)};
-}
-
-int Actor::getMoveSpeed() const { return m_moveSpeed; }
-
-bool Actor::setMoveSpeed(int speed)
-{
-	if (speed >= 0 && speed <= MAX_MOVE_SPEED)
-	{
-		m_moveSpeed = speed;
-		return true;
-	}
-
-	return false;
-}
-
+    /**
+     * @brief The positioning for an entity
+     */
+    struct Position
+    {
+        /// @brief The direction the entity is facing
+        math::vec3 rotation;
+        /// @brief The cardinal position of the entity
+        math::vec3 position;
+    };
+} // namespace phx

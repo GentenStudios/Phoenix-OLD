@@ -7,3 +7,6 @@
 [submodule "Phoenix/ThirdParty/entt"]
 	path = Phoenix/ThirdParty/entt
 	url = https://github.com/skypjack/entt.git
+[submodule "Phoenix/ThirdParty/json"]
+	path = Phoenix/ThirdParty/json
+	url = https://github.com/nlohmann/json.git

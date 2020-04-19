@@ -1,2 +1,2 @@
 print ("Load mod 3")
---voxel.block.register("core:cobble", "CobbleStone")
+--voxel.block.register("core.cobble", "CobbleStone")
