@@ -50,6 +50,7 @@ void Server::run()
 	m_running = true;
 
 	std::thread t_iris(&networking::Iris::run, m_iris);
+	std::thread t_game(&Game::run, m_game);
 
 	std::string input;
 	while (m_running)
@@ -61,7 +62,8 @@ void Server::run()
 			m_running = false;
 		}
 	}
-
+	t_iris.join();
+	t_game.join();
 	Settings::get()->save("config.txt");
 }
 

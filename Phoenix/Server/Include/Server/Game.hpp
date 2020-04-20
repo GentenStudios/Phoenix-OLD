@@ -41,6 +41,8 @@ namespace phx::server
 
 		void run();
 
+		static constexpr float dt = 1.f / 20.f;
+
 	private:
 		bool* m_running;
 

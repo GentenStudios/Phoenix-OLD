@@ -32,6 +32,7 @@
 #include <Common/Actor.hpp>
 #include <Common/Movement.hpp>
 #include <Common/Position.hpp>
+#include <thread>
 
 using namespace phx;
 using namespace phx::server;
@@ -43,29 +44,32 @@ Game::Game(entt::registry* registry, bool* running, networking::Iris* iris)
 
 void Game::run()
 {
-	static const float dt = 1.f / 20.f;
-
 	while (m_running)
 	{
-		// @todo @beeper is this efficient? we process a state 20 times a second
-		while (m_iris->stateQueue.front().ready == false)
-		{ /* Waiting */
-		}
-
-		networking::StateBundle m_currentState = m_iris->stateQueue.front();
-		m_iris->stateQueue.pop_front();
-
-		for (auto state : m_currentState.states)
+		// @todo @beeper is this efficient?
+		if (!m_iris->stateQueue.front().ready)
 		{
-			ActorSystem::tick(m_registry,
-			                  m_registry->get<Player>(*state.first).actor, dt,
-			                  state.second);
-			std::cout << m_registry
-			                 ->get<Position>(
-			                     m_registry->get<Player>(*state.first).actor)
-			                 .position
-			          << "\n";
+			std::this_thread::sleep_for(std::chrono::milliseconds(25));
 		}
-		m_iris::sendState(stateQueue.sequence);
+		else
+		{
+			printf("State");
+			networking::StateBundle m_currentState = m_iris->stateQueue.front();
+			m_iris->stateQueue.pop_front();
+
+			for (auto state : m_currentState.states)
+			{
+				ActorSystem::tick(m_registry,
+				                  m_registry->get<Player>(*state.first).actor,
+				                  dt, state.second);
+				std::cout
+				    << m_registry
+				           ->get<Position>(
+				               m_registry->get<Player>(*state.first).actor)
+				           .position
+				    << "\n";
+			}
+			m_iris->sendState(m_currentState.sequence);
+		}
 	}
 }

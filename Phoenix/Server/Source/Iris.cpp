@@ -159,29 +159,36 @@ void Iris::parseState(entt::entity* userRef, enet_uint8* data)
 
 	/// @todo This is going to error out when the size_t loops, we can get
 	/// around this with some logic checking for that.
-	if (input.sequence < stateQueue.front().sequence)
+	if (input.sequence > stateQueue.end()->sequence || stateQueue.empty())
 	{
-		// Discard if we have already processed this sequence
-	}
-	else if (input.sequence > stateQueue.end()->sequence)
-	{
+		printf("insert new");
 		// Insert a new bundle if this is the first packet in this sequence
 		StateBundle bundle;
 		bundle.sequence        = input.sequence;
 		bundle.ready           = false;
 		bundle.states[userRef] = input;
 		bundle.users = 1; ///@todo We need to capture how many users we are
-		                  ///expecting packets from
+		/// expecting packets from
+		if (bundle.states.size() >= bundle.users)
+		{
+			bundle.ready = true;
+		}
 		stateQueue.push_back(bundle);
+	}
+	else if (input.sequence < stateQueue.front().sequence)
+	{
+		printf("discard");
+		// Discard if we have already processed this sequence
 	}
 	else
 	{
+		printf("insert existing");
 		for (auto bundle : stateQueue)
 		{
 			if (bundle.sequence == input.sequence)
 			{
 				// Thread safety! If we said a bundle is ready, were too late
-				if (bundle.ready != true)
+				if (!bundle.ready)
 				{
 					bundle.states[userRef] = input;
 					// If we have all the states we need, then the bundle is
