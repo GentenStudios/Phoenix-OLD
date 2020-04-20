@@ -158,8 +158,6 @@ void Iris::parseState(entt::entity* userRef, enet_uint8* data)
 	input.down     = data[1] & static_cast<char>(1 << 2);
 
 	// If the queue is empty we need to add a new bundle
-	// @todo this is probably going to skip states if the server is grabbing
-	// states instantly, we should work around that.
 	if (stateQueue.empty())
 	{
 		StateBundle bundle;
