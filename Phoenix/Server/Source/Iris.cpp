@@ -157,32 +157,43 @@ void Iris::parseState(entt::entity* userRef, enet_uint8* data)
 	input.up       = data[1] & static_cast<char>(1 << 3);
 	input.down     = data[1] & static_cast<char>(1 << 2);
 
-	/// @todo This is going to error out when the size_t loops, we can get
-	/// around this with some logic checking for that.
-	if (input.sequence > stateQueue.end()->sequence || stateQueue.empty())
+	// If the queue is empty we need to add a new bundle
+	// @todo this is probably going to skip states if the server is grabbing
+	// states instantly, we should work around that.
+	if (stateQueue.empty())
 	{
-		printf("insert new");
-		// Insert a new bundle if this is the first packet in this sequence
 		StateBundle bundle;
-		bundle.sequence        = input.sequence;
-		bundle.ready           = false;
-		bundle.states[userRef] = input;
-		bundle.users = 1; ///@todo We need to capture how many users we are
+		bundle.sequence = input.sequence;
+		bundle.ready    = false;
+		bundle.users    = 1; ///@todo We need to capture how many users we are
 		/// expecting packets from
-		if (bundle.states.size() >= bundle.users)
-		{
-			bundle.ready = true;
-		}
 		stateQueue.push_back(bundle);
 	}
-	else if (input.sequence < stateQueue.front().sequence)
+
+	// Discard state if its older that the oldest stateBundle
+	if (input.sequence < stateQueue.front().sequence)
 	{
-		printf("discard");
-		// Discard if we have already processed this sequence
+		printf("discard %lu \n", input.sequence);
+		return;
 	}
-	else
+
+	/// @todo This is going to error out when the size_t loops, we can get
+	/// around this with some logic checking for that.
+
+	// Fill the stateBundles up to the current input sequence
+	while (input.sequence > stateQueue.end()->sequence)
 	{
-		printf("insert existing");
+		// Insert a new bundle if this is the first packet in this sequence
+		StateBundle bundle;
+		bundle.sequence = stateQueue.end()->sequence + 1;
+		bundle.ready    = false;
+		bundle.users    = 1; ///@todo We need to capture how many users we are
+		/// expecting packets from
+		stateQueue.push_back(bundle);
+	}
+
+	{
+		printf("insert existing %lu \n", input.sequence);
 		for (auto bundle : stateQueue)
 		{
 			if (bundle.sequence == input.sequence)
