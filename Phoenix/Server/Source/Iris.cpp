@@ -71,7 +71,7 @@ void Iris::run()
 {
 	while (m_running)
 	{
-		while (enet_host_service(m_server, &m_event, 1000 / 20) > 0)
+		while (enet_host_service(m_server, &m_event, 0) > 0)
 		{
 			switch (m_event.type)
 			{
