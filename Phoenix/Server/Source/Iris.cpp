@@ -171,17 +171,17 @@ void Iris::parseState(entt::entity* userRef, enet_uint8* data)
 	}
 
 	// Discard state if its older that the oldest stateBundle
-	if (input.sequence < stateQueue.front().sequence)
+	if (input.sequence < stateQueue.front().sequence &&
+	    stateQueue.end()->sequence - input.sequence < 10)
 	{
 		printf("discard %lu \n", input.sequence);
 		return;
 	}
 
-	/// @todo This is going to error out when the size_t loops, we can get
-	/// around this with some logic checking for that.
-
 	// Fill the stateBundles up to the current input sequence
-	while (input.sequence > stateQueue.end()->sequence)
+	while ((input.sequence > stateQueue.end()->sequence &&
+	        input.sequence - stateQueue.end()->sequence > 10) ||
+	       stateQueue.end()->sequence == 255)
 	{
 		// Insert a new bundle if this is the first packet in this sequence
 		StateBundle bundle;
