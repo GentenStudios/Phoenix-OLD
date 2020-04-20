@@ -69,59 +69,57 @@ Iris::~Iris() { enet_host_destroy(m_server); }
 
 void Iris::run()
 {
-	while (m_running)
+	while (enet_host_service(m_server, &m_event, 1000 / 20) > 0 && m_running)
 	{
-		while (enet_host_service(m_server, &m_event, 0) > 0)
+		switch (m_event.type)
 		{
-			switch (m_event.type)
+		case ENET_EVENT_TYPE_CONNECT:
+			printf("A new client connected from %x:%u.\n",
+			       m_event.peer->address.host, m_event.peer->address.port);
 			{
-			case ENET_EVENT_TYPE_CONNECT:
-				printf("A new client connected from %x:%u.\n",
-				       m_event.peer->address.host, m_event.peer->address.port);
-				{
-					auto entity = m_registry->create();
-					m_registry->emplace<User>(entity, "toby", m_event.peer);
-					m_event.peer->data = static_cast<void*>(&entity);
-					m_registry->emplace<Player>(
-					    entity, ActorSystem::registerActor(m_registry));
-				}
+				auto entity = m_registry->create();
+				m_registry->emplace<User>(entity, "toby", m_event.peer);
+				m_event.peer->data = static_cast<void*>(&entity);
+				m_registry->emplace<Player>(
+				    entity, ActorSystem::registerActor(m_registry));
+			}
+			break;
+
+		case ENET_EVENT_TYPE_RECEIVE:
+			//                printf ("A packet of length %u containing %s
+			//                was received from %s on channel %u.\n",
+			//                        m_event.packet -> dataLength,
+			//                        m_event.packet -> data,
+			//                        m_event.peer -> data -> userName,
+			//                        m_event.channelID);
+
+			switch (m_event.channelID)
+			{
+			case 0:
+				parseEvent(static_cast<entt::entity*>(m_event.peer->data),
+				           m_event.packet->data);
 				break;
-
-			case ENET_EVENT_TYPE_RECEIVE:
-				//                printf ("A packet of length %u containing %s
-				//                was received from %s on channel %u.\n",
-				//                        m_event.packet -> dataLength,
-				//                        m_event.packet -> data,
-				//                        m_event.peer -> data -> userName,
-				//                        m_event.channelID);
-
-				switch (m_event.channelID)
-				{
-				case 0:
-					parseEvent(static_cast<entt::entity*>(m_event.peer->data),
-					           m_event.packet->data);
-					break;
-				case 1:
-					parseState(static_cast<entt::entity*>(m_event.peer->data),
-					           m_event.packet->data);
-					break;
-				case 2:
-					parseMessage(static_cast<entt::entity*>(m_event.peer->data),
-					             m_event.packet->data);
-					break;
-				}
-
-				/* Clean up the packet now that we're done using it. */
-				enet_packet_destroy(m_event.packet);
+			case 1:
+				parseState(static_cast<entt::entity*>(m_event.peer->data),
+				           m_event.packet->data);
 				break;
-
-			case ENET_EVENT_TYPE_DISCONNECT:
-				printf("%s disconnected.\n", m_event.peer->data);
-				break;
-
-			case ENET_EVENT_TYPE_NONE:
+			case 2:
+				parseMessage(static_cast<entt::entity*>(m_event.peer->data),
+				             m_event.packet->data);
 				break;
 			}
+
+			/* Clean up the packet now that we're done using it. */
+			enet_packet_destroy(m_event.packet);
+			break;
+
+		case ENET_EVENT_TYPE_DISCONNECT:
+			printf("%s disconnected.\n",
+			       reinterpret_cast<const char*>(m_event.peer->data));
+			break;
+
+		case ENET_EVENT_TYPE_NONE:
+			break;
 		}
 	}
 }
