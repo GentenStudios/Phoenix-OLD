@@ -95,6 +95,7 @@ void ModManager::registerFunction(const std::string& funcName)
 		}
 
 		// vyom this is your issue fix tomoz.
+		// something to do with it being a reference so we fucked up...
 		currentPos  = currentPos[branches[i]];
 		currentTree = *exist;
 	}
