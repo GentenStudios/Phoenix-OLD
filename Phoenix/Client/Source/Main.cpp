@@ -28,13 +28,24 @@
 
 #include <Client/Client.hpp>
 
+#include <Common/Mods/ModManager.hpp>
+#include <Common/Logger.hpp>
+
+using namespace phx::mods;
 using namespace phx;
 
 #undef main
 int main(int argc, char** argv)
 {
-	client::Client::get()->run();
+	//client::Client::get()->run();
 
+	ModManager manager = ModManager({"oopsie"});
+
+	std::function<void(std::string)> func = [](std::string wow) { return wow; };
+	
+	Logger::initialize({});
+	manager.registerFunction("core.block.register");
+	
 	return 0;
 }
 

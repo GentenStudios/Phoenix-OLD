@@ -34,38 +34,40 @@
 
 using namespace phx::mods;
 
-Privileges::Privileges()  = default;
-Privileges::~Privileges() = default;
-
 void Privileges::registerPrivilege(const std::string& priv)
 {
-	auto it = std::find(m_privileges.begin(), m_privileges.end(), priv);
+	const auto it = std::find(m_privileges.begin(), m_privileges.end(), priv);
 	if (it == m_privileges.end())
 	{
 		m_privileges.push_back(priv);
 	}
 }
 
-bool Privileges::hasPrivilege(const std::string& privList,
-                              const std::string  priv) const
+Privileges::PrivList Privileges::parsePrivList(
+    const std::string& commaDelimList)
+{
+	// split comma delimited list into array.
+	PrivList          privs;
+	std::stringstream sstream(commaDelimList);
+	std::string       substr;
+	while (std::getline(sstream, substr, ','))
+	{
+		privs.push_back(substr);
+	}
+
+	return privs;
+}
+
+bool Privileges::hasPrivilege(const PrivList& privList, const std::string& priv)
 {
 	if (priv.length() == 0)
 	{
 		return true;
 	}
 
-	// split comma delimited list into array.
-	std::vector<std::string> privs;
-	std::stringstream        sstream(privList);
-	std::string              substr;
-	while (std::getline(sstream, substr, ','))
-	{
-		privs.push_back(substr);
-	}
-
 	// search array for privilege.
-	auto it = std::find(m_privileges.begin(), m_privileges.end(), priv);
-	if (it == m_privileges.end())
+	const auto it = std::find(privList.begin(), privList.end(), priv);
+	if (it == privList.end())
 	{
 		return false;
 	}
@@ -76,7 +78,8 @@ bool Privileges::hasPrivilege(const std::string& privList,
 CommandBook::CommandBook()
 {
 	m_commands["help"] = {"Type /help [command] to learn more about a command.",
-	                      "", [=](std::vector<std::string> args) {
+	                      {},
+	                      [=](std::vector<std::string> args) {
 		                      if (args.empty())
 		                      {
 			                      return m_commands["help"].help;
@@ -88,7 +91,8 @@ CommandBook::CommandBook()
 	m_commands["list"] = {
 	    "Type /list to list every command, use a privilege as a parameter to "
 	    "see what commands are available to that role.",
-	    "", [=](std::vector<std::string> args) {
+	    {},
+	    [=](std::vector<std::string> args) {
 		    if (args.empty())
 		    {
 			    std::string commands;
@@ -99,26 +103,40 @@ CommandBook::CommandBook()
 
 			    return commands;
 		    }
+
+		    std::string commands;
+		    for (auto& command : m_commands)
+		    {
+			    if (Privileges::hasPrivilege(command.second.privs, args[0]))
+			    {
+				    commands += command.first + "\n";
+			    }
+		    }
+
+		    return commands;
+	    }};
+
+	m_commands["unknown"] = {
+	    "Unknown command", {}, [](std::vector<std::string> args) {
+		    return "An unknown command has been called";
 	    }};
 }
 
-void CommandBook::registerCommand(const std::string&     command,
-                                  const std::string&     help,
-                                  const std::string&     privilege,
-                                  const CommandFunction& func)
+void CommandBook::registerCommand(const std::string&          command,
+                                  const std::string&          help,
+                                  const Privileges::PrivList& privilege,
+                                  const CommandFunction&      func)
 {
 	auto it = m_commands.find(command);
 	if (it == m_commands.end())
 	{
-		LOG_DEBUG("[MODDING]")
+		LOG_INFO("[MODDING]")
 		    << "The command \" " << command
 		    << "\" has already been defined by another mod, the formally "
-		       "registered command shall be used.";
+		       "registered command shall be overwritten.";
 	}
-	else
-	{
-		m_commands[command] = {help, privilege, func};
-	}
+
+	m_commands[command] = {help, privilege, func};
 }
 
 bool CommandBook::commandExists(const std::string& command) const
@@ -128,5 +146,11 @@ bool CommandBook::commandExists(const std::string& command) const
 
 const CommandBook::Command* CommandBook::getCommand(const std::string& command) const
 {
-	
+	auto it = m_commands.find(command);
+	if (it == m_commands.end())
+	{
+		return &m_commands.at("unknown");
+	}
+
+	return &(it->second);
 }

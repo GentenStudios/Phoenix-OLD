@@ -37,29 +37,41 @@ namespace phx::mods
 	class Privileges
 	{
 	public:
-		Privileges();
-		~Privileges();
+		// each player object stores this, list of all privileges they have.
+		using PrivList = std::vector<std::string>;
 
-		void registerPrivilege(const std::string& priv);
+	public:
+		Privileges()  = default;
+		~Privileges() = default;
 
-		// privList is a comma-delimited list.
-		bool hasPrivilege(const std::string& privList,
-		                  const std::string  priv) const;
+		void            registerPrivilege(const std::string& priv);
+		void            privilegeExists(const std::string& priv) const;
+		const PrivList& getPrivileges() const { return m_privileges; }
+
+		///////////////////////
+		// utility functions //
+		///////////////////////
+
+		static bool hasPrivilege(const PrivList&    privList,
+		                         const std::string& priv);
+
+		static PrivList parsePrivList(const std::string& commaDelimList);
 
 	private:
-		std::vector<std::string> m_privileges;
+		PrivList m_privileges;
 	};
 
 	class CommandBook
 	{
 	public:
-		using CommandFunction = std::function<std::string(std::vector<std::string>)>;
+		using CommandFunction =
+		    std::function<std::string(std::vector<std::string>)>;
 
 		struct Command
 		{
-			std::string     help;
-			std::string     privs;
-			CommandFunction func;
+			std::string          help;
+			Privileges::PrivList privs;
+			CommandFunction      func;
 		};
 
 	public:
@@ -67,10 +79,10 @@ namespace phx::mods
 		~CommandBook() = default;
 
 		// will allow for a command to work from multiple different privileges.
-		void registerCommand(const std::string&     command,
-		                     const std::string&     help,
-		                     const std::string&     privilege,
-		                     const CommandFunction& func);
+		void registerCommand(const std::string&          command,
+		                     const std::string&          help,
+		                     const Privileges::PrivList& privileges,
+		                     const CommandFunction&      func);
 
 		bool           commandExists(const std::string& command) const;
 		const Command* getCommand(const std::string& command) const;

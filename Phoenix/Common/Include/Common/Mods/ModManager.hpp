@@ -29,6 +29,7 @@
 #pragma once
 
 #include <Common/Mods/Mod.hpp>
+#include <Common/Mods/ModAPI.hpp>
 
 #include <functional>
 #include <vector>
@@ -38,21 +39,28 @@ namespace phx::mods
 	class ModManager
 	{
 	public:
+		struct Status
+		{
+			bool ok;
+			std::string what;
+		};
+
 		using ModList = std::vector<std::string>;
 
 	public:
 		ModManager() = delete;
-		ModManager(const ModList& modList);
+		explicit ModManager(const ModList& modList);
 
-		const ModList& getRequiredMods();
-
-		template <typename RtnType, typename... Args>
-		void registerFunction(const std::string&              funcName,
-		                      std::function<RtnType(Args...)> func);
+		//template <typename RtnType, typename... Args>
+		void registerFunction(const std::string&              funcName);
 
 		// you can make status return a percentage for a progress bar.
-		void load(float* status);
+		Status load(float* progress);
 		void cleanup();
+
+		const ModList&     getModList() const;
+		const Privileges*  getPrivileges() const;
+		const CommandBook* getCommandBook() const;
 
 	private:
 		struct InternalTree
@@ -65,5 +73,10 @@ namespace phx::mods
 
 		std::vector<std::string> m_modsRequired;
 		std::vector<Mod>         m_mods;
+
+		Privileges  m_privileges;
+		CommandBook m_commandBook;
+
+		sol::state m_luaState;
 	};
 } // namespace phx::mods

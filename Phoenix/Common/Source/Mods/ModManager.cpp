@@ -26,106 +26,94 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Common/Voxels/Map.hpp>
-#include <fstream>
-#include <iostream>
-#include <utility>
+#include <Common/Logger.hpp>
+#include <Common/Mods/ModManager.hpp>
 
-using namespace phx::voxels;
-using namespace phx;
+using namespace phx::mods;
 
-Map::Map(std::string save, std::string name)
-    : m_save(std::move(save)), m_mapName(std::move(name))
+ModManager::ModManager(const ModList& modList) : m_modsRequired(modList)
 {
+	m_luaState.open_libraries(sol::lib::base);
 }
 
-Chunk Map::getChunk(math::vec3 pos)
+// template <typename RtnType, typename... Args>
+void ModManager::registerFunction(const std::string& funcName)
 {
-	if (m_chunks.find(pos) != m_chunks.end())
+	std::vector<std::string> branches;
+	std::stringstream        sstream(funcName);
+	std::string              substr;
+	while (std::getline(sstream, substr, '.'))
 	{
-		return m_chunks.at(pos);
+		branches.push_back(substr);
 	}
-	else
-	{
-		std::ifstream saveFile;
-		std::string   position = "." + std::to_string(int(pos.x)) + "_" +
-		                       std::to_string(int(pos.y)) + "_" +
-		                       std::to_string(int(pos.z));
-		saveFile.open("Saves/" + m_save + "/" + m_mapName + position + ".save");
 
-		if (saveFile)
+	// malformed request.
+	if (branches.empty())
+		return;
+
+	std::vector<InternalTree>::iterator it =
+	    std::find_if(m_functionTree.begin(), m_functionTree.end(),
+	                 [branches](const InternalTree& branch) {
+		                 if (branch.branch == branches[0])
+		                 {
+			                 return true;
+		                 }
+
+		                 return false;
+	                 });
+
+	if (it == m_functionTree.end())
+	{
+		it = m_functionTree.insert(m_functionTree.end(), {branches[0], {}});
+		m_luaState[branches[0]] = m_luaState.create_table();
+	}
+
+	InternalTree& currentTree = *it;
+	auto         currentPos  = m_luaState[branches[0]];
+
+	// we don't process the last one, that's the function name.
+	// we've already checked for the first one too, that's the base, like
+	// "core".
+	for (int i = 1; i <= branches.size() - 1; ++i)
+	{
+		auto exist =
+		    std::find_if(currentTree.twigs.begin(), currentTree.twigs.end(),
+		                 [currentTree, branches, i](const InternalTree& tree) {
+			                 if (branches[i] == tree.branch)
+			                 {
+				                 return true;
+			                 }
+
+			                 return false;
+		                 });
+
+		if (exist == currentTree.twigs.end())
 		{
-			std::string saveString;
-			std::getline(saveFile, saveString);
-			auto win = m_chunks.emplace(pos, Chunk(pos, saveString));
+			exist = currentTree.twigs.insert(currentTree.twigs.end(),
+			                                 {branches[i], {}});
+			currentPos[branches[i]] = m_luaState.create_table();
 		}
-		else
-		{
-			auto win = m_chunks.emplace(pos, Chunk(pos));
-			m_chunks.at(pos).autoTestFill();
-			save(pos);
-		}
-		return m_chunks.at(pos);
+
+		// vyom this is your issue fix tomoz.
+		currentPos  = currentPos[branches[i]];
+		currentTree = *exist;
 	}
+
+	LOG_FATAL("[FUNC]") << branches.size();
+	LOG_FATAL("[FUNC]") << m_functionTree[0].branch
+	                    << m_functionTree[0].twigs[0].branch;
+	//	                    << m_functionTree[0].twigs[0].twigs[0].branch;
 }
 
-void Map::setBlockAt(phx::math::vec3 position, BlockType* block)
+ModManager::Status ModManager::load(float* progress) { return {true}; }
+
+void ModManager::cleanup() {}
+
+const ModManager::ModList& ModManager::getModList() const
 {
-	int posX = static_cast<int>(position.x / Chunk::CHUNK_WIDTH);
-	int posY = static_cast<int>(position.y / Chunk::CHUNK_HEIGHT);
-	int posZ = static_cast<int>(position.z / Chunk::CHUNK_DEPTH);
-
-	position.x =
-	    static_cast<float>(static_cast<int>(position.x) % Chunk::CHUNK_WIDTH);
-	if (position.x < 0)
-	{
-		posX -= 1;
-		position.x += Chunk::CHUNK_WIDTH;
-	}
-
-	position.y =
-	    static_cast<float>(static_cast<int>(position.y) % Chunk::CHUNK_HEIGHT);
-	if (position.y < 0)
-	{
-		posY -= 1;
-		position.y += Chunk::CHUNK_HEIGHT;
-	}
-
-	position.z =
-	    static_cast<float>(static_cast<int>(position.z) % Chunk::CHUNK_DEPTH);
-	if (position.z < 0)
-	{
-		posZ -= 1;
-		position.z += Chunk::CHUNK_DEPTH;
-	}
-
-	const math::vec3 chunkPosition =
-	    math::vec3(static_cast<float>(posX * Chunk::CHUNK_WIDTH),
-	               static_cast<float>(posY * Chunk::CHUNK_HEIGHT),
-	               static_cast<float>(posZ * Chunk::CHUNK_DEPTH));
-
-	m_chunks.at(chunkPosition)
-	    .setBlockAt(
-	        {
-	            // "INLINE" VECTOR 3 DECLARATION
-	            position.x, // x position IN the chunk, not overall
-	            position.y, // y position IN the chunk, not overall
-	            position.z  // z position IN the chunk, not overall
-	        },
-	        block);
-
-	save(chunkPosition);
+	return m_modsRequired;
 }
 
-void Map::save(phx::math::vec3 pos)
-{
-	std::ofstream saveFile;
-	std::string   position = "." + std::to_string(int(pos.x)) + "_" +
-	                       std::to_string(int(pos.y)) + "_" +
-	                       std::to_string(int(pos.z));
-	saveFile.open("Saves/" + m_save + "/" + m_mapName + position + ".save");
-	saveFile << m_chunks.at(pos).save();
+const Privileges* ModManager::getPrivileges() const { return &m_privileges; }
 
-	saveFile.close();
-}
-
+const CommandBook* ModManager::getCommandBook() const { return &m_commandBook; }
