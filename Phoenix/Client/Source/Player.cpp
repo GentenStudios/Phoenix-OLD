@@ -229,15 +229,54 @@ void Player::renderSelectionBox(const math::mat4 view, const math::mat4 proj)
 	pos.y = (pos.y - 0.5f) * 2.f;
 	pos.z = (pos.z - 0.5f) * 2.f;
 
+	/*
+	       1 +--------+ 2
+		    /|       /|
+		   / |   3  / |
+		0 +--------+  |
+		  |  |6    |  |
+		  |  x-----|--+ 7
+		  | /      | /
+		  |/       |/
+		5 +--------+ 4
+	 */
+
 	float vertices[] = {
-		pos.x + 1.f, pos.y + 1.f, pos.z - 1.f,
-		pos.x - 1.f, pos.y + 1.f, pos.z - 1.f,
-		pos.x - 1.f, pos.y + 1.f, pos.z + 1.f,
-		pos.x + 1.f, pos.y + 1.f, pos.z + 1.f,
-		pos.x + 1.f, pos.y - 1.f, pos.z + 1.f,
-		pos.x + 1.f, pos.y - 1.f, pos.z - 1.f,
-		pos.x - 1.f, pos.y - 1.f, pos.z - 1.f,
-		pos.x - 1.f, pos.y - 1.f, pos.z + 1.f
+		pos.x + 2.f, pos.y + 2.f, pos.z      ,  // 0-1
+		pos.x      , pos.y + 2.f, pos.z      ,
+
+		pos.x      , pos.y + 2.f, pos.z      ,  // 1-2
+		pos.x      , pos.y + 2.f, pos.z + 2.f,
+
+		pos.x      , pos.y + 2.f, pos.z + 2.f,  // 2-3
+		pos.x + 2.f, pos.y + 2.f, pos.z + 2.f,
+
+		pos.x + 2.f, pos.y + 2.f, pos.z + 2.f,  // 3-4
+		pos.x + 2.f, pos.y      , pos.z + 2.f,
+
+		pos.x + 2.f, pos.y      , pos.z + 2.f,  // 4-5
+		pos.x + 2.f, pos.y      , pos.z      ,
+
+		pos.x + 2.f, pos.y      , pos.z      ,  // 5-6
+		pos.x      , pos.y      , pos.z      ,
+
+		pos.x      , pos.y      , pos.z      ,  // 6-7
+		pos.x      , pos.y      , pos.z + 2.f,
+
+		pos.x      , pos.y      , pos.z + 2.f,  // 7-4
+		pos.x + 2.f, pos.y      , pos.z + 2.f,
+
+		pos.x      , pos.y      , pos.z + 2.f,  // 7-2
+		pos.x      , pos.y + 2.f, pos.z + 2.f,
+
+		pos.x      , pos.y + 2.f, pos.z      ,  // 1-6
+		pos.x      , pos.y      , pos.z      ,
+
+		pos.x + 2.f, pos.y + 2.f, pos.z      ,  // 0-3
+		pos.x + 2.f, pos.y + 2.f, pos.z + 2.f,
+
+		pos.x + 2.f, pos.y + 2.f, pos.z      ,  // 0-5
+		pos.x + 2.f, pos.y      , pos.z      
 	};
 
 	glBindVertexArray(m_vao);
@@ -249,5 +288,5 @@ void Player::renderSelectionBox(const math::mat4 view, const math::mat4 proj)
 	m_pipeline.activate();
 	m_pipeline.setMatrix("u_view", view);
 	m_pipeline.setMatrix("u_projection", proj);
-	glDrawArrays(GL_LINES, 0, 8);
+	glDrawArrays(GL_LINES, 0, 24);
 }
