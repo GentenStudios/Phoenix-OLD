@@ -37,6 +37,9 @@
 
 #include <Client/Graphics/ChunkView.hpp>
 
+#include <glad/glad.h>
+#include <Client/Graphics/ShaderPipeline.hpp>
+
 #include <entt/entt.hpp>
 
 namespace phx
@@ -65,10 +68,17 @@ namespace phx
         /// @brief Gets the direction something is facing based on its rotation
         static math::vec3 rotToDir(math::vec3 m_rotation);
 
+		/// @brief Render the selection box around the pointed block
+		void renderSelectionBox();
+
 	private:
 		const float        m_reach = 32.f;
 		voxels::ChunkView* m_world;
 		entt::registry*    m_registry;
 		entt::entity       m_entity;
+
+		GLuint              m_vao;
+		GLuint              m_vbo;
+		gfx::ShaderPipeline m_pipeline;
 	};
 } // namespace phx

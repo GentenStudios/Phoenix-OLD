@@ -48,6 +48,13 @@ Player::Player(voxels::ChunkView* world, entt::registry* registry)
         math::vec3{0, 0, 0}, math::vec3{0, 0, 0});
     m_registry->emplace<Movement>(m_entity, DEFAULT_MOVE_SPEED);
 
+	glGenVertexArrays(1, &m_vao);
+	glGenBuffers(1, &m_vbo);
+
+	std::vector<gfx::ShaderLayout> layout;
+	layout.emplace_back("position", 0);
+	m_pipeline.prepare("Assets/SimpleLines.vert", "Assets/SimpleLines.frag", layout);
+
 	ContentManager::get()->lua["core"]["player"] = 
 		/**
 		 * @addtogroup luaapi
@@ -207,4 +214,35 @@ math::vec3 Player::rotToDir(math::vec3 m_rotation){
     return {std::cos(m_rotation.y) * std::sin(m_rotation.x),
             std::sin(m_rotation.y),
             std::cos(m_rotation.y) * std::cos(m_rotation.x)};
+}
+
+void Player::renderSelectionBox()
+{
+	auto pos = getTarget().getCurrentPosition();
+	// do not waste cpu time if we aren't targetting a solid block
+	if (m_world->getBlockAt(pos)->category != voxels::BlockCategory::SOLID)
+		return;
+
+	float vertices[] = {
+		pos.x + 0.5f, pos.y + 0.5f, pos.z - 0.5f,
+		pos.x - 0.5f, pos.y + 0.5f, pos.z - 0.5f,
+		pos.x - 0.5f, pos.y + 0.5f, pos.z + 0.5f,
+		pos.x + 0.5f, pos.y + 0.5f, pos.z + 0.5f,
+		pos.x + 0.5f, pos.y - 0.5f, pos.z + 0.5f,
+		pos.x + 0.5f, pos.y - 0.5f, pos.z - 0.5f,
+		pos.x - 0.5f, pos.y - 0.5f, pos.z - 0.5f,
+		pos.x - 0.5f, pos.y - 0.5f, pos.z + 0.5f
+	};
+
+	for (int i=0; i < sizeof(vertices) / sizeof(float); ++i)
+		vertices[i] *= 16;
+
+	glBindVertexArray(m_vao);
+	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_DYNAMIC_DRAW);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
+	glEnableVertexAttribArray(0);
+
+	m_pipeline.activate();
+	glDrawArrays(GL_LINES, 0, 8);
 }
