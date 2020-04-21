@@ -69,7 +69,7 @@ namespace phx
         static math::vec3 rotToDir(math::vec3 m_rotation);
 
 		/// @brief Render the selection box around the pointed block
-		void renderSelectionBox();
+		void renderSelectionBox(const math::mat4 view, const math::mat4 proj);
 
 	private:
 		const float        m_reach = 32.f;

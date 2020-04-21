@@ -229,5 +229,5 @@ void Game::tick(float dt)
 	m_renderPipeline.setMatrix("u_projection", m_camera->getProjection());
 
 	m_world->render();
-	m_player->renderSelectionBox();
+	m_player->renderSelectionBox(m_camera->calculateViewMatrix(), m_camera->getProjection());
 }

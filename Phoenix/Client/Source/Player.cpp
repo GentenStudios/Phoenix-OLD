@@ -216,7 +216,7 @@ math::vec3 Player::rotToDir(math::vec3 m_rotation){
             std::cos(m_rotation.y) * std::cos(m_rotation.x)};
 }
 
-void Player::renderSelectionBox()
+void Player::renderSelectionBox(const math::mat4 view, const math::mat4 proj)
 {
 	auto pos = getTarget().getCurrentPosition();
 	// do not waste cpu time if we aren't targetting a solid block
@@ -234,9 +234,6 @@ void Player::renderSelectionBox()
 		pos.x - 0.5f, pos.y - 0.5f, pos.z + 0.5f
 	};
 
-	for (int i=0; i < sizeof(vertices) / sizeof(float); ++i)
-		vertices[i] *= 16;
-
 	glBindVertexArray(m_vao);
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_DYNAMIC_DRAW);
@@ -244,5 +241,7 @@ void Player::renderSelectionBox()
 	glEnableVertexAttribArray(0);
 
 	m_pipeline.activate();
+	m_pipeline.setMatrix("u_view", view);
+	m_pipeline.setMatrix("u_projection", proj);
 	glDrawArrays(GL_LINES, 0, 8);
 }
