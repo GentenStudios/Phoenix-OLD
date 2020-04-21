@@ -7,7 +7,8 @@ More information on this project and its mission can be found [here](https://doc
 
 ## Community
 [Here's a link to our public discord server](https://discord.gg/XRttqAm), where we collaborate and discuss the development of the Phoenix.
-[Here's a link to our community guidelines](./CODE_OF_CONDUCT.md)
+
+[Here's a link to our community guidelines](CODE_OF_CONDUCT.md)
 
 ## Dependencies
 - CMake (Version >= 3.0)
@@ -40,4 +41,10 @@ Now follow the platform specific instructions detailed below.
   - Navigate to the `Build/Phoenix` folder and run `./Phoenix` to run the executable.
 
 ## Contributing
-We encourage everyone to contribute, this is an open source project that will ultimately be powered by its community. If you are interested in contributing check out [our contributing guidelines](./CONTRIBUTING.md) for information on how we work and our coding standards. Before you get started, reach out on #programming on discord to collaborate so you aren't duplicating any work. Finally check out [Our issues on GitHub](https://github.com/GentenStudios/Phoenix/issues) for a list of what we currently have planned/ need help with.
+We encourage everyone to contribute, this is an open source project that will ultimately be powered by its community. If 
+you are interested in contributing check out [our contributing guidelines](CONTRIBUTING.md) for information on how we 
+work and our coding standards. Before you get started, reach out on [#programming](https://discord.gg/ufJPY5C) on 
+discord to collaborate so you aren't duplicating any work. To get an understanding of how our project is designed, check 
+out [our architecture documentation](Documentation/Architecture.md). Finally check out 
+[Our issues on GitHub](https://github.com/GentenStudios/Phoenix/issues) for a list of what we currently have planned/ 
+need help with.

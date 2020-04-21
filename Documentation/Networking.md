@@ -19,7 +19,7 @@ yet implemented.
 
 ### States
 
-Input states are created by the client every ∆T / game tick (1/20 of a second by default) and queued for transmission. 
+[InputState]s are created by the client every ∆T / game tick (1/20 of a second by default) and queued for transmission. 
 This happens in a thread so we never run out of time before the next ∆T. 
 
 The networking system is then running in another thread `m_iris` watching that queue. It packs states into redundant 
@@ -72,3 +72,5 @@ goes wrong.
 * Messages from the Server to the Client are purely information and printed to the terminal with little to no client 
 side processing. If a Message from the client results in an action (EX: /tp) then there is no client side prediction and 
 the Event system is instead used to relay that the action happened.
+
+[InputState]: @ref InputState
