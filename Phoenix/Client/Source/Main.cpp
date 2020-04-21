@@ -44,7 +44,7 @@ int main(int argc, char** argv)
 	std::function<void(std::string)> func = [](std::string wow) { return wow; };
 	
 	Logger::initialize({});
-	manager.registerFunction("core.block.register");
+	manager.registerFunction("core.block.register.remove.pp.hard");
 	
 	return 0;
 }

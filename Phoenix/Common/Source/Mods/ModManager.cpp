@@ -51,59 +51,31 @@ void ModManager::registerFunction(const std::string& funcName)
 	if (branches.empty())
 		return;
 
-	std::vector<InternalTree>::iterator it =
-	    std::find_if(m_functionTree.begin(), m_functionTree.end(),
-	                 [branches](const InternalTree& branch) {
-		                 if (branch.branch == branches[0])
-		                 {
-			                 return true;
-		                 }
-
-		                 return false;
-	                 });
-
-	if (it == m_functionTree.end())
+	if (branches.size() == 1)
 	{
-		it = m_functionTree.insert(m_functionTree.end(), {branches[0], {}});
-		m_luaState[branches[0]] = m_luaState.create_table();
+		// m_luaState[branches[0]] = function;
+		return;
 	}
 
-	InternalTree& currentTree = *it;
-	auto         currentPos  = m_luaState[branches[0]];
-
-	// we don't process the last one, that's the function name.
-	// we've already checked for the first one too, that's the base, like
-	// "core".
-	for (int i = 1; i <= branches.size() - 1; ++i)
+	std::vector<sol::table> tables;
+	tables.resize(branches.size() - 1);
+	for (std::size_t i = branches.size() - 1; i > 0; --i)
 	{
-		auto exist =
-		    std::find_if(currentTree.twigs.begin(), currentTree.twigs.end(),
-		                 [currentTree, branches, i](const InternalTree& tree) {
-			                 if (branches[i] == tree.branch)
-			                 {
-				                 return true;
-			                 }
+		tables[i - 1] = m_luaState.create_table();
 
-			                 return false;
-		                 });
-
-		if (exist == currentTree.twigs.end())
+		if (i == branches.size() - 1)
 		{
-			exist = currentTree.twigs.insert(currentTree.twigs.end(),
-			                                 {branches[i], {}});
-			currentPos[branches[i]] = m_luaState.create_table();
+			// replace wid actual function
+			tables[i - 1][branches[i]] = []() { return -1; };
 		}
 
-		// vyom this is your issue fix tomoz.
-		// something to do with it being a reference so we fucked up...
-		currentPos  = currentPos[branches[i]];
-		currentTree = *exist;
+		if (i < branches.size() - 1)
+		{
+			tables[i - 1][branches[i]] = tables[i];
+		}
 	}
 
-	LOG_FATAL("[FUNC]") << branches.size();
-	LOG_FATAL("[FUNC]") << m_functionTree[0].branch
-	                    << m_functionTree[0].twigs[0].branch;
-	//	                    << m_functionTree[0].twigs[0].twigs[0].branch;
+	m_luaState[branches[0]] = tables[0];
 }
 
 ModManager::Status ModManager::load(float* progress) { return {true}; }
