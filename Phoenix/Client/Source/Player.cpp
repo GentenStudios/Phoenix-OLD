@@ -240,43 +240,46 @@ void Player::renderSelectionBox(const math::mat4 view, const math::mat4 proj)
 		  |/       |/
 		5 +--------+ 4
 	 */
+	
+	const float more = 2.001f;
+	const float less = 0.001f;
 
 	float vertices[] = {
-		pos.x + 2.f, pos.y + 2.f, pos.z      ,  // 0-1
-		pos.x      , pos.y + 2.f, pos.z      ,
+		pos.x + more, pos.y + more, pos.z - less,  // 0-1
+		pos.x - less, pos.y + more, pos.z - less,
 
-		pos.x      , pos.y + 2.f, pos.z      ,  // 1-2
-		pos.x      , pos.y + 2.f, pos.z + 2.f,
+		pos.x - less, pos.y + more, pos.z - less,  // 1-2
+		pos.x - less, pos.y + more, pos.z + more,
 
-		pos.x      , pos.y + 2.f, pos.z + 2.f,  // 2-3
-		pos.x + 2.f, pos.y + 2.f, pos.z + 2.f,
+		pos.x - less, pos.y + more, pos.z + more,  // 2-3
+		pos.x + more, pos.y + more, pos.z + more,
 
-		pos.x + 2.f, pos.y + 2.f, pos.z + 2.f,  // 3-4
-		pos.x + 2.f, pos.y      , pos.z + 2.f,
+		pos.x + more, pos.y + more, pos.z + more,  // 3-4
+		pos.x + more, pos.y - less, pos.z + more,
 
-		pos.x + 2.f, pos.y      , pos.z + 2.f,  // 4-5
-		pos.x + 2.f, pos.y      , pos.z      ,
+		pos.x + more, pos.y - less, pos.z + more,  // 4-5
+		pos.x + more, pos.y - less, pos.z - less,
 
-		pos.x + 2.f, pos.y      , pos.z      ,  // 5-6
-		pos.x      , pos.y      , pos.z      ,
+		pos.x + more, pos.y - less, pos.z - less,  // 5-6
+		pos.x - less, pos.y - less, pos.z - less,
 
-		pos.x      , pos.y      , pos.z      ,  // 6-7
-		pos.x      , pos.y      , pos.z + 2.f,
+		pos.x - less, pos.y - less, pos.z - less,  // 6-7
+		pos.x - less, pos.y - less, pos.z + more,
 
-		pos.x      , pos.y      , pos.z + 2.f,  // 7-4
-		pos.x + 2.f, pos.y      , pos.z + 2.f,
+		pos.x - less, pos.y - less, pos.z + more,  // 7-4
+		pos.x + more, pos.y - less, pos.z + more,
 
-		pos.x      , pos.y      , pos.z + 2.f,  // 7-2
-		pos.x      , pos.y + 2.f, pos.z + 2.f,
+		pos.x - less, pos.y - less, pos.z + more,  // 7-2
+		pos.x - less, pos.y + more, pos.z + more,
 
-		pos.x      , pos.y + 2.f, pos.z      ,  // 1-6
-		pos.x      , pos.y      , pos.z      ,
+		pos.x - less, pos.y + more, pos.z - less,  // 1-6
+		pos.x - less, pos.y - less, pos.z - less,
 
-		pos.x + 2.f, pos.y + 2.f, pos.z      ,  // 0-3
-		pos.x + 2.f, pos.y + 2.f, pos.z + 2.f,
+		pos.x + more, pos.y + more, pos.z - less,  // 0-3
+		pos.x + more, pos.y + more, pos.z + more,
 
-		pos.x + 2.f, pos.y + 2.f, pos.z      ,  // 0-5
-		pos.x + 2.f, pos.y      , pos.z      
+		pos.x + more, pos.y + more, pos.z - less,  // 0-5
+		pos.x + more, pos.y - less, pos.z - less
 	};
 
 	glBindVertexArray(m_vao);
