@@ -219,19 +219,25 @@ math::vec3 Player::rotToDir(math::vec3 m_rotation){
 void Player::renderSelectionBox(const math::mat4 view, const math::mat4 proj)
 {
 	auto pos = getTarget().getCurrentPosition();
+	pos.floor();
 	// do not waste cpu time if we aren't targetting a solid block
 	if (m_world->getBlockAt(pos)->category != voxels::BlockCategory::SOLID)
 		return;
 
+	// voxel position to camera position
+	pos.x = (pos.x - 0.5f) * 2.f;
+	pos.y = (pos.y - 0.5f) * 2.f;
+	pos.z = (pos.z - 0.5f) * 2.f;
+
 	float vertices[] = {
-		pos.x + 0.5f, pos.y + 0.5f, pos.z - 0.5f,
-		pos.x - 0.5f, pos.y + 0.5f, pos.z - 0.5f,
-		pos.x - 0.5f, pos.y + 0.5f, pos.z + 0.5f,
-		pos.x + 0.5f, pos.y + 0.5f, pos.z + 0.5f,
-		pos.x + 0.5f, pos.y - 0.5f, pos.z + 0.5f,
-		pos.x + 0.5f, pos.y - 0.5f, pos.z - 0.5f,
-		pos.x - 0.5f, pos.y - 0.5f, pos.z - 0.5f,
-		pos.x - 0.5f, pos.y - 0.5f, pos.z + 0.5f
+		pos.x + 1.f, pos.y + 1.f, pos.z - 1.f,
+		pos.x - 1.f, pos.y + 1.f, pos.z - 1.f,
+		pos.x - 1.f, pos.y + 1.f, pos.z + 1.f,
+		pos.x + 1.f, pos.y + 1.f, pos.z + 1.f,
+		pos.x + 1.f, pos.y - 1.f, pos.z + 1.f,
+		pos.x + 1.f, pos.y - 1.f, pos.z - 1.f,
+		pos.x - 1.f, pos.y - 1.f, pos.z - 1.f,
+		pos.x - 1.f, pos.y - 1.f, pos.z + 1.f
 	};
 
 	glBindVertexArray(m_vao);
