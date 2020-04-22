@@ -62,6 +62,8 @@ void Game::run()
 				ActorSystem::tick(m_registry,
 				                  m_registry->get<Player>(*state.first).actor,
 				                  dt, state.second);
+
+				// @todo remove this debug statement before merging to develop
 				std::cout
 				    << m_registry
 				           ->get<Position>(

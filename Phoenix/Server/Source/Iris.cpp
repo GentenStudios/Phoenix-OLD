@@ -69,7 +69,7 @@ Iris::~Iris() { enet_host_destroy(m_server); }
 
 void Iris::run()
 {
-	while (enet_host_service(m_server, &m_event, 1000 / 20) > 0 && m_running)
+	while (enet_host_service(m_server, &m_event, 50) > 0 && m_running)
 	{
 		switch (m_event.type)
 		{
@@ -115,7 +115,7 @@ void Iris::run()
 
 		case ENET_EVENT_TYPE_DISCONNECT:
 			printf("%s disconnected.\n",
-			       reinterpret_cast<const char*>(m_event.peer->data));
+			       static_cast<const char*>(m_event.peer->data));
 			break;
 
 		case ENET_EVENT_TYPE_NONE:
