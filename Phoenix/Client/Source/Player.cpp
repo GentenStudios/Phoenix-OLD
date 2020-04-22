@@ -48,6 +48,13 @@ Player::Player(voxels::ChunkView* world, entt::registry* registry)
         math::vec3{0, 0, 0}, math::vec3{0, 0, 0});
     m_registry->emplace<Movement>(m_entity, DEFAULT_MOVE_SPEED);
 
+	glGenVertexArrays(1, &m_vao);
+	glGenBuffers(1, &m_vbo);
+
+	std::vector<gfx::ShaderLayout> layout;
+	layout.emplace_back("position", 0);
+	m_pipeline.prepare("Assets/SimpleLines.vert", "Assets/SimpleLines.frag", layout);
+
 	ContentManager::get()->lua["core"]["player"] = 
 		/**
 		 * @addtogroup luaapi
@@ -207,4 +214,82 @@ math::vec3 Player::rotToDir(math::vec3 m_rotation){
     return {std::cos(m_rotation.y) * std::sin(m_rotation.x),
             std::sin(m_rotation.y),
             std::cos(m_rotation.y) * std::cos(m_rotation.x)};
+}
+
+void Player::renderSelectionBox(const math::mat4 view, const math::mat4 proj)
+{
+	auto pos = getTarget().getCurrentPosition();
+	pos.floor();
+	// do not waste cpu time if we aren't targetting a solid block
+	if (m_world->getBlockAt(pos)->category != voxels::BlockCategory::SOLID)
+		return;
+
+	// voxel position to camera position
+	pos.x = (pos.x - 0.5f) * 2.f;
+	pos.y = (pos.y - 0.5f) * 2.f;
+	pos.z = (pos.z - 0.5f) * 2.f;
+
+	/*
+	       1 +--------+ 2
+		    /|       /|
+		   / |   3  / |
+		0 +--------+  |
+		  |  |6    |  |
+		  |  x-----|--+ 7
+		  | /      | /
+		  |/       |/
+		5 +--------+ 4
+	 */
+	
+	const float more = 2.001f;
+	const float less = 0.001f;
+
+	float vertices[] = {
+		pos.x + more, pos.y + more, pos.z - less,  // 0-1
+		pos.x - less, pos.y + more, pos.z - less,
+
+		pos.x - less, pos.y + more, pos.z - less,  // 1-2
+		pos.x - less, pos.y + more, pos.z + more,
+
+		pos.x - less, pos.y + more, pos.z + more,  // 2-3
+		pos.x + more, pos.y + more, pos.z + more,
+
+		pos.x + more, pos.y + more, pos.z + more,  // 3-4
+		pos.x + more, pos.y - less, pos.z + more,
+
+		pos.x + more, pos.y - less, pos.z + more,  // 4-5
+		pos.x + more, pos.y - less, pos.z - less,
+
+		pos.x + more, pos.y - less, pos.z - less,  // 5-6
+		pos.x - less, pos.y - less, pos.z - less,
+
+		pos.x - less, pos.y - less, pos.z - less,  // 6-7
+		pos.x - less, pos.y - less, pos.z + more,
+
+		pos.x - less, pos.y - less, pos.z + more,  // 7-4
+		pos.x + more, pos.y - less, pos.z + more,
+
+		pos.x - less, pos.y - less, pos.z + more,  // 7-2
+		pos.x - less, pos.y + more, pos.z + more,
+
+		pos.x - less, pos.y + more, pos.z - less,  // 1-6
+		pos.x - less, pos.y - less, pos.z - less,
+
+		pos.x + more, pos.y + more, pos.z - less,  // 0-3
+		pos.x + more, pos.y + more, pos.z + more,
+
+		pos.x + more, pos.y + more, pos.z - less,  // 0-5
+		pos.x + more, pos.y - less, pos.z - less
+	};
+
+	glBindVertexArray(m_vao);
+	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_DYNAMIC_DRAW);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
+	glEnableVertexAttribArray(0);
+
+	m_pipeline.activate();
+	m_pipeline.setMatrix("u_view", view);
+	m_pipeline.setMatrix("u_projection", proj);
+	glDrawArrays(GL_LINES, 0, 24);
 }
