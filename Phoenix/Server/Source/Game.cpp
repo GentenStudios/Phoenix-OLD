@@ -26,40 +26,52 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#pragma once
-
 #include <Server/Game.hpp>
-#include <Server/Iris.hpp>
-
 #include <Server/User.hpp>
 
-//#include <Server/Commander.hpp>
+#include <Common/Actor.hpp>
+#include <Common/Movement.hpp>
+#include <Common/Position.hpp>
+#include <thread>
 
-#include <entt/entt.hpp>
-#include <enet/enet.h>
+using namespace phx;
+using namespace phx::server;
 
-#include <array>
-#include <string>
-
-namespace phx::server
+Game::Game(entt::registry* registry, bool* running, networking::Iris* iris)
+    : m_registry(registry), m_running(running), m_iris(iris)
 {
+}
 
-	class Server
+void Game::run()
+{
+	while (m_running)
 	{
-	public:
-		Server(std::string save);
-		~Server();
+		// @todo @beeper is this efficient?
+		if (!m_iris->stateQueue.front().ready)
+		{
+			std::this_thread::sleep_for(std::chrono::milliseconds(25));
+		}
+		else
+		{
+			printf("State");
+			networking::StateBundle m_currentState = m_iris->stateQueue.front();
+			m_iris->stateQueue.pop_front();
 
-		void run();
+			for (auto state : m_currentState.states)
+			{
+				ActorSystem::tick(m_registry,
+				                  m_registry->get<Player>(*state.first).actor,
+				                  dt, state.second);
 
-	private:
-		bool m_running;
-
-		entt::registry m_registry;
-
-		networking::Iris* m_iris;
-		Game*             m_game;
-
-		std::string m_save;
-	};
-} // namespace phx::server
+				// @todo remove this debug statement before merging to develop
+				std::cout
+				    << m_registry
+				           ->get<Position>(
+				               m_registry->get<Player>(*state.first).actor)
+				           .position
+				    << "\n";
+			}
+			m_iris->sendState(m_currentState.sequence);
+		}
+	}
+}
