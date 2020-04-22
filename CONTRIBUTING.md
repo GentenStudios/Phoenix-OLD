@@ -1,7 +1,7 @@
 # GENTEN STUDIOS CONTRIBITING GUIDELINES
 These are mostly guidelines, not rules. Use your best judgment, and feel free to propose changes to this document in a pull request. However a PR may have changes requested on it if it does not adhear to guidelines outlined here.
 
-If you are just browsing through quick before starting, its worth keeping [the PR checklist](#pr-checklist) in mind before you open a new PR to help make your PR review go smoother. 
+If you are just browsing through quick before starting, it's worth keeping [the PR checklist](#pr-checklist) in mind before you open a new PR to help make your PR review go smoother. 
 
 ## TABLE OF CONTENTS
 
@@ -20,7 +20,7 @@ Familiarity with Git, specifically with using branches, is a must for interactin
 **The Master Branch** is the *most* stable source for the code, this contains major/ minor releases and nothing else. Only release and hotfix branches can be pushed here.
 - All Genten Developers and Staff Members must approve any push to the master branch - unless said otherwise (e.g. last minute hotfixes).
 - The code must be thoroughly tested on all supported systems before being pushed here.
-- Pre-compiled distributable code should be pushed to the releases section of github when pushing code to the Master branch.
+- Pre-compiled distributable code should be pushed to the releases section of GitHub when pushing code to the Master branch.
 - The release version should be incremented any time code is pushed to the release branch. See [Versioning and releases](#VERSIONING-AND-RELEASES)
 
 **Hot Fix Branches** are a method for pushing code to the master branch after a release. These should be minor fixes that add no functionality (unless the bug restricts a certain functionality) to the project.
@@ -45,7 +45,7 @@ All Branches:
 - Accomplish the feature(s) it was designed to accomplish
 - Has the branch it's merging into merged onto itself and all conflicts are resolved
 - Clean of all binaries and other non-source material
-- All classes, public functions, and public variables are documented with doxygen style comments
+- All classes, functions, and variables are documented with doxygen style comments
 - Complies with style guide and other contributing guidelines
 - All Developer reviewer comments are resolved
 - Code is formatted with cLang
@@ -139,13 +139,13 @@ public:
 	 * @brief This does an important thing
 	 * 
 	 * @param desc A description of the provided parameter
-	 * @return What does the value returned by this function mean?
-	 */
-  	int doThing(std::string desc);
+     * @return What does the value returned by this function mean?
+     */
+    int doThing(std::string desc);
   	
-  	float randomNumber; //< This is a single line description for a member
+    float randomNumber; //< This is a single line description for a member
 
-  	/// @brief This member variable requires a longer single line comment. (filling space)
+    /// @brief This member variable requires a longer single line comment. (filling space)
     bool  foobarred;
 };
 ```
