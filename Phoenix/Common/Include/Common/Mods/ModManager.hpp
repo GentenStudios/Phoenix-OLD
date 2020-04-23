@@ -41,7 +41,7 @@ namespace phx::mods
 	public:
 		struct Status
 		{
-			bool ok;
+			bool        ok;
 			std::string what;
 		};
 
@@ -51,17 +51,24 @@ namespace phx::mods
 		ModManager() = delete;
 		explicit ModManager(const ModList& modList);
 
-		//template <typename RtnType, typename... Args>
-		void registerFunction(const std::string&              funcName);
+		// using just typename F is not particularly safe in terms of checking
+		// for safe use, however, it works, using something like:
+		//		template<typename RtnType, typename... Args>
+		//		void registerFunction(const std::string& funcName,
+		//							std::function<RtnType(Args...)> func);
+		// doesn't actually compile. :(
+		template<typename F>
+		void registerFunction(const std::string& funcName, F func);
 
 		// you can make status return a percentage for a progress bar.
 		Status load(float* progress);
-		void cleanup();
+		void   cleanup();
 
 		const ModList&     getModList() const;
 		const Privileges*  getPrivileges() const;
 		const CommandBook* getCommandBook() const;
 
+		sol::state m_luaState;
 	private:
 		struct InternalTree
 		{
@@ -77,6 +84,5 @@ namespace phx::mods
 		Privileges  m_privileges;
 		CommandBook m_commandBook;
 
-		sol::state m_luaState;
 	};
 } // namespace phx::mods

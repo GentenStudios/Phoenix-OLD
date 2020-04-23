@@ -41,11 +41,18 @@ int main(int argc, char** argv)
 
 	ModManager manager = ModManager({"oopsie"});
 
-	std::function<void(std::string)> func = [](std::string wow) { return wow; };
+	auto func = []() { return -1; };
 	
 	Logger::initialize({});
-	manager.registerFunction("core.block.register.remove.pp.hard");
-	
+	manager.registerFunction("core.block.register", func);
+	//manager.registerFunction("core.block.get", func);
+
+	int a = manager.m_luaState["core"]["block"]["register"]();
+	/*int b = manager.m_luaState["core"]["block"]["get"]();*/
+
+	LOG_INFO("WARNING") << a;
+	//LOG_INFO("WARNING") << b;
+
 	return 0;
 }
 

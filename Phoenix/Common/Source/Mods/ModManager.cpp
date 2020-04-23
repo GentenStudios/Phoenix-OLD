@@ -29,6 +29,8 @@
 #include <Common/Logger.hpp>
 #include <Common/Mods/ModManager.hpp>
 
+#include <type_traits>
+
 using namespace phx::mods;
 
 ModManager::ModManager(const ModList& modList) : m_modsRequired(modList)
@@ -36,9 +38,13 @@ ModManager::ModManager(const ModList& modList) : m_modsRequired(modList)
 	m_luaState.open_libraries(sol::lib::base);
 }
 
-// template <typename RtnType, typename... Args>
-void ModManager::registerFunction(const std::string& funcName)
+template <typename F>
+void ModManager::registerFunction(const std::string& funcName, F func)
 {
+	// splitting the function name by periods.
+	// something like core.block.register would be broken down into core, block
+	// and register. core and block need to be created as Lua tables, however
+	// register is just set to the function since it's the actual name of it.
 	std::vector<std::string> branches;
 	std::stringstream        sstream(funcName);
 	std::string              substr;
@@ -51,31 +57,69 @@ void ModManager::registerFunction(const std::string& funcName)
 	if (branches.empty())
 		return;
 
+	// limiting to 3 levels of hierarchy for a v1. Otherwise deep infinite
+	// recursion doesn't work.
 	if (branches.size() == 1)
 	{
-		// m_luaState[branches[0]] = function;
+		m_luaState[branches[0]] = []() { return -1; };
 		return;
 	}
 
-	std::vector<sol::table> tables;
-	tables.resize(branches.size() - 1);
-	for (std::size_t i = branches.size() - 1; i > 0; --i)
+	if (branches.size() == 2)
 	{
-		tables[i - 1] = m_luaState.create_table();
-
-		if (i == branches.size() - 1)
+		if (!m_luaState[branches[0]].valid())
 		{
-			// replace wid actual function
-			tables[i - 1][branches[i]] = []() { return -1; };
+			m_luaState[branches[0]] = m_luaState.create_table();
 		}
 
-		if (i < branches.size() - 1)
-		{
-			tables[i - 1][branches[i]] = tables[i];
-		}
+		m_luaState[branches[0]][branches[1]] = []() { return -1; };
 	}
 
-	m_luaState[branches[0]] = tables[0];
+	if (branches.size() == 3)
+	{
+		if (!m_luaState[branches[0]].valid())
+		{
+			m_luaState[branches[0]] = m_luaState.create_table();
+		}
+
+		if (!m_luaState[branches[0]][branches[1]].valid())
+		{
+			m_luaState[branches[0]][branches[1]] = m_luaState.create_table();
+		}
+
+		m_luaState[branches[0]][branches[1]][branches[2]] = func;
+	}
+
+	if (branches.size() > 3)
+	{
+		LOG_WARNING("MODDING")
+		    << "Function hierarchies of more than 3 are not currently "
+		       "supported. Please limit function names to the depth of "
+		       "\"core.block.register\".";
+	}
+
+	// keeping for future use.
+	//// recursively checks whether the tables for the function exist and just
+	//// pushes the function onto the table.
+	// std::vector<sol::table> tables;
+	// tables.resize(branches.size() - 1);
+	// for (std::size_t i = branches.size() - 1; i > 0; --i)
+	//{
+	//	tables[i - 1] = m_luaState.create_table();
+
+	//	if (i == branches.size() - 1)
+	//	{
+	//		// replace wid actual function
+	//		tables[i - 1][branches[i]] = []() { return -1; };
+	//	}
+
+	//	if (i < branches.size() - 1)
+	//	{
+	//		tables[i - 1][branches[i]] = tables[i];
+	//	}
+	//}
+
+	// m_luaState[branches[0]] = tables[0];
 }
 
 ModManager::Status ModManager::load(float* progress) { return {true}; }
