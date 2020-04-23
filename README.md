@@ -50,6 +50,7 @@ out [our architecture documentation][architecture]. Finally check out
 [Our issues on GitHub](https://github.com/GentenStudios/Phoenix/issues) for a list of what we currently have planned/
 need help with.
 
+Links for Doxy:
 <!-- Trying out a hack to work around Doxy not liking to evaluate relative file references directly -->
 [conduct]: CODE_OF_CONDUCT.md
 [conduct]: @ref codeofconduct
