@@ -160,4 +160,4 @@ When working with C++ code, we should use a submodule for third parties if possi
 ### 3. Never modify the third party
 To help with maintainability, third parties should have no modified code in them. When it comes to updating the third party it should be as easy as replacing the current version with the new version.
 
-#### {#contributing}
+#### </b> {#contributing}

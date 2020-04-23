@@ -4,7 +4,8 @@ contribute to this project, this is a good place to start to figure out how thin
 covered by these documents, reach out to [\#help](https://discord.gg/bPHVcxv) in discord.
  * [Networking][networking]
 
-[networking]: @ref networking
-[networking]: Networking.md
 
-#### {#architecture}
+[networking]: Networking.md
+[networking]: @ref networking
+
+#### </b> {#architecture}

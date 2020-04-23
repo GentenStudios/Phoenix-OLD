@@ -68,4 +68,4 @@ the Event system is instead used to relay that the action happened.
 
 [InputState]: @ref phx::InputState
 
-#### {#networking}
+#### </b> {#networking}
