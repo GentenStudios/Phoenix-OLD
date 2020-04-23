@@ -1,4 +1,4 @@
-# GENTEN STUDIOS: PROJECT PHOENIX              {#mainpage}
+# GENTEN STUDIOS: PROJECT PHOENIX
 [![Build Status](https://dev.azure.com/GentenStudios/ProjectPhoenix/_apis/build/status/GentenStudios.Phoenix?branchName=develop)](https://dev.azure.com/GentenStudios/ProjectPhoenix/_build/latest?definitionId=1&branchName=develop)
 ## Introduction
 Project Phoenix is an open world sandbox style voxel game with a twist. The program itself does not provide any content but gets that content entirely from modules written in Lua. An easy to use Lua API provides the capability to define all of the games content in addition to some functional features. This allows content to be quickly created by someone with little to no programming experience while still retaining the power of C++.
@@ -43,10 +43,10 @@ Now follow the platform specific instructions detailed below.
 
 ## Contributing
 We encourage everyone to contribute, this is an open source project that will ultimately be powered by its community. If
-you are interested in contributing check out [our contributing guidelines](contributing.md) for information on how we
+you are interested in contributing check out [our contributing guidelines][contributing] for information on how we
 work and our coding standards. Before you get started, reach out on [\#programming](https://discord.gg/ufJPY5C) on
 discord to collaborate so you aren't duplicating any work. To get an understanding of how our project is designed, check
-out [our architecture documentation](Documentation/Architecture.md). Finally check out
+out [our architecture documentation][architecture]. Finally check out
 [Our issues on GitHub](https://github.com/GentenStudios/Phoenix/issues) for a list of what we currently have planned/
 need help with.
 
@@ -60,14 +60,4 @@ need help with.
 [contributing]: CONTRIBUTING.md
 [contributing]: @ref contributing
 
-<!--
-	This isn't necessary to make the page the index
-	in Doxygen's output so It's commented out for now.
-	If it's necessary in the future I believe we could
-	just post this at the end of the Level 1 Header
-	and have it work properly. In order to give Doxygen
-	pages explicit names the tag must be on the
-	first Level 1 Header.
--->
-<!--
-#### <div style="display:none"> {#mainpage} -->
+<!-- ####  {#mainpage} -->
