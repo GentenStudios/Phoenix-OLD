@@ -4,6 +4,7 @@ set(modHeaders
 	${currentDir}/Permissions.hpp
 	${currentDir}/ModAPI.hpp
 	${currentDir}/ModManager.hpp
+	${currentDir}/ModManager.inl
 
 	PARENT_SCOPE
 )

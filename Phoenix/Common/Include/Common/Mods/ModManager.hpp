@@ -28,6 +28,7 @@
 
 #pragma once
 
+#include <Common/Logger.hpp>
 #include <Common/Mods/Mod.hpp>
 #include <Common/Mods/ModAPI.hpp>
 
@@ -51,13 +52,7 @@ namespace phx::mods
 		ModManager() = delete;
 		explicit ModManager(const ModList& modList);
 
-		// using just typename F is not particularly safe in terms of checking
-		// for safe use, however, it works, using something like:
-		//		template<typename RtnType, typename... Args>
-		//		void registerFunction(const std::string& funcName,
-		//							std::function<RtnType(Args...)> func);
-		// doesn't actually compile. :(
-		template<typename F>
+		template <typename F>
 		void registerFunction(const std::string& funcName, F func);
 
 		// you can make status return a percentage for a progress bar.
@@ -68,21 +63,15 @@ namespace phx::mods
 		const Privileges*  getPrivileges() const;
 		const CommandBook* getCommandBook() const;
 
-		sol::state m_luaState;
 	private:
-		struct InternalTree
-		{
-			std::string               branch;
-			std::vector<InternalTree> twigs;
-		};
-
-		std::vector<InternalTree> m_functionTree;
-
 		std::vector<std::string> m_modsRequired;
 		std::vector<Mod>         m_mods;
 
 		Privileges  m_privileges;
 		CommandBook m_commandBook;
 
+		sol::state m_luaState;
 	};
 } // namespace phx::mods
+
+#include "ModManager.inl"
