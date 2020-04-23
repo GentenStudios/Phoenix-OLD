@@ -1,32 +1,23 @@
-# Networking Architecure {#Networking}
-
+# Networking Architecure
 This is a generic overview of how the networking system works. If you have additional questions beyond what is
 described here, reach out in [#networking](https://discord.gg/6vwjZhC) on Discord. If you are interested in contributing
 to the networking system, this is also the place to reach out to coordinate any work you want to do.
-
 ## Flow
-
 The data in the networking system is managed in a deterministic lockstep method. This means the server is 100%
 authoritative as to what happens. For some background information on deterministic lockstep check out
 [this article by GlenFelder (Gaffer On Games) is a good read](https://gafferongames.com/post/deterministic_lockstep/).
-
 We process three types of information during runtime. States are non-critical but time-sensitive pieces of information
 that get sent unreliably and are discarded when not received (such as positioning). Events are critical pieces of
 information that are sent via Enet's reliable packet system (Suck as when a block is broken). Messages are essentially
 events but we use a third channel on Enet since they are processed by an entirely separate system.
-
 NOTE: This system's V1 version is a WIP, some information here may describe a future state of the networking system not
 yet implemented.
-
 ### States
-
-[InputState][InputState]s are created by the client every ∆T / game tick (1/20 of a second by default) and queued for transmission.
+[InputState]s are created by the client every ∆T / game tick (1/20 of a second by default) and queued for transmission.
 This happens in a thread so we never run out of time before the next ∆T.
-
 The networking system is then running in another thread `m_iris` watching that queue. It packs states into redundant
 packages (of 5 by default) so each packet will include the X most recent states. This helps prevent packet loss from
 becoming an issue.
-
 When the server gets packets, the networking thread (`m_iris` again) unpacks the data and fills a new queue system with
 any packets it doesn't already have discarding any data it does have or arrived too late. This queue system contains
 StateBundles which are a bundle of InputStates, one from each player for that tick (sequence). When either we have an
@@ -74,4 +65,7 @@ goes wrong.
 side processing. If a Message from the client results in an action (EX: /tp) then there is no client side prediction and
 the Event system is instead used to relay that the action happened.
 
-[InputState]: Phoenix/Common/Include/Common/Input.hpp
+
+[InputState]: @ref phx::InputState
+
+#### {#networking}

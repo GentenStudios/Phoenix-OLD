@@ -53,3 +53,21 @@ need help with.
 <!-- Trying out a hack to work around Doxy not liking to evaluate relative file references directly -->
 [conduct]: CODE_OF_CONDUCT.md
 [conduct]: @ref codeofconduct
+
+[architecture]: Documentation/Architecture.md
+[architecture]: @ref architecture
+
+[contributing]: CONTRIBUTING.md
+[contributing]: @ref contributing
+
+<!--
+	This isn't necessary to make the page the index
+	in Doxygen's output so It's commented out for now.
+	If it's necessary in the future I believe we could
+	just post this at the end of the Level 1 Header
+	and have it work properly. In order to give Doxygen
+	pages explicit names the tag must be on the
+	first Level 1 Header.
+-->
+<!--
+#### <div style="display:none"> {#mainpage} -->
