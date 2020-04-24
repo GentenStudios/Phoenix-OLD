@@ -102,7 +102,7 @@ namespace phx::voxels
 		BlockCallback onInteract;
 
 		/// @brief (temporary) a bitpacked color: rrrrggggbbbbaaaa (a letter = 1 bit)
-		unsigned color = 0b1111000000001111;
+		unsigned color = 0b1111111111111111;
 
 		/**
 		 * @brief An array of texture paths used for rendering the block.

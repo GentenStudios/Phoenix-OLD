@@ -18,7 +18,7 @@ void main()
 		float((color_i & 61440) >> 12) / 16.0,
 		float((color_i & 3840)  >> 8 ) / 16.0,
 		float((color_i & 240)   >> 4 ) / 16.0,
-		float((color_i & 15)         ) / 16.0
+		1.0  // float((color_i & 15)         ) / 16.0
 	);
 
 	const vec3 lightColor = vec3(1.0, 1.0, 1.0);
@@ -38,6 +38,6 @@ void main()
 
 	// -- output color --
 
-	vec4 result = vec4((ambient + diffuse), 1.0) * objectColor;
+	vec4 result = vec4(ambient, 1.0) + vec4(diffuse, 1.0) * objectColor;
 	out_FragColor = result * texture(u_TexArray, pass_UV);
 }
