@@ -173,6 +173,34 @@ void ChunkMesher::addBlockFace(voxels::BlockType* block, BlockFace face,
 {
 	const std::size_t texLayer = m_texTable.at(block->textures[static_cast<std::size_t>(face)]);
 
+	math::vec3 normals;
+	switch (face)
+	{
+		case BlockFace::FRONT:
+			normals = math::vec3(0, 0, -1);
+			break;
+
+		case BlockFace::LEFT:
+			normals = math::vec3(-1, 0, 0);
+			break;
+
+		case BlockFace::BACK:
+			normals = math::vec3(0, 0, 1);
+			break;
+
+		case BlockFace::RIGHT:
+			normals = math::vec3(1, 0, 0);
+			break;
+
+		case BlockFace::TOP:
+			normals = math::vec3(0, 1, 0);
+			break;
+
+		case BlockFace::BOTTOM:
+			normals = math::vec3(0, -1, 0);
+			break;
+	}
+
 	for (int i = 0; i < NUM_VERTS_IN_FACE; ++i)
 	{
 		math::vec3 blockVertices = CUBE_VERTS[(static_cast<int>(face) * NUM_FACES_IN_CUBE) + i];
@@ -190,6 +218,16 @@ void ChunkMesher::addBlockFace(voxels::BlockType* block, BlockFace face,
 		m_mesh.push_back(cubeUVs.y);
 
 		m_mesh.push_back(static_cast<float>(texLayer));
+
+		m_mesh.push_back(normals.x);
+		m_mesh.push_back(normals.y);
+		m_mesh.push_back(normals.z);
+
+		m_mesh.push_back(block->color);
+
+		m_mesh.push_back(x);
+		m_mesh.push_back(y);
+		m_mesh.push_back(z);
 	}
 }
 
