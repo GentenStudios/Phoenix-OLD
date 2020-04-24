@@ -216,14 +216,13 @@ void Game::onEvent(events::Event& e)
 void Game::tick(float dt)
 {
 	// temp, will change in the future, based on game time
-	static math::vec3 lightpos(0.f, 256.f, 0.f);
+	static math::vec3 lightdir(0.f, -1.f, 0.f);
 	static float time = 0.f;
 
 	time += dt;
 
-	lightpos.x = std::cos(time) * lightpos.y;
-	lightpos.z = std::sin(time) * lightpos.y;
-	lightpos.y = std::cos(time) * 128.f + 256.f;
+	lightdir.y = std::sin(time);
+	lightdir.x = std::cos(time);
 
 	m_camera->tick(dt);
 
@@ -240,7 +239,7 @@ void Game::tick(float dt)
 	m_renderPipeline.setMatrix("u_view", m_camera->calculateViewMatrix());
 	m_renderPipeline.setMatrix("u_projection", m_camera->getProjection());
 	m_renderPipeline.setFloat("u_AmbientStrength", 0.7f);
-	m_renderPipeline.setVector3("u_LightPos", lightpos);
+	m_renderPipeline.setVector3("u_LightDir", lightdir);
 
 	m_world->render();
 	m_player->renderSelectionBox(m_camera->calculateViewMatrix(), m_camera->getProjection());

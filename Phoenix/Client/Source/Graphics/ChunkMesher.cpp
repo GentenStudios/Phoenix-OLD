@@ -225,9 +225,9 @@ void ChunkMesher::addBlockFace(voxels::BlockType* block, BlockFace face,
 
 		m_mesh.push_back(block->color);
 
-		m_mesh.push_back(x);
-		m_mesh.push_back(y);
-		m_mesh.push_back(z);
+		// m_mesh.push_back(x);
+		// m_mesh.push_back(y);
+		// m_mesh.push_back(z);
 	}
 }
 

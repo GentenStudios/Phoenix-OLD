@@ -198,7 +198,7 @@ namespace phx::gfx
 		const int m_uvAttributeLocation     = 1;
 		const int m_normalAttributeLocation = 2;
 		const int m_colorAttributeLocation  = 3;
-		const int m_posAttributeLocation    = 4;
+		// const int m_posAttributeLocation    = 4;
 
 		AssociativeTextureTable m_textureTable;
 	};
