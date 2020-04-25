@@ -145,7 +145,7 @@ void Iris::parseState(entt::entity* userRef, enet_uint8* data, std::size_t dataL
 
 	InputState input;
 
-    phx::Serializer ser(Serializer::mode::read);
+    phx::Serializer ser(Serializer::Mode::READ);
 	ser.setBuffer((std::byte*)data, dataLenght);
     ser & input;
 
