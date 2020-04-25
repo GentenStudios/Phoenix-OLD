@@ -30,17 +30,17 @@ namespace phx
 	class Serializer
 	{
 	public:
-		enum class mode
+		enum class Mode
 		{
-			read,
-			write
+			READ,
+			WRITE
 		};
 		void setBuffer(std::byte* data_, size_t dataLenght_)
 		{
 			buffer.clear();
 			buffer.insert(buffer.begin(), data_, data_ + dataLenght_);
 		}
-		explicit Serializer(mode mode_);
+		explicit Serializer(Mode mode_);
 		phx::Serializer& operator&(ISerializable& value_);
 		phx::Serializer& operator&(bool& value_);
 		phx::Serializer& operator&(char& value_);
@@ -103,7 +103,7 @@ namespace phx
 		}
 
 	private:
-		mode                   m_mode;
+		Mode                   m_mode;
 		std::vector<std::byte> buffer;
 	};
 } // namespace phx

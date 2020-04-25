@@ -76,16 +76,16 @@
 
 namespace phx
 {
-	enum class endian
+	enum class Endian
 	{
-		little  = __LITTLE_ENDIAN__,
-		big     = __BIG_ENDIAN__,
-		network = __BIG_ENDIAN__,
-		pdp     = __PDP_ENDIAN__,
-		native  = __BYTE_ORDER__
+		LITTLE  = __LITTLE_ENDIAN__,
+		BIG     = __BIG_ENDIAN__,
+		NETWORK = __BIG_ENDIAN__,
+		PDP     = __PDP_ENDIAN__,
+		NATIVE  = __BYTE_ORDER__
 	};
 
-	template <typename T, phx::endian from = phx::endian::native>
+	template <typename T, phx::Endian from = phx::Endian::NATIVE>
 	struct word
 	{
 		static_assert(CHAR_BIT == 8, "CHAR_BIT != 8");
@@ -111,46 +111,46 @@ namespace phx
 
 		inline T to_big()
 		{
-			if constexpr (from != phx::endian::big)
+			if constexpr (from != phx::Endian::big)
 			{
-				swap_endian();
+				swapEndian();
 			}
 			return value.numeric;
 		}
-		inline T to_little()
+		inline T toLittle()
 		{
-			if constexpr (from != phx::endian::little)
+			if constexpr (from != phx::Endian::little)
 			{
-				swap_endian();
+				swapEndian();
 			}
 			return value.numeric;
 		}
 		inline T from_network()
 		{
-			if constexpr (from != phx::endian::network)
+			if constexpr (from != phx::Endian::NETWORK)
 			{
-				swap_endian();
+				swapEndian();
 			}
 			return value.numeric;
 		}
 		inline T to_network()
 		{
-			if constexpr (from != phx::endian::network)
+			if constexpr (from != phx::Endian::NETWORK)
 			{
-				swap_endian();
+				swapEndian();
 			}
 			return value.numeric;
 		}
 		inline T to_native()
 		{
-			if (from != phx::endian::native)
+			if (from != phx::Endian::NATIVE)
 			{
-				swap_endian();
+				swapEndian();
 			}
 			return value.numeric;
 		}
 
-		void swap_endian()
+		void swapEndian()
 		{
 			if constexpr (sizeof(T) > 1)
 			{
@@ -166,7 +166,7 @@ namespace phx
 			}
 		}
 	};
-	template <typename T, phx::endian from>
+	template <typename T, phx::Endian from>
 	struct word<T*, from>
 	{
 		static_assert(CHAR_BIT == 8, "CHAR_BIT != 8");
@@ -184,48 +184,48 @@ namespace phx
 			value.bytes = bytes_;
 		}
 
-		inline T to_big()
+		inline T toBig()
 		{
-			if constexpr (from != phx::endian::big)
+			if constexpr (from != phx::Endian::big)
 			{
-				swap_endian();
+				swapEndian();
 			}
 			return value.numeric[0];
 		}
-		inline T to_little()
+		inline T toLittle()
 		{
-			if constexpr (from != phx::endian::little)
+			if constexpr (from != phx::Endian::little)
 			{
-				swap_endian();
+				swapEndian();
 			}
 			return value.numeric[0];
 		}
 		inline T from_network()
 		{
-			if constexpr (from != phx::endian::network)
+			if constexpr (from != phx::Endian::NETWORK)
 			{
-				swap_endian();
+				swapEndian();
 			}
 			return value.numeric[0];
 		}
 		inline T to_network()
 		{
-			if constexpr (from != phx::endian::network)
+			if constexpr (from != phx::Endian::NETWORK)
 			{
-				swap_endian();
+				swapEndian();
 			}
 			return value.numeric[0];
 		}
 		inline T to_native()
 		{
-			if (from != phx::endian::native)
+			if (from != phx::Endian::NATIVE)
 			{
-				swap_endian();
+				swapEndian();
 			}
 			return value.numeric[0];
 		}
 
-		void swap_endian()
+		void swapEndian()
 		{
 			if constexpr (sizeof(T) > 1)
 			{
@@ -244,30 +244,30 @@ namespace phx
 } // namespace phx
 
 template <typename T>
-T big_endian(T value_)
+T bigEndian(T value_)
 {
-	phx::word<T, phx::endian::native> value(value_);
-	return value.to_big();
+	phx::word<T, phx::Endian::NATIVE> value(value_);
+	return value.toBig();
 }
 
 template <typename T>
-T little_endian(T value_)
+T littleEndian(T value_)
 {
-	phx::word<T, phx::endian::native> value(value_);
-	return value.to_little();
+	phx::word<T, phx::Endian::NATIVE> value(value_);
+	return value.toLittle();
 }
 
 template <typename T>
-T from_network(T value_)
+T fromNetwork(T value_)
 {
-	phx::word<T, phx::endian::big> value(value_);
+	phx::word<T, phx::Endian::big> value(value_);
 	return value.from_network();
 }
 
 template <typename T>
-T to_network(T value_)
+T toNetwork(T value_)
 {
-	phx::word<T, phx::endian::native> value(value_);
+	phx::word<T, phx::Endian::NATIVE> value(value_);
 	return value.to_network();
 }
 

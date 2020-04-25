@@ -37,7 +37,7 @@
 
 #include <Common/Position.hpp>
 #include <Common/Actor.hpp>
-#include "Common/Serialization/Serializer.hpp"
+#include <Common/Serialization/Serializer.hpp>
 using namespace phx::client;
 using namespace phx;
 
@@ -318,7 +318,7 @@ void Game::tick(float dt)
 	inputState.rotation.y =
         static_cast<unsigned>(m_registry->get<Position>(m_player->getEntity()).rotation.y * 360000.0);
 
-	phx::Serializer ser(Serializer::mode::write);
+	phx::Serializer ser(Serializer::Mode::WRITE);
 	auto state = ser & inputState & Serializer::endp;
 
 	ENetPacket* packet;

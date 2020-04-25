@@ -11,7 +11,7 @@ phx::Serializer& phx::Serializer::operator&(phx::ISerializable& value_)
 }
 phx::Serializer& phx::Serializer::operator&(bool& value_)
 {
-	if (mode::read == m_mode)
+	if (Mode::READ == m_mode)
 	{
 		read(value_);
 	}
@@ -23,7 +23,7 @@ phx::Serializer& phx::Serializer::operator&(bool& value_)
 }
 phx::Serializer& phx::Serializer::operator&(char& value_)
 {
-	if (mode::read == m_mode)
+	if (Mode::READ == m_mode)
 	{
 		read(value_);
 	}
@@ -36,7 +36,7 @@ phx::Serializer& phx::Serializer::operator&(char& value_)
 #if __INT32_EQUAL_LONG__
 phx::Serializer& phx::Serializer::operator&(long& value_)
 {
-	if (mode::read == m_mode)
+	if (Mode::READ == m_mode)
 	{
 		read(value_);
 	}
@@ -48,7 +48,7 @@ phx::Serializer& phx::Serializer::operator&(long& value_)
 }
 phx::Serializer& phx::Serializer::operator&(unsigned long& value_)
 {
-	if (mode::read == m_mode)
+	if (Mode::READ == m_mode)
 	{
 		read(value_);
 	}
@@ -61,7 +61,7 @@ phx::Serializer& phx::Serializer::operator&(unsigned long& value_)
 #endif
 phx::Serializer& phx::Serializer::operator&(std::uint8_t& value_)
 {
-	if (mode::read == m_mode)
+	if (Mode::READ == m_mode)
 	{
 		read(value_);
 	}
@@ -73,7 +73,7 @@ phx::Serializer& phx::Serializer::operator&(std::uint8_t& value_)
 }
 phx::Serializer& phx::Serializer::operator&(std::uint16_t& value_)
 {
-	if (mode::read == m_mode)
+	if (Mode::READ == m_mode)
 	{
 		read(value_);
 	}
@@ -85,7 +85,7 @@ phx::Serializer& phx::Serializer::operator&(std::uint16_t& value_)
 }
 phx::Serializer& phx::Serializer::operator&(std::int16_t& value_)
 {
-	if (mode::read == m_mode)
+	if (Mode::READ == m_mode)
 	{
 		read(value_);
 	}
@@ -97,7 +97,7 @@ phx::Serializer& phx::Serializer::operator&(std::int16_t& value_)
 }
 phx::Serializer& phx::Serializer::operator&(std::uint32_t& value_)
 {
-	if (mode::read == m_mode)
+	if (Mode::READ == m_mode)
 	{
 		read(value_);
 	}
@@ -109,7 +109,7 @@ phx::Serializer& phx::Serializer::operator&(std::uint32_t& value_)
 }
 phx::Serializer& phx::Serializer::operator&(std::int32_t& value_)
 {
-	if (mode::read == m_mode)
+	if (Mode::READ == m_mode)
 	{
 		read(value_);
 	}
@@ -121,7 +121,7 @@ phx::Serializer& phx::Serializer::operator&(std::int32_t& value_)
 }
 phx::Serializer& phx::Serializer::operator&(std::uint64_t& value_)
 {
-	if (mode::read == m_mode)
+	if (Mode::READ == m_mode)
 	{
 		read(value_);
 	}
@@ -133,7 +133,7 @@ phx::Serializer& phx::Serializer::operator&(std::uint64_t& value_)
 }
 phx::Serializer& phx::Serializer::operator&(std::int64_t& value_)
 {
-	if (mode::read == m_mode)
+	if (Mode::READ == m_mode)
 	{
 		read(value_);
 	}
@@ -145,7 +145,7 @@ phx::Serializer& phx::Serializer::operator&(std::int64_t& value_)
 }
 phx::Serializer& phx::Serializer::operator&(std::string& value_)
 {
-	if (mode::read == m_mode)
+	if (Mode::READ == m_mode)
 	{
 		read(value_);
 	}
@@ -157,7 +157,7 @@ phx::Serializer& phx::Serializer::operator&(std::string& value_)
 }
 phx::Serializer& phx::Serializer::operator&(std::wstring& value_)
 {
-	if (mode::read == m_mode)
+	if (Mode::READ == m_mode)
 	{
 		read(value_);
 	}
@@ -179,7 +179,7 @@ std::vector<std::byte> phx::Serializer::operator&(
 }
 phx::Serializer& phx::Serializer::operator&(int8_t& value_)
 {
-	if (mode::read == m_mode)
+	if (Mode::READ == m_mode)
 	{
 		read(value_);
 	}
@@ -189,4 +189,4 @@ phx::Serializer& phx::Serializer::operator&(int8_t& value_)
 	}
 	return *this;
 }
-phx::Serializer::Serializer(phx::Serializer::mode mode_) : m_mode(mode_) {}
+phx::Serializer::Serializer(phx::Serializer::Mode mode_) : m_mode(mode_) {}
