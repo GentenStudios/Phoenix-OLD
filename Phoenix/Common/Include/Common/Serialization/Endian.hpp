@@ -15,7 +15,6 @@
 
 #ifndef __clang__
 #	ifdef _MSC_VER
-#		include <Windows.h>
 #		define __LITTLE_ENDIAN__ 1
 #		define __BIG_ENDIAN__ 2
 #		define __PDP_ENDIAN__ 3
