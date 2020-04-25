@@ -9,7 +9,9 @@
 #include <functional>
 #include <vector>
 
-#if defined(_WIN32) or defined(__OSX__)
+#if defined(__OSX__)
+#	define __INT32_EQUAL_LONG__ 1
+#elif defined(_WIN32)
 #	define __INT32_EQUAL_LONG__ 1
 #else
 #	define __INT32_EQUAL_LONG__ 0

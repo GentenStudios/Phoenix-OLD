@@ -20,9 +20,9 @@
 #		define __BIG_ENDIAN__ 2
 #		define __PDP_ENDIAN__ 3
 #		if REG_DWORD == REG_DWORD_LITTLE_ENDIAN
-#			define __BYTE_ORDER__ _LITTLE_ENDIAN_
+#			define __BYTE_ORDER__ __LITTLE_ENDIAN__
 #		else
-#			define __BYTE_ORDER__ _BIG_ENDIAN_
+#			define __BYTE_ORDER__ __BIG_ENDIAN__
 #		endif
 #	endif
 #endif
