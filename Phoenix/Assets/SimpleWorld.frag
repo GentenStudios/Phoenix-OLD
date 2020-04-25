@@ -8,6 +8,7 @@ flat in uint pass_color;
 uniform sampler2DArray u_TexArray;
 uniform float u_AmbientStrength;
 uniform vec3 u_LightDir;
+uniform float u_Brightness;
 
 out vec4 out_FragColor;
 
@@ -39,5 +40,5 @@ void main()
 	// -- output color --
 
 	vec4 result = vec4(ambient, 1.0) + vec4(diffuse, 1.0) * objectColor;
-	out_FragColor = result * texture(u_TexArray, pass_UV);
+	out_FragColor = result * texture(u_TexArray, pass_UV) * u_Brightness;
 }

@@ -240,6 +240,7 @@ void Game::tick(float dt)
 	m_renderPipeline.setMatrix("u_projection", m_camera->getProjection());
 	m_renderPipeline.setFloat("u_AmbientStrength", 0.7f);
 	m_renderPipeline.setVector3("u_LightDir", lightdir);
+	m_renderPipeline.setFloat("u_Brightness", 0.6f);
 
 	m_world->render();
 	m_player->renderSelectionBox(m_camera->calculateViewMatrix(), m_camera->getProjection());
