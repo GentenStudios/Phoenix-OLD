@@ -210,7 +210,7 @@ namespace phx
 
 		inline T toBig()
 		{
-			if constexpr (from != phx::Endian::big)
+			if constexpr (from != phx::Endian::BIG)
 			{
 				swapEndian();
 			}
@@ -218,7 +218,7 @@ namespace phx
 		}
 		inline T toLittle()
 		{
-			if constexpr (from != phx::Endian::little)
+			if constexpr (from != phx::Endian::LITTLE)
 			{
 				swapEndian();
 			}
@@ -284,7 +284,7 @@ T littleEndian(T value_)
 template <typename T>
 T fromNetwork(T value_)
 {
-	phx::word<T, phx::Endian::big> value(value_);
+	phx::word<T, phx::Endian::BIG> value(value_);
 	return value.from_network();
 }
 
