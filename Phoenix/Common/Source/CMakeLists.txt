@@ -12,6 +12,8 @@ set(Sources
 		${currentDir}/Settings.cpp
 		${currentDir}/Logger.cpp
 		${currentDir}/Commander.cpp
+		${currentDir}/Input.cpp
+		${currentDir}/Serialization/Serializer.cpp
 
 		PARENT_SCOPE
 		)

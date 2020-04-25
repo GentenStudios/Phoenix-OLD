@@ -33,6 +33,7 @@
 #include <Common/Input.hpp>
 #include <Common/Movement.hpp>
 #include <Common/Position.hpp>
+#include <Common/Serialization/Serializer.hpp>
 
 #include <cstring> //For std::memcpy on non-mac machines
 
@@ -100,15 +101,15 @@ void Iris::run()
 				{
 				case 0:
 					parseEvent(static_cast<entt::entity*>(m_event.peer->data),
-					           m_event.packet->data);
+                               m_event.packet->data, m_event.packet->dataLength);
 					break;
 				case 1:
 					parseState(static_cast<entt::entity*>(m_event.peer->data),
-					           m_event.packet->data);
+					           m_event.packet->data, m_event.packet->dataLength);
 					break;
 				case 2:
 					parseMessage(static_cast<entt::entity*>(m_event.peer->data),
-					             m_event.packet->data);
+					             m_event.packet->data, m_event.packet->dataLength);
 					break;
 				}
 
@@ -130,14 +131,14 @@ void Iris::run()
 void Iris::auth() {}
 
 void Iris::disconnect() {}
-void Iris::parseEvent(entt::entity* userRef, enet_uint8* data)
+void Iris::parseEvent(entt::entity* userRef, enet_uint8* data, std::size_t dataLenght)
 {
 	User user = m_registry->get<User>(*userRef);
 	printf("Event received");
 	printf("An Event packet containing %s was received from %s\n", data,
 	       user.userName.c_str());
 }
-void Iris::parseState(entt::entity* userRef, enet_uint8* data)
+void Iris::parseState(entt::entity* userRef, enet_uint8* data, std::size_t dataLenght)
 {
 	User user = m_registry->get<User>(*userRef);
 	printf("A State packet containing %s was received from %s\n", data,
@@ -147,16 +148,9 @@ void Iris::parseState(entt::entity* userRef, enet_uint8* data)
 
 	InputState input;
 
-	std::memcpy(&input.sequence, &data[0], 1);
-	std::memcpy(&input.rotation.x, &data[2], 4);
-	std::memcpy(&input.rotation.y, &data[6], 4);
-
-	input.forward  = data[1] & static_cast<char>(1 << 7);
-	input.backward = data[1] & static_cast<char>(1 << 6);
-	input.left     = data[1] & static_cast<char>(1 << 5);
-	input.right    = data[1] & static_cast<char>(1 << 4);
-	input.up       = data[1] & static_cast<char>(1 << 3);
-	input.down     = data[1] & static_cast<char>(1 << 2);
+    phx::Serializer ser(Serializer::mode::read);
+	ser.setBuffer((std::byte*)data, dataLenght);
+    ser & input;
 
 	ActorSystem::tick(m_registry, m_registry->get<Player>(*userRef).actor, dt,
 	                  input);
@@ -167,7 +161,7 @@ void Iris::parseState(entt::entity* userRef, enet_uint8* data)
 
 	sendState(input.sequence);
 }
-void Iris::parseMessage(entt::entity* userRef, enet_uint8* data)
+void Iris::parseMessage(entt::entity* userRef, enet_uint8* data, std::size_t dataLenght)
 {
 	User user = m_registry->get<User>(*userRef);
 	if (data[0] == '/')

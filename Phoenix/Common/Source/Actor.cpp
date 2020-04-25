@@ -46,8 +46,8 @@ void ActorSystem::tick(entt::registry* registry, entt::entity entity,
 {
 	auto& pos = registry->get<Position>(entity);
 
-	pos.rotation.x = input.rotation.x;
-	pos.rotation.y = input.rotation.y;
+	pos.rotation.x = static_cast<float>(input.rotation.x) / 360000.0;
+	pos.rotation.y = static_cast<float>(input.rotation.y) / 360000.0;
 	const auto moveSpeed =
 	    static_cast<float>(registry->get<Movement>(entity).moveSpeed);
 
