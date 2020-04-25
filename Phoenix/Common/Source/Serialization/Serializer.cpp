@@ -2,8 +2,8 @@
 // Created by Nicolas Ricard on 19/04/2020.
 //
 
-#include "Common/Serialization/Serializer.hpp"
-#include "Common/Serialization/Endian.hpp"
+#include <Common/Serialization/Serializer.hpp>
+#include <Common/Serialization/Endian.hpp>
 
 phx::Serializer& phx::Serializer::operator&(phx::ISerializable& value_)
 {
@@ -33,6 +33,7 @@ phx::Serializer& phx::Serializer::operator&(char& value_)
 	}
 	return *this;
 }
+#if __INT32_EQUAL_LONG__
 phx::Serializer& phx::Serializer::operator&(long& value_)
 {
 	if (mode::read == m_mode)
@@ -57,6 +58,7 @@ phx::Serializer& phx::Serializer::operator&(unsigned long& value_)
 	}
 	return *this;
 }
+#endif
 phx::Serializer& phx::Serializer::operator&(std::uint8_t& value_)
 {
 	if (mode::read == m_mode)
