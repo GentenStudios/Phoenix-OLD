@@ -58,11 +58,7 @@ namespace phx
 			READ,
 			WRITE
 		};
-		void setBuffer(std::byte* data_, size_t dataLenght_)
-		{
-			buffer.clear();
-			buffer.insert(buffer.begin(), data_, data_ + dataLenght_);
-		}
+		void setBuffer(std::byte* data_, size_t dataLength_);
 		explicit Serializer(Mode mode_);
 		phx::Serializer& operator&(ISerializable& value_);
 		phx::Serializer& operator&(bool& value_);

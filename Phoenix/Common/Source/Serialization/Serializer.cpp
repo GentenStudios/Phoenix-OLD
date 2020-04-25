@@ -214,3 +214,8 @@ phx::Serializer& phx::Serializer::operator&(int8_t& value_)
 	return *this;
 }
 phx::Serializer::Serializer(phx::Serializer::Mode mode_) : m_mode(mode_) {}
+void phx::Serializer::setBuffer(std::byte* data_, size_t dataLength_)
+{
+	buffer.clear();
+	buffer.insert(buffer.begin(), data_, data_ + dataLength_);
+}
