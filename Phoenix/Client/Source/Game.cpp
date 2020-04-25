@@ -313,6 +313,8 @@ void Game::tick(float dt)
 	inputState.right    = m_window->isKeyDown(events::Keys::KEY_D);
 	inputState.up       = m_window->isKeyDown(events::Keys::KEY_SPACE);
 	inputState.down     = m_window->isKeyDown(events::Keys::KEY_LEFT_SHIFT);
+
+	/// conversion from rad to 1/1000 of degres
 	inputState.rotation.x =
 	    static_cast<unsigned>(m_registry->get<Position>(m_player->getEntity()).rotation.x * 360000.0);
 	inputState.rotation.y =
