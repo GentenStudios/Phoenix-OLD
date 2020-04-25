@@ -30,7 +30,6 @@
 #include <Server/User.hpp>
 
 #include <Common/Actor.hpp>
-#include <Common/Input.hpp>
 #include <Common/Movement.hpp>
 #include <Common/Position.hpp>
 #include <Common/Serialization/Serializer.hpp>
@@ -71,31 +70,29 @@ Iris::~Iris() { enet_host_destroy(m_server); }
 
 void Iris::run()
 {
-	while (m_running)
+	while (enet_host_service(m_server, &m_event, 50) > 0 && m_running)
 	{
-		while (enet_host_service(m_server, &m_event, 1000) > 0)
+		switch (m_event.type)
 		{
-			switch (m_event.type)
+		case ENET_EVENT_TYPE_CONNECT:
+			printf("A new client connected from %x:%u.\n",
+			       m_event.peer->address.host, m_event.peer->address.port);
 			{
-			case ENET_EVENT_TYPE_CONNECT:
-				printf("A new client connected from %x:%u.\n",
-				       m_event.peer->address.host, m_event.peer->address.port);
-				{
-					auto entity = m_registry->create();
-					m_registry->emplace<User>(entity, "toby", m_event.peer);
-					m_event.peer->data = static_cast<void*>(&entity);
-					m_registry->emplace<Player>(
-					    entity, ActorSystem::registerActor(m_registry));
-				}
-				break;
+				auto entity = m_registry->create();
+				m_registry->emplace<User>(entity, "toby", m_event.peer);
+				m_event.peer->data = static_cast<void*>(&entity);
+				m_registry->emplace<Player>(
+				    entity, ActorSystem::registerActor(m_registry));
+			}
+			break;
 
-			case ENET_EVENT_TYPE_RECEIVE:
-				//                printf ("A packet of length %u containing %s
-				//                was received from %s on channel %u.\n",
-				//                        m_event.packet -> dataLength,
-				//                        m_event.packet -> data,
-				//                        m_event.peer -> data -> userName,
-				//                        m_event.channelID);
+		case ENET_EVENT_TYPE_RECEIVE:
+			//                printf ("A packet of length %u containing %s
+			//                was received from %s on channel %u.\n",
+			//                        m_event.packet -> dataLength,
+			//                        m_event.packet -> data,
+			//                        m_event.peer -> data -> userName,
+			//                        m_event.channelID);
 
 				switch (m_event.channelID)
 				{
@@ -113,17 +110,17 @@ void Iris::run()
 					break;
 				}
 
-				/* Clean up the packet now that we're done using it. */
-				enet_packet_destroy(m_event.packet);
-				break;
+			/* Clean up the packet now that we're done using it. */
+			enet_packet_destroy(m_event.packet);
+			break;
 
-			case ENET_EVENT_TYPE_DISCONNECT:
-				printf("%s disconnected.\n", m_event.peer->data);
-				break;
+		case ENET_EVENT_TYPE_DISCONNECT:
+			printf("%s disconnected.\n",
+			       static_cast<const char*>(m_event.peer->data));
+			break;
 
-			case ENET_EVENT_TYPE_NONE:
-				break;
-			}
+		case ENET_EVENT_TYPE_NONE:
+			break;
 		}
 	}
 }
@@ -152,14 +149,66 @@ void Iris::parseState(entt::entity* userRef, enet_uint8* data, std::size_t dataL
 	ser.setBuffer((std::byte*)data, dataLenght);
     ser & input;
 
-	ActorSystem::tick(m_registry, m_registry->get<Player>(*userRef).actor, dt,
-	                  input);
-	std::cout << m_registry
-	                 ->get<Position>(m_registry->get<Player>(*userRef).actor)
-	                 .position
-	          << "\n";
+	// If the queue is empty we need to add a new bundle
+	if (stateQueue.empty())
+	{
+		StateBundle bundle;
+		bundle.sequence = input.sequence;
+		bundle.ready    = false;
+		bundle.users    = 1; ///@todo We need to capture how many users we are
+		/// expecting packets from
+		stateQueue.push_back(bundle);
+	}
 
-	sendState(input.sequence);
+	// Discard state if its older that the oldest stateBundle
+	if (input.sequence < stateQueue.front().sequence &&
+	    stateQueue.end()->sequence - input.sequence < 10)
+	{
+		printf("discard %lu \n", input.sequence);
+		return;
+	}
+
+	// Fill the stateBundles up to the current input sequence
+	while ((input.sequence > stateQueue.end()->sequence &&
+	        input.sequence - stateQueue.end()->sequence > 10) ||
+	       stateQueue.end()->sequence == 255)
+	{
+		// Insert a new bundle if this is the first packet in this sequence
+		StateBundle bundle;
+		bundle.sequence = stateQueue.end()->sequence + 1;
+		bundle.ready    = false;
+		bundle.users    = 1; ///@todo We need to capture how many users we are
+		/// expecting packets from
+		stateQueue.push_back(bundle);
+	}
+
+	{
+		printf("insert existing %lu \n", input.sequence);
+		for (auto bundle : stateQueue)
+		{
+			if (bundle.sequence == input.sequence)
+			{
+				// Thread safety! If we said a bundle is ready, were too late
+				if (!bundle.ready)
+				{
+					bundle.states[userRef] = input;
+					// If we have all the states we need, then the bundle is
+					// ready
+					if (bundle.states.size() >= bundle.users)
+					{
+						bundle.ready = true;
+					}
+				}
+				break;
+			}
+		}
+	}
+
+	// If we have more than 10 states enqueued, assume we lost a packet
+	if (stateQueue.size() > 10)
+	{
+		stateQueue.front().ready = true;
+	}
 }
 void Iris::parseMessage(entt::entity* userRef, enet_uint8* data, std::size_t dataLenght)
 {

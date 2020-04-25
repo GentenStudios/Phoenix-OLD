@@ -26,8 +26,9 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Common/Settings.hpp>
 #include <Server/Server.hpp>
+
+#include <Common/Settings.hpp>
 
 #include <iostream>
 #include <thread>
@@ -39,6 +40,7 @@ using namespace phx;
 Server::Server(std::string save) : m_save(std::move(save))
 {
 	m_iris = new networking::Iris(&m_registry, &m_running);
+	m_game = new Game(&m_registry, &m_running, m_iris);
 }
 
 void Server::run()
@@ -48,6 +50,7 @@ void Server::run()
 	m_running = true;
 
 	std::thread t_iris(&networking::Iris::run, m_iris);
+	std::thread t_game(&Game::run, m_game);
 
 	std::string input;
 	while (m_running)
@@ -59,7 +62,8 @@ void Server::run()
 			m_running = false;
 		}
 	}
-
+	t_iris.join();
+	t_game.join();
 	Settings::get()->save("config.txt");
 }
 
