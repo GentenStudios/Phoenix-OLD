@@ -26,8 +26,7 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef TEMPLATE_PROJECT_NAME_ENDIAN_HPP
-#define TEMPLATE_PROJECT_NAME_ENDIAN_HPP
+#pragma once
 
 #include <climits>
 #include <cstddef>
@@ -294,5 +293,3 @@ T toNetwork(T value_)
 	phx::word<T, phx::Endian::NATIVE> value(value_);
 	return value.to_network();
 }
-
-#endif // TEMPLATE_PROJECT_NAME_ENDIAN_HPP

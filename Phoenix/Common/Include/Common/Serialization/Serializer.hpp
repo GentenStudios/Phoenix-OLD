@@ -26,8 +26,7 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef PHOENIX_SERIALIZER_HPP
-#define PHOENIX_SERIALIZER_HPP
+#pragma once
 #include <Common/Serialization/Endian.hpp>
 #include <cstddef>
 #include <functional>
@@ -131,5 +130,3 @@ namespace phx
 		std::vector<std::byte> buffer;
 	};
 } // namespace phx
-
-#endif // PHOENIX_SERIALIZER_HPP
