@@ -135,7 +135,7 @@ namespace phx
 
 		inline T to_big()
 		{
-			if constexpr (from != phx::Endian::big)
+			if constexpr (from != phx::Endian::BIG)
 			{
 				swapEndian();
 			}
@@ -143,7 +143,7 @@ namespace phx
 		}
 		inline T toLittle()
 		{
-			if constexpr (from != phx::Endian::little)
+			if constexpr (from != phx::Endian::LITTLE)
 			{
 				swapEndian();
 			}
