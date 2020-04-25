@@ -21,7 +21,7 @@ Familiarity with Git, specifically with using branches, is a must for interactin
 
 **Hot Fix Branches** are a method for pushing code to the master branch after a release. These should be minor fixes that add no functionality (unless the bug restricts a certain functionality) to the project.
 
-**Release Branches** are the staging area for a release. Similar to a hotfix branch only bug testing is to be done here and no new features should be added. 
+**Release Branches** are the staging area for a release. Similar to a hotfix branch only bug testing is to be done here and no new features should be added.
 - A 3/4 developer approval to push to the release branch.
 - The code must be tested on all supported systems before being pushed here.
 
@@ -89,7 +89,7 @@ Functions should follow the `camelCase` convention, where the first word has a l
 ```cpp
 int doSomething();
 int goddIsTodd();
-int wowThisIsACoolFunction(); 
+int wowThisIsACoolFunction();
 ```
 #### VARIABLES
 There are a few things to know about naming variables. Most all variables must follow the camelCase convention, however, private member variables of a class must use an `m_` prefix before them. However, constants and macros should be ALL_CAPITALS_USING_UNDERSCORES_INSTEAD_OF_SPACES. Hopefully that makes sense, if not, here’s an example to make things make sense:
@@ -129,7 +129,7 @@ Multiline comments should use the /* */ method of commenting, where the /* and *
 When documenting classes, methods and similar we follow the Doxygen Javadoc syntax. For example, this convention should be followed:
 ```cpp
 /**
- * @brief This class is for documentation reasons. 
+ * @brief This class is for documentation reasons.
  */
 class FooBar {
 public:
@@ -139,7 +139,7 @@ public:
 	 * @return A very important integer. (probably an error code or something)
 	 */
   	int doThing(std::string desc);
-  	
+
   	float randomNumber; //< This is a single line description for a member
 
       /// @brief This member variable requires a longer single line comment. (filling space)
@@ -159,3 +159,5 @@ When choosing a third party, we need to make sure the third party is right for o
 When working with C++ code, we should use a submodule for third parties if possible. We also want to keep the third party code seperate from our own source code so it should be placed in the ThirdParties folder of the project.
 ### 3. Never modify the third party
 To help with maintainability, third parties should have no modified code in them. When it comes to updating the third party it should be as easy as replacing the current version with the new version.
+
+#### </b> {#contributing}
