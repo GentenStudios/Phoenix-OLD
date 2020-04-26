@@ -28,7 +28,6 @@
 
 #pragma once
 
-#define SOL_ALL_SAFETIES_ON 1
 #include <sol/sol.hpp>
 
 #include <string>
@@ -43,15 +42,20 @@ namespace phx::mods
 
 	public:
 		Mod() = delete;
-		Mod(const std::string& modName, const std::string& modFolder);
 
-		void                load(sol::state_view lua);
+		// mod path is where all mods are stored. not Phoenix/Mods/Mod1 but Phoenix/Mods... this will also allow for mods to be loaded from
+		// different paths, like client mods and general mods if we every
+		// implement that in the future. Also makes it easier for developers if
+		// they wanna put their mod in a completely different folder.
+		Mod(const std::string& modName, const std::string& modPath);
+
 		const std::string&  getName() const;
+		const std::string&  getPath() const;
 		const Dependencies& getDependencies() const;
 
 	private:
 		std::string m_name;
-		std::string m_modFolder;
+		std::string m_path;
 
 		Dependencies m_dependencies;
 	};

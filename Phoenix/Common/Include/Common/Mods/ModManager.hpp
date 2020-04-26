@@ -30,10 +30,10 @@
 
 #include <Common/Logger.hpp>
 #include <Common/Mods/Mod.hpp>
-#include <Common/Mods/ModAPI.hpp>
 
 #include <functional>
 #include <vector>
+#include <queue>
 
 namespace phx::mods
 {
@@ -50,25 +50,26 @@ namespace phx::mods
 
 	public:
 		ModManager() = delete;
-		explicit ModManager(const ModList& modList);
+
+		// mod paths is a list of paths where mods could be stored.
+		// mod list is literally just the list of mods to load.
+		explicit ModManager(const ModList& toLoad, const ModList& paths);
 
 		template <typename F>
 		void registerFunction(const std::string& funcName, F func);
+
+		template <typename T>
+		void exposeVariable(const std::string& name, T var);
 
 		// you can make status return a percentage for a progress bar.
 		Status load(float* progress);
 		void   cleanup();
 
 		const ModList&     getModList() const;
-		const Privileges*  getPrivileges() const;
-		const CommandBook* getCommandBook() const;
 
 	private:
 		std::vector<std::string> m_modsRequired;
-		std::vector<Mod>         m_mods;
-
-		Privileges  m_privileges;
-		CommandBook m_commandBook;
+		std::vector<std::string> m_modPaths;
 
 		sol::state m_luaState;
 	};

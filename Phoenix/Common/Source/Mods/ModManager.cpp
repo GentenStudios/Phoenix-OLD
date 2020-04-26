@@ -26,35 +26,10 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+#include <Common/Logger.hpp>
 #include <Common/Mods/ModManager.hpp>
 
 using namespace phx::mods;
-
-static int CustomExceptionHandler(
-    lua_State* l, sol::optional<const std::exception&> maybe_exception,
-    sol::string_view description)
-{
-	std::string error;
-	if (maybe_exception)
-	{
-		const std::exception& ex = *maybe_exception;
-		error                    = ex.what();
-	}
-	else
-	{
-		error = description;
-	}
-
-	LOG_FATAL("MODDING") << "An unexpected error has occured. \n"
-	                     << "\t>> " << error;
-
-	// you must push 1 element onto the stack to be
-	// transported through as the error object in Lua
-	// note that Lua -- and 99.5% of all Lua users and libraries -- expects a
-	// string so we push a single string (in our case, the description of the
-	// error)
-	return sol::stack::push(l, description);
-}
 
 static void CustomPanicHandler(sol::optional<std::string> maybe_msg)
 {
@@ -67,22 +42,120 @@ static void CustomPanicHandler(sol::optional<std::string> maybe_msg)
 		error += "\n";
 	}
 
-	LOG_FATAL("MODDING") << "An unexpected Lua error has occured. " << error << "The application will now be aborted.";
+	LOG_FATAL("MODDING") << "An unexpected Lua error has occured. " << error
+	                     << "The application will now be aborted.";
 }
 
-ModManager::ModManager(const ModList& modList) : m_modsRequired(modList)
+ModManager::ModManager(const ModList& toLoad, const ModList& paths)
+    : m_modsRequired(toLoad), m_modPaths(paths)
 {
 	m_luaState.open_libraries(sol::lib::base);
-	m_luaState.set_exception_handler(&CustomExceptionHandler);
-	m_luaState.set_panic(sol::c_call<decltype(&CustomPanicHandler), &CustomPanicHandler>);
-
-	sol::protected_function_result pfr =
-	    m_luaState.safe_script("wassup fam", &sol::script_pass_on_error);
-	sol::error err = pfr;
-	LOG_FATAL("MODDING") << err.what();
+	m_luaState.set_panic(
+	    sol::c_call<decltype(&CustomPanicHandler), &CustomPanicHandler>);
 }
 
-ModManager::Status ModManager::load(float* progress) { return {true}; }
+ModManager::Status ModManager::load(float* progress)
+{
+	std::queue<Mod> toLoad;
+	
+	for (auto& require : m_modsRequired)
+	{
+		bool found = false;
+		for (auto& path : m_modPaths)
+		{
+			std::fstream file;
+			file.open(path + "/" + require + "/Init.lua");
+			if (file.is_open())
+			{
+				found = true;
+				toLoad.emplace(require, path);
+				break;
+			}
+		}
+
+		if (!found)
+		{
+			std::string pathList = "\n\t";
+			for (auto& path : m_modPaths)
+			{
+				pathList += path;
+				pathList += "\n\t";
+			}
+
+			LOG_FATAL("MODDING")
+			    << "The mod: " << require
+			    << " was not found in any of the provided mod directories: "
+			    << pathList;
+
+			return {false, "The mod: " + require + " was not found."};
+		}
+	}
+
+	std::vector<std::string> loadedMods;
+	while (!toLoad.empty())
+	{
+		std::size_t lastPass = toLoad.size();
+
+		for (std::size_t i = 0; i < toLoad.size(); ++i)
+		{
+			Mod& mod       = toLoad.front();
+			bool satisfied = true;
+
+			for (auto& dependency : mod.getDependencies())
+			{
+				if (std::find(loadedMods.begin(), loadedMods.end(),
+				              dependency) == loadedMods.end())
+				{
+					satisfied = false;
+				}
+			}
+
+			if (satisfied)
+			{
+				sol::protected_function_result pfr =
+				    m_luaState.safe_script_file(mod.getPath() + "/" +
+				                                    mod.getName() + "/Init.lua",
+				                                &sol::script_pass_on_error);
+
+				// error occured if return is not valid.
+				if (!pfr.valid())
+				{
+					sol::error err = pfr;
+
+					std::string errString = "An error occured loading ";
+					errString += mod.getName();
+					errString += ": ";
+					errString += err.what();
+
+					LOG_FATAL("MODDING") << errString;
+					
+					return {false, errString};
+				}
+			}
+			else
+			{
+				toLoad.push(toLoad.front());
+			}
+
+			toLoad.pop();
+		}
+
+		if (lastPass == toLoad.size())
+		{
+			std::string err = "The mod: ";
+			err += toLoad.front().getName();
+			err += " is missing one or more dependencies, please resolve this "
+			       "issue before continuing.";
+
+			LOG_FATAL("MODDING") << err;
+
+			return {false, err };
+		}
+	}
+
+	// no need to put in something for "what", since nothing went wrong.
+	return {true};
+}
 
 void ModManager::cleanup() {}
 
@@ -90,7 +163,3 @@ const ModManager::ModList& ModManager::getModList() const
 {
 	return m_modsRequired;
 }
-
-const Privileges* ModManager::getPrivileges() const { return &m_privileges; }
-
-const CommandBook* ModManager::getCommandBook() const { return &m_commandBook; }

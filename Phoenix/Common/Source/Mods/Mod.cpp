@@ -33,15 +33,15 @@
 
 using namespace phx::mods;
 
-Mod::Mod(const std::string& modName, const std::string& modFolder)
+Mod::Mod(const std::string& modName, const std::string& modPath)
 {
-	m_name      = modName;
-	m_modFolder = modFolder;
+	m_name    = modName;
+	m_path = modPath;
 
 	{
 		std::fstream deps;
 
-		deps.open(modFolder + "/" + modName + "/Dependencies.txt");
+		deps.open(m_path + "/" + modName + "/Dependencies.txt");
 		if (!deps.is_open())
 		{
 			LOG_WARNING("[MOD]")
@@ -62,11 +62,5 @@ Mod::Mod(const std::string& modName, const std::string& modFolder)
 }
 
 const Mod::Dependencies& Mod::getDependencies() const { return m_dependencies; }
-
-void Mod::load(sol::state_view lua)
-{
-	const std::string filename = m_modFolder + "/" + m_name + "/Init.lua";
-	auto              result = lua.safe_script_file(filename);
-}
-
-const std::string& Mod::getName() const { return m_name; }
+const std::string&       Mod::getPath() const { return m_path; }
+const std::string&       Mod::getName() const { return m_name; }

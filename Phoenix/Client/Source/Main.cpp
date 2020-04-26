@@ -28,8 +28,8 @@
 
 #include <Client/Client.hpp>
 
-#include <Common/Mods/ModManager.hpp>
 #include <Common/Logger.hpp>
+#include <Common/Mods/ModManager.hpp>
 
 using namespace phx::mods;
 using namespace phx;
@@ -37,22 +37,7 @@ using namespace phx;
 #undef main
 int main(int argc, char** argv)
 {
-	//client::Client::get()->run();
-
-	ModManager manager = ModManager({"oopsie"});
-
-	std::function<int()> func = []() { return -1; };
-	
-	Logger::initialize({});
-	manager.registerFunction("core.block.register", []() { return -1; });
-	manager.registerFunction("core.block.get", func);
-
-	//int a = manager.m_luaState["core"]["block"]["register"]();
-	//int b = manager.m_luaState["core"]["block"]["get"]();
-
-	//LOG_INFO("WARNING") << a;
-	//LOG_INFO("WARNING") << b;
+	client::Client::get()->run();
 
 	return 0;
 }
-

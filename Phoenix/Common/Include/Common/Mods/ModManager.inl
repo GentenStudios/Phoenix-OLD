@@ -62,7 +62,7 @@ namespace phx::mods
 			return;
 		}
 
-		if (branches.size())
+		if (branches.size() == 2)
 		{
 			if (!m_luaState[branches[0]].valid())
 			{
