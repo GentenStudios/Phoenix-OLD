@@ -26,24 +26,9 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#pragma once
+#include <Common/Input.hpp>
 
-#include <Common/Math/Math.hpp>
-#include <Common/Serialization/Serializer.hpp>
-#include <cstddef>
-
-namespace phx
+phx::Serializer& phx::InputState::operator&(phx::Serializer& this_)
 {
-	struct InputState : public phx::ISerializable
-	{
-		bool        forward{};
-		bool        backward{};
-		bool        left{};
-		bool        right{};
-		bool        up{};
-		bool        down{};
-		math::vec2u rotation{}; // in 1/1000 degres
-		std::size_t sequence{};
-		Serializer& operator&(Serializer& this_) override;
-	};
-} // namespace phx
+    return this_ & forward & backward & left & right & up & down & rotation.x & rotation.y & sequence;
+}

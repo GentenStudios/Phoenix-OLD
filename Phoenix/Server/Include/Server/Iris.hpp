@@ -70,9 +70,9 @@ namespace phx::server::networking
 		void auth();
 		void disconnect();
 
-		void parseEvent(entt::entity* userRef, enet_uint8* data);
-		void parseState(entt::entity* userRef, enet_uint8* data);
-		void parseMessage(entt::entity* userRef, enet_uint8* data);
+		void parseEvent(entt::entity* userRef, enet_uint8* data, std::size_t dataLength);
+		void parseState(entt::entity* userRef, enet_uint8* data, std::size_t dataLength);
+		void parseMessage(entt::entity* userRef, enet_uint8* data, std::size_t dataLength);
 
 		void sendEvent(entt::entity* userRef, enet_uint8* data);
 		void sendState(std::size_t sequence);

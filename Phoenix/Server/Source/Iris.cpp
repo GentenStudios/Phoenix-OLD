@@ -32,6 +32,7 @@
 #include <Common/Actor.hpp>
 #include <Common/Movement.hpp>
 #include <Common/Position.hpp>
+#include <Common/Serialization/Serializer.hpp>
 
 #include <cstring> //For std::memcpy on non-mac machines
 
@@ -93,21 +94,21 @@ void Iris::run()
 			//                        m_event.peer -> data -> userName,
 			//                        m_event.channelID);
 
-			switch (m_event.channelID)
-			{
-			case 0:
-				parseEvent(static_cast<entt::entity*>(m_event.peer->data),
-				           m_event.packet->data);
-				break;
-			case 1:
-				parseState(static_cast<entt::entity*>(m_event.peer->data),
-				           m_event.packet->data);
-				break;
-			case 2:
-				parseMessage(static_cast<entt::entity*>(m_event.peer->data),
-				             m_event.packet->data);
-				break;
-			}
+				switch (m_event.channelID)
+				{
+				case 0:
+					parseEvent(static_cast<entt::entity*>(m_event.peer->data),
+                               m_event.packet->data, m_event.packet->dataLength);
+					break;
+				case 1:
+					parseState(static_cast<entt::entity*>(m_event.peer->data),
+					           m_event.packet->data, m_event.packet->dataLength);
+					break;
+				case 2:
+					parseMessage(static_cast<entt::entity*>(m_event.peer->data),
+					             m_event.packet->data, m_event.packet->dataLength);
+					break;
+				}
 
 			/* Clean up the packet now that we're done using it. */
 			enet_packet_destroy(m_event.packet);
@@ -127,14 +128,14 @@ void Iris::run()
 void Iris::auth() {}
 
 void Iris::disconnect() {}
-void Iris::parseEvent(entt::entity* userRef, enet_uint8* data)
+void Iris::parseEvent(entt::entity* userRef, enet_uint8* data, std::size_t dataLength)
 {
 	User user = m_registry->get<User>(*userRef);
 	printf("Event received");
 	printf("An Event packet containing %s was received from %s\n", data,
 	       user.userName.c_str());
 }
-void Iris::parseState(entt::entity* userRef, enet_uint8* data)
+void Iris::parseState(entt::entity* userRef, enet_uint8* data, std::size_t dataLength)
 {
 	User user = m_registry->get<User>(*userRef);
 	printf("A State packet containing %s was received from %s\n", data,
@@ -144,16 +145,9 @@ void Iris::parseState(entt::entity* userRef, enet_uint8* data)
 
 	InputState input;
 
-	std::memcpy(&input.sequence, &data[0], 1);
-	std::memcpy(&input.rotation.x, &data[2], 4);
-	std::memcpy(&input.rotation.y, &data[6], 4);
-
-	input.forward  = data[1] & static_cast<char>(1 << 7);
-	input.backward = data[1] & static_cast<char>(1 << 6);
-	input.left     = data[1] & static_cast<char>(1 << 5);
-	input.right    = data[1] & static_cast<char>(1 << 4);
-	input.up       = data[1] & static_cast<char>(1 << 3);
-	input.down     = data[1] & static_cast<char>(1 << 2);
+    phx::Serializer ser(Serializer::Mode::READ);
+	ser.setBuffer((std::byte*)data, dataLength);
+    ser & input;
 
 	// If the queue is empty we need to add a new bundle
 	if (stateQueue.empty())
@@ -216,7 +210,7 @@ void Iris::parseState(entt::entity* userRef, enet_uint8* data)
 		stateQueue.front().ready = true;
 	}
 }
-void Iris::parseMessage(entt::entity* userRef, enet_uint8* data)
+void Iris::parseMessage(entt::entity* userRef, enet_uint8* data, std::size_t dataLength)
 {
 	User user = m_registry->get<User>(*userRef);
 	if (data[0] == '/')

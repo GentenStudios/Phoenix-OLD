@@ -37,7 +37,7 @@
 
 #include <Common/Position.hpp>
 #include <Common/Actor.hpp>
-
+#include <Common/Serialization/Serializer.hpp>
 using namespace phx::client;
 using namespace phx;
 
@@ -298,7 +298,6 @@ void Game::tick(float dt)
 
 	m_camera->tick(dt);
 
-	char state[10];
 
 	static std::size_t sequence;
 	sequence++;
@@ -314,34 +313,18 @@ void Game::tick(float dt)
 	inputState.right    = m_window->isKeyDown(events::Keys::KEY_D);
 	inputState.up       = m_window->isKeyDown(events::Keys::KEY_SPACE);
 	inputState.down     = m_window->isKeyDown(events::Keys::KEY_LEFT_SHIFT);
+
+	/// conversion from rad to 1/1000 of degres
 	inputState.rotation.x =
-	    m_registry->get<Position>(m_player->getEntity()).rotation.x;
+	    static_cast<unsigned>(m_registry->get<Position>(m_player->getEntity()).rotation.x * 360000.0);
 	inputState.rotation.y =
-	    m_registry->get<Position>(m_player->getEntity()).rotation.y;
+        static_cast<unsigned>(m_registry->get<Position>(m_player->getEntity()).rotation.y * 360000.0);
 
-	// @todo replace with bit packer
-	state[0] = sequence;
-
-	// WASD
-	state[1] = 0;
-	if (inputState.forward)
-		state[1] |= 1 << 7;
-	if (inputState.backward)
-		state[1] |= 1 << 6;
-	if (inputState.left)
-		state[1] |= 1 << 5;
-	if (inputState.right)
-		state[1] |= 1 << 4;
-	if (inputState.up)
-		state[1] |= 1 << 3;
-	if (inputState.down)
-		state[1] |= 1 << 2;
-
-	std::memcpy(state + 2, &inputState.rotation.x, 4);
-	std::memcpy(state + 6, &inputState.rotation.y, 4);
+	phx::Serializer ser(Serializer::Mode::WRITE);
+	auto state = ser & inputState & Serializer::endp;
 
 	ENetPacket* packet;
-	packet = enet_packet_create(&state, sizeof(state),
+	packet = enet_packet_create(state.data(), state.size(),
 	                            ENET_PACKET_FLAG_UNRELIABLE_FRAGMENT);
 
 	enet_peer_send(m_peer, 1, packet);
