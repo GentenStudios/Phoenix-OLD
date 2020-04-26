@@ -28,38 +28,22 @@
 
 #pragma once
 
-#include <Server/Game.hpp>
-#include <Server/Iris.hpp>
+#include <Common/Math/Math.hpp>
+#include <Common/Serialization/Serializer.hpp>
+#include <cstddef>
 
-#include <Server/User.hpp>
-
-//#include <Server/Commander.hpp>
-
-#include <entt/entt.hpp>
-#include <enet/enet.h>
-
-#include <array>
-#include <string>
-
-namespace phx::server
+namespace phx
 {
-
-	class Server
+	struct InputState : public phx::ISerializable
 	{
-	public:
-		Server(std::string save);
-		~Server();
-
-		void run();
-
-	private:
-		bool m_running;
-
-		entt::registry m_registry;
-
-		networking::Iris* m_iris;
-		Game*             m_game;
-
-		std::string m_save;
+		bool        forward{};
+		bool        backward{};
+		bool        left{};
+		bool        right{};
+		bool        up{};
+		bool        down{};
+		math::vec2u rotation{}; // in 1/1000 degres
+		std::size_t sequence{};
+		Serializer& operator&(Serializer& this_) override;
 	};
-} // namespace phx::server
+} // namespace phx

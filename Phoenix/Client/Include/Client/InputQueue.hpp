@@ -28,38 +28,54 @@
 
 #pragma once
 
-#include <Server/Game.hpp>
-#include <Server/Iris.hpp>
+#include <Common/Input.hpp>
+#include <list>
 
-#include <Server/User.hpp>
-
-//#include <Server/Commander.hpp>
-
-#include <entt/entt.hpp>
-#include <enet/enet.h>
-
-#include <array>
-#include <string>
-
-namespace phx::server
+namespace phx::client
 {
-
-	class Server
+	class InputQueue
 	{
 	public:
-		Server(std::string save);
-		~Server();
+		InputQueue();
 
-		void run();
+		/**
+		 * @brief Thread to capture and queue input states
+		 * @param dt How frequently in seconds a state should be captured
+		 */
+		void run(float dt);
+
+		/**
+		 * @brief Stops the current thread
+		 */
+		void kill();
+
+		/**
+		 * @brief Gets a state for processing
+		 * @param sequence The sequence number for the desired state
+		 * @return The input state
+		 */
+		InputState getState(std::size_t sequence);
+		/**
+		 * @brief Clears all states equal to or older than the supplied sequence
+		 * @param sequence The sequence number to clear through
+		 */
+		void clearState(std::size_t sequence);
+		/**
+		 * @brief Gets the current sequence number, this is the most recent
+		 * InputState that was queued
+		 * @return A numerical identifier for the sequence
+		 */
+		std::size_t currentSequence();
 
 	private:
-		bool m_running;
+		std::list<InputState> m_queue;
+		bool                  m_running;
 
-		entt::registry m_registry;
-
-		networking::Iris* m_iris;
-		Game*             m_game;
-
-		std::string m_save;
+		client::Input* m_forward;
+		client::Input* m_backward;
+		client::Input* m_left;
+		client::Input* m_right;
+		client::Input* m_up;
+		client::Input* m_down;
 	};
-} // namespace phx::server
+} // namespace phx::client

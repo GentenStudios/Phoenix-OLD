@@ -37,7 +37,7 @@
 
 #include <Client/Graphics/ChunkView.hpp>
 
-#include <Common/Actor.hpp>
+#include <entt/entt.hpp>
 
 namespace phx
 {
@@ -48,24 +48,30 @@ namespace phx
 	 * player can be controlled by a camera object.
 	 *
 	 */
-	class Player : public Actor
+	class Player
 	{
 	public:
 		// temporary until a proper management system is put in place.
-		explicit Player(voxels::ChunkView* world);
+		explicit Player(voxels::ChunkView* world, entt::registry* registry);
 
 		math::Ray getTarget() const;
 
 		bool action1();
 		bool action2();
 
-		void               setHand(voxels::BlockType* block);
-		voxels::BlockType* getHand();
+		/// @brief Gets the entity for the player used in ECS
+		entt::entity getEntity() {return m_entity;};
+
+        /// @brief Gets the direction something is facing based on its rotation
+        static math::vec3 rotToDir(math::vec3 m_rotation);
+
+		// don't forget to free the ressource afterward
+		char* getBitPackedState();
 
 	private:
-		float              m_reach = 32.f;
+		const float        m_reach = 32.f;
 		voxels::ChunkView* m_world;
-		voxels::BlockType* m_hand;
+		entt::registry*    m_registry;
+		entt::entity       m_entity;
 	};
 } // namespace phx
-

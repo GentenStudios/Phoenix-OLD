@@ -28,38 +28,67 @@
 
 #pragma once
 
-#include <Server/Game.hpp>
-#include <Server/Iris.hpp>
+// This is needed because Windows https://github.com/skypjack/entt/issues/96
+#ifndef NOMINMAX
+#	define NOMINMAX
+#endif
 
-#include <Server/User.hpp>
+#include <Common/Input.hpp>
 
-//#include <Server/Commander.hpp>
-
-#include <entt/entt.hpp>
 #include <enet/enet.h>
+#include <entt/entt.hpp>
 
-#include <array>
-#include <string>
-
-namespace phx::server
+namespace phx::server::networking
 {
+	struct StateBundle
+	{
+		bool                                          ready;
+		std::size_t                                   users;
+		std::size_t                                   sequence;
+		std::unordered_map<entt::entity*, InputState> states;
+	};
 
-	class Server
+	struct EventBundle
+	{
+		entt::entity* userRef;
+	};
+
+	struct MessageBundle
+	{
+		entt::entity* userRef;
+		std::string   message;
+	};
+
+	class Iris
 	{
 	public:
-		Server(std::string save);
-		~Server();
+		Iris(entt::registry* registry, bool* running);
+		~Iris();
 
 		void run();
 
+		void auth();
+		void disconnect();
+
+		void parseEvent(entt::entity* userRef, enet_uint8* data, std::size_t dataLength);
+		void parseState(entt::entity* userRef, enet_uint8* data, std::size_t dataLength);
+		void parseMessage(entt::entity* userRef, enet_uint8* data, std::size_t dataLength);
+
+		void sendEvent(entt::entity* userRef, enet_uint8* data);
+		void sendState(std::size_t sequence);
+		void sendMessage(entt::entity* userRef, enet_uint8* data);
+
+		std::list<StateBundle>   stateQueue;
+		std::list<EventBundle>   eventQueue;
+		std::list<MessageBundle> messageQueue;
+
 	private:
-		bool m_running;
+		bool* m_running;
 
-		entt::registry m_registry;
+		entt::registry* m_registry;
 
-		networking::Iris* m_iris;
-		Game*             m_game;
-
-		std::string m_save;
+		ENetHost*   m_server;
+		ENetEvent   m_event;
+		ENetAddress m_address;
 	};
-} // namespace phx::server
+} // namespace phx::server::networking

@@ -26,40 +26,9 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#pragma once
+#include <Common/Input.hpp>
 
-#include <Server/Game.hpp>
-#include <Server/Iris.hpp>
-
-#include <Server/User.hpp>
-
-//#include <Server/Commander.hpp>
-
-#include <entt/entt.hpp>
-#include <enet/enet.h>
-
-#include <array>
-#include <string>
-
-namespace phx::server
+phx::Serializer& phx::InputState::operator&(phx::Serializer& this_)
 {
-
-	class Server
-	{
-	public:
-		Server(std::string save);
-		~Server();
-
-		void run();
-
-	private:
-		bool m_running;
-
-		entt::registry m_registry;
-
-		networking::Iris* m_iris;
-		Game*             m_game;
-
-		std::string m_save;
-	};
-} // namespace phx::server
+    return this_ & forward & backward & left & right & up & down & rotation.x & rotation.y & sequence;
+}

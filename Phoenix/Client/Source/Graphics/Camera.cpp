@@ -28,12 +28,16 @@
 
 #include <Client/Graphics/Camera.hpp>
 
+#include <Common/Position.hpp>
+#include <Common/Movement.hpp>
+
 const float MOVE_SPEED = 0.01f;
 
 using namespace phx;
 using namespace gfx;
 
-FPSCamera::FPSCamera(Window* window)
+FPSCamera::FPSCamera(Window* window, entt::registry* registry) :
+m_registry(registry)
 {
 	m_window = window;
 	m_window->setCursorState(CursorState::DISABLED);
@@ -52,6 +56,19 @@ FPSCamera::FPSCamera(Window* window)
 	    Settings::get()->add("Sensitivity", "camera:sensitivity", 50);
 	m_settingSensitivity->setMax(100);
 	m_settingSensitivity->setMin(1);
+
+	m_forward = client::InputMap::get()->registerInput(
+	    "core.move.forward", "Move Forward", events::Keys::KEY_W);
+	m_backward = client::InputMap::get()->registerInput(
+	    "core.move.backward", "Move Backward", events::Keys::KEY_S);
+	m_left = client::InputMap::get()->registerInput(
+	    "core.move.left", "Strafe Left", events::Keys::KEY_A);
+	m_right = client::InputMap::get()->registerInput(
+	    "core.move.right", "Strafe Right", events::Keys::KEY_D);
+	m_fly  = client::InputMap::get()->registerInput("core.move.up", "Fly Up",
+                                                   events::Keys::KEY_SPACE);
+	m_down = client::InputMap::get()->registerInput(
+	    "core.move.down", "Fly Down", events::Keys::KEY_LEFT_SHIFT);
 }
 
 math::vec3 FPSCamera::getPosition() const { return m_position; }
@@ -78,7 +95,7 @@ void FPSCamera::tick(float dt)
 		return;
 
 	// make sure we don't segfault because we haven't set the actor yet.
-	if (m_actor == nullptr)
+	if (!m_registry->valid(m_actor))
 		return;
 
 	const math::vec2 mousePos = m_window->getCursorPosition();
@@ -87,8 +104,8 @@ void FPSCamera::tick(float dt)
 
 	const float sensitivity = static_cast<float>(m_settingSensitivity->value()) / 50;
 
-	m_rotation = m_actor->getRotation();
-	m_position = m_actor->getPosition();
+	m_rotation = m_registry->get<Position>(m_actor).rotation;
+	m_position = m_registry->get<Position>(m_actor).position;
 
 	/// @todo Fix this up since we're having an issue where we turn more/less
 	/// due to higher/lower frames.
@@ -108,37 +125,38 @@ void FPSCamera::tick(float dt)
 
 	m_up = math::vec3::cross(right, m_direction);
 
-	const float moveSpeed = static_cast<float>(m_actor->getMoveSpeed());
+	const float moveSpeed =
+	    static_cast<float>(m_registry->get<Movement>(m_actor).moveSpeed);
 
-	if (m_window->isKeyDown(events::Keys::KEY_W))
+	if (m_window->isKeyDown(m_forward->key))
 	{
 		m_position += forward * dt * moveSpeed;
 	}
-	else if (m_window->isKeyDown(events::Keys::KEY_S))
+	else if (m_window->isKeyDown(m_backward->key))
 	{
 		m_position -= forward * dt * moveSpeed;
 	}
 
-	if (m_window->isKeyDown(events::Keys::KEY_A))
+	if (m_window->isKeyDown(m_left->key))
 	{
 		m_position -= right * dt * moveSpeed;
 	}
-	else if (m_window->isKeyDown(events::Keys::KEY_D))
+	else if (m_window->isKeyDown(m_right->key))
 	{
 		m_position += right * dt * moveSpeed;
 	}
 
-	if (m_window->isKeyDown(events::Keys::KEY_SPACE))
+	if (m_window->isKeyDown(m_fly->key))
 	{
 		m_position.y += dt * moveSpeed;
 	}
-	else if (m_window->isKeyDown(events::Keys::KEY_LEFT_SHIFT))
+	else if (m_window->isKeyDown(m_down->key))
 	{
 		m_position.y -= dt * moveSpeed;
 	}
 
-	m_actor->setPosition(m_position);
-	m_actor->setRotation(m_rotation);
+	m_registry->get<Position>(m_actor).position = m_position;
+	m_registry->get<Position>(m_actor).rotation = m_rotation;
 }
 
 void FPSCamera::enable(bool enabled)
@@ -170,5 +188,4 @@ void FPSCamera::onWindowResize(events::Event e)
 	                  static_cast<float>(static_cast<int>(windowSize.y / 2))};
 }
 
-void FPSCamera::setActor(Actor* actor) { m_actor = actor; }
-
+void FPSCamera::setActor(entt::entity actor) { m_actor = actor;}

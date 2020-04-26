@@ -60,7 +60,7 @@ namespace phx::client
 	class Game : public gfx::Layer
 	{
 	public:
-		explicit Game(gfx::Window* window);
+		explicit Game(gfx::Window* window, entt::registry* registry);
 		~Game() override;
 
 		void onAttach() override;
@@ -75,12 +75,13 @@ namespace phx::client
 		 * @param input The message sent to the server
 		 * @param cout Needs to be depreciated, unused (but required by terminal)
 		 */
-        void sendMessage(const std::string& input, std::ostringstream& cout);
+		void sendMessage(const std::string& input, std::ostringstream& cout);
 
 	private:
 		gfx::Window*       m_window;
 		gfx::FPSCamera*    m_camera = nullptr;
-		Player*            m_player;
+        entt::registry*    m_registry;
+        Player*            m_player;
 		voxels::ChunkView* m_world = nullptr;
 
 		gfx::ShaderPipeline m_renderPipeline;
@@ -93,16 +94,16 @@ namespace phx::client
 		math::vec3 m_prevPos;
 		int        m_playerHand = 0;
 
-        static constexpr size_t STATE_SIZE = 7;
-        static constexpr size_t LOG_SIZE = 5;
-        std::string stateLog;
+		static constexpr size_t STATE_SIZE = 7;
+		static constexpr size_t LOG_SIZE = 5;
+		std::string stateLog;
 
-        // Networking stuff
+		// Networking stuff
 
-        ENetHost*   m_client;
-        ENetEvent   m_event;
-        ENetPeer*   m_peer;
-        ENetAddress m_address;
+		ENetHost*   m_client;
+		ENetEvent   m_event;
+		ENetPeer*   m_peer;
+		ENetAddress m_address;
 	};
 } // namespace phx::client
 

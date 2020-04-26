@@ -40,6 +40,9 @@
 
 #include <string>
 #include <unordered_map>
+#include <nlohmann/json.hpp>
+
+using json = nlohmann::json;
 
 namespace phx
 {
@@ -71,6 +74,9 @@ namespace phx
 		/// @brief Minimum value that the setting can be set to.
 		int m_minValue;
 
+		/// @brief A pointer to the JSON object to be able to update it
+		json* m_json;
+
 	public:
 		Setting() = default;
 
@@ -81,7 +87,7 @@ namespace phx
 		 * @param key The unique name for the setting in the format core:volume.
 		 * @param defaultValue The default value for the setting upon creation.
 		 */
-		Setting(std::string name, std::string key, int defaultValue);
+		Setting(std::string name, std::string key, int defaultValue, json* json_);
 
 		/**
 		 * @brief Sets the value of an already existing setting.
@@ -144,13 +150,9 @@ namespace phx
 	 */
 	class Settings : public Singleton<Settings>
 	{
-		std::unordered_map<std::string, Setting>     m_settings;
-		std::unordered_map<std::string, int> m_unused;
-
 	public:
-
 		Settings();
-		
+
 		/**
 		 * @brief Adds a new setting.
 		 *
@@ -182,5 +184,9 @@ namespace phx
 		 * @brief Saves settings to file.
 		 */
 		void save(const std::string& saveFile);
+
+	private:
+		std::unordered_map<std::string, Setting> m_settings;
+		json m_data;
 	};
 }; // namespace phx

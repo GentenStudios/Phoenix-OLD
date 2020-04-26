@@ -1,4 +1,4 @@
-// Copyright 2019-20 Genten Studios
+// Copyright 2020 Genten Studios
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -28,46 +28,60 @@
 
 #include <Common/Actor.hpp>
 
+#include <Common/Movement.hpp>
+#include <Common/Position.hpp>
+
 using namespace phx;
 
-static const int MAX_MOVE_SPEED     = 500;
-static const int DEFAULT_MOVE_SPEED = 10;
-
-Actor::Actor() : m_moveSpeed(DEFAULT_MOVE_SPEED) {}
-
-math::vec3 Actor::getPosition() const { return m_position; }
-
-bool Actor::setPosition(math::vec3 pos)
+entt::entity ActorSystem::registerActor(entt::registry* registry)
 {
-	m_position = pos;
-	return true;
+	auto entity = registry->create();
+	registry->emplace<Position>(entity, math::vec3 {0, 0, 0},
+	                            math::vec3 {0, 0, 0});
+	registry->emplace<Movement>(entity, DEFAULT_MOVE_SPEED);
+	return entity;
 }
-
-math::vec3 Actor::getRotation() const { return m_rotation; }
-
-bool Actor::setRotation(math::vec3 rot)
+void ActorSystem::tick(entt::registry* registry, entt::entity entity,
+                       const float dt, InputState input)
 {
-	m_rotation = rot;
-	return true;
-}
+	auto& pos = registry->get<Position>(entity);
 
-math::vec3 Actor::getDirection() const
-{
-	return {std::cos(m_rotation.y) * std::sin(m_rotation.x),
-	        std::sin(m_rotation.y),
-	        std::cos(m_rotation.y) * std::cos(m_rotation.x)};
-}
+    /// conversion from 1/1000 of degres to rad
+	pos.rotation.x = static_cast<float>(input.rotation.x) / 360000.0;
+	pos.rotation.y = static_cast<float>(input.rotation.y) / 360000.0;
+	const auto moveSpeed =
+	    static_cast<float>(registry->get<Movement>(entity).moveSpeed);
 
-int Actor::getMoveSpeed() const { return m_moveSpeed; }
+	math::vec3       direction = pos.getDirection();
+	const math::vec3 right     = {std::sin(direction.x - math::PIDIV2), 0.f,
+                              std::cos(direction.x - math::PIDIV2)};
+	const math::vec3 forward   = {std::sin(direction.x), 0.f,
+                                std::cos(direction.x)};
 
-bool Actor::setMoveSpeed(int speed)
-{
-	if (speed >= 0 && speed <= MAX_MOVE_SPEED)
+	if (input.forward)
 	{
-		m_moveSpeed = speed;
-		return true;
+		pos.position += forward * dt * moveSpeed;
+	}
+	else if (input.backward)
+	{
+		pos.position -= forward * dt * moveSpeed;
 	}
 
-	return false;
-}
+	if (input.left)
+	{
+		pos.position -= right * dt * moveSpeed;
+	}
+	else if (input.right)
+	{
+		pos.position += right * dt * moveSpeed;
+	}
 
+	if (input.up)
+	{
+		pos.position.y += dt * moveSpeed;
+	}
+	else if (input.down)
+	{
+		pos.position.y -= dt * moveSpeed;
+	}
+}

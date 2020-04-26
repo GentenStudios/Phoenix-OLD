@@ -28,38 +28,25 @@
 
 #pragma once
 
-#include <Server/Game.hpp>
-#include <Server/Iris.hpp>
+#include <Common/Math/Math.hpp>
 
-#include <Server/User.hpp>
-
-//#include <Server/Commander.hpp>
-
-#include <entt/entt.hpp>
-#include <enet/enet.h>
-
-#include <array>
-#include <string>
-
-namespace phx::server
+namespace phx
 {
-
-	class Server
+	/**
+	 * @brief The positioning for an entity
+	 */
+	struct Position
 	{
-	public:
-		Server(std::string save);
-		~Server();
+		/// @brief The direction the entity is facing
+		math::vec3 rotation;
+		/// @brief The cardinal position of the entity
+		math::vec3 position;
 
-		void run();
-
-	private:
-		bool m_running;
-
-		entt::registry m_registry;
-
-		networking::Iris* m_iris;
-		Game*             m_game;
-
-		std::string m_save;
+		math::vec3 getDirection()
+		{
+			return math::vec3 {std::cos(rotation.y) * std::sin(rotation.x),
+			                   std::sin(rotation.y),
+			                   std::cos(rotation.y) * std::cos(rotation.x)};
+		};
 	};
-} // namespace phx::server
+} // namespace phx

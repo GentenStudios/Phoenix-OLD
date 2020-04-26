@@ -33,6 +33,8 @@
 #include <SDL.h>
 
 #include <cstring>
+#include <functional>
+#include <string>
 
 namespace phx::events
 {
@@ -122,4 +124,3 @@ namespace phx::events
 		Event() { std::memset(this, 0, sizeof(Event)); }
 	};
 } // namespace phx::events
-

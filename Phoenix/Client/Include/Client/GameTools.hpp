@@ -34,35 +34,34 @@
 
 #include <Common/Settings.hpp>
 
-namespace phx
+namespace phx::client
 {
-	namespace client
-	{
-		/**
-		 * @brief The Debug Tool for the Game.
-		 *
-		 * @see Layer
-		 * @see LayerStack
-		 */
-		class GameTools : public gfx::Overlay
-		{
-		public:
-			GameTools(bool* followCam, int* playerHand, Player* player);
-			~GameTools() override = default;
+    /**
+     * @brief The Debug Tool for the Game.
+     *
+     * @see Layer
+     * @see LayerStack
+     */
+    class GameTools : public gfx::Overlay
+    {
+    public:
+        GameTools(bool* followCam, int* playerHand, Player* player, entt::registry* registry);
+        ~GameTools() override = default;
 
-			void onAttach() override;
-			void onDetach() override;
-			void onEvent(events::Event& e) override;
-			void tick(float dt) override;
+        void onAttach() override;
+        void onDetach() override;
+        void onEvent(events::Event& e) override;
+        void tick(float dt) override;
 
-		private:
-			bool*    m_followCam = nullptr;
-			int      m_currentSensitivity = 1;
-			Setting* m_sensitivity = nullptr;
-			int*     m_playerHand  = nullptr;
+    private:
+        entt::registry* m_registry;
 
-			Player* m_player;
-		};
-	} // namespace client
-} // namespace phx
+        bool*    m_followCam = nullptr;
+        int      m_currentSensitivity = 1;
+        Setting* m_sensitivity = nullptr;
+        int*     m_playerHand  = nullptr;
+
+        Player* m_player;
+    };
+} // namespace phx::client
 
