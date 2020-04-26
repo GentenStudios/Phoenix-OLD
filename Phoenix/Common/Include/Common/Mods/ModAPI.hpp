@@ -31,6 +31,7 @@
 #include <functional>
 #include <string>
 #include <vector>
+#include <unordered_map>
 
 namespace phx::mods
 {
