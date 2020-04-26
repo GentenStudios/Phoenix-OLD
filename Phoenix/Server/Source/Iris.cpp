@@ -128,14 +128,14 @@ void Iris::run()
 void Iris::auth() {}
 
 void Iris::disconnect() {}
-void Iris::parseEvent(entt::entity* userRef, enet_uint8* data, std::size_t dataLenght)
+void Iris::parseEvent(entt::entity* userRef, enet_uint8* data, std::size_t dataLength)
 {
 	User user = m_registry->get<User>(*userRef);
 	printf("Event received");
 	printf("An Event packet containing %s was received from %s\n", data,
 	       user.userName.c_str());
 }
-void Iris::parseState(entt::entity* userRef, enet_uint8* data, std::size_t dataLenght)
+void Iris::parseState(entt::entity* userRef, enet_uint8* data, std::size_t dataLength)
 {
 	User user = m_registry->get<User>(*userRef);
 	printf("A State packet containing %s was received from %s\n", data,
@@ -146,7 +146,7 @@ void Iris::parseState(entt::entity* userRef, enet_uint8* data, std::size_t dataL
 	InputState input;
 
     phx::Serializer ser(Serializer::Mode::READ);
-	ser.setBuffer((std::byte*)data, dataLenght);
+	ser.setBuffer((std::byte*)data, dataLength);
     ser & input;
 
 	// If the queue is empty we need to add a new bundle
@@ -210,7 +210,7 @@ void Iris::parseState(entt::entity* userRef, enet_uint8* data, std::size_t dataL
 		stateQueue.front().ready = true;
 	}
 }
-void Iris::parseMessage(entt::entity* userRef, enet_uint8* data, std::size_t dataLenght)
+void Iris::parseMessage(entt::entity* userRef, enet_uint8* data, std::size_t dataLength)
 {
 	User user = m_registry->get<User>(*userRef);
 	if (data[0] == '/')
