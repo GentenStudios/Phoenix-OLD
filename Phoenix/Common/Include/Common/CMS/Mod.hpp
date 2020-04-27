@@ -35,6 +35,13 @@
 
 namespace phx::cms
 {
+	/**
+	 * @brief Class to encapsulate a "mod".
+	 *
+	 * This class is literally just to load dependencies and provide an easy way
+	 * to get the name and path of the mod. It's tidier to store a vector of
+	 * mods than a vector of names, paths, and dependencies.
+	 */
 	class Mod
 	{
 	public:
@@ -43,14 +50,35 @@ namespace phx::cms
 	public:
 		Mod() = delete;
 
-		// mod path is where all mods are stored. not Phoenix/Mods/Mod1 but Phoenix/Mods... this will also allow for mods to be loaded from
-		// different paths, like client mods and general mods if we every
-		// implement that in the future. Also makes it easier for developers if
-		// they wanna put their mod in a completely different folder.
+		/**
+		 * @brief Constructs a mod object and reads the dependency list.
+		 * @param modName The name of the mod.
+		 * @param modPath The path that the mod is found in.
+		 *
+		 * Mod Path should be the path that the mod is found in, not the
+		 * directory of the mod itself.
+		 */
 		Mod(const std::string& modName, const std::string& modPath);
 
+		/**
+		 * @brief Gets the name of the mod.
+		 * @return The name of the mod.
+		 */
 		const std::string&  getName() const;
+
+		/**
+		 * @brief Gets the parent folder of the mod.
+		 * @return The path that the mod resides in.
+		 *
+		 * It will return the folder that the mod resides in, not the mod's
+		 * folder itself. Combine with getName() to make a whole path.
+		 */
 		const std::string&  getPath() const;
+
+		/**
+		 * @brief Gets the mod's dependencies.
+		 * @return An array of dependencies for the mod.
+		 */
 		const Dependencies& getDependencies() const;
 
 	private:

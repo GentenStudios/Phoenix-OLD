@@ -35,6 +35,9 @@
 
 namespace phx::cms
 {
+	// not documenting since we don't have an exact lifetime on the existance of
+	// these.
+	
 	class Privileges
 	{
 	public:
