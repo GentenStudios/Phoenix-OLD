@@ -70,7 +70,7 @@ namespace phx::server
 	class Commander
 	{
 	public:
-		Commander(entt::registry* registry, networking::Iris* iris);
+		Commander(networking::Iris* iris);
 
 		/**
 		 * @brief Registers a command in the command registry.
@@ -82,8 +82,8 @@ namespace phx::server
 		 * @param help A help string that can be displayed to the user.
 		 * @param f The function that is called when the command is executed.
 		 */
-		static void add(const std::string& command, const std::string& help,
-		                const CommandFunction& f);
+		void add(const std::string& command, const std::string& help,
+		         const CommandFunction& f);
 
 		/**
 		 * @brief Calls a command.
@@ -95,7 +95,7 @@ namespace phx::server
 		 * @return Returns True if the function was called and False if the
 		 * function could not be found
 		 */
-		static bool run(entt::entity* userRef, const std::string& input);
+		bool run(entt::entity* userRef, const std::string& input);
 
 		/**
 		 * @brief Returns helpstring for command.
@@ -106,18 +106,17 @@ namespace phx::server
 		 * @return Returns True if successful and False if it could not find
 		 * the inputted command.
 		 */
-		static bool help(entt::entity*                   userRef,
-		                 const std::vector<std::string>& args);
+		bool help(entt::entity* userRef, const std::vector<std::string>& args);
 
 		/**
 		 * @brief Outputs a string listing available commands.
 		 *
 		 * @param out The output stream the list of commands is sent to.
 		 */
-		static void list(entt::entity* userRef);
+		void list(entt::entity* userRef);
 
 	private:
-		static entt::registry*   m_registry;
-		static networking::Iris* m_iris;
+		networking::Iris*                        m_iris;
+		std::unordered_map<std::string, Command> m_commands;
 	};
 } // namespace phx

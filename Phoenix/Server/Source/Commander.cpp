@@ -40,10 +40,8 @@
 
 using namespace phx::server;
 
-Commander::Commander(entt::registry* registry, networking::Iris* iris)
+Commander::Commander(networking::Iris* iris) : m_iris(iris)
 {
-	m_iris     = iris;
-	m_registry = registry;
 	//    ContentManager::get()->lua["core"]["command"] =
 	//        /**
 	//         * @addtogroup luaapi
@@ -96,19 +94,16 @@ Commander::Commander(entt::registry* registry, networking::Iris* iris)
 void Commander::add(const std::string& command, const std::string& help,
                     const CommandFunction& f)
 {
-	auto view = m_registry->view<Command>();
-	for (auto entity : view)
+	auto m_command = m_commands.find(command);
+	if (m_command != m_commands.end())
 	{
-		auto& com = view.get<Command>(entity);
-		if (com.command == command)
-		{
-			com.help     = help;
-			com.callback = f;
-			return;
-		}
+		///@TODO log that we over-wrote a command
+		m_command->second.command  = command;
+		m_command->second.help     = help;
+		m_command->second.callback = f;
+		return;
 	}
-	auto entity = m_registry->create();
-	m_registry->emplace<Command>(entity, command, help, f);
+	m_commands[command] = {command, help, f};
 }
 
 bool Commander::run(entt::entity* userRef, const std::string& input)
@@ -177,16 +172,12 @@ bool Commander::run(entt::entity* userRef, const std::string& input)
 		return true;
 	}
 
-    // If no built in functions match, search library
-	auto view = m_registry->view<Command>();
-	for (auto entity : view)
+	// If no built in functions match, search library
+	auto com = m_commands.find(command);
+	if (com != m_commands.end())
 	{
-		auto& com = view.get<Command>(entity);
-		if (com.command == command)
-		{
-			com.callback(args);
-			return true;
-		}
+		com->second.callback(args);
+		return true;
 	}
 	// No commands match
 	return false;
@@ -214,15 +205,11 @@ bool Commander::help(entt::entity*                   userRef,
 		return true;
 	}
 
-	auto view = m_registry->view<Command>();
-	for (auto entity : view)
+	auto com = m_commands.find(args[0]);
+	if (com != m_commands.end())
 	{
-		auto& com = view.get<Command>(entity);
-		if (com.command == args[0])
-		{
-			m_iris->sendMessage(userRef, com.help + "\n");
-			return true;
-		}
+		m_iris->sendMessage(userRef, com->second.help + "\n");
+		return true;
 	}
 	m_iris->sendMessage(userRef, "Command \"" + args[0] + "\" not found \n");
 	return false;
@@ -231,10 +218,8 @@ bool Commander::help(entt::entity*                   userRef,
 void Commander::list(entt::entity* userRef)
 {
 	m_iris->sendMessage(userRef, "Available commands:\n");
-	auto view = m_registry->view<Command>();
-	for (auto entity : view)
+	for (const auto& com : m_commands)
 	{
-		auto& com = view.get<Command>(entity);
-		m_iris->sendMessage(userRef, "-" + com.command + "\n");
+		m_iris->sendMessage(userRef, "- " + com.second.command + "\n");
 	}
 }

@@ -26,7 +26,6 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Server/Commander.hpp>
 #include <Server/Game.hpp>
 #include <Server/User.hpp>
 
@@ -41,7 +40,7 @@ using namespace phx::server;
 Game::Game(entt::registry* registry, bool* running, networking::Iris* iris)
     : m_registry(registry), m_running(running), m_iris(iris)
 {
-	Commander(m_registry, m_iris);
+	m_commander = new Commander(m_iris);
 }
 
 void Game::run()
@@ -60,7 +59,7 @@ void Game::run()
 			networking::StateBundle m_currentState = m_iris->stateQueue.front();
 			m_iris->stateQueue.pop_front();
 
-			for (auto state : m_currentState.states)
+			for (const auto& state : m_currentState.states)
 			{
 				ActorSystem::tick(m_registry,
 				                  m_registry->get<Player>(*state.first).actor,
@@ -82,7 +81,7 @@ void Game::run()
 			{
 				networking::MessageBundle message =
 				    m_iris->messageQueue.front();
-				Commander::run(message.userRef, message.message);
+				m_commander->run(message.userRef, message.message);
 				m_iris->messageQueue.pop_front();
 			}
 
