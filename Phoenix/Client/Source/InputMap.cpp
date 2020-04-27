@@ -28,8 +28,6 @@
 
 #include <Client/InputMap.hpp>
 
-#include <Common/ContentLoader.hpp>
-
 #include <SDL.h>
 
 using namespace phx::client;
@@ -37,84 +35,34 @@ using namespace phx;
 
 InputMap::InputMap()
 {
-	ContentManager::get()->lua["core"]["input"] =
-	    /**
-	     * @addtogroup luaapi
-	     *
-	     * ---
-	     * @subsection coreinput core.input
-	     * @brief Interfaces with the player
-	     */
-	    ContentManager::get()->lua.create_table();
-	ContentManager::get()->lua["core"]["input"]["registerInput"] =
-	    /**
-	     * @addtogroup luaapi
-	     *
-	     * @subsubsection coreplayerregisterinput
-	     * core.player.registerInput(string uniqueName, string displayName,
-	     * string defaultKey)
-	     * @brief Registers a new input
-	     * @param uniqueName the unique name for the input in the format
-	     * "modname:inputname"
-	     * @param displayName the display name that is shown to the user when
-	     * binding keys
-	     * @param defaultKey the default key that is first registered if the
-	     * user does not set one
-	     * @warning The default key is currently not functional, it will be set
-	     * to 0 every time
-	     *
-	     * @return The input index (*Not functional at this time)
-	     *
-	     * @todo convert from string provided by lua to enum
-	     */
-	    [this](std::string uniqueName, std::string displayName,
-	           std::string defaultKey) {
-		    registerInput(uniqueName, displayName, events::Keys::KEY_0);
-		    return m_currentInputRef;
-	    };
-	ContentManager::get()->lua["core"]["input"]["getInput"] =
-	    /**
-	     * @addtogroup luaapi
-	     *
-	     * @subsubsection coreplayergetInput core.player.getInput(int input)
-	     * @brief Gets the state of the input
-	     * @param input The reference of the input you are looking for
-	     *
-	     * @return The state of the input
-	     */
-	    [this](int input) { return getState(input); };
-	ContentManager::get()->lua["core"]["input"]["getInputRef"] =
-	    /**
-	     * @addtogroup luaapi
-	     *
-	     * @subsubsection coreplayergetInputRef core.player.getInputRef(string
-	     * uniqueName)
-	     * @brief Gets the state of the input
-	     * @param uniqueName the unique name used when registering the input
-	     *
-	     * @return The reference of the input
-	     */
-	    [this](std::string uniqueName) { return getReference(uniqueName); };
-	ContentManager::get()->lua["core"]["input"]["registerCallback"] =
-	    /**
-	     * @addtogroup luaapi
-	     *
-	     * @subsubsection coreplayerregisterCallback
-	     * core.player.getRegisterCallback(int input, function f)
-	     * @brief Registers a callback to be called when an input event happens
-	     * @param input The reference of the input you are looking for
-	     * @param f The function that is called
-	     */
-	    [this](int input, sol::function f) { attachCallbackToInput(input, f); };
+	m_uniqueInputs["core:none"] = m_currentInputRef;
+	m_inputs[m_currentInputRef] = {"None", "core:none"};
+	++m_currentInputRef;
 }
 
 InputMap::~InputMap() = default;
 
-void InputMap::initialize()
+void InputMap::registerAPI(cms::ModManager* manager)
 {
-	m_uniqueInputs["core:none"] = m_currentInputRef;
-	m_inputs[m_currentInputRef] = {"None", "core:none"};
-	++m_currentInputRef;
+	manager->registerFunction(
+	    "core.input.registerInput",
+	    [this](std::string uniqueName, std::string displayName,
+	           std::string defaultKey) {
+		    registerInput(uniqueName, displayName, events::Keys::KEY_0);
+		    return m_currentInputRef;
+	    });
+
+	manager->registerFunction("core.input.getInput",
+	                          [this](int input) { return getState(input); });
+
+	manager->registerFunction(
+	    "core.input.getInputRef",
+	    [this](std::string uniqueName) { return getReference(uniqueName); });
+
+	manager->registerFunction("core.input.registerCallback",
+	                          [this](int input, sol::function f) {
+		                          attachCallbackToInput(input, f);
+	                          });
 }
 
 void InputMap::onEvent(events::Event e)
@@ -142,8 +90,9 @@ Input* InputMap::registerInput(const std::string& uniqueName,
                                const std::string& displayName,
                                events::Keys       defaultKey)
 {
-	m_uniqueInputs[uniqueName] = m_currentInputRef;
-	m_inputs[m_currentInputRef] = {displayName, uniqueName, defaultKey, defaultKey};
+	m_uniqueInputs[uniqueName]  = m_currentInputRef;
+	m_inputs[m_currentInputRef] = {displayName, uniqueName, defaultKey,
+	                               defaultKey};
 	++m_currentInputRef;
 	return &m_inputs[m_currentInputRef - 1];
 }
@@ -194,8 +143,7 @@ bool InputMap::getState(InputRef primaryKey)
 
 bool InputMap::getState(Input* input)
 {
-	return SDL_GetKeyboardState(
-	    nullptr)[static_cast<SDL_Scancode>(input->key)];
+	return SDL_GetKeyboardState(nullptr)[static_cast<SDL_Scancode>(input->key)];
 }
 
 InputMap::InputRef InputMap::getReference(const std::string& uniqueName)

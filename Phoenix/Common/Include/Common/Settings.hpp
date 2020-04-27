@@ -37,6 +37,7 @@
 #pragma once
 
 #include <Common/Singleton.hpp>
+#include <Common/CMS/ModManager.hpp>
 
 #include <string>
 #include <unordered_map>
@@ -88,7 +89,7 @@ namespace phx
 		 * @param defaultValue The default value for the setting upon creation.
 		 */
 		Setting(std::string name, std::string key, int defaultValue, json* json_);
-
+	
 		/**
 		 * @brief Sets the value of an already existing setting.
 		 *
@@ -152,6 +153,8 @@ namespace phx
 	{
 	public:
 		Settings();
+
+		void registerAPI(cms::ModManager* manager);
 
 		/**
 		 * @brief Adds a new setting.

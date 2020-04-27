@@ -1,15 +1,16 @@
 add_subdirectory(Math)
 add_subdirectory(Voxels)
+add_subdirectory(CMS)
 
 set(currentDir ${CMAKE_CURRENT_LIST_DIR})
 set(Sources
-		${mathSources}
-		${voxelSources}
+	${mathSources}
+	${voxelSources}
+	${cmsSources}
 
-		${currentDir}/ContentLoader.cpp
-		${currentDir}/Settings.cpp
-		${currentDir}/Logger.cpp
-		${currentDir}/Commander.cpp
+	${currentDir}/Settings.cpp
+	${currentDir}/Logger.cpp
+	${currentDir}/Commander.cpp
 
-		PARENT_SCOPE
-		)
+	PARENT_SCOPE
+)

@@ -36,10 +36,11 @@
 #pragma once
 
 #include <Client/Graphics/ChunkView.hpp>
-
-#include <glad/glad.h>
 #include <Client/Graphics/ShaderPipeline.hpp>
 
+#include <Common/CMS/ModManager.hpp>
+
+#include <glad/glad.h>
 #include <entt/entt.hpp>
 
 namespace phx
@@ -55,18 +56,22 @@ namespace phx
 	{
 	public:
 		// temporary until a proper management system is put in place.
-		explicit Player(voxels::ChunkView* world, entt::registry* registry);
+		explicit Player(entt::registry* registry);
 
+		void registerAPI(cms::ModManager* manager);
+
+		void setWorld(voxels::ChunkView* world);
+		
 		math::Ray getTarget() const;
 
 		bool action1();
 		bool action2();
 
 		/// @brief Gets the entity for the player used in ECS
-		entt::entity getEntity() {return m_entity;};
+		entt::entity getEntity() { return m_entity; }
 
-        /// @brief Gets the direction something is facing based on its rotation
-        static math::vec3 rotToDir(math::vec3 m_rotation);
+		/// @brief Gets the direction something is facing based on its rotation
+		static math::vec3 rotToDir(math::vec3 m_rotation);
 
 		/// @brief Render the selection box around the pointed block
 		void renderSelectionBox(const math::mat4 view, const math::mat4 proj);
