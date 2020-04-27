@@ -36,6 +36,8 @@
 #include <Common/Position.hpp>
 #include <Common/Voxels/BlockRegistry.hpp>
 
+#include <cmath>
+
 using namespace phx::client;
 using namespace phx;
 
@@ -235,6 +237,15 @@ void Game::onEvent(events::Event& e)
 
 void Game::tick(float dt)
 {
+	// temp, will change in the future, based on game time
+	static math::vec3 lightdir(0.f, -1.f, 0.f);
+	static float time = 0.f;
+
+	time += dt;
+
+	lightdir.y = std::sin(time);
+	lightdir.x = std::cos(time);
+
 	m_camera->tick(dt);
 
 	if (m_followCam)
@@ -249,6 +260,10 @@ void Game::tick(float dt)
 	m_renderPipeline.activate();
 	m_renderPipeline.setMatrix("u_view", m_camera->calculateViewMatrix());
 	m_renderPipeline.setMatrix("u_projection", m_camera->getProjection());
+	m_renderPipeline.setFloat("u_AmbientStrength", 0.7f);
+	m_renderPipeline.setVector3("u_LightDir", lightdir);
+	m_renderPipeline.setFloat("u_Brightness", 0.6f);
 
 	m_world->render();
+	m_player->renderSelectionBox(m_camera->calculateViewMatrix(), m_camera->getProjection());
 }
