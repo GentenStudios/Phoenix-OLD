@@ -14,7 +14,6 @@ set(Headers
 	${currentDir}/FileIO.hpp
 	${currentDir}/Logger.hpp
 
-	${currentDir}/ContentLoader.hpp
 	${currentDir}/Settings.hpp
 	${currentDir}/Commander.hpp
 	${currentDir}/Position.hpp

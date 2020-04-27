@@ -26,77 +26,31 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Common/ContentLoader.hpp>
 #include <Common/Voxels/BlockRegistry.hpp>
 
 #include <algorithm>
 #include <cstring>
 
 using namespace phx::voxels;
+using namespace phx;
 
-BlockRegistry::BlockRegistry()
+void BlockRegistry::registerAPI(mods::ModManager* manager)
 {
-	ContentManager::get()->lua["voxel"] =
-	    ContentManager::get()->lua.create_table();
-	/**
-	 * @addtogroup luaapi
-	 *
-	 * ---
-	 * ---
-	 * @section voxel voxel
-	 * @brief The voxel API for interacting voxels
-	 */
-	ContentManager::get()->lua["voxel"]["block"] =
-	    ContentManager::get()->lua.create_table();
-	/**
-	 * @addtogroup luaapi
-	 *
-	 * ---
-	 * @subsection voxelblock voxel.block
-	 * @brief Interfaces with blocks
-	 */
-	ContentManager::get()->lua["voxel"]["block"]["register"] =
-	    /**
-	     * @addtogroup luaapi
-	     *
-	     * @subsubsection voxelblockreg voxel.block.register(luaBlock)
-	     * @brief Sets the value of a setting based on its unique key
-	     *
-	     * @param luaBlock a table storing the data used to create a block
-	     *
-	     * @details The luaBlock table stores the following values: \n
-	     * Required:
-	     * - @b name: The display name for the block
-	     * - @b id: The unique id for the block usually in the form module:block
-	     *
-	     * Optional:
-	     * - @b category: The category of the block chosen from "Air", "Liquid",
-	     * or "Solid" \n If not specified, the default is "Solid"
-	     * - @b onPlace: A function that is run when the block is placed
-	     * - @b onBreak: A function that is run when the block is broken
-	     * - @b onInteract: A function that is run when the block is interacted
-	     * with
-	     * - @b textures: A table of filepaths where textures are located \n
-	     * 			   Filepaths are relative to to the module directory \n
-	     * 			   If only one filepath is specified, that will be used for
-	     * all textures
-	     *
-	     * @b Example:
-	     *
-	     * @code {.lua}
-	     * block = {}
-	     * block.name = "Grass"
-	     * block.id = "core.grass"
-	     * block.textures = {"Assets/grass_side.png", "Assets/grass_side.png",
-	     * "Assets/grass_side.png", "Assets/grass_side.png",
-	     * "Assets/grass_top.png",  "Assets/dirt.png"}
-	     * block.onBreak = function (position)
-	     * 	print("grass broken at" + position)
-	     * end
-	     * voxel.block.register(block)
-	     * @endcode
-	     */
-	    [](sol::table luaBlock) {
+	BlockType unknownBlock;
+	unknownBlock.displayName = "Unknown Block";
+	unknownBlock.id          = "core.unknown";
+	unknownBlock.category    = BlockCategory::SOLID;
+	unknownBlock.setAllTextures("Assets/unknown.png");
+	registerBlock(unknownBlock);
+
+	BlockType outOfBoundsBlock;
+	outOfBoundsBlock.displayName = "Out Of Bounds";
+	outOfBoundsBlock.id          = "core.out_of_bounds";
+	outOfBoundsBlock.category    = BlockCategory::AIR;
+	registerBlock(outOfBoundsBlock);
+
+	manager->registerFunction(
+	    "voxel.block.register", [manager](sol::table luaBlock) {
 		    BlockType block;
 		    {
 			    block.displayName = luaBlock["name"];
@@ -143,31 +97,15 @@ BlockRegistry::BlockRegistry()
 						    // texture in its place
 						    texture = luaBlock["textures"][1];
 					    }
-					    textures[i] = "Modules/" +
-					                  ContentManager::get()->currentMod + "/" +
-					                  texture;
+					    textures[i] = manager->getCurrentModPath() + texture;
+					    LOG_WARNING("MODDING")
+					        << manager->getCurrentModPath() + texture;
 				    }
 				    block.textures = textures;
 			    }
 		    }
 		    BlockRegistry::get()->registerBlock(block);
-	    };
-}
-
-void BlockRegistry::initialise()
-{
-	BlockType unknownBlock;
-	unknownBlock.displayName = "Unknown Block";
-	unknownBlock.id          = "core.unknown";
-	unknownBlock.category    = BlockCategory::SOLID;
-	unknownBlock.setAllTextures("Assets/unknown.png");
-	registerBlock(unknownBlock);
-
-	BlockType outOfBoundsBlock;
-	outOfBoundsBlock.displayName = "Out Of Bounds";
-	outOfBoundsBlock.id          = "core.out_of_bounds";
-	outOfBoundsBlock.category    = BlockCategory::AIR;
-	registerBlock(outOfBoundsBlock);
+	    });
 }
 
 void BlockRegistry::registerBlock(BlockType blockInfo)
@@ -210,4 +148,3 @@ BlockType* BlockRegistry::getFromRegistryID(std::size_t registryID)
 }
 
 TextureRegistry* BlockRegistry::getTextures() { return &m_textures; }
-

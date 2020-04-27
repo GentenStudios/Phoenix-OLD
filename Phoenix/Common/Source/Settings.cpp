@@ -26,17 +26,17 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Common/ContentLoader.hpp>
 #include <Common/Settings.hpp>
 
 #include <climits>
 #include <fstream>
-#include <iostream>
 #include <iomanip>
+#include <iostream>
 
 using namespace phx;
 
-Setting::Setting(std::string name, std::string key, int defaultValue, json* json_)
+Setting::Setting(std::string name, std::string key, int defaultValue,
+                 json* json_)
     : m_name(std::move(name)), m_key(std::move(key)), m_value(defaultValue),
       m_maxValue(SHRT_MAX), m_minValue(SHRT_MIN), m_default(defaultValue),
       m_json(json_)
@@ -47,7 +47,7 @@ bool Setting::set(int value)
 {
 	if (value >= m_minValue && value <= m_maxValue)
 	{
-		m_value = value;
+		m_value          = value;
 		(*m_json)[m_key] = value;
 		return true;
 	}
@@ -66,68 +66,24 @@ int Setting::value() const { return m_value; }
 
 int Setting::getDefault() const { return m_default; }
 
-Settings::Settings() :
-	m_data(json::object())
+Settings::Settings() : m_data(json::object()) {}
+
+void Settings::registerAPI(mods::ModManager* manager)
 {
-	ContentManager::get()->lua["core"]["setting"] =
-	    /**
-	     * @addtogroup luaapi
-	     *
-	     * ---
-	     * @subsection coreset core.setting
-	     * @brief Interfaces with the settings system
-	     */
-	    ContentManager::get()->lua.create_table();
-	ContentManager::get()->lua["core"]["setting"]["register"] =
-	    /**
-	     * @addtogroup luaapi
-	     *
-	     * @subsubsection coresetreg core.setting.register(displayName, key,
-	     * defaultValue)
-	     * @brief Registers a setting that the player can adjust via the
-	     * settings menu
-	     *
-	     * @param displayName The Display name for the setting seen in the
-	     * settings menu
-	     * @param key The unique key for the setting, usually in the form
-	     * module:setting
-	     * @param defaultValue The default value for the setting if not already
-	     * set
-	     *
-	     */
+	manager->registerFunction(
+	    "core.setting.register",
 	    [](std::string displayName, std::string key, int defaultValue) {
 		    Settings::get()->add(displayName, key, defaultValue);
-	    };
-	ContentManager::get()->lua["core"]["setting"]["get"] =
-	    /**
-	     * @addtogroup luaapi
-	     *
-	     * @subsubsection coresetget core.setting.get(key)
-	     * @brief Gets the value of a setting based on its unique key
-	     *
-	     * @param key The unique key for the setting, usually in the form
-	     * module:setting
-	     * @return The integer value of the setting
-	     *
-	     */
-	    [](std::string key) {
-		    return Settings::get()->getSetting(key)->value();
-	    };
-	ContentManager::get()->lua["core"]["setting"]["set"] =
-	    /**
-	     * @addtogroup luaapi
-	     *
-	     * @subsubsection coresetset core.setting.set(key)
-	     * @brief Sets the value of a setting based on its unique key
-	     *
-	     * @param key The unique key for the setting, usually in the form
-	     * module:setting
-	     * @param value The value the setting should be set to
-	     *
-	     */
-	    [](std::string key, int value) {
-		    Settings::get()->getSetting(key)->set(value);
-	    };
+	    });
+
+	manager->registerFunction("core.setting.get", [](std::string key) {
+		return Settings::get()->getSetting(key)->value();
+	});
+
+	manager->registerFunction("core.setting.set",
+	                          [](std::string key, int value) {
+		                          Settings::get()->getSetting(key)->set(value);
+	                          });
 }
 
 Setting* Settings::add(const std::string& name, const std::string& key,
@@ -172,4 +128,3 @@ void Settings::save(const std::string& saveFile)
 	file << std::setw(4) << m_data << std::endl;
 	file.close();
 }
-

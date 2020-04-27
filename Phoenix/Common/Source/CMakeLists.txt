@@ -8,7 +8,6 @@ set(Sources
 	${voxelSources}
 	${modSources}
 
-	${currentDir}/ContentLoader.cpp
 	${currentDir}/Settings.cpp
 	${currentDir}/Logger.cpp
 	${currentDir}/Commander.cpp

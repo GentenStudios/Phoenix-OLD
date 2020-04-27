@@ -29,11 +29,12 @@
 #pragma once
 
 #include <Common/Logger.hpp>
-#include <Common/Mods/Mod.hpp>
+
+#include <sol/sol.hpp>
 
 #include <functional>
-#include <vector>
 #include <queue>
+#include <vector>
 
 namespace phx::mods
 {
@@ -66,10 +67,12 @@ namespace phx::mods
 		void   cleanup();
 
 		const ModList&     getModList() const;
+		const std::string& getCurrentModPath() const;
 
 	private:
 		std::vector<std::string> m_modsRequired;
 		std::vector<std::string> m_modPaths;
+		std::string              m_currentModPath;
 
 		sol::state m_luaState;
 	};

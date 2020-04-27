@@ -38,6 +38,7 @@
 #pragma once
 
 #include <Common/Singleton.hpp>
+#include <Common/Mods/ModManager.hpp>
 
 #include <functional>
 #include <ostream>
@@ -68,7 +69,10 @@ namespace phx
 		std::vector<std::string>     m_permission;
 		std::vector<CommandFunction> m_functions;
 
-		CommandBook();
+		CommandBook() = default;
+		~CommandBook() = default;
+
+		void registerAPI(mods::ModManager* manager);
 
 		/**
 		 * @brief Registers a command in the command registry.

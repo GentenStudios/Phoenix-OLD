@@ -44,7 +44,7 @@ Mod::Mod(const std::string& modName, const std::string& modPath)
 		deps.open(m_path + "/" + modName + "/Dependencies.txt");
 		if (!deps.is_open())
 		{
-			LOG_WARNING("[MOD]")
+			LOG_WARNING("MODDING")
 			    << "Mod " << modName << " does not include a Dependencies.txt!";
 
 			// assuming no deps, even if it causes failure further down.
@@ -54,7 +54,8 @@ Mod::Mod(const std::string& modName, const std::string& modPath)
 		std::string input;
 		while (std::getline(deps, input))
 		{
-			m_dependencies.push_back(input);
+			if (!input.empty())
+				m_dependencies.push_back(input);
 		}
 
 		deps.close();

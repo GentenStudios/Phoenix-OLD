@@ -26,8 +26,9 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Common/Logger.hpp>
 #include <Common/Mods/ModManager.hpp>
+#include <Common/Mods/Mod.hpp>
+#include <Common/Logger.hpp>
 
 using namespace phx::mods;
 
@@ -57,7 +58,7 @@ ModManager::ModManager(const ModList& toLoad, const ModList& paths)
 ModManager::Status ModManager::load(float* progress)
 {
 	std::queue<Mod> toLoad;
-	
+
 	for (auto& require : m_modsRequired)
 	{
 		bool found = false;
@@ -112,10 +113,12 @@ ModManager::Status ModManager::load(float* progress)
 
 			if (satisfied)
 			{
+				m_currentModPath = mod.getPath() + "/" + mod.getName() + "/";
 				sol::protected_function_result pfr =
-				    m_luaState.safe_script_file(mod.getPath() + "/" +
-				                                    mod.getName() + "/Init.lua",
+				    m_luaState.safe_script_file(m_currentModPath + "Init.lua",
 				                                &sol::script_pass_on_error);
+
+				loadedMods.push_back(mod.getName());
 
 				// error occured if return is not valid.
 				if (!pfr.valid())
@@ -128,7 +131,7 @@ ModManager::Status ModManager::load(float* progress)
 					errString += err.what();
 
 					LOG_FATAL("MODDING") << errString;
-					
+
 					return {false, errString};
 				}
 			}
@@ -149,7 +152,7 @@ ModManager::Status ModManager::load(float* progress)
 
 			LOG_FATAL("MODDING") << err;
 
-			return {false, err };
+			return {false, err};
 		}
 	}
 
@@ -162,4 +165,9 @@ void ModManager::cleanup() {}
 const ModManager::ModList& ModManager::getModList() const
 {
 	return m_modsRequired;
+}
+
+const std::string& ModManager::getCurrentModPath() const
+{
+	return m_currentModPath;
 }
