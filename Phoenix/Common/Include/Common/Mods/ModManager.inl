@@ -30,7 +30,7 @@
 
 // Header exists in ModManager.hpp
 
-namespace phx::mods
+namespace phx::cms
 {
 	// can do template<typename RtnType, typename... Args>
 	// but allowing for anything makes sure you can capture lambdas.

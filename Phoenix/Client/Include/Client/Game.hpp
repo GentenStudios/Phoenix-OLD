@@ -79,7 +79,7 @@ namespace phx::client
 
 		ui::ChatWindow* m_chat = nullptr;
 
-		mods::ModManager* m_modManager;
+		cms::ModManager* m_modManager;
 
 		EscapeMenu* m_escapeMenu = nullptr;
 		GameTools* m_gameDebug = nullptr;

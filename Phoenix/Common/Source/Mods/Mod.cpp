@@ -31,11 +31,11 @@
 
 #include <fstream>
 
-using namespace phx::mods;
+using namespace phx::cms;
 
 Mod::Mod(const std::string& modName, const std::string& modPath)
 {
-	m_name    = modName;
+	m_name = modName;
 	m_path = modPath;
 
 	{
@@ -55,7 +55,9 @@ Mod::Mod(const std::string& modName, const std::string& modPath)
 		while (std::getline(deps, input))
 		{
 			if (!input.empty())
+			{
 				m_dependencies.push_back(input);
+			}
 		}
 
 		deps.close();

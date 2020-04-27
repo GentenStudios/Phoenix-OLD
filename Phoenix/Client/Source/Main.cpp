@@ -28,10 +28,6 @@
 
 #include <Client/Client.hpp>
 
-#include <Common/Logger.hpp>
-#include <Common/Mods/ModManager.hpp>
-
-using namespace phx::mods;
 using namespace phx;
 
 #undef main

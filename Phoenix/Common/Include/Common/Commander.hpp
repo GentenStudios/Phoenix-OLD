@@ -72,7 +72,7 @@ namespace phx
 		CommandBook() = default;
 		~CommandBook() = default;
 
-		void registerAPI(mods::ModManager* manager);
+		void registerAPI(cms::ModManager* manager);
 
 		/**
 		 * @brief Registers a command in the command registry.

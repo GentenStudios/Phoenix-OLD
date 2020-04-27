@@ -30,7 +30,7 @@
 #include <Common/Mods/Mod.hpp>
 #include <Common/Logger.hpp>
 
-using namespace phx::mods;
+using namespace phx::cms;
 
 static void CustomPanicHandler(sol::optional<std::string> maybe_msg)
 {

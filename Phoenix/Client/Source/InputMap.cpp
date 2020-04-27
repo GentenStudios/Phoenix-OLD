@@ -42,7 +42,7 @@ InputMap::InputMap()
 
 InputMap::~InputMap() = default;
 
-void InputMap::registerAPI(mods::ModManager* manager)
+void InputMap::registerAPI(cms::ModManager* manager)
 {
 	manager->registerFunction(
 	    "core.input.registerInput",

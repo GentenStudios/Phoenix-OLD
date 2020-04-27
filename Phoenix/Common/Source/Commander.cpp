@@ -71,7 +71,7 @@ void CommandBook::add(const std::string& command, const std::string& help,
 
 int CommandBook::getPage() { return m_page; }
 
-void CommandBook::registerAPI(mods::ModManager* manager)
+void CommandBook::registerAPI(cms::ModManager* manager)
 {
 	manager->registerFunction(
 	    "core.command.register",

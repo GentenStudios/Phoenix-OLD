@@ -63,11 +63,11 @@ namespace phx::voxels
 	class BlockRegistry : public Singleton<BlockRegistry>
 	{
 	public:
-		BlockRegistry() = default;
+		BlockRegistry();
 		~BlockRegistry() = default;
 
 		// @brief Initializes the registry.
-		void registerAPI(mods::ModManager* manager);
+		void registerAPI(cms::ModManager* manager);
 
 		/**
 		 * @brief Registers a block in the registry.

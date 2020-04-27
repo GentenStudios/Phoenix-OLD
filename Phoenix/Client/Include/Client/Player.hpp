@@ -58,7 +58,7 @@ namespace phx
 		// temporary until a proper management system is put in place.
 		explicit Player(entt::registry* registry);
 
-		void registerAPI(mods::ModManager* manager);
+		void registerAPI(cms::ModManager* manager);
 
 		void setWorld(voxels::ChunkView* world);
 		

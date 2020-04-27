@@ -154,7 +154,7 @@ namespace phx
 	public:
 		Settings();
 
-		void registerAPI(mods::ModManager* manager);
+		void registerAPI(cms::ModManager* manager);
 
 		/**
 		 * @brief Adds a new setting.

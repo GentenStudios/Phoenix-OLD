@@ -34,7 +34,7 @@
 using namespace phx::voxels;
 using namespace phx;
 
-void BlockRegistry::registerAPI(mods::ModManager* manager)
+BlockRegistry::BlockRegistry()
 {
 	BlockType unknownBlock;
 	unknownBlock.displayName = "Unknown Block";
@@ -48,7 +48,10 @@ void BlockRegistry::registerAPI(mods::ModManager* manager)
 	outOfBoundsBlock.id          = "core.out_of_bounds";
 	outOfBoundsBlock.category    = BlockCategory::AIR;
 	registerBlock(outOfBoundsBlock);
+}
 
+void BlockRegistry::registerAPI(cms::ModManager* manager)
+{
 	manager->registerFunction(
 	    "voxel.block.register", [manager](sol::table luaBlock) {
 		    BlockType block;
@@ -98,10 +101,9 @@ void BlockRegistry::registerAPI(mods::ModManager* manager)
 						    texture = luaBlock["textures"][1];
 					    }
 					    textures[i] = manager->getCurrentModPath() + texture;
-					    LOG_WARNING("MODDING")
-					        << manager->getCurrentModPath() + texture;
 				    }
-				    block.textures = textures;
+
+			    	block.textures = textures;
 			    }
 		    }
 		    BlockRegistry::get()->registerBlock(block);

@@ -36,7 +36,7 @@
 #include <queue>
 #include <vector>
 
-namespace phx::mods
+namespace phx::cms
 {
 	class ModManager
 	{
@@ -53,7 +53,7 @@ namespace phx::mods
 		ModManager() = delete;
 
 		// mod paths is a list of paths where mods could be stored.
-		// mod list is literally just the list of mods to load.
+		// toLoad is literally just the list of mods to load.
 		explicit ModManager(const ModList& toLoad, const ModList& paths);
 
 		template <typename F>

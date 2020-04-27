@@ -32,7 +32,7 @@
 #include <algorithm>
 #include <sstream>
 
-using namespace phx::mods;
+using namespace phx::cms;
 
 void Privileges::registerPrivilege(const std::string& priv)
 {

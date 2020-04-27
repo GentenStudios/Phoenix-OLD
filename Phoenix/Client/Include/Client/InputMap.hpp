@@ -65,7 +65,7 @@ namespace phx::client
 		InputMap();
 		~InputMap();
 
-		void registerAPI(mods::ModManager* manager);
+		void registerAPI(cms::ModManager* manager);
 
 		/**
 		 * @brief Forwards call to any matching registered callbacks

@@ -62,7 +62,7 @@ Player::Player(entt::registry* registry)
 	m_pipeline.prepare("Assets/SimpleLines.vert", "Assets/SimpleLines.frag", layout);
 }
 
-void Player::registerAPI(mods::ModManager* manager)
+void Player::registerAPI(cms::ModManager* manager)
 {
 	manager->registerFunction("core.player.getSpeed", [this]() {
 		return m_registry->get<Movement>(m_entity).moveSpeed;

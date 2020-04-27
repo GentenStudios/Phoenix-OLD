@@ -33,7 +33,7 @@
 #include <string>
 #include <vector>
 
-namespace phx::mods
+namespace phx::cms
 {
 	class Mod
 	{

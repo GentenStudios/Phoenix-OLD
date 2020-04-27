@@ -68,7 +68,7 @@ int Setting::getDefault() const { return m_default; }
 
 Settings::Settings() : m_data(json::object()) {}
 
-void Settings::registerAPI(mods::ModManager* manager)
+void Settings::registerAPI(cms::ModManager* manager)
 {
 	manager->registerFunction(
 	    "core.setting.register",

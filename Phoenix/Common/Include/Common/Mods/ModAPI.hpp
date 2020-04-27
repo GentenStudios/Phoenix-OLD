@@ -33,7 +33,7 @@
 #include <vector>
 #include <unordered_map>
 
-namespace phx::mods
+namespace phx::cms
 {
 	class Privileges
 	{

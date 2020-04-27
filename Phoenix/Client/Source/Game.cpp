@@ -69,7 +69,7 @@ Game::Game(gfx::Window* window, entt::registry* registry)
 		toLoad.push_back(input);
 	}
 
-	m_modManager = new mods::ModManager(toLoad, {"Modules"});
+	m_modManager = new cms::ModManager(toLoad, {"Modules"});
 
 	voxels::BlockRegistry::get()->registerAPI(m_modManager);
 
