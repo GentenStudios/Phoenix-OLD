@@ -38,7 +38,7 @@
 #pragma once
 
 #include <Common/Singleton.hpp>
-#include <Common/Mods/ModManager.hpp>
+#include <Common/CMS/ModManager.hpp>
 
 #include <functional>
 #include <ostream>

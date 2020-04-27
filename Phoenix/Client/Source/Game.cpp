@@ -32,7 +32,7 @@
 
 #include <Common/Actor.hpp>
 #include <Common/Commander.hpp>
-#include <Common/Mods/ModManager.hpp>
+#include <Common/CMS/ModManager.hpp>
 #include <Common/Position.hpp>
 #include <Common/Voxels/BlockRegistry.hpp>
 

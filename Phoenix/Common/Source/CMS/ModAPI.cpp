@@ -27,7 +27,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <Common/Logger.hpp>
-#include <Common/Mods/ModAPI.hpp>
+#include <Common/CMS/ModAPI.hpp>
 
 #include <algorithm>
 #include <sstream>

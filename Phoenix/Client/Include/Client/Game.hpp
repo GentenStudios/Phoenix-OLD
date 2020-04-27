@@ -37,7 +37,7 @@
 #include <Client/Player.hpp>
 #include <Client/EscapeMenu.hpp>
 
-#include <Common/Mods/ModManager.hpp>
+#include <Common/CMS/ModManager.hpp>
 
 namespace phx::client
 {

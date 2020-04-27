@@ -26,8 +26,8 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Common/Mods/ModManager.hpp>
-#include <Common/Mods/Mod.hpp>
+#include <Common/CMS/ModManager.hpp>
+#include <Common/CMS/Mod.hpp>
 #include <Common/Logger.hpp>
 
 using namespace phx::cms;

@@ -37,7 +37,7 @@
 #pragma once
 
 #include <Common/Singleton.hpp>
-#include <Common/Mods/ModManager.hpp>
+#include <Common/CMS/ModManager.hpp>
 
 #include <string>
 #include <unordered_map>

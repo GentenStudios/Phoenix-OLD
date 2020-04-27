@@ -38,7 +38,7 @@
 #include <Client/Graphics/ChunkView.hpp>
 #include <Client/Graphics/ShaderPipeline.hpp>
 
-#include <Common/Mods/ModManager.hpp>
+#include <Common/CMS/ModManager.hpp>
 
 #include <glad/glad.h>
 #include <entt/entt.hpp>

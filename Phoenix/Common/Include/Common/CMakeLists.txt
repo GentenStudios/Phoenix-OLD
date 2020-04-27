@@ -1,12 +1,12 @@
 add_subdirectory(Math)
 add_subdirectory(Voxels)
-add_subdirectory(Mods)
+add_subdirectory(CMS)
 
 set(currentDir ${CMAKE_CURRENT_LIST_DIR})
 set(Headers
 	${mathHeaders}
 	${voxelHeaders}
-	${modHeaders}
+	${cmsHeaders}
 
 	${currentDir}/CoreIntrinsics.hpp
 	${currentDir}/EnumTools.hpp

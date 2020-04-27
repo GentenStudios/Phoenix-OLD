@@ -27,7 +27,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <Common/Logger.hpp>
-#include <Common/Mods/Mod.hpp>
+#include <Common/CMS/Mod.hpp>
 
 #include <fstream>
 

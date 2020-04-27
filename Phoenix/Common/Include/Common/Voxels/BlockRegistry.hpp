@@ -31,7 +31,7 @@
 #include <Common/Singleton.hpp>
 #include <Common/Voxels/Block.hpp>
 #include <Common/Voxels/TextureRegistry.hpp>
-#include <Common/Mods/ModManager.hpp>
+#include <Common/CMS/ModManager.hpp>
 
 #include <vector>
 
