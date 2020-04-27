@@ -37,18 +37,16 @@
 
 #pragma once
 
-#include <Common/Singleton.hpp>
+#include <Server/Iris.hpp>
 
 #include <entt/entity/registry.hpp>
+
 #include <functional>
-#include <istream>
-#include <ostream>
 #include <sstream>
 #include <string>
-#include <unordered_map>
 #include <vector>
 
-namespace phx
+namespace phx::server
 {
 	/**
 	 * @brief A function that is called when a command is executed.
@@ -71,76 +69,55 @@ namespace phx
 	 */
 	class Commander
 	{
-        /**
-         * @brief Searches for a command.
-         *
-         * @param command The command to search for.
-         * @return index command is located at or -1 if its not found.
-         */
-        static int find(entt::registry &registry, const std::string& command);
+	public:
+		Commander(entt::registry* registry, networking::Iris* iris);
 
 		/**
 		 * @brief Registers a command in the command registry.
 		 *
+		 * If a command already exists in the registry, this function will
+		 * over write that command with the new data.
+		 *
 		 * @param command The keyword for calling the command.
 		 * @param help A help string that can be displayed to the user.
-		 * @param permission What permission is required to run this command.
 		 * @param f The function that is called when the command is executed.
 		 */
-		static void add(entt::registry &registry, const std::string& command,
-		    const std::string& help, const CommandFunction& f);
+		static void add(const std::string& command, const std::string& help,
+		                const CommandFunction& f);
 
-        /**
-         * @brief Calls a command.
-         *
-         * @param command The keyword for calling the command.
-         * @param args The arguments to be passed to the command.
-         * @param out An output stream to output any return from internal.
-         * commander functions
-         * @return Returns True if the function was called and False if the
-         * function could not be found
-         */
-        static bool run(entt::registry &registry, auto user,
-            const std::string& command, const std::vector<std::string>& args);
+		/**
+		 * @brief Calls a command.
+		 *
+		 * @param command The keyword for calling the command.
+		 * @param args The arguments to be passed to the command.
+		 * @param out An output stream to output any return from internal.
+		 * commander functions
+		 * @return Returns True if the function was called and False if the
+		 * function could not be found
+		 */
+		static bool run(entt::entity* userRef, const std::string& input);
 
-        /**
-         * @brief Returns helpstring for command.
-         *
-         * @param args array of input, args[0] is the command helpstring is
-         * returned for, all other array values are not used.
-         * @param out An output stream to output any help text to.
-         * @return Returns True if successful and False if it could not find
-         * the inputted command.
-         */
-        static bool help(entt::registry &registry, auto user, const std::vector<std::string>& args);
+		/**
+		 * @brief Returns helpstring for command.
+		 *
+		 * @param args array of input, args[0] is the command helpstring is
+		 * returned for, all other array values are not used.
+		 * @param out An output stream to output any help text to.
+		 * @return Returns True if successful and False if it could not find
+		 * the inputted command.
+		 */
+		static bool help(entt::entity*                   userRef,
+		                 const std::vector<std::string>& args);
 
-        /**
-         * @brief Outputs a string listing available commands.
-         *
-         * @param out The output stream the list of commands is sent to.
-         */
-        static void list(entt::registry &registry);
+		/**
+		 * @brief Outputs a string listing available commands.
+		 *
+		 * @param out The output stream the list of commands is sent to.
+		 */
+		static void list(entt::entity* userRef);
 
-        /**
-         * @brief Terminal interface to listen for and execute commands.
-         *
-         * @param in An input stream to get input, usually (but not necessarily)
-         * std::cin.
-         * @param out An output stream output is sent to, usually (but not
-         * necessarily) std::cout.
-         */
-        static void post(std::istream& in, std::ostream& out);
-
-        /**
-         * @brief A callback function that runs a single command and outputs to
-         * a stream.
-         *
-         * @param input Input string containing the command and arguments to be
-         * ran.
-         * @param cout The output stream any output goes to.
-         */
-        static void callback(entt::registry &registry, const std::string& input);
-
+	private:
+		static entt::registry*   m_registry;
+		static networking::Iris* m_iris;
 	};
 } // namespace phx
-

@@ -256,4 +256,4 @@ void Iris::sendState(std::size_t sequence)
 	}
 	enet_host_flush(m_server);
 }
-void Iris::sendMessage(entt::entity* userRef, enet_uint8* data) {}
+void Iris::sendMessage(entt::entity* userRef, const std::string& message) {}
