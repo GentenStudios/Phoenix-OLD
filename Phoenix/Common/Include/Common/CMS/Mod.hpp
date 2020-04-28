@@ -26,65 +26,65 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-
-/**
- * @file ContentLoader.hpp
- * @brief Implements Lua module loading system.
- *
- * @copyright Copyright (c) 2020 Genten Studios
- *
- */
-
 #pragma once
-
-#include <Common/Singleton.hpp>
 
 #include <sol/sol.hpp>
 
-#include <vector>
 #include <string>
+#include <vector>
 
-namespace phx
+namespace phx::cms
 {
-	/// @brief A lightweight struct to store a module and the list of
-	/// dependencies that module has.
-	struct Mod
-	{
-		/// @brief The name of the module, should match the folder name.
-		std::string name;
-
-		/// @brief List of dependencies that the module needs in order to load.
-		std::vector<std::string> dependencies;
-
-		/**
-		 * @brief Constructor for mod object, folder matching mod name with a
-		 * dependencies.txt inside modules folder must exist.
-		 */
-		explicit Mod(std::string name);
-		~Mod() = default;
-	};
-
-    class ContentManager : public Singleton<ContentManager>
+	/**
+	 * @brief Class to encapsulate a "mod".
+	 *
+	 * This class is literally just to load dependencies and provide an easy way
+	 * to get the name and path of the mod. It's tidier to store a vector of
+	 * mods than a vector of names, paths, and dependencies.
+	 */
+	class Mod
 	{
 	public:
+		using Dependencies = std::vector<std::string>;
+
+	public:
+		Mod() = delete;
+
 		/**
-		 * @brief Loads necessary lua modules required to load a save file.
+		 * @brief Constructs a mod object and reads the dependency list.
+		 * @param modName The name of the mod.
+		 * @param modPath The path that the mod is found in.
 		 *
-		 * @param save The save file to be loaded.
-		 * @return true If the function successfully loaded all modules.
-		 * @return false If the function failed to load modules, details will
-		 *         be outputted to the terminal.
-		 *
-		 * @todo Add proper error handling instead of returning a boolean.
+		 * Mod Path should be the path that the mod is found in, not the
+		 * directory of the mod itself.
 		 */
-		bool loadModules(const std::string& save);
+		Mod(const std::string& modName, const std::string& modPath);
 
-		sol::state lua;
+		/**
+		 * @brief Gets the name of the mod.
+		 * @return The name of the mod.
+		 */
+		const std::string&  getName() const;
 
-		std::string currentMod;
+		/**
+		 * @brief Gets the parent folder of the mod.
+		 * @return The path that the mod resides in.
+		 *
+		 * It will return the folder that the mod resides in, not the mod's
+		 * folder itself. Combine with getName() to make a whole path.
+		 */
+		const std::string&  getPath() const;
 
-		ContentManager();
+		/**
+		 * @brief Gets the mod's dependencies.
+		 * @return An array of dependencies for the mod.
+		 */
+		const Dependencies& getDependencies() const;
+
+	private:
+		std::string m_name;
+		std::string m_path;
+
+		Dependencies m_dependencies;
 	};
-}; // namespace phx
-
-
+} // namespace phx::mods

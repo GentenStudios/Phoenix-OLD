@@ -30,14 +30,16 @@
 #include <Client/Crosshair.hpp>
 #include <Client/Game.hpp>
 
+#include <Common/CMS/ModManager.hpp>
+#include <Common/Serialization/Serializer.hpp>
 #include <Common/Voxels/BlockRegistry.hpp>
 
-#include <Common/Commander.hpp>
-#include <Common/ContentLoader.hpp>
-
-#include <Common/Position.hpp>
 #include <Common/Actor.hpp>
-#include <Common/Serialization/Serializer.hpp>
+#include <Common/Commander.hpp>
+#include <Common/Position.hpp>
+
+#include <cmath>
+
 using namespace phx::client;
 using namespace phx;
 
@@ -58,23 +60,37 @@ static void rawEcho(const std::string& input, std::ostringstream& cout)
 }
 
 Game::Game(gfx::Window* window, entt::registry* registry)
-: Layer("Game"), m_window(window), m_registry(registry)
+    : Layer("Game"), m_window(window), m_registry(registry)
 {
-	ContentManager::get()->lua["core"]["print"] =
-		/**
-		* @addtogroup luaapi
-		*
-		* @subsubsection coreprint core.print(text)
-		* @brief Prints text to the players terminal
-		*
-		* @param text The text to be outputted to the terminal
-		*
-		*/
-		[=](const std::string& text) { m_chat->cout << text << "\n"; };
+	const std::string save = "save1";
 
-	voxels::BlockRegistry::get()->initialise();
+	std::fstream             fileStream;
+	std::vector<std::string> toLoad;
 
-	myGame = this;
+	fileStream.open("Saves/" + save + "/Mods.txt");
+	if (!fileStream.is_open())
+	{
+		std::cout << "Error opening save file";
+		exit(EXIT_FAILURE);
+	}
+
+	std::string input;
+	while (std::getline(fileStream, input))
+	{
+		toLoad.push_back(input);
+	}
+
+	m_modManager = new cms::ModManager(toLoad, {"Modules"});
+
+	voxels::BlockRegistry::get()->registerAPI(m_modManager);
+
+	m_modManager->registerFunction("core.print", [=](const std::string& text) {
+		m_chat->cout << text << "\n";
+	});
+
+	Settings::get()->registerAPI(m_modManager);
+	InputMap::get()->registerAPI(m_modManager);
+	CommandBook::get()->registerAPI(m_modManager);
 }
 
 Game::~Game() { delete m_chat; }
@@ -127,23 +143,30 @@ void Game::onAttach()
 	/// @TODO replace with network callback
 	m_chat->registerCallback(rawEcho);
 
-	const std::string save = "save1";
+	m_player = new Player(m_registry);
+	m_player->registerAPI(m_modManager);
 
-    printf("%s", "Loading Modules\n");
-	if (!ContentManager::get()->loadModules(save))
+	float progress = 0.f;
+	auto  result   = m_modManager->load(&progress);
+
+	if (!result.ok)
 	{
-		signalRemoval();
+		LOG_FATAL("MODDING") << "An error has occured.";
+		exit(EXIT_FAILURE);
 	}
 
-    printf("%s", "Registering world\n");
+	printf("%s", "Registering world\n");
+	const std::string save = "save1";
 	m_world  = new voxels::ChunkView(3, voxels::Map(save, "map1"));
-	m_player = new Player(m_world, m_registry);
+	m_player->setWorld(m_world);
 	m_camera = new gfx::FPSCamera(m_window, m_registry);
 	m_camera->setActor(m_player->getEntity());
 
-    m_registry->emplace<Hand>(m_player->getEntity(), voxels::BlockRegistry::get()->getFromRegistryID(0));
+	m_registry->emplace<Hand>(
+	    m_player->getEntity(),
+	    voxels::BlockRegistry::get()->getFromRegistryID(0));
 
-    printf("%s", "Prepare rendering\n");
+	printf("%s", "Prepare rendering\n");
 	m_renderPipeline.prepare("Assets/SimpleWorld.vert",
 							"Assets/SimpleWorld.frag",
 							gfx::ChunkRenderer::getRequiredShaderLayout());
@@ -153,16 +176,17 @@ void Game::onAttach()
 	const math::mat4 model;
 	m_renderPipeline.setMatrix("u_model", model);
 
-    printf("%s", "Register GUI\n");
+	printf("%s", "Register GUI\n");
 	Client::get()->pushLayer(new Crosshair(m_window));
 	m_escapeMenu = new EscapeMenu(m_window);
 
 	if (Client::get()->isDebugLayerActive())
 	{
-		m_gameDebug = new GameTools(&m_followCam, &m_playerHand, m_player, m_registry);
+		m_gameDebug =
+		    new GameTools(&m_followCam, &m_playerHand, m_player, m_registry);
 		Client::get()->pushLayer(m_gameDebug);
 	}
-    printf("%s", "Game layer attached");
+	printf("%s", "Game layer attached");
 }
 
 void Game::onDetach()
@@ -212,13 +236,13 @@ void Game::onEvent(events::Event& e)
 			break;
 		case events::Keys::KEY_E:
 			m_playerHand++;
-            m_registry->get<Hand>(m_player->getEntity()).hand =
+			m_registry->get<Hand>(m_player->getEntity()).hand =
 			    voxels::BlockRegistry::get()->getFromRegistryID(m_playerHand);
 			e.handled = true;
 			break;
 		case events::Keys::KEY_R:
 			m_playerHand--;
-            m_registry->get<Hand>(m_player->getEntity()).hand =
+			m_registry->get<Hand>(m_player->getEntity()).hand =
 			    voxels::BlockRegistry::get()->getFromRegistryID(m_playerHand);
 			e.handled = true;
 			break;
@@ -226,8 +250,8 @@ void Game::onEvent(events::Event& e)
 			if (Client::get()->isDebugLayerActive())
 				if (m_gameDebug == nullptr)
 				{
-					m_gameDebug =
-					    new GameTools(&m_followCam, &m_playerHand, m_player, m_registry);
+					m_gameDebug = new GameTools(&m_followCam, &m_playerHand,
+					                            m_player, m_registry);
 					Client::get()->pushLayer(m_gameDebug);
 				}
 				else
@@ -296,8 +320,16 @@ void Game::tick(float dt)
 		}
 	}
 
-	m_camera->tick(dt);
+	// temp, will change in the future, based on game time
+	static math::vec3 lightdir(0.f, -1.f, 0.f);
+	static float time = 0.f;
 
+	time += dt;
+
+	lightdir.y = std::sin(time);
+	lightdir.x = std::cos(time);
+
+	m_camera->tick(dt);
 
 	static std::size_t sequence;
 	sequence++;
@@ -342,8 +374,12 @@ void Game::tick(float dt)
 	m_renderPipeline.activate();
 	m_renderPipeline.setMatrix("u_view", m_camera->calculateViewMatrix());
 	m_renderPipeline.setMatrix("u_projection", m_camera->getProjection());
+	m_renderPipeline.setFloat("u_AmbientStrength", 0.7f);
+	m_renderPipeline.setVector3("u_LightDir", lightdir);
+	m_renderPipeline.setFloat("u_Brightness", 0.6f);
 
 	m_world->render();
+	m_player->renderSelectionBox(m_camera->calculateViewMatrix(), m_camera->getProjection());
 }
 
 void Game::sendMessage(const std::string& input, std::ostringstream& cout)
