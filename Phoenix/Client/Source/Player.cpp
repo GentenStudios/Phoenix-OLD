@@ -35,8 +35,6 @@
 #include <Common/Movement.hpp>
 #include <Common/Position.hpp>
 
-#include <cstring>
-
 using namespace phx;
 
 static const float RAY_INCREMENT = 0.5f;

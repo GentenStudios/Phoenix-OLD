@@ -27,7 +27,6 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <Server/Server.hpp>
-
 #include <Common/Settings.hpp>
 
 #include <iostream>

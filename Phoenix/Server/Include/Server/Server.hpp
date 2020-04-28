@@ -43,7 +43,6 @@
 
 namespace phx::server
 {
-
 	class Server
 	{
 	public:

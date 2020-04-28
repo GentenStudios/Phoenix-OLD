@@ -138,7 +138,7 @@ void Game::onAttach()
 	}
 
 	m_chat = new ui::ChatWindow("Chat Window", 5,
-								"Type /help for a command list and help.");
+	                            "Type /help for a command list and help.");
 
 	/// @TODO replace with network callback
 	m_chat->registerCallback(rawEcho);
@@ -168,8 +168,8 @@ void Game::onAttach()
 
 	printf("%s", "Prepare rendering\n");
 	m_renderPipeline.prepare("Assets/SimpleWorld.vert",
-							"Assets/SimpleWorld.frag",
-							gfx::ChunkRenderer::getRequiredShaderLayout());
+	                         "Assets/SimpleWorld.frag",
+	                         gfx::ChunkRenderer::getRequiredShaderLayout());
 
 	m_renderPipeline.activate();
 
