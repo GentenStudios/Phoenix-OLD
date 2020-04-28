@@ -68,7 +68,7 @@ namespace phx::server::networking
 		void run();
 
 		void auth();
-		void disconnect();
+		void disconnect(entt::entity* userRef);
 
 		void parseEvent(entt::entity* userRef, enet_uint8* data,
 		                std::size_t dataLength);

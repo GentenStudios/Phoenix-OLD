@@ -278,7 +278,7 @@ void Game::onEvent(events::Event& e)
 void Game::tick(float dt)
 {
 	//	std::cout << "tick";
-	//    LOG_WARNING("MAINLOOP") << "WTF";
+	//  LOG_WARNING("MAINLOOP") << "WTF";
 	if (enet_host_service(m_client, &m_event, 0))
 	{
 		switch (m_event.type)
@@ -385,6 +385,6 @@ void Game::parseState(enet_uint8* data, std::size_t dataLength)
 }
 void Game::parseMessage(enet_uint8* data, std::size_t dataLength)
 {
-	LOG_INFO("Messenger") << "Message received";
+	LOG_INFO("Messenger") << data;
 	m_chat->cout << data;
 }

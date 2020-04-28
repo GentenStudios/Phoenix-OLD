@@ -120,8 +120,7 @@ void Iris::run()
 				break;
 
 			case ENET_EVENT_TYPE_DISCONNECT:
-				printf("%s disconnected.\n",
-				       static_cast<const char*>(m_event.peer->data));
+				disconnect(static_cast<entt::entity*>(m_event.peer->data));
 				break;
 
 			case ENET_EVENT_TYPE_NONE:
@@ -133,8 +132,14 @@ void Iris::run()
 
 void Iris::auth() {}
 
-void Iris::disconnect() {}
-void Iris::parseEvent(entt::entity* userRef, enet_uint8* data, std::size_t dataLength)
+void Iris::disconnect(entt::entity* userRef)
+{
+	printf("%s disconnected.\n",
+	       m_registry->get<User>(*userRef).userName.c_str());
+	m_registry->destroy(*userRef);
+}
+void Iris::parseEvent(entt::entity* userRef, enet_uint8* data,
+                      std::size_t dataLength)
 {
 	User user = m_registry->get<User>(*userRef);
 	printf("Event received");
