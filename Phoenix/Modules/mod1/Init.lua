@@ -9,7 +9,7 @@ function hello (args)
     end
 end
 
-core.command.register("Hello", "Master the arts of the Jedi you must", hello)
+--core.command.register("Hello", "Master the arts of the Jedi you must", hello)
 
 block = {}
 block.name = "Dirt"

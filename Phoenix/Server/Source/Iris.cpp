@@ -144,16 +144,16 @@ void Iris::parseEvent(entt::entity* userRef, enet_uint8* data, std::size_t dataL
 void Iris::parseState(entt::entity* userRef, enet_uint8* data, std::size_t dataLength)
 {
 	User user = m_registry->get<User>(*userRef);
-	printf("A State packet containing %s was received from %s\n", data,
-	       user.userName.c_str());
+	//	printf("A State packet containing %s was received from %s\n", data,
+	//	       user.userName.c_str());
 
 	const float dt = 1.f / 20.f;
 
 	InputState input;
 
-    phx::Serializer ser(Serializer::Mode::READ);
-	ser.setBuffer((std::byte*)data, dataLength);
-    ser & input;
+	phx::Serializer ser(Serializer::Mode::READ);
+	ser.setBuffer((std::byte*) data, dataLength);
+	ser& input;
 
 	// If the queue is empty we need to add a new bundle
 	if (stateQueue.empty())
@@ -189,7 +189,7 @@ void Iris::parseState(entt::entity* userRef, enet_uint8* data, std::size_t dataL
 	}
 
 	{
-		printf("insert existing %lu \n", input.sequence);
+		//		printf("insert existing %lu \n", input.sequence);
 		for (auto bundle : stateQueue)
 		{
 			if (bundle.sequence == input.sequence)
@@ -226,7 +226,7 @@ void Iris::parseMessage(entt::entity* userRef, enet_uint8* data, std::size_t dat
 	else
 	{
 		std::string message =
-		    user.userName + ": " + reinterpret_cast<char*>(data);
+		    user.userName + ": " + reinterpret_cast<char*>(data) + "\n";
 
 		printf("%s", message.c_str());
 		ENetPacket* packet = enet_packet_create(message.c_str(), message.size(),

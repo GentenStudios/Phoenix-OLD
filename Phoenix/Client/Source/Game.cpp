@@ -35,13 +35,12 @@
 #include <Common/Commander.hpp>
 #include <Common/ContentLoader.hpp>
 
-#include <Common/Position.hpp>
 #include <Common/Actor.hpp>
+#include <Common/Logger.hpp>
+#include <Common/Position.hpp>
 #include <Common/Serialization/Serializer.hpp>
 using namespace phx::client;
 using namespace phx;
-
-static Commander kirk;
 
 ///@todo This needs refactored to play nicely
 /**
@@ -278,26 +277,48 @@ void Game::onEvent(events::Event& e)
 
 void Game::tick(float dt)
 {
-	if(enet_host_service(m_client, &m_event, 0))
+	//	std::cout << "tick";
+	//    LOG_WARNING("MAINLOOP") << "WTF";
+	if (enet_host_service(m_client, &m_event, 0))
 	{
-		switch(m_event.type)
+		switch (m_event.type)
 		{
 		case ENET_EVENT_TYPE_RECEIVE:
-			printf ("A packet of length %zu containing %s was received from %u on channel %u|%u.\n",
-					m_event.packet -> dataLength,
-					m_event.packet -> data,
-					m_event.peer -> address.host,
-					m_event.peer -> address.port,
-			       m_event.channelID);
+			//                printf ("A packet of length %u containing %s
+			//                was received from %s on channel %u.\n",
+			//                        m_event.packet -> dataLength,
+			//                        m_event.packet -> data,
+			//                        m_event.peer -> data -> userName,
+			//                        m_event.channelID);
+			switch (m_event.channelID)
+			{
+			case 0:
+				parseEvent(m_event.packet->data, m_event.packet->dataLength);
+				break;
+			case 1:
+				parseState(m_event.packet->data, m_event.packet->dataLength);
+				break;
+			case 2:
+				parseMessage(m_event.packet->data, m_event.packet->dataLength);
+				break;
+			}
+
 			/* Clean up the packet now that we're done using it. */
 			enet_packet_destroy(m_event.packet);
+			break;
 
+		case ENET_EVENT_TYPE_DISCONNECT:
+			printf("%s disconnected.\n",
+			       static_cast<const char*>(m_event.peer->data));
+			/// @todo we should probably kill the game at this point
+			break;
+
+		case ENET_EVENT_TYPE_NONE:
 			break;
 		}
 	}
 
 	m_camera->tick(dt);
-
 
 	static std::size_t sequence;
 	sequence++;
@@ -350,7 +371,20 @@ void Game::sendMessage(const std::string& input, std::ostringstream& cout)
 {
 	ENetPacket* packet;
 	packet = enet_packet_create(input.c_str(), input.size(),
-								ENET_PACKET_FLAG_RELIABLE);
+	                            ENET_PACKET_FLAG_RELIABLE);
 	enet_peer_send(m_peer, 2, packet);
 	enet_host_flush(m_client);
+}
+void Game::parseEvent(enet_uint8* data, std::size_t dataLength)
+{
+	printf("Event received");
+}
+void Game::parseState(enet_uint8* data, std::size_t dataLength)
+{
+	printf("State received");
+}
+void Game::parseMessage(enet_uint8* data, std::size_t dataLength)
+{
+	LOG_INFO("Messenger") << "Message received";
+	m_chat->cout << data;
 }
