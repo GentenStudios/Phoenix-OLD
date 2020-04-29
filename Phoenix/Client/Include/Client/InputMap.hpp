@@ -32,6 +32,7 @@
 #include <Client/Events/IEventListener.hpp>
 
 #include <Common/Singleton.hpp>
+#include <Common/CMS/ModManager.hpp>
 
 #include <functional>
 #include <string>
@@ -64,10 +65,7 @@ namespace phx::client
 		InputMap();
 		~InputMap();
 
-		/**
-		 * @brief Initializes the Lua API for the inputMap
-		 */
-		void initialize();
+		void registerAPI(cms::ModManager* manager);
 
 		/**
 		 * @brief Forwards call to any matching registered callbacks

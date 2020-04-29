@@ -37,6 +37,8 @@
 #include <Client/Player.hpp>
 #include <Client/EscapeMenu.hpp>
 
+#include <Common/CMS/ModManager.hpp>
+
 #include <deque>
 #include <enet/enet.h>
 
@@ -91,6 +93,8 @@ namespace phx::client
 		gfx::ShaderPipeline m_renderPipeline;
 
 		ui::ChatWindow* m_chat = nullptr;
+
+		cms::ModManager* m_modManager;
 
 		EscapeMenu* m_escapeMenu = nullptr;
 		GameTools* m_gameDebug = nullptr;

@@ -36,7 +36,6 @@
  */
 
 #include <Common/Commander.hpp>
-#include <Common/ContentLoader.hpp>
 
 using namespace phx;
 
@@ -72,54 +71,13 @@ void CommandBook::add(const std::string& command, const std::string& help,
 
 int CommandBook::getPage() { return m_page; }
 
-CommandBook::CommandBook()
+void CommandBook::registerAPI(cms::ModManager* manager)
 {
-	ContentManager::get()->lua["core"]["command"] =
-	    /**
-	     * @addtogroup luaapi
-	     *
-	     * ---
-	     * @subsection corecmd core.command
-	     * @brief Interfaces with the commander
-	     *
-	     */
-	    ContentManager::get()->lua.create_table();
-	ContentManager::get()->lua["core"]["command"]["register"] =
-	    /**
-	     * @addtogroup luaapi
-	     *
-	     * @subsubsection corecmdreg core.command.register
-	     * @brief Registers a new command
-	     *
-	     * In the terminal typing "/" followed by a command will execute the
-	     *command
-	     *
-	     * @param command The command to register
-	     * @param help A helpstring that is printed to terminal when typing
-	     *"/help <command>"
-	     * @param f The callback function that is called by the commander
-	     * The callback function must take a table as an argument
-	     * Any arguments included when the command is executed will be passed in
-	     *this table
-	     *
-	     * @b Example:
-	     * @code {.lua}
-	     * function hello (args)
-	     *     if args[1] == "there" then
-	     *         print("General Kenobi")
-	     *	   elseif args[1] == "world" then
-	     * 		   print("World says hi")
-	     *	   else
-	     *         print("with you, the force is not")
-	     *     end
-	     * end
-	     * core.command.register("Hello", "Master the arts of the Jedi you
-	     *must", hello)
-	     * @endcode
-	     */
+	manager->registerFunction(
+	    "core.command.register",
 	    [](std::string command, std::string help, sol::function f) {
 		    CommandBook::get()->add(command, help, "all", f);
-	    };
+	    });
 }
 
 bool Commander::help(const std::vector<std::string>& args, std::ostream& out)
@@ -282,4 +240,3 @@ void Commander::callback(const std::string& input, std::ostringstream& cout)
 		run(command, args, cout);
 	}
 }
-

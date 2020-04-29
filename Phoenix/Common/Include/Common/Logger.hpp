@@ -38,7 +38,7 @@
 #include <utility>
 
 #define LOGGER_INTERNAL(verbosity, component)           \
-	if (phx::Logger::get() == nullptr &&                \
+	if (phx::Logger::get() == nullptr ||                \
 	    verbosity > phx::Logger::get()->getVerbosity()) \
 	{                                                   \
 		;                                               \

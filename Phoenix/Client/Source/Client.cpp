@@ -31,6 +31,7 @@
 #include <Client/SplashScreen.hpp>
 
 #include <Common/Logger.hpp>
+#include <Common/Settings.hpp>
 
 using namespace phx::client;
 using namespace phx;
