@@ -31,6 +31,7 @@
 #include <Common/Singleton.hpp>
 #include <Common/Voxels/Block.hpp>
 #include <Common/Voxels/TextureRegistry.hpp>
+#include <Common/CMS/ModManager.hpp>
 
 #include <vector>
 
@@ -62,11 +63,11 @@ namespace phx::voxels
 	class BlockRegistry : public Singleton<BlockRegistry>
 	{
 	public:
-		/// @brief Registers respective Lua methods.
 		BlockRegistry();
+		~BlockRegistry() = default;
 
 		// @brief Initializes the registry.
-		void initialise();
+		void registerAPI(cms::ModManager* manager);
 
 		/**
 		 * @brief Registers a block in the registry.

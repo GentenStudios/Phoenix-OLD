@@ -29,7 +29,9 @@
 #include <Client/Client.hpp>
 #include <Client/Game.hpp>
 #include <Client/SplashScreen.hpp>
-#include <cstring>
+
+#include <Common/Logger.hpp>
+#include <Common/Settings.hpp>
 
 using namespace phx::client;
 using namespace phx;
@@ -116,6 +118,8 @@ void Client::onEvent(events::Event e)
 
 void Client::run()
 {
+	Logger::get()->initialize({});
+
 	Settings::get()->load("settings.txt");
 
 	SplashScreen* splashScreen = new SplashScreen();

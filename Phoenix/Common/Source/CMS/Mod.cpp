@@ -26,14 +26,44 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Client/Client.hpp>
+#include <Common/Logger.hpp>
+#include <Common/CMS/Mod.hpp>
 
-using namespace phx;
+#include <fstream>
 
-#undef main
-int main(int argc, char** argv)
+using namespace phx::cms;
+
+Mod::Mod(const std::string& modName, const std::string& modPath)
 {
-	client::Client::get()->run();
+	m_name = modName;
+	m_path = modPath;
 
-	return 0;
+	{
+		std::fstream deps;
+
+		deps.open(m_path + "/" + modName + "/Dependencies.txt");
+		if (!deps.is_open())
+		{
+			LOG_WARNING("MODDING")
+			    << "Mod " << modName << " does not include a Dependencies.txt!";
+
+			// assuming no deps, even if it causes failure further down.
+			return;
+		}
+
+		std::string input;
+		while (std::getline(deps, input))
+		{
+			if (!input.empty())
+			{
+				m_dependencies.push_back(input);
+			}
+		}
+
+		deps.close();
+	}
 }
+
+const Mod::Dependencies& Mod::getDependencies() const { return m_dependencies; }
+const std::string&       Mod::getPath() const { return m_path; }
+const std::string&       Mod::getName() const { return m_name; }
