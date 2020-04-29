@@ -22,7 +22,7 @@ void main()
 		b => bits needed for the blue component
 		a => bits needed for the alpha component
 	*/
-	const float lightIntensity = float((color_i & 15)) / 15.0;
+	float lightIntensity = float((color_i & 15)) / 15.0;
 	vec4 objectColor = vec4(
 		float((color_i & 61440) >> 12) / 15.0,
 		float((color_i & 3840)  >> 8 ) / 15.0,
