@@ -90,6 +90,8 @@ Game::Game(gfx::Window* window, entt::registry* registry)
 	Settings::get()->registerAPI(m_modManager);
 	InputMap::get()->registerAPI(m_modManager);
 	CommandBook::get()->registerAPI(m_modManager);
+
+	myGame = this;
 }
 
 Game::~Game() { delete m_chat; }
@@ -409,8 +411,11 @@ void Game::sendMessage(const std::string& input, std::ostringstream& cout)
 	ENetPacket* packet;
 	packet = enet_packet_create(input.c_str(), input.size(),
 	                            ENET_PACKET_FLAG_RELIABLE);
+	LOG_INFO("TEST") << "Send Message: " << input;
 	enet_peer_send(m_peer, 2, packet);
+	LOG_INFO("TEST") << "Sending Message";
 	enet_host_flush(m_client);
+	LOG_INFO("TEST") << "Sent Message";
 }
 void Game::parseEvent(enet_uint8* data, std::size_t dataLength)
 {
