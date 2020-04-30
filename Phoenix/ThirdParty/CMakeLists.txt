@@ -25,8 +25,9 @@ add_subdirectory (ImGui)
 add_subdirectory (sol2)
 add_subdirectory (lua)
 add_subdirectory (json)
+add_subdirectory (enet)
 
-set_target_properties(SDL2main SDL2-static uninstall Glad ImGui lua liblua PROPERTIES FOLDER Dependencies)
+set_target_properties(SDL2main SDL2-static uninstall Glad ImGui lua liblua enet PROPERTIES FOLDER Dependencies)
 
 # utility thing to make phoenix cmake tidier
 set(PHX_THIRD_PARTY_INCLUDES
@@ -37,9 +38,9 @@ set(PHX_THIRD_PARTY_INCLUDES
 	${CMAKE_CURRENT_LIST_DIR}/lua
 	${CMAKE_CURRENT_LIST_DIR}/sol2/include
 	${CMAKE_CURRENT_LIST_DIR}/stb_image
-	${CMAKE_CURRENT_LIST_DIR}/stb_rectpack
 	${CMAKE_CURRENT_LIST_DIR}/entt/src
 	${CMAKE_CURRENT_LIST_DIR}/json/include
+	${CMAKE_CURRENT_LIST_DIR}/enet/include
 
 	PARENT_SCOPE
 )
@@ -52,7 +53,10 @@ set(PHX_THIRD_PARTY_LIBRARIES
 	sol2
 	liblua
 	nlohmann_json::nlohmann_json
+	enet
 	$<$<PLATFORM_ID:Windows>:opengl32.lib> # link to opengl32.lib if windows.
+	$<$<PLATFORM_ID:Windows>:ws2_32.lib> # link to ws2_32.lib if windows.
+	$<$<PLATFORM_ID:Windows>:winmm.lib> # link to winmm.lib if windows.
 
 	PARENT_SCOPE
 )
