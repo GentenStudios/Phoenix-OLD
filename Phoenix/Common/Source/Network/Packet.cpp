@@ -40,7 +40,7 @@ Packet::Packet(const Data& data, PacketFlags flags)
 Packet::Packet(std::size_t size, PacketFlags flags)
     : Packet(*enet_packet_create(
           nullptr, size,
-          static_cast<enet_uint32>(flags & ~PacketFlags::UNRELIABLE)))
+          static_cast<enet_uint32>(flags & ~PacketFlags::UNRELIABLE)), false)
 {
 }
 

@@ -75,7 +75,7 @@ namespace phx::net
 		Packet() = default;
 		Packet(const Data& data, PacketFlags flags);
 		Packet(std::size_t size, PacketFlags flags);
-		explicit Packet(ENetPacket& packet, bool sent = false);
+		Packet(ENetPacket& packet, bool sent);
 
 		~Packet();
 

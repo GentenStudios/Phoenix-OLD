@@ -34,7 +34,7 @@
 
 static std::vector<std::byte> pack(const std::string& string)
 {
-	std::vector<std::byte> arr(string.length() + 1);
+	std::vector<std::byte> arr(string.length());
 	std::transform(string.begin(), string.end(), arr.begin(),
 	               [](char c) { return std::byte(c); });
 
@@ -70,8 +70,9 @@ int main(int argc, char** argv)
 
 	client.onConnect(
 	    [](net::Peer&, enet_uint32) { LOG_INFO("CLIENT") << "Connected."; });
-	client.onDisconnect(
-	    [](void*, enet_uint32) { LOG_INFO("CLIENT") << "Disconnected."; });
+	client.onDisconnect([](std::size_t, enet_uint32) {
+		LOG_INFO("CLIENT") << "Disconnected.";
+	});
 
 	bool work = true;
 	client.onReceive([&work](net::Peer&, net::Packet&& packet, enet_uint32) {
@@ -82,24 +83,29 @@ int main(int argc, char** argv)
 		}
 
 		LOG_INFO("CLIENT") << "Server says: " << data;
+		std::cout << ">> ";
 	});
 
 	auto server = client.connect({hostname, port}).value().get();
 
+	std::thread t1([&work, &client]() {
+		while (work)
+		{
+			client.poll(100_ms);
+		}
+	});
+
 	while (work)
 	{
-		client.poll(100_ms);
+		std::string str;
+		std::cout << ">> ";
+		std::cin >> str;
 
-		if (work)
-		{
-			std::string str;
-			LOG_INFO("Another loop") << "";
-			std::cin >> str;
-
-			auto data = pack(str);
-			server.send({data, net::PacketFlags::RELIABLE}, 0);
-		}
+		auto data = pack(str);
+		server.send({data, net::PacketFlags::RELIABLE}, 0);
 	}
+
+	t1.join();
 
 	return 0;
 }

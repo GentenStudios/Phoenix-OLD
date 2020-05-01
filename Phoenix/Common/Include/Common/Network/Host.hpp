@@ -48,17 +48,19 @@ namespace phx::net
 		    std::function<void(Peer&, Packet&&, enet_uint8)>;
 		using ConnectCallback = std::function<void(Peer&, enet_uint32)>;
 		using DisconnectCallback =
-		    std::function<void(void*, enet_uint32)>;
+		    std::function<void(std::size_t, enet_uint32)>;
 
 	public:
 		Host(std::size_t peers = 1, const ENetAddress* address = nullptr);
-		Host(const Address& address, std::size_t peers, std::size_t channels = 0);
+		Host(const Address& address, std::size_t peers,
+		     std::size_t channels = 0);
 		~Host();
 
 		// check if value exists before using.
 		using OptionalPeer = std::optional<std::reference_wrapper<Peer>>;
 		OptionalPeer connect(const Address& address);
-		OptionalPeer connect(const Address& address, enet_uint8 channels, enet_uint32 data = 0);
+		OptionalPeer connect(const Address& address, enet_uint8 channels,
+		                     enet_uint32 data = 0);
 
 		Bandwidth getBandwidth() const;
 		void      setBandwidth(const Bandwidth& bandwidth);
@@ -73,8 +75,8 @@ namespace phx::net
 		void onConnect(ConnectCallback callback);
 		void onDisconnect(DisconnectCallback callback);
 
-		void poll(int limit = 0);
-		void poll(time::ms timeout, int limit = 0);
+		void poll(int limit = 1);
+		void poll(time::ms timeout, int limit = 1);
 
 		void flush();
 
@@ -95,7 +97,7 @@ namespace phx::net
 
 		Peer& getPeer(ENetPeer& peer);
 		Peer& createPeer(ENetPeer& peer);
-		void removePeer(ENetPeer& peer);
+		void  removePeer(ENetPeer& peer);
 
 	private:
 		ENetHost* m_host;

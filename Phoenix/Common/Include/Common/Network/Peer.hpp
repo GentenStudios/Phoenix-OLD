@@ -95,11 +95,7 @@ namespace phx::net
 
 		PeerStatus getState() const;
 
-		template <typename T>
-		void setData(T data);
-
-		template <typename T>
-		T* getData();
+		std::size_t getID() const { return std::size_t(m_peer->data); }
 
 		operator ENetPeer*() const { return m_peer; }
 
@@ -110,17 +106,3 @@ namespace phx::net
 		Address m_address;
 	};
 } // namespace phx::net
-
-template <typename T>
-void phx::net::Peer::setData(T data)
-{
-	static_cast<detail::PeerData*>(m_peer->data)->data =
-	    static_cast<void*>(data);
-}
-
-template <typename T>
-T* phx::net::Peer::getData()
-{
-	return static_cast<T*>(
-	    static_cast<detail::PeerData*>(m_peer->data)->data);
-}

@@ -91,11 +91,18 @@ std::string Address::getIP() const
 	// enet doesn't support ipv6 afaik.
 	constexpr int IPv4MaxBytes = 15;
 
+	std::string ip;
+
 	// + 1 for null terminator.
-	char ip[IPv4MaxBytes + 1];
-	if (enet_address_get_host_ip(&m_address, ip, IPv4MaxBytes))
+	char ipRaw[IPv4MaxBytes + 1];
+	if (enet_address_get_host_ip(&m_address, ipRaw, IPv4MaxBytes))
 	{
 		LOG_FATAL("NETCODE") << "Failed to get IP.";
+		ip = "Unknown IP";
+	}
+	else
+	{
+		ip = ipRaw;
 	}
 
 	return ip;

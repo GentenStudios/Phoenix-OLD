@@ -40,7 +40,7 @@ using namespace phx;
 
 static std::vector<std::byte> pack(const std::string& string)
 {
-	std::vector<std::byte> arr(string.length() + 1);
+	std::vector<std::byte> arr(string.length());
 	std::transform(string.begin(), string.end(), arr.begin(),
 	               [](char c) { return std::byte(c); });
 
@@ -50,6 +50,7 @@ static std::vector<std::byte> pack(const std::string& string)
 static std::string unpack(const std::vector<std::byte>& data)
 {
 	std::string string;
+	string.resize(data.size());
 	std::transform(data.begin(), data.end(), string.begin(),
 	               [](std::byte c) { return char(c); });
 
@@ -77,9 +78,10 @@ int main(int argc, char** argv)
 
 	server.onConnect([](net::Peer& peer, enet_uint32) {
 		LOG_INFO("SERVER") << "New connection: " << descClient(peer);
+		peer.send({pack("yoyo!"), net::PacketFlags::RELIABLE});
 	});
 
-	server.onDisconnect([](void*, enet_uint32) {
+	server.onDisconnect([](std::size_t, enet_uint32) {
 		LOG_INFO("SERVER") << "A client disconnected.";
 	});
 
@@ -88,18 +90,19 @@ int main(int argc, char** argv)
 	    [&work](net::Peer& peer, net::Packet&& packet, enet_uint32) {
 		    auto data = unpack(packet.getData());
 		    LOG_INFO("SERVER") << "New packet from: " << descClient(peer)
-		                       << "\n Contents: " << data;
+		                       << "\n\tContents: " << data;
 		    peer.send(packet);
 
 		    if (data == "quit")
 		    {
+			    //server.flush();
 			    work = false;
 		    }
 	    });
 
 	while (work)
 	{
-		server.poll(1000_ms);
+		server.poll(100_ms);
 	}
 
 	Logger::teardown();

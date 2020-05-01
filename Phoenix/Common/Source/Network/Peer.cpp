@@ -89,7 +89,7 @@ void Peer::receive(Callback callback) const
 {
 	enet_uint8 channel;
 	auto       packet = enet_peer_receive(m_peer, &channel);
-	callback(Packet {*packet}, channel);
+	callback(Packet {*packet, true}, channel);
 }
 
 void Peer::send(Packet& packet, enet_uint8 channel)
