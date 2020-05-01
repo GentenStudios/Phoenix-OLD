@@ -173,20 +173,20 @@ void Iris::parseState(entt::entity* userRef, enet_uint8* data, std::size_t dataL
 
 	// Discard state if its older that the oldest stateBundle
 	if (input.sequence < stateQueue.front().sequence &&
-	    stateQueue.end()->sequence - input.sequence < 10)
+	    stateQueue.back().sequence - input.sequence < 10)
 	{
-		printf("discard %lu \n", input.sequence);
+		printf("discard %u \n", input.sequence);
 		return;
 	}
 
 	// Fill the stateBundles up to the current input sequence
-	while ((input.sequence > stateQueue.end()->sequence &&
-	        input.sequence - stateQueue.end()->sequence > 10) ||
-	       stateQueue.end()->sequence == 255)
+	while ((input.sequence > stateQueue.back().sequence &&
+	        input.sequence - stateQueue.back().sequence > 10) ||
+	       stateQueue.back().sequence == 255)
 	{
 		// Insert a new bundle if this is the first packet in this sequence
 		StateBundle bundle;
-		bundle.sequence = stateQueue.end()->sequence + 1;
+		bundle.sequence = stateQueue.back().sequence + 1;
 		bundle.ready    = false;
 		bundle.users    = 1; ///@todo We need to capture how many users we are
 		/// expecting packets from

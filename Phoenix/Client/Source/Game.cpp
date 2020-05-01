@@ -423,7 +423,7 @@ void Game::parseEvent(enet_uint8* data, std::size_t dataLength)
 }
 void Game::parseState(enet_uint8* data, std::size_t dataLength)
 {
-	printf("State received");
+	// printf("State received");
 }
 void Game::parseMessage(enet_uint8* data, std::size_t dataLength)
 {
