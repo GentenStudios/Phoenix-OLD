@@ -30,35 +30,42 @@
 
 #include <enet/enet.h>
 
-#include <string>
+#include <chrono>
 
-namespace phx::net
+namespace phx
 {
-	class Address
+	namespace time
 	{
-	public:
-		Address() = default;
+		using ms = std::chrono::duration<unsigned int, std::milli>;
+	} // namespace time
 
-		explicit Address(enet_uint16 port);
-		Address(enet_uint32 host, enet_uint16 port);
-		Address(const std::string& host, enet_uint16 port);
+	namespace net
+	{
+		struct Timeout
+		{
+			time::ms limit;
+			time::ms minimum;
+			time::ms maximum;
+		};
 
-		Address(const ENetAddress& address);
-		Address& operator=(const ENetAddress& address);
+		struct Throttle
+		{
+			time::ms    interval;
+			enet_uint32 acceleration;
+			enet_uint32 deceleration;
+		};
 
-		Address(ENetAddress&& address);
-		Address& operator=(ENetAddress&& address);
+		using speed = enet_uint32;
 
-		void setHost(const std::string& host);
-		void setHost(enet_uint32 host);
-		void setPort(enet_uint16 port);
+		struct Bandwidth
+		{
+			speed incoming;
+			speed outgoing;
+		};
+	} // namespace net
+} // namespace phx
 
-		std::string getHostname() const;
-		std::string getIP() const;
-
-		operator const ENetAddress*() const;
-
-	private:
-		ENetAddress m_address;
-	};
-} // namespace phx::net
+constexpr phx::time::ms operator"" _ms(std::size_t ms)
+{
+	return phx::time::ms {ms};
+}

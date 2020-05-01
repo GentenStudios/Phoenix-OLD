@@ -28,12 +28,97 @@
 
 #include <Client/Client.hpp>
 
+#include <Common/Logger.hpp>
+#include <Common/Network/Host.hpp>
+#include <Common/Network/Packet.hpp>
+
+static std::vector<std::byte> pack(const std::string& string)
+{
+	std::vector<std::byte> arr(string.length() + 1);
+	std::transform(string.begin(), string.end(), arr.begin(),
+	               [](char c) { return std::byte(c); });
+
+	return std::move(arr);
+}
+
+static std::string unpack(const std::vector<std::byte>& data)
+{
+	std::string string;
+	string.resize(data.size() + 1);
+	std::transform(data.begin(), data.end(), string.begin(),
+	               [](std::byte c) { return char(c); });
+
+	return string;
+}
+
 using namespace phx;
 
 #undef main
 int main(int argc, char** argv)
 {
-	client::Client::get()->run();
+	LoggerConfig config;
+	config.verbosity = LogVerbosity::DEBUG;
+
+	Logger::initialize(config);
+
+	// client::Client::get()->run();
+
+	auto clientCode = [](std::string username) {
+		bool running = true;
+
+		net::Host client;
+		client.onConnect([username](net::Peer& peer, enet_uint32 data) {
+			LOG_INFO("CLIENT") << "Connected to server.";
+			peer.ping();
+			LOG_INFO("CLIENT")
+			    << username
+			    << " has a ping of: " << peer.getRoundTripTime().count();
+
+			char* name = new char[strlen("server") + 1];
+			memcpy(name, "server", strlen("server"));
+			name[strlen("server")] = '\n';
+			peer.setData(name);
+		});
+
+		client.onDisconnect([username, &running](void* data, enet_uint32) {
+			if (std::string(static_cast<char*>(data)) == std::string("server"))
+			{
+				running = false;
+				LOG_INFO("CLIENT") << "Server timed out.";
+			}
+		});
+
+		client.onReceive(
+		    [](net::Peer&, net::Packet&& packet, enet_uint8 channel) {
+			    LOG_INFO("CLIENT") << unpack(packet.getData());
+		    });
+
+		net::Address serverAddr;
+		serverAddr.setHost("127.0.0.1");
+		serverAddr.setPort(7777);
+
+		auto serverOptional = client.connect(serverAddr);
+
+		if (!serverOptional)
+		{
+			LOG_FATAL("CLIENT") << "Could not connect to server!";
+			return;
+		}
+
+		auto& peer = serverOptional.value().get();
+		peer.setTimeout({10000_ms, 0_ms, 10000_ms});
+
+		peer.send(net::Packet(pack("password;password;"),
+		                      net::PacketFlags::RELIABLE));
+		client.flush();
+
+		while (running)
+		{
+			client.poll(10);
+		}
+	};
+
+	clientCode("toby");
 
 	return 0;
 }

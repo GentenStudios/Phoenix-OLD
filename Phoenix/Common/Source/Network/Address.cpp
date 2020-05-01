@@ -39,6 +39,12 @@ Address::Address(enet_uint32 host, enet_uint16 port)
 	m_address.port = port;
 }
 
+Address::Address(const std::string& host, enet_uint16 port)
+{
+	setHost(host);
+	m_address.port = port;
+}
+
 Address::Address(const ENetAddress& address) { m_address = address; }
 Address& Address::operator=(const ENetAddress& address)
 {
@@ -53,8 +59,49 @@ Address& Address::operator=(ENetAddress&& address)
 	return *this;
 }
 
+void Address::setHost(const std::string& host)
+{
+	if (enet_address_set_host(&m_address, host.c_str()))
+	{
+		LOG_FATAL("NETCODE") << "Could not resolve hostname.";
+	}
+}
+
 void Address::setHost(enet_uint32 host) { m_address.host = host; }
 
 void Address::setPort(enet_uint16 port) { m_address.port = port; }
 
-Address::operator const _ENetAddress*() const { return &m_address; }
+std::string Address::getHostname() const
+{
+	// hostnames can be max of 255 bytes.
+	constexpr int MaxHostNameBytes = 255;
+
+	// + 1 for null terminator.
+	char hostname[MaxHostNameBytes + 1];
+	if (enet_address_get_host(&m_address, hostname, MaxHostNameBytes))
+	{
+		LOG_FATAL("NETCODE") << "Could not resolve hostname.";
+	}
+
+	return hostname;
+}
+
+std::string Address::getIP() const
+{
+	// enet doesn't support ipv6 afaik.
+	constexpr int IPv4MaxBytes = 15;
+
+	// + 1 for null terminator.
+	char ip[IPv4MaxBytes + 1];
+	if (enet_address_get_host_ip(&m_address, ip, IPv4MaxBytes))
+	{
+		LOG_FATAL("NETCODE") << "Failed to get IP.";
+	}
+
+	return ip;
+}
+
+Address::operator const _ENetAddress*() const
+{
+	return &m_address;
+}

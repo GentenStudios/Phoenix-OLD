@@ -32,7 +32,6 @@
 #include <cstring>
 
 using namespace phx::voxels;
-using namespace phx;
 
 BlockRegistry::BlockRegistry()
 {
@@ -50,7 +49,7 @@ BlockRegistry::BlockRegistry()
 	registerBlock(outOfBoundsBlock);
 }
 
-void BlockRegistry::registerAPI(cms::ModManager* manager)
+void BlockRegistry::registerAPI(phx::cms::ModManager* manager)
 {
 	manager->registerFunction(
 	    "voxel.block.register", [manager](sol::table luaBlock) {

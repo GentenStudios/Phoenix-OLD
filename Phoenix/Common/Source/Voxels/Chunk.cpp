@@ -31,14 +31,14 @@
 #include <iostream>
 
 using namespace phx::voxels;
-using namespace phx;
 
-Chunk::Chunk(math::vec3 chunkPos) : m_pos(chunkPos)
+Chunk::Chunk(phx::math::vec3 chunkPos) : m_pos(chunkPos)
 {
 	m_blocks.reserve(CHUNK_WIDTH * CHUNK_HEIGHT * CHUNK_DEPTH);
 }
 
-Chunk::Chunk(math::vec3 chunkPos, const std::string& save) : m_pos(chunkPos)
+Chunk::Chunk(phx::math::vec3 chunkPos, const std::string& save)
+    : m_pos(chunkPos)
 {
 	std::string_view search = save;
 	size_t           pos;
@@ -76,10 +76,10 @@ void Chunk::autoTestFill()
 	}
 }
 
-math::vec3               Chunk::getChunkPos() const { return m_pos; }
+phx::math::vec3          Chunk::getChunkPos() const { return m_pos; }
 std::vector<BlockType*>& Chunk::getBlocks() { return m_blocks; }
 
-BlockType* Chunk::getBlockAt(math::vec3 position) const
+BlockType* Chunk::getBlockAt(phx::math::vec3 position) const
 {
 	if (position.x < CHUNK_WIDTH && position.y < CHUNK_HEIGHT &&
 	    position.z < CHUNK_DEPTH)
@@ -91,7 +91,7 @@ BlockType* Chunk::getBlockAt(math::vec3 position) const
 	    1); // 1 is always out of bounds
 }
 
-void Chunk::setBlockAt(math::vec3 position, BlockType* newBlock)
+void Chunk::setBlockAt(phx::math::vec3 position, BlockType* newBlock)
 {
 	if (position.x < CHUNK_WIDTH && position.y < CHUNK_HEIGHT &&
 	    position.z < CHUNK_DEPTH)
@@ -99,4 +99,3 @@ void Chunk::setBlockAt(math::vec3 position, BlockType* newBlock)
 		m_blocks[getVectorIndex(position)] = newBlock;
 	}
 }
-
