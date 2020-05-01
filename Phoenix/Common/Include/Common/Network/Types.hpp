@@ -65,7 +65,7 @@ namespace phx
 	} // namespace net
 } // namespace phx
 
-constexpr phx::time::ms operator"" _ms(std::size_t ms)
+constexpr phx::time::ms operator"" _ms(unsigned long long ms)
 {
 	return phx::time::ms {ms};
 }
