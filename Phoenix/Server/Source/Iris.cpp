@@ -234,7 +234,9 @@ void Iris::parseMessage(entt::entity* userRef, enet_uint8* data, std::size_t dat
 		    user.userName + ": " + reinterpret_cast<char*>(data) + "\n";
 
 		printf("%s", message.c_str());
-		ENetPacket* packet = enet_packet_create(message.c_str(), message.size(),
+		
+		// + 1 for the \0 null terminator at the end of the string. Size/Length doesn't include it.
+		ENetPacket* packet = enet_packet_create(message.c_str(), message.length() + 1,
 		                                        ENET_PACKET_FLAG_RELIABLE);
 		auto        view   = m_registry->view<User>();
 		for (auto entity : view)
