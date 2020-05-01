@@ -67,10 +67,15 @@ Host::~Host()
 	}
 }
 
-Host::OptionalPeer Host::connect(const Address& address, enet_uint32 data)
+Host::OptionalPeer Host::connect(const Address& address)
+{
+	return connect(address, getChannelLimit());
+}
+
+Host::OptionalPeer Host::connect(const Address& address, enet_uint8 channels, enet_uint32 data)
 {
 	ENetPeer* peer =
-	    enet_host_connect(m_host, address, getChannelLimit(), data);
+	    enet_host_connect(m_host, address, channels, data);
 
 	if (!peer)
 	{
@@ -164,7 +169,7 @@ enet_uint32 Host::getTotalSentData() const { return m_host->totalSentData; }
 
 void Host::removePeer(const Peer& peer)
 {
-	ENetPeer& enetPeer = *static_cast<ENetPeer*>(peer);
+	removePeer(*static_cast<ENetPeer*>(peer));
 }
 
 void Host::handleEvent(ENetEvent& event)
@@ -186,6 +191,7 @@ void Host::handleEvent(ENetEvent& event)
 		{
 			m_receiveCallback(getPeer(*peer), Packet(*event.packet), event.channelID);
 		}
+		enet_packet_destroy(event.packet);
 		break;
 
 	case ENET_EVENT_TYPE_DISCONNECT:

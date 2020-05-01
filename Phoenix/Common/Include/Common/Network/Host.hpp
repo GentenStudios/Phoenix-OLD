@@ -57,7 +57,8 @@ namespace phx::net
 
 		// check if value exists before using.
 		using OptionalPeer = std::optional<std::reference_wrapper<Peer>>;
-		OptionalPeer connect(const Address& address, enet_uint32 data = 0);
+		OptionalPeer connect(const Address& address);
+		OptionalPeer connect(const Address& address, enet_uint8 channels, enet_uint32 data = 0);
 
 		Bandwidth getBandwidth() const;
 		void      setBandwidth(const Bandwidth& bandwidth);

@@ -101,7 +101,4 @@ std::string Address::getIP() const
 	return ip;
 }
 
-Address::operator const _ENetAddress*() const
-{
-	return &m_address;
-}
+enet_uint16 Address::getPort() const { return m_address.port; }

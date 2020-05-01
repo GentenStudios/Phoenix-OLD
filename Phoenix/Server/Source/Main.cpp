@@ -56,6 +56,13 @@ static std::string unpack(const std::vector<std::byte>& data)
 	return string;
 }
 
+std::string descClient(const net::Peer& peer)
+{
+	auto addr = peer.getAddress();
+	auto name = "[" + addr.getIP() + ":" + std::to_string(addr.getPort()) + "]";
+	return name;
+}
+
 #undef main
 int main(int argc, char** argv)
 {
@@ -64,125 +71,37 @@ int main(int argc, char** argv)
 
 	Logger::initialize(config);
 
-	auto clientCode = [](std::string username) {
-		bool running = true;
+	const auto port = 1234u;
 
-		net::Host client;
-		client.onConnect([username](net::Peer& peer, enet_uint32 data) {
-			LOG_INFO("CLIENT") << "Connected to server.";
-			peer.ping();
-			LOG_INFO("CLIENT")
-			    << username
-			    << " has a ping of: " << peer.getRoundTripTime().count();
+	net::Host server(net::Address {port}, 32);
 
-			char* name = new char[strlen("server") + 1];
-			memcpy(name, "server", strlen("server"));
-			name[strlen("server")] = '\n';
-			peer.setData(name);
-		});
-		
-		client.onDisconnect([username, &running](void* data, enet_uint32) {
-			if (std::string(static_cast<char*>(data)) == std::string("server"))
-			{
-				running = false;
-				LOG_INFO("CLIENT") << "Server timed out.";
-			}
-		});
+	server.onConnect([](net::Peer& peer, enet_uint32) {
+		LOG_INFO("SERVER") << "New connection: " << descClient(peer);
+	});
 
-		net::Address serverAddr;
-		serverAddr.setHost("127.0.0.1");
-		serverAddr.setPort(7777);
+	server.onDisconnect([](void*, enet_uint32) {
+		LOG_INFO("SERVER") << "A client disconnected.";
+	});
 
-		auto serverOptional = client.connect(serverAddr);
+	bool work = true;
+	server.onReceive(
+	    [&work](net::Peer& peer, net::Packet&& packet, enet_uint32) {
+		    auto data = unpack(packet.getData());
+		    LOG_INFO("SERVER") << "New packet from: " << descClient(peer)
+		                       << "\n Contents: " << data;
+		    peer.send(packet);
 
-		if (!serverOptional)
-		{
-			LOG_FATAL("CLIENT") << "Could not connect to server!";
-			return;
-		}
+		    if (data == "quit")
+		    {
+			    work = false;
+		    }
+	    });
 
-		auto& peer = serverOptional.value().get();
-
-		peer.send(net::Packet(pack("password;password;" + username),
-		                      net::PacketFlags::RELIABLE), 0);
-
-		peer.setTimeout({10000_ms, 0_ms, 10000_ms});
-
-		client.flush();
-
-		while (running)
-		{
-			client.poll(10);
-		}
-	};
-	
-	auto work = []()
+	while (work)
 	{
-		net::Host server(net::Address(7777), 10);
+		server.poll(1000_ms);
+	}
 
-		bool running = true;
-
-		server.onConnect([&server](net::Peer& peer, enet_uint32 data) {
-			LOG_INFO("SERVER") << "Player attempting connection...";
-			peer.send(net::Packet(pack("yoyo!"), net::PacketFlags::RELIABLE));
-			server.flush();
-		});
-
-		server.onReceive([&running](net::Peer& peer, net::Packet&& packet,
-		                            enet_uint8 channel) {
-			LOG_INFO("SERVER") << "Receiving packet!";
-			if (channel == 0)
-			{
-				std::string data = unpack(packet.getData());
-
-				std::vector<std::string> parts;
-
-				std::stringstream stream(data);
-				std::string       input;
-				while (std::getline(stream, input, ';'))
-				{
-					parts.push_back(input);
-				}
-
-				if (parts[0] == parts[1])
-				{
-					LOG_INFO("SERVER")
-					    << "Player: " << parts[2] << " has connected!";
-
-					char* name = new char[parts[3].length() + 1];
-					memcpy(name, parts[3].c_str(), parts[3].length());
-					name[parts[3].length()] = '\0';
-
-					LOG_DEBUG("SERVER") << name;
-
-					peer.setData(name);
-				}
-			}
-			else if (channel == 1)
-			{
-				std::string data = unpack(packet.getData());
-				if (data == "quit")
-				{
-					running = false;
-				}
-			}
-		});
-
-		server.onDisconnect([](void* data, enet_uint32) {
-			const char* name = static_cast<char*>(data);
-			LOG_INFO("SERVER") << "Player: " << name << " has disconnected";
-			delete static_cast<char*>(data);
-		});
-
-		
-		while (running)
-		{
-			server.poll(10);
-		}
-	};
-
-	work();
-	
 	Logger::teardown();
 
 	return 0;

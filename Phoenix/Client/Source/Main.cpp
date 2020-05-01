@@ -63,62 +63,43 @@ int main(int argc, char** argv)
 
 	// client::Client::get()->run();
 
-	auto clientCode = [](std::string username) {
-		bool running = true;
+	const auto hostname = "127.0.0.1";
+	const auto port     = 1234u;
 
-		net::Host client;
-		client.onConnect([username](net::Peer& peer, enet_uint32 data) {
-			LOG_INFO("CLIENT") << "Connected to server.";
-			peer.ping();
-			LOG_INFO("CLIENT")
-			    << username
-			    << " has a ping of: " << peer.getRoundTripTime().count();
+	net::Host client;
 
-			char* name = new char[strlen("server") + 1];
-			memcpy(name, "server", strlen("server"));
-			name[strlen("server")] = '\n';
-			peer.setData(name);
-		});
+	client.onConnect(
+	    [](net::Peer&, enet_uint32) { LOG_INFO("CLIENT") << "Connected."; });
+	client.onDisconnect(
+	    [](void*, enet_uint32) { LOG_INFO("CLIENT") << "Disconnected."; });
 
-		client.onDisconnect([username, &running](void* data, enet_uint32) {
-			if (std::string(static_cast<char*>(data)) == std::string("server"))
-			{
-				running = false;
-				LOG_INFO("CLIENT") << "Server timed out.";
-			}
-		});
-
-		client.onReceive(
-		    [](net::Peer&, net::Packet&& packet, enet_uint8 channel) {
-			    LOG_INFO("CLIENT") << unpack(packet.getData());
-		    });
-
-		net::Address serverAddr;
-		serverAddr.setHost("127.0.0.1");
-		serverAddr.setPort(7777);
-
-		auto serverOptional = client.connect(serverAddr);
-
-		if (!serverOptional)
+	bool work = true;
+	client.onReceive([&work](net::Peer&, net::Packet&& packet, enet_uint32) {
+		auto data = unpack(packet.getData());
+		if (data == "quit")
 		{
-			LOG_FATAL("CLIENT") << "Could not connect to server!";
-			return;
+			work = false;
 		}
 
-		auto& peer = serverOptional.value().get();
-		peer.setTimeout({10000_ms, 0_ms, 10000_ms});
+		LOG_INFO("CLIENT") << "Server says: " << data;
+	});
 
-		peer.send(net::Packet(pack("password;password;"),
-		                      net::PacketFlags::RELIABLE));
-		client.flush();
+	auto server = client.connect({hostname, port}).value().get();
 
-		while (running)
+	while (work)
+	{
+		client.poll(100_ms);
+
+		if (work)
 		{
-			client.poll(10);
-		}
-	};
+			std::string str;
+			LOG_INFO("Another loop") << "";
+			std::cin >> str;
 
-	clientCode("toby");
+			auto data = pack(str);
+			server.send({data, net::PacketFlags::RELIABLE}, 0);
+		}
+	}
 
 	return 0;
 }

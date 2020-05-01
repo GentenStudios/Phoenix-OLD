@@ -67,13 +67,7 @@ namespace phx::net
 		explicit Peer(Host& host);
 		Peer(Host& host, ENetPeer& peer);
 
-		Peer& operator=(ENetPeer& peer)
-		{
-			m_peer    = &peer;
-			m_address = peer.address;
-
-			return *this;
-		}
+		Peer& operator=(ENetPeer& peer);
 
 		void disconnect(enet_uint32 data = 0) const;
 		void disconnectImmediately(enet_uint32 data = 0) const;

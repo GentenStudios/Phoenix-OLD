@@ -36,6 +36,14 @@ Peer::Peer(Host& host) : m_host(&host) {}
 
 Peer::Peer(Host& host, ENetPeer& peer) : m_peer(&peer), m_host(&host) {}
 
+Peer& Peer::operator=(ENetPeer& peer)
+{
+	m_peer    = &peer;
+	m_address = peer.address;
+
+	return *this;
+}
+
 void Peer::disconnect(enet_uint32 data) const
 {
 	enet_peer_disconnect(m_peer, data);
@@ -52,7 +60,11 @@ void Peer::disconnectOncePacketsAreSent(enet_uint32 data) const
 	enet_peer_disconnect_later(m_peer, data);
 }
 
-void Peer::drop() const { enet_peer_reset(m_peer); }
+void Peer::drop() const
+{
+	enet_peer_reset(m_peer);
+	m_host->removePeer(*this);
+}
 
 void Peer::ping() { enet_peer_ping(m_peer); }
 

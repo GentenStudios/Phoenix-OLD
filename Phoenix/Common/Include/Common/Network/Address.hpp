@@ -55,8 +55,9 @@ namespace phx::net
 
 		std::string getHostname() const;
 		std::string getIP() const;
+		enet_uint16 getPort() const;
 
-		operator const ENetAddress*() const;
+		operator const ENetAddress*() const { return &m_address; }
 
 	private:
 		ENetAddress m_address;
