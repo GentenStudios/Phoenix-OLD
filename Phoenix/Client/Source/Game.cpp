@@ -409,7 +409,7 @@ void Game::tick(float dt)
 void Game::sendMessage(const std::string& input, std::ostringstream& cout)
 {
 	ENetPacket* packet;
-	packet = enet_packet_create(input.c_str(), input.size(),
+	packet = enet_packet_create(input.c_str(), input.length() + 1,
 	                            ENET_PACKET_FLAG_RELIABLE);
 	LOG_INFO("TEST") << "Send Message: " << input;
 	enet_peer_send(m_peer, 2, packet);
