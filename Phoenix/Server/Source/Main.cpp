@@ -87,15 +87,15 @@ int main(int argc, char** argv)
 
 	bool work = true;
 	server.onReceive(
-	    [&work](net::Peer& peer, net::Packet&& packet, enet_uint32) {
+	    [&work, &server](net::Peer& peer, net::Packet&& packet, enet_uint32) {
 		    auto data = unpack(packet.getData());
 		    LOG_INFO("SERVER") << "New packet from: " << descClient(peer)
 		                       << "\n\tContents: " << data;
-		    peer.send(packet);
+		    peer.send({pack("quit"), net::PacketFlags::RELIABLE});
 
 		    if (data == "quit")
 		    {
-			    //server.flush();
+			    server.flush();
 			    work = false;
 		    }
 	    });

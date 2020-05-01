@@ -38,13 +38,13 @@ static std::vector<std::byte> pack(const std::string& string)
 	std::transform(string.begin(), string.end(), arr.begin(),
 	               [](char c) { return std::byte(c); });
 
-	return std::move(arr);
+	return arr;
 }
 
 static std::string unpack(const std::vector<std::byte>& data)
 {
 	std::string string;
-	string.resize(data.size() + 1);
+	string.resize(data.size());
 	std::transform(data.begin(), data.end(), string.begin(),
 	               [](std::byte c) { return char(c); });
 
@@ -80,9 +80,10 @@ int main(int argc, char** argv)
 		if (data == "quit")
 		{
 			work = false;
+			LOG_DEBUG("CLIENT") << "Shutting down.";
 		}
 
-		LOG_INFO("CLIENT") << "Server says: " << data;
+		LOG_INFO("CLIENT") << "Server says: (" << data.size() << ") " << data;
 		std::cout << ">> ";
 	});
 
@@ -97,11 +98,11 @@ int main(int argc, char** argv)
 
 	while (work)
 	{
-		std::string str;
+		std::string input;
 		std::cout << ">> ";
-		std::cin >> str;
+		std::getline(std::cin, input);
 
-		auto data = pack(str);
+		auto data = pack(input);
 		server.send({data, net::PacketFlags::RELIABLE}, 0);
 	}
 
