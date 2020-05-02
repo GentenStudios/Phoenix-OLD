@@ -106,18 +106,13 @@ void Host::setChannelLimit(std::size_t limit)
 
 void Host::broadcast(Packet& packet, enet_uint8 channel)
 {
-	if (!packet.isSent())
-	{
-		packet.prepareForSend();
-	}
-
+	packet.prepareForSend();
 	enet_host_broadcast(m_host, channel, packet);
 }
 
 void Host::broadcast(Packet&& packet, enet_uint8 channel)
 {
 	packet.prepareForSend();
-
 	enet_host_broadcast(m_host, channel, packet);
 }
 
