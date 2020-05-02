@@ -64,9 +64,12 @@ namespace phx::net
 		using Callback = std::function<void(const Packet&, enet_uint8)>;
 
 	public:
+		Peer() = default;
 		Peer(Host& host, ENetPeer& peer);
+		Peer(const Peer& other) = default;
 
 		Peer& operator=(ENetPeer& peer);
+		Peer& operator=(const Peer& other) = default;
 
 		void disconnect(enet_uint32 data = 0);
 		void disconnectImmediately(enet_uint32 data = 0);

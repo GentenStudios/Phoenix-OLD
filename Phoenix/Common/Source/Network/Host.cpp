@@ -29,6 +29,8 @@
 #include <Common/Logger.hpp>
 #include <Common/Network/Host.hpp>
 
+#include <utility>
+
 using namespace phx::net;
 
 std::atomic<std::size_t> Host::m_activeInstances = 0;
@@ -52,7 +54,6 @@ Host::Host(const Address& address, std::size_t peers, std::size_t channels)
 	++m_activeInstances;
 
 	m_host = enet_host_create(address, peers, channels, 0, 0);
-	m_peers.reserve(peers);
 }
 
 Host::~Host()
@@ -156,7 +157,10 @@ std::size_t Host::getPeerCount() const { return m_host->connectedPeers; }
 
 std::size_t Host::getPeerLimit() const { return m_host->peerCount; }
 
-std::vector<Peer> Host::getPeers() const { return {m_peers.begin(), m_peers.end()}; }
+std::vector<Peer> Host::getPeers() const
+{
+	return {m_peers.begin(), m_peers.end()};
+}
 
 const Address& Host::getAddress() const { return m_address; }
 
@@ -208,12 +212,16 @@ void Host::handleEvent(ENetEvent& event)
 	}
 }
 
-Peer& Host::getPeer(ENetPeer& peer) { return m_peers.at(std::size_t(peer.data)); }
+Peer& Host::getPeer(ENetPeer& peer)
+{
+	return m_peers.at(std::size_t(peer.data));
+}
 
 Peer& Host::createPeer(ENetPeer& peer)
 {
-	peer.data = reinterpret_cast<void*>(m_peerID++);
-	m_peers.emplace(m_peerID, Peer{*this, peer});
+	peer.data    = reinterpret_cast<void*>(m_peerID++);
+	Peer newPeer = {*this, peer};
+	//m_peers[m_peerID] = newPeer;
 	return m_peers.at(m_peerID);
 }
 
