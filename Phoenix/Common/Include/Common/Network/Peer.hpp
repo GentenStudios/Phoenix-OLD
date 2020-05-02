@@ -64,17 +64,16 @@ namespace phx::net
 		using Callback = std::function<void(const Packet&, enet_uint8)>;
 
 	public:
-		explicit Peer(Host& host);
 		Peer(Host& host, ENetPeer& peer);
 
 		Peer& operator=(ENetPeer& peer);
 
-		void disconnect(enet_uint32 data = 0) const;
-		void disconnectImmediately(enet_uint32 data = 0) const;
-		void disconnectOncePacketsAreSent(enet_uint32 data = 0) const;
-		void drop() const;
+		void disconnect(enet_uint32 data = 0);
+		void disconnectImmediately(enet_uint32 data = 0);
+		void disconnectOncePacketsAreSent(enet_uint32 data = 0);
+		void drop();
 
-		void        ping();
+		void        ping() const;
 		time::ms    getPingInterval() const;
 		void        setPingInterval(time::ms interval);
 		time::ms    getRoundTripTime() const;
@@ -92,10 +91,8 @@ namespace phx::net
 		void    setTimeout(const Timeout& timeout);
 
 		const Address& getAddress() const;
-
-		PeerStatus getState() const;
-
-		std::size_t getID() const { return std::size_t(m_peer->data); }
+		PeerStatus     getState() const;
+		std::size_t    getID() const { return std::size_t(m_peer->data); }
 
 		operator ENetPeer*() const { return m_peer; }
 

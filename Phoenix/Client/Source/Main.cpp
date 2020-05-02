@@ -67,6 +67,7 @@ int main(int argc, char** argv)
 	const auto port     = 1234u;
 
 	net::Host client;
+	auto server = client.connect({hostname, port}).value().get();
 
 	client.onConnect(
 	    [](net::Peer&, enet_uint32) { LOG_INFO("CLIENT") << "Connected."; });
@@ -75,19 +76,17 @@ int main(int argc, char** argv)
 	});
 
 	bool work = true;
-	client.onReceive([&work](net::Peer&, net::Packet&& packet, enet_uint32) {
+	client.onReceive([&work, &server](net::Peer&, net::Packet&& packet, enet_uint32) {
 		auto data = unpack(packet.getData());
 		if (data == "quit")
 		{
-			work = false;
-			LOG_DEBUG("CLIENT") << "Shutting down.";
+
 		}
 
 		LOG_INFO("CLIENT") << "Server says: (" << data.size() << ") " << data;
 		std::cout << ">> ";
 	});
 
-	auto server = client.connect({hostname, port}).value().get();
 
 	std::thread t1([&work, &client]() {
 		while (work)
@@ -107,6 +106,6 @@ int main(int argc, char** argv)
 	}
 
 	t1.join();
-
+	
 	return 0;
 }

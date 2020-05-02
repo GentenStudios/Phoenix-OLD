@@ -61,7 +61,7 @@ std::string descClient(const net::Peer& peer)
 {
 	auto addr = peer.getAddress();
 	auto name = "[" + addr.getIP() + ":" + std::to_string(addr.getPort()) + "]";
-	return name;
+	return name + " # " + std::to_string(peer.getID());
 }
 
 #undef main
@@ -76,18 +76,26 @@ int main(int argc, char** argv)
 
 	net::Host server(net::Address {port}, 32);
 
-	server.onConnect([](net::Peer& peer, enet_uint32) {
+	std::vector<std::size_t> users;
+
+	server.onConnect([&users](net::Peer& peer, enet_uint32) {
 		LOG_INFO("SERVER") << "New connection: " << descClient(peer);
 		peer.send({pack("yoyo!"), net::PacketFlags::RELIABLE});
+		users.push_back(peer.getID());
 	});
 
-	server.onDisconnect([](std::size_t, enet_uint32) {
+	server.onDisconnect([&users](std::size_t id, enet_uint32) {
 		LOG_INFO("SERVER") << "A client disconnected.";
+		auto it = std::find(users.begin(), users.end(), id);
+		if (it != users.end())
+		{
+			users.erase(it);
+		}
 	});
 
 	bool work = true;
 	server.onReceive(
-	    [&work, &server](net::Peer& peer, net::Packet&& packet, enet_uint32) {
+	    [&work, &server, &users](net::Peer& peer, net::Packet&& packet, enet_uint32) {
 		    auto data = unpack(packet.getData());
 		    LOG_INFO("SERVER") << "New packet from: " << descClient(peer)
 		                       << "\n\tContents: " << data;
@@ -95,14 +103,18 @@ int main(int argc, char** argv)
 
 		    if (data == "quit")
 		    {
-			    server.flush();
-			    work = false;
+			    peer.disconnectImmediately();
 		    }
 	    });
 
 	while (work)
 	{
-		server.poll(100_ms);
+		server.poll(2000_ms);
+		LOG_INFO("PLAYERS") << users.size() << " players connected";
+		for (auto user : users)
+		{
+			LOG_DEBUG("PLAYERS") << user << " is connected.";
+		}
 	}
 
 	Logger::teardown();

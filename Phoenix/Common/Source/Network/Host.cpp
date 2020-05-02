@@ -88,8 +88,7 @@ Host::OptionalPeer Host::connect(const Address& address, enet_uint8 channels,
 
 Bandwidth Host::getBandwidth() const
 {
-	return {m_host->incomingBandwidth,
-	        m_host->outgoingBandwidth};
+	return {m_host->incomingBandwidth, m_host->outgoingBandwidth};
 }
 
 void Host::setBandwidth(const Bandwidth& bandwidth)
@@ -157,7 +156,7 @@ std::size_t Host::getPeerCount() const { return m_host->connectedPeers; }
 
 std::size_t Host::getPeerLimit() const { return m_host->peerCount; }
 
-const std::vector<Peer>& Host::getPeers() const { return m_peers; }
+std::vector<Peer> Host::getPeers() const { return {m_peers.begin(), m_peers.end()}; }
 
 const Address& Host::getAddress() const { return m_address; }
 
@@ -180,10 +179,9 @@ void Host::handleEvent(ENetEvent& event)
 	switch (event.type)
 	{
 	case ENET_EVENT_TYPE_CONNECT:
-		createPeer(*peer);
 		if (m_connectCallback)
 		{
-			m_connectCallback(m_peers.back(), event.data);
+			m_connectCallback(createPeer(*peer), event.data);
 		}
 		break;
 
@@ -202,6 +200,7 @@ void Host::handleEvent(ENetEvent& event)
 		{
 			m_disconnectCallback(std::size_t(peer->data), event.data);
 		}
+		removePeer(*peer);
 		break;
 
 	default:
@@ -209,24 +208,29 @@ void Host::handleEvent(ENetEvent& event)
 	}
 }
 
-Peer& Host::getPeer(ENetPeer& peer) { return m_peers[std::size_t(peer.data)]; }
+Peer& Host::getPeer(ENetPeer& peer) { return m_peers.at(std::size_t(peer.data)); }
 
 Peer& Host::createPeer(ENetPeer& peer)
 {
-	peer.data = reinterpret_cast<void*>(m_peers.size());
-	m_peers.emplace_back(*this, peer);
-	return m_peers.back();
+	peer.data = reinterpret_cast<void*>(m_peerID++);
+	m_peers.emplace(m_peerID, Peer{*this, peer});
+	return m_peers.at(m_peerID);
 }
 
 void Host::removePeer(ENetPeer& peer)
 {
-	auto index = std::size_t(peer.data);
+	auto id = std::size_t(peer.data);
+	m_peers.erase(id);
 
-	std::swap(m_peers[index], m_peers.back());
-
-	auto& newPeer                         = m_peers[index];
-	static_cast<ENetPeer*>(newPeer)->data = reinterpret_cast<void*>(index);
-
-	m_peers.pop_back();
 	peer.data = nullptr;
+}
+
+void Host::disconnectPeer(std::size_t id)
+{
+	if (m_disconnectCallback)
+	{
+		m_disconnectCallback(id, 0);
+	}
+
+	removePeer(m_peers.at(id));
 }

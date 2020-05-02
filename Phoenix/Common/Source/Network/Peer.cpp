@@ -32,8 +32,6 @@
 
 using namespace phx::net;
 
-Peer::Peer(Host& host) : m_host(&host) {}
-
 Peer::Peer(Host& host, ENetPeer& peer) : m_peer(&peer), m_host(&host) {}
 
 Peer& Peer::operator=(ENetPeer& peer)
@@ -44,29 +42,32 @@ Peer& Peer::operator=(ENetPeer& peer)
 	return *this;
 }
 
-void Peer::disconnect(enet_uint32 data) const
-{
-	enet_peer_disconnect(m_peer, data);
-}
+void Peer::disconnect(enet_uint32 data) { enet_peer_disconnect(m_peer, data); }
 
-void Peer::disconnectImmediately(enet_uint32 data) const
+void Peer::disconnectImmediately(enet_uint32 data)
 {
+	// doing this doesn't produce a disconnect event on the host, so we manually
+	// trigger the disconnection callback.
+	std::size_t id = getID();
 	enet_peer_disconnect_now(m_peer, data);
-	m_host->removePeer(*this);
+	m_host->disconnectPeer(id);
 }
 
-void Peer::disconnectOncePacketsAreSent(enet_uint32 data) const
+void Peer::disconnectOncePacketsAreSent(enet_uint32 data)
 {
 	enet_peer_disconnect_later(m_peer, data);
 }
 
-void Peer::drop() const
+void Peer::drop()
 {
+	// doing this doesn't produce a disconnect event on the host, so we manually
+	// trigger the disconnection callback.
+	std::size_t id = getID();
 	enet_peer_reset(m_peer);
-	m_host->removePeer(*this);
+	m_host->disconnectPeer(id);
 }
 
-void Peer::ping() { enet_peer_ping(m_peer); }
+void Peer::ping() const { enet_peer_ping(m_peer); }
 
 phx::time::ms Peer::getPingInterval() const
 {

@@ -38,6 +38,7 @@
 #include <atomic>
 #include <functional>
 #include <optional>
+#include <unordered_map>
 
 namespace phx::net
 {
@@ -80,10 +81,10 @@ namespace phx::net
 
 		void flush();
 
-		std::size_t              getPeerCount() const;
-		std::size_t              getPeerLimit() const;
-		const std::vector<Peer>& getPeers() const;
-		void                     removePeer(const Peer& peer);
+		std::size_t       getPeerCount() const;
+		std::size_t       getPeerLimit() const;
+		std::vector<Peer> getPeers() const;
+		void              removePeer(const Peer& peer);
 
 		const Address& getAddress() const;
 
@@ -99,6 +100,9 @@ namespace phx::net
 		Peer& createPeer(ENetPeer& peer);
 		void  removePeer(ENetPeer& peer);
 
+		friend class Peer;
+		void disconnectPeer(std::size_t id);
+
 	private:
 		ENetHost* m_host;
 		Address   m_address;
@@ -107,7 +111,8 @@ namespace phx::net
 		ConnectCallback    m_connectCallback;
 		DisconnectCallback m_disconnectCallback;
 
-		std::vector<Peer> m_peers;
+		std::size_t                           m_peerID = 0;
+		std::unordered_map<std::size_t, Peer> m_peers;
 
 		static std::atomic<std::size_t> m_activeInstances;
 	};
