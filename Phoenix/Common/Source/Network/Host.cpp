@@ -157,11 +157,6 @@ std::size_t Host::getPeerCount() const { return m_host->connectedPeers; }
 
 std::size_t Host::getPeerLimit() const { return m_host->peerCount; }
 
-std::vector<Peer> Host::getPeers() const
-{
-	return {m_peers.begin(), m_peers.end()};
-}
-
 const Address& Host::getAddress() const { return m_address; }
 
 enet_uint32 Host::getTotalReceievedData() const
@@ -220,8 +215,7 @@ Peer& Host::getPeer(ENetPeer& peer)
 Peer& Host::createPeer(ENetPeer& peer)
 {
 	peer.data    = reinterpret_cast<void*>(m_peerID++);
-	Peer newPeer = {*this, peer};
-	//m_peers[m_peerID] = newPeer;
+	m_peers.insert({m_peerID, {*this, peer}});
 	return m_peers.at(m_peerID);
 }
 

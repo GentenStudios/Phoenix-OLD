@@ -81,10 +81,9 @@ namespace phx::net
 
 		void flush();
 
-		std::size_t       getPeerCount() const;
-		std::size_t       getPeerLimit() const;
-		std::vector<Peer> getPeers() const;
-		void              removePeer(const Peer& peer);
+		std::size_t getPeerCount() const;
+		std::size_t getPeerLimit() const;
+		void        removePeer(const Peer& peer);
 
 		const Address& getAddress() const;
 
