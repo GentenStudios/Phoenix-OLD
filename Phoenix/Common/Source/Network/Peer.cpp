@@ -94,11 +94,7 @@ void Peer::receive(Callback callback) const
 
 void Peer::send(Packet& packet, enet_uint8 channel)
 {
-	if (!packet.isSent())
-	{
-		packet.prepareForSend();
-	}
-
+	packet.prepareForSend();
 	enet_peer_send(m_peer, channel, packet);
 }
 
