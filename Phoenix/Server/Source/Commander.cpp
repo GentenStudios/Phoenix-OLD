@@ -94,14 +94,9 @@ Commander::Commander(networking::Iris* iris) : m_iris(iris)
 void Commander::add(const std::string& command, const std::string& help,
                     const CommandFunction& f)
 {
-	auto m_command = m_commands.find(command);
-	if (m_command != m_commands.end())
+	if (m_commands.find(command) != m_commands.end())
 	{
-		///@TODO log that we over-wrote a command
-		m_command->second.command  = command;
-		m_command->second.help     = help;
-		m_command->second.callback = f;
-		return;
+		std::cout << "Command overwritten: " << command << "\n";
 	}
 	m_commands[command] = {command, help, f};
 }

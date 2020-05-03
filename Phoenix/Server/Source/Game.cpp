@@ -55,7 +55,7 @@ void Game::run()
 		}
 		else
 		{
-			// Process everybodies input first
+			// Process everybody's input first
 			networking::StateBundle m_currentState = m_iris->stateQueue.front();
 			m_iris->stateQueue.pop_front();
 
