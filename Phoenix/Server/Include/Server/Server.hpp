@@ -33,7 +33,7 @@
 
 #include <Server/User.hpp>
 
-//#include <Server/Commander.hpp>
+#include <Common/CMS/ModManager.hpp>
 
 #include <entt/entt.hpp>
 #include <enet/enet.h>
@@ -59,6 +59,7 @@ namespace phx::server
 		networking::Iris* m_iris;
 		Game*             m_game;
 
-		std::string m_save;
+		cms::ModManager* m_modManager;
+		std::string      m_save;
 	};
 } // namespace phx::server

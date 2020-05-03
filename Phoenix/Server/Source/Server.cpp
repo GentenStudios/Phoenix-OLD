@@ -27,6 +27,8 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <Server/Server.hpp>
+
+#include <Common/Logger.hpp>
 #include <Common/Settings.hpp>
 
 #include <iostream>
@@ -45,7 +47,52 @@ Server::Server(std::string save) : m_save(std::move(save))
 void Server::run()
 {
 	std::cout << "Hello, Server!" << std::endl;
+
+	Logger::get()->initialize({});
 	Settings::get()->load("config.txt");
+
+	// Initialize the Modules //
+
+	std::fstream             fileStream;
+	std::vector<std::string> toLoad;
+
+	fileStream.open("Saves/" + m_save + "/Mods.txt");
+	if (!fileStream.is_open())
+	{
+		LOG_FATAL("CMS") << "Error opening save file";
+		exit(EXIT_FAILURE);
+	}
+
+	std::string modules;
+	while (std::getline(fileStream, modules))
+	{
+		toLoad.push_back(modules);
+	}
+
+	m_modManager = new cms::ModManager(toLoad, {"Modules"});
+
+	m_modManager->registerFunction("core.print", [=](const std::string& text) {
+		std::cout << text << "\n";
+	});
+
+	// voxels::BlockRegistry::get()->registerAPI(m_modManager);
+	// Settings::get()->registerAPI(m_modManager);
+	// InputMap::get()->registerAPI(m_modManager);
+	// CommandBook::get()->registerAPI(m_modManager);
+
+	float progress = 0.f;
+	auto  result   = m_modManager->load(&progress);
+
+	if (!result.ok)
+	{
+		LOG_FATAL("CMS") << "An error has occured.";
+		exit(EXIT_FAILURE);
+	}
+
+	// Modules Initialized //
+
+	// Fire up Threads //
+
 	m_running = true;
 
 	std::thread t_iris(&networking::Iris::run, m_iris);
