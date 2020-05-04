@@ -83,6 +83,10 @@ Game::Game(gfx::Window* window, entt::registry* registry)
 
 	voxels::BlockRegistry::get()->registerAPI(m_modManager);
 
+	m_modManager->registerFunction(
+	    "core.command.register",
+	    [](std::string command, std::string help, sol::function f) {});
+
 	m_modManager->registerFunction("core.print", [=](const std::string& text) {
 		m_chat->cout << text << "\n";
 	});

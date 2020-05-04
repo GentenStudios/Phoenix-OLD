@@ -46,6 +46,19 @@ Server::Server(std::string save) : m_save(std::move(save))
 	m_game = new Game(&m_registry, &m_running, m_iris);
 }
 
+void registerUnusedAPI(cms::ModManager* manager)
+{
+	manager->registerFunction("core.input.registerInput",
+	                          [](std::string uniqueName,
+	                             std::string displayName,
+	                             std::string defaultKey) {});
+	manager->registerFunction("core.input.getInput", [](int input) {});
+	manager->registerFunction("core.input.getInputRef",
+	                          [](std::string uniqueName) {});
+	manager->registerFunction("core.input.registerCallback",
+	                          [](int input, sol::function f) {});
+}
+
 void Server::run()
 {
 	std::cout << "Hello, Server!" << std::endl;
@@ -80,15 +93,15 @@ void Server::run()
 
 	voxels::BlockRegistry::get()->registerAPI(m_modManager);
 	Settings::get()->registerAPI(m_modManager);
-	// InputMap::get()->registerAPI(m_modManager);
-	// CommandBook::get()->registerAPI(m_modManager);
+	m_game->registerAPI(m_modManager);
+	registerUnusedAPI(m_modManager);
 
 	float progress = 0.f;
 	auto  result   = m_modManager->load(&progress);
 
 	if (!result.ok)
 	{
-		LOG_FATAL("CMS") << "An error has ocurred loading modules.";
+		LOG_FATAL("CMS") << "An error has occurred loading modules.";
 		exit(EXIT_FAILURE);
 	}
 
@@ -101,6 +114,8 @@ void Server::run()
 	std::thread t_iris(&networking::Iris::run, m_iris);
 	std::thread t_game(&Game::run, m_game);
 
+	// Enter Main Loop //
+
 	std::string input;
 	while (m_running)
 	{
@@ -111,10 +126,17 @@ void Server::run()
 			m_running = false;
 		}
 	}
+
+	// Begin Shutdown //
+
 	t_iris.join();
 	t_game.join();
 	Settings::get()->save("config.txt");
 }
 
 Server::~Server()
-{ delete m_iris; }
+{
+	delete m_iris;
+	delete m_game;
+	delete m_modManager;
+}

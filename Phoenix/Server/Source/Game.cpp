@@ -43,6 +43,11 @@ Game::Game(entt::registry* registry, bool* running, networking::Iris* iris)
 	m_commander = new Commander(m_iris);
 }
 
+void Game::registerAPI(cms::ModManager* manager)
+{
+	m_commander->registerAPI(manager);
+}
+
 void Game::run()
 {
 	while (m_running)

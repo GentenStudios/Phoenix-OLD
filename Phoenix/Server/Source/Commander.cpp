@@ -40,55 +40,48 @@
 
 using namespace phx::server;
 
-Commander::Commander(networking::Iris* iris) : m_iris(iris)
+Commander::Commander(networking::Iris* iris) : m_iris(iris) {}
+
+void Commander::registerAPI(phx::cms::ModManager* manager)
 {
-	//    ContentManager::get()->lua["core"]["command"] =
-	//        /**
-	//         * @addtogroup luaapi
-	//         *
-	//         * ---
-	//         * @subsection corecmd core.command
-	//         * @brief Interfaces with the commander
-	//         *
-	//         */
-	//        ContentManager::get()->lua.create_table();
-	//    ContentManager::get()->lua["core"]["command"]["register"] =
-	//        /**
-	//         * @addtogroup luaapi
-	//         *
-	//         * @subsubsection corecmdreg core.command.register
-	//         * @brief Registers a new command
-	//         *
-	//         * In the terminal typing "/" followed by a command will execute
-	//         the *command
-	//         *
-	//         * @param command The command to register
-	//         * @param help A helpstring that is printed to terminal when
-	//         typing
-	//         *"/help <command>"
-	//         * @param f The callback function that is called by the commander
-	//         * The callback function must take a table as an argument
-	//         * Any arguments included when the command is executed will be
-	//         passed in *this table
-	//         *
-	//         * @b Example:
-	//         * @code {.lua}
-	//         * function hello (args)
-	//         *     if args[1] == "there" then
-	//         *         print("General Kenobi")
-	//         *	   elseif args[1] == "world" then
-	//         * 		   print("World says hi")
-	//         *	   else
-	//         *         print("with you, the force is not")
-	//         *     end
-	//         * end
-	//         * core.command.register("Hello", "Master the arts of the Jedi you
-	//         *must", hello)
-	//         * @endcode
-	//         */
-	//        [](std::string command, std::string help, sol::function f) {
-	//          Commander.add(command, help, f);
-	//        };
+	/**
+	* @addtogroup luaapi
+	*
+	* @subsubsection corecmdreg core.command.register
+	* @brief Registers a new command
+	*
+	* In the terminal typing "/" followed by a command will execute
+	the *command
+	*
+	* @param command The command to register
+	* @param help A helpstring that is printed to terminal when
+	typing
+	*"/help <command>"
+	* @param f The callback function that is called by the commander
+	* The callback function must take a table as an argument
+	* Any arguments included when the command is executed will be
+	passed in *this table
+	*
+	* @b Example:
+	* @code {.lua}
+	* function hello (args)
+	*     if args[1] == "there" then
+	*         print("General Kenobi")
+	*	   elseif args[1] == "world" then
+	* 		   print("World says hi")
+	*	   else
+	*         print("with you, the force is not")
+	*     end
+	* end
+	* core.command.register("Hello", "Master the arts of the Jedi you
+	*must", hello)
+	* @endcode
+	*/
+	manager->registerFunction(
+	    "core.command.register",
+	    [this](std::string command, std::string help, sol::function f) {
+		    this->add(command, help, f);
+	    });
 }
 
 void Commander::add(const std::string& command, const std::string& help,
