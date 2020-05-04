@@ -35,8 +35,8 @@
  *
  */
 
+#include <Common/Logger.hpp>
 #include <Server/Commander.hpp>
-//#include <Common/ContentLoader.hpp>
 
 using namespace phx::server;
 
@@ -89,7 +89,7 @@ void Commander::add(const std::string& command, const std::string& help,
 {
 	if (m_commands.find(command) != m_commands.end())
 	{
-		std::cout << "Command overwritten: " << command << "\n";
+		LOG_INFO("COMMANDER") << "Command overwritten: " << command;
 	}
 	m_commands[command] = {command, help, f};
 }
