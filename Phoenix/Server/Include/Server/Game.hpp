@@ -28,6 +28,7 @@
 
 #pragma once
 
+#include <Server/Commander.hpp>
 #include <Server/Iris.hpp>
 
 #include <entt/entt.hpp>
@@ -44,10 +45,9 @@ namespace phx::server
 		static constexpr float dt = 1.f / 20.f;
 
 	private:
-		bool* m_running;
-
-		entt::registry* m_registry;
-
+		bool*             m_running;
+		entt::registry*   m_registry;
 		networking::Iris* m_iris;
+		Commander*        m_commander;
 	};
 } // namespace phx::server

@@ -75,15 +75,19 @@ namespace phx::client
 		 * interpret.
 		 *
 		 * @param input The message sent to the server
-		 * @param cout Needs to be depreciated, unused (but required by terminal)
+		 * @param cout Needs to be depreciated, unused (but required by
+		 * terminal)
 		 */
 		void sendMessage(const std::string& input, std::ostringstream& cout);
+		void parseEvent(enet_uint8* data, std::size_t dataLength);
+		void parseState(enet_uint8* data, std::size_t dataLength);
+		void parseMessage(enet_uint8* data, std::size_t dataLength);
 
 	private:
 		gfx::Window*       m_window;
 		gfx::FPSCamera*    m_camera = nullptr;
-        entt::registry*    m_registry;
-        Player*            m_player;
+		entt::registry*    m_registry;
+		Player*            m_player;
 		voxels::ChunkView* m_world = nullptr;
 
 		gfx::ShaderPipeline m_renderPipeline;
@@ -110,4 +114,3 @@ namespace phx::client
 		ENetAddress m_address;
 	};
 } // namespace phx::client
-

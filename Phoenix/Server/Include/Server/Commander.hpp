@@ -37,17 +37,16 @@
 
 #pragma once
 
-#include <Common/Singleton.hpp>
+#include <Server/Iris.hpp>
+
+#include <entt/entity/registry.hpp>
 
 #include <functional>
-#include <istream>
-#include <ostream>
 #include <sstream>
 #include <string>
-#include <unordered_map>
 #include <vector>
 
-namespace phx
+namespace phx::server
 {
 	/**
 	 * @brief A function that is called when a command is executed.
@@ -59,6 +58,7 @@ namespace phx
 	typedef std::function<void(std::vector<std::string> args)> CommandFunction;
 
 	struct Command{
+	    std::string command;
 	    std::string help;
 	    CommandFunction callback;
 	};
@@ -69,89 +69,54 @@ namespace phx
 	 */
 	class Commander
 	{
+	public:
+		Commander(networking::Iris* iris);
+
 		/**
 		 * @brief Registers a command in the command registry.
 		 *
+		 * If a command already exists in the registry, this function will
+		 * over write that command with the new data.
+		 *
 		 * @param command The keyword for calling the command.
 		 * @param help A help string that can be displayed to the user.
-		 * @param permission What permission is required to run this command.
 		 * @param f The function that is called when the command is executed.
 		 */
-		static void add(const std::string& command, const std::string& help,
+		void add(const std::string& command, const std::string& help,
 		         const CommandFunction& f);
 
 		/**
-		 * @brief Searches for a command.
+		 * @brief Calls a command.
 		 *
-		 * @param command The command to search for.
-		 * @return index command is located at or -1 if its not found.
+		 * @param command The keyword for calling the command.
+		 * @param args The arguments to be passed to the command.
+		 * @param out An output stream to output any return from internal.
+		 * commander functions
+		 * @return Returns True if the function was called and False if the
+		 * function could not be found
 		 */
-		static int find(const std::string& command);
+		bool run(entt::entity* userRef, const std::string& input);
 
 		/**
-		 * @brief Gets next open space in book.
+		 * @brief Returns helpstring for command.
 		 *
-		 * @return Returns the next open space in arrays as an integer.
+		 * @param args array of input, args[0] is the command helpstring is
+		 * returned for, all other array values are not used.
+		 * @param out An output stream to output any help text to.
+		 * @return Returns True if successful and False if it could not find
+		 * the inputted command.
 		 */
-		static int getPage();
+		bool help(entt::entity* userRef, const std::vector<std::string>& args);
 
-        /**
-         * @brief Calls a command.
-         *
-         * @param command The keyword for calling the command.
-         * @param args The arguments to be passed to the command.
-         * @param out An output stream to output any return from internal.
-         * commander functions
-         * @return Returns True if the function was called and False if the
-         * function could not be found
-         */
-        static bool run(int user, const std::string& command,
-                 const std::vector<std::string>& args);
-
-        /**
-         * @brief Returns helpstring for command.
-         *
-         * @param args array of input, args[0] is the command helpstring is
-         * returned for, all other array values are not used.
-         * @param out An output stream to output any help text to.
-         * @return Returns True if successful and False if it could not find
-         * the inputted command.
-         */
-        static bool help(int user, const std::vector<std::string>& args);
-
-        /**
-         * @brief Outputs a string listing available commands.
-         *
-         * @param out The output stream the list of commands is sent to.
-         */
-        static void list(std::ostream& out);
-
-        /**
-         * @brief Terminal interface to listen for and execute commands.
-         *
-         * @param in An input stream to get input, usually (but not necessarily)
-         * std::cin.
-         * @param out An output stream output is sent to, usually (but not
-         * necessarily) std::cout.
-         */
-        static void post(std::istream& in, std::ostream& out);
-
-        /**
-         * @brief A callback function that runs a single command and outputs to
-         * a stream.
-         *
-         * @param input Input string containing the command and arguments to be
-         * ran.
-         * @param cout The output stream any output goes to.
-         */
-        static void callback(const std::string& input, std::ostringstream& cout);
+		/**
+		 * @brief Outputs a string listing available commands.
+		 *
+		 * @param out The output stream the list of commands is sent to.
+		 */
+		void list(entt::entity* userRef);
 
 	private:
-		/**
-		 * @brief Counter that keeps track of next space in the arrays (eg
-		 * next page in the book).
-		 */
-		static std::unordered_map<std::string, Command> m_commands;
+		networking::Iris*                        m_iris;
+		std::unordered_map<std::string, Command> m_commands;
 	};
 } // namespace phx
-

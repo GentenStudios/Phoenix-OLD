@@ -120,8 +120,7 @@ void Iris::run()
 				break;
 
 			case ENET_EVENT_TYPE_DISCONNECT:
-				printf("%s disconnected.\n",
-				       static_cast<const char*>(m_event.peer->data));
+				disconnect(static_cast<entt::entity*>(m_event.peer->data));
 				break;
 
 			case ENET_EVENT_TYPE_NONE:
@@ -133,8 +132,14 @@ void Iris::run()
 
 void Iris::auth() {}
 
-void Iris::disconnect() {}
-void Iris::parseEvent(entt::entity* userRef, enet_uint8* data, std::size_t dataLength)
+void Iris::disconnect(entt::entity* userRef)
+{
+	printf("%s disconnected.\n",
+	       m_registry->get<User>(*userRef).userName.c_str());
+	m_registry->destroy(*userRef);
+}
+void Iris::parseEvent(entt::entity* userRef, enet_uint8* data,
+                      std::size_t dataLength)
 {
 	User user = m_registry->get<User>(*userRef);
 	printf("Event received");
@@ -144,16 +149,16 @@ void Iris::parseEvent(entt::entity* userRef, enet_uint8* data, std::size_t dataL
 void Iris::parseState(entt::entity* userRef, enet_uint8* data, std::size_t dataLength)
 {
 	User user = m_registry->get<User>(*userRef);
-	printf("A State packet containing %s was received from %s\n", data,
-	       user.userName.c_str());
+	//	printf("A State packet containing %s was received from %s\n", data,
+	//	       user.userName.c_str());
 
 	const float dt = 1.f / 20.f;
 
 	InputState input;
 
-    phx::Serializer ser(Serializer::Mode::READ);
-	ser.setBuffer((std::byte*)data, dataLength);
-    ser & input;
+	phx::Serializer ser(Serializer::Mode::READ);
+	ser.setBuffer((std::byte*) data, dataLength);
+	ser& input;
 
 	// If the queue is empty we need to add a new bundle
 	if (stateQueue.empty())
@@ -168,20 +173,20 @@ void Iris::parseState(entt::entity* userRef, enet_uint8* data, std::size_t dataL
 
 	// Discard state if its older that the oldest stateBundle
 	if (input.sequence < stateQueue.front().sequence &&
-	    stateQueue.end()->sequence - input.sequence < 10)
+	    stateQueue.back().sequence - input.sequence < 10)
 	{
-		printf("discard %lu \n", input.sequence);
+		printf("discard %u \n", input.sequence);
 		return;
 	}
 
 	// Fill the stateBundles up to the current input sequence
-	while ((input.sequence > stateQueue.end()->sequence &&
-	        input.sequence - stateQueue.end()->sequence > 10) ||
-	       stateQueue.end()->sequence == 255)
+	while ((input.sequence > stateQueue.back().sequence &&
+	        input.sequence - stateQueue.back().sequence > 10) ||
+	       stateQueue.back().sequence == 255)
 	{
 		// Insert a new bundle if this is the first packet in this sequence
 		StateBundle bundle;
-		bundle.sequence = stateQueue.end()->sequence + 1;
+		bundle.sequence = stateQueue.back().sequence + 1;
 		bundle.ready    = false;
 		bundle.users    = 1; ///@todo We need to capture how many users we are
 		/// expecting packets from
@@ -189,7 +194,7 @@ void Iris::parseState(entt::entity* userRef, enet_uint8* data, std::size_t dataL
 	}
 
 	{
-		printf("insert existing %lu \n", input.sequence);
+		//		printf("insert existing %lu \n", input.sequence);
 		for (auto bundle : stateQueue)
 		{
 			if (bundle.sequence == input.sequence)
@@ -226,10 +231,12 @@ void Iris::parseMessage(entt::entity* userRef, enet_uint8* data, std::size_t dat
 	else
 	{
 		std::string message =
-		    user.userName + ": " + reinterpret_cast<char*>(data);
+		    user.userName + ": " + reinterpret_cast<char*>(data) + "\n";
 
 		printf("%s", message.c_str());
-		ENetPacket* packet = enet_packet_create(message.c_str(), message.size(),
+		
+		// + 1 for the \0 null terminator at the end of the string. Size/Length doesn't include it.
+		ENetPacket* packet = enet_packet_create(message.c_str(), message.length() + 1,
 		                                        ENET_PACKET_FLAG_RELIABLE);
 		auto        view   = m_registry->view<User>();
 		for (auto entity : view)
@@ -262,4 +269,4 @@ void Iris::sendState(std::size_t sequence)
 	}
 	enet_host_flush(m_server);
 }
-void Iris::sendMessage(entt::entity* userRef, enet_uint8* data) {}
+void Iris::sendMessage(entt::entity* userRef, const std::string& message) {}

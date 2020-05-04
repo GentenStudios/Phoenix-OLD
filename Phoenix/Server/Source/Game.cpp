@@ -40,6 +40,7 @@ using namespace phx::server;
 Game::Game(entt::registry* registry, bool* running, networking::Iris* iris)
     : m_registry(registry), m_running(running), m_iris(iris)
 {
+	m_commander = new Commander(m_iris);
 }
 
 void Game::run()
@@ -47,17 +48,18 @@ void Game::run()
 	while (m_running)
 	{
 		// @todo @beeper is this efficient?
-		if (!m_iris->stateQueue.front().ready)
+		if (m_iris->stateQueue.size() == 0 || !m_iris->stateQueue.front().ready)
 		{
+			// This just prevents us from overloading the CPU by freely spinning
 			std::this_thread::sleep_for(std::chrono::milliseconds(25));
 		}
 		else
 		{
-			printf("State");
+			// Process everybodies input first
 			networking::StateBundle m_currentState = m_iris->stateQueue.front();
 			m_iris->stateQueue.pop_front();
 
-			for (auto state : m_currentState.states)
+			for (const auto& state : m_currentState.states)
 			{
 				ActorSystem::tick(m_registry,
 				                  m_registry->get<Player>(*state.first).actor,
@@ -71,6 +73,18 @@ void Game::run()
 				           .position
 				    << "\n";
 			}
+			// Process events second
+
+			// Process messages last
+			size_t size = m_iris->messageQueue.size();
+			for (size_t i = 0; i < size; i++)
+			{
+				networking::MessageBundle message =
+				    m_iris->messageQueue.front();
+				m_commander->run(message.userRef, message.message);
+				m_iris->messageQueue.pop_front();
+			}
+
 			m_iris->sendState(m_currentState.sequence);
 		}
 	}
