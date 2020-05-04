@@ -28,6 +28,8 @@
 
 #include <Server/Server.hpp>
 
+#include <Common/Voxels/BlockRegistry.hpp>
+
 #include <Common/Logger.hpp>
 #include <Common/Settings.hpp>
 
@@ -59,7 +61,8 @@ void Server::run()
 	fileStream.open("Saves/" + m_save + "/Mods.txt");
 	if (!fileStream.is_open())
 	{
-		LOG_FATAL("CMS") << "Error opening save file";
+		LOG_FATAL("CMS") << "Error opening save file: \"Saves/" + m_save +
+		                        "/Mods.txt\"";
 		exit(EXIT_FAILURE);
 	}
 
@@ -75,8 +78,8 @@ void Server::run()
 		std::cout << text << "\n";
 	});
 
-	// voxels::BlockRegistry::get()->registerAPI(m_modManager);
-	// Settings::get()->registerAPI(m_modManager);
+	voxels::BlockRegistry::get()->registerAPI(m_modManager);
+	Settings::get()->registerAPI(m_modManager);
 	// InputMap::get()->registerAPI(m_modManager);
 	// CommandBook::get()->registerAPI(m_modManager);
 
@@ -85,7 +88,7 @@ void Server::run()
 
 	if (!result.ok)
 	{
-		LOG_FATAL("CMS") << "An error has occured.";
+		LOG_FATAL("CMS") << "An error has ocurred loading modules.";
 		exit(EXIT_FAILURE);
 	}
 
