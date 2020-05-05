@@ -19,6 +19,9 @@ add_definitions(-DSDL_MAIN_HANDLED)
 # turn off the JSON tests
 set(JSON_BuildTests OFF CACHE INTERNAL "")
 
+# turn off the EnTT tests.
+set(BUILD_TESTING OFF)
+
 add_subdirectory (SDL2)
 add_subdirectory (Glad)
 add_subdirectory (ImGui)
@@ -28,7 +31,7 @@ add_subdirectory (enet)
 add_subdirectory (entt)
 add_subdirectory (json)
 
-set_target_properties(SDL2main SDL2-static uninstall Glad ImGui lua liblua enet PROPERTIES FOLDER Dependencies)
+set_target_properties(SDL2main SDL2-static uninstall Glad ImGui lua liblua enet aob PROPERTIES FOLDER Dependencies)
 
 # utility thing to make phoenix cmake tidier
 set(PHX_THIRD_PARTY_INCLUDES
@@ -62,10 +65,3 @@ set(PHX_THIRD_PARTY_LIBRARIES
 
 	PARENT_SCOPE
 )
-
-# hide huge list of targets.
-set_target_properties(actor algorithm aob delegate dispatcher emitter entity 
-	family gmock gmock_main group gtest gtest_main hashed_string helper 
-	ident locator meta monostate observer odr process registry resource 
-	runtime_view scheduler sigh snapshot sparse_set storage type_info 
-	type_traits utility view PROPERTIES FOLDER Dependencies/EnTT)
