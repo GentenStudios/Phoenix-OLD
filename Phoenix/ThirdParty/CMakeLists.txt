@@ -75,7 +75,10 @@ set(PHX_THIRD_PARTY_LIBRARIES
 
 if(UNIX)
 	find_package(Threads REQUIRED)
-	target_link_libraries(${PROJECT_NAME} PRIVATE Threads::Threads)
+	set(PHX_THIRD_PARTY_LIBRARIES 
+		${PHX_THIRD_PARTY_LIBRARIES} 
+		Threads::Threads		
+		PARENT_SCOPE)
 endif()
 
 target_compile_options(sol2 INTERFACE
