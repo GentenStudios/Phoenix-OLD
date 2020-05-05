@@ -32,7 +32,7 @@ add_subdirectory (ImGui)
 add_subdirectory (sol2)
 add_subdirectory (lua)
 add_subdirectory (json)
-add_subdirectory(openal-soft)
+add_subdirectory (openal-soft)
 
 # new line for each group of dependencies. Currently SDL, OpenGL, Lua and then OpenAL.
 set_target_properties(SDL2main SDL2-static uninstall 
