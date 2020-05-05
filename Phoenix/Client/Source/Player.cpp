@@ -53,7 +53,7 @@ Player::Player(entt::registry* registry)
 		    m_registry->get<Position>(m_entity).position = {
 		        std::stoi(args[0]), std::stoi(args[1]), std::stoi(args[2])};
 	    });
-      
+
 	glGenVertexArrays(1, &m_vao);
 	glGenBuffers(1, &m_vbo);
 
@@ -190,7 +190,7 @@ void Player::renderSelectionBox(const math::mat4 view, const math::mat4 proj)
 		  |/       |/
 		5 +--------+ 4
 	 */
-	
+
 	const float more = 2.001f;
 	const float less = 0.001f;
 
@@ -242,4 +242,45 @@ void Player::renderSelectionBox(const math::mat4 view, const math::mat4 proj)
 	m_pipeline.setMatrix("u_view", view);
 	m_pipeline.setMatrix("u_projection", proj);
 	glDrawArrays(GL_LINES, 0, 24);
+}
+
+char* Player::getBitPackedState()
+{
+	char* state = new char[32];
+
+	std::size_t i = 0;
+
+	// hand
+	std::size_t block_id = m_registry->get<Hand>(getEntity()).hand->getRegistryID();
+	std::memcpy(state + i, &block_id, sizeof(block_id));
+	i += sizeof(block_id);
+
+	// position
+	auto d = m_registry->get<Position>(m_entity).position.x;
+	std::memcpy(state + i, &d, sizeof(d));
+	i += sizeof(d);
+	d = m_registry->get<Position>(m_entity).position.y;
+	std::memcpy(state + i, &d, sizeof(d));
+	i += sizeof(d);
+	d = m_registry->get<Position>(m_entity).position.z;
+	std::memcpy(state + i, &d, sizeof(d));
+	i += sizeof(d);
+
+	// rotation
+	d = m_registry->get<Position>(m_entity).rotation.x;
+	std::memcpy(state + i, &d, sizeof(d));
+	i += sizeof(d);
+	d = m_registry->get<Position>(m_entity).rotation.y;
+	std::memcpy(state + i, &d, sizeof(d));
+	i += sizeof(d);
+	d = m_registry->get<Position>(m_entity).rotation.z;
+	std::memcpy(state + i, &d, sizeof(d));
+	i += sizeof(d);
+
+	// speed
+	auto f =  m_registry->get<Movement>(m_entity).moveSpeed;
+	std::memcpy(state + i, &f, sizeof(f));
+	i += sizeof(f);
+
+	return state;
 }

@@ -24,6 +24,8 @@ add_subdirectory (Glad)
 add_subdirectory (ImGui)
 add_subdirectory (sol2)
 add_subdirectory (lua)
+add_subdirectory (enet)
+add_subdirectory (entt)
 add_subdirectory (json)
 add_subdirectory (enet)
 
@@ -36,6 +38,7 @@ set(PHX_THIRD_PARTY_INCLUDES
 	${CMAKE_CURRENT_LIST_DIR}/ImGui
 	${CMAKE_CURRENT_LIST_DIR}/ImGui/examples
 	${CMAKE_CURRENT_LIST_DIR}/lua
+	${CMAKE_CURRENT_LIST_DIR}/enet/include
 	${CMAKE_CURRENT_LIST_DIR}/sol2/include
 	${CMAKE_CURRENT_LIST_DIR}/stb_image
 	${CMAKE_CURRENT_LIST_DIR}/entt/src
@@ -50,6 +53,7 @@ set(PHX_THIRD_PARTY_LIBRARIES
 	SDL2main
 	Glad 
 	ImGui
+	enet
 	sol2
 	liblua
 	nlohmann_json::nlohmann_json

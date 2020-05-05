@@ -76,6 +76,9 @@ namespace phx
 		/// @brief Render the selection box around the pointed block
 		void renderSelectionBox(const math::mat4 view, const math::mat4 proj);
 
+		// don't forget to free the ressource afterward
+		char* getBitPackedState();
+
 	private:
 		const float        m_reach = 32.f;
 		voxels::ChunkView* m_world;

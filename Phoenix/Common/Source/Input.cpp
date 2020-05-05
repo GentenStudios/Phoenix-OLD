@@ -26,27 +26,9 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#pragma once
+#include <Common/Input.hpp>
 
-#include <Common/Math/Math.hpp>
-
-namespace phx
+phx::Serializer& phx::InputState::operator&(phx::Serializer& this_)
 {
-	/**
-	 * @brief The positioning for an entity
-	 */
-	struct Position
-	{
-		/// @brief The direction the entity is facing
-		math::vec3 rotation;
-		/// @brief The cardinal position of the entity
-		math::vec3 position;
-
-		math::vec3 getDirection()
-		{
-			return math::vec3 {std::cos(rotation.y) * std::sin(rotation.x),
-			                   std::sin(rotation.y),
-			                   std::cos(rotation.y) * std::cos(rotation.x)};
-		};
-	};
-} // namespace phx
+    return this_ & forward & backward & left & right & up & down & rotation.x & rotation.y & sequence;
+}

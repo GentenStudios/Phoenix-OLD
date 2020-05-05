@@ -28,25 +28,54 @@
 
 #pragma once
 
-#include <Common/Math/Math.hpp>
+#include <Common/Input.hpp>
+#include <list>
 
-namespace phx
+namespace phx::client
 {
-	/**
-	 * @brief The positioning for an entity
-	 */
-	struct Position
+	class InputQueue
 	{
-		/// @brief The direction the entity is facing
-		math::vec3 rotation;
-		/// @brief The cardinal position of the entity
-		math::vec3 position;
+	public:
+		InputQueue();
 
-		math::vec3 getDirection()
-		{
-			return math::vec3 {std::cos(rotation.y) * std::sin(rotation.x),
-			                   std::sin(rotation.y),
-			                   std::cos(rotation.y) * std::cos(rotation.x)};
-		};
+		/**
+		 * @brief Thread to capture and queue input states
+		 * @param dt How frequently in seconds a state should be captured
+		 */
+		void run(float dt);
+
+		/**
+		 * @brief Stops the current thread
+		 */
+		void kill();
+
+		/**
+		 * @brief Gets a state for processing
+		 * @param sequence The sequence number for the desired state
+		 * @return The input state
+		 */
+		InputState getState(std::size_t sequence);
+		/**
+		 * @brief Clears all states equal to or older than the supplied sequence
+		 * @param sequence The sequence number to clear through
+		 */
+		void clearState(std::size_t sequence);
+		/**
+		 * @brief Gets the current sequence number, this is the most recent
+		 * InputState that was queued
+		 * @return A numerical identifier for the sequence
+		 */
+		std::size_t currentSequence();
+
+	private:
+		std::list<InputState> m_queue;
+		bool                  m_running;
+
+		client::Input* m_forward;
+		client::Input* m_backward;
+		client::Input* m_left;
+		client::Input* m_right;
+		client::Input* m_up;
+		client::Input* m_down;
 	};
-} // namespace phx
+} // namespace phx::client

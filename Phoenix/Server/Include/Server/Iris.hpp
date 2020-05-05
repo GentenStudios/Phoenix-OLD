@@ -28,25 +28,70 @@
 
 #pragma once
 
-#include <Common/Math/Math.hpp>
+// This is needed because Windows https://github.com/skypjack/entt/issues/96
+#ifndef NOMINMAX
+#	define NOMINMAX
+#endif
 
-namespace phx
+#include <Common/Input.hpp>
+
+#include <enet/enet.h>
+#include <entt/entt.hpp>
+
+namespace phx::server::networking
 {
-	/**
-	 * @brief The positioning for an entity
-	 */
-	struct Position
+	struct StateBundle
 	{
-		/// @brief The direction the entity is facing
-		math::vec3 rotation;
-		/// @brief The cardinal position of the entity
-		math::vec3 position;
-
-		math::vec3 getDirection()
-		{
-			return math::vec3 {std::cos(rotation.y) * std::sin(rotation.x),
-			                   std::sin(rotation.y),
-			                   std::cos(rotation.y) * std::cos(rotation.x)};
-		};
+		bool                                          ready;
+		std::size_t                                   users;
+		std::size_t                                   sequence;
+		std::unordered_map<entt::entity*, InputState> states;
 	};
-} // namespace phx
+
+	struct EventBundle
+	{
+		entt::entity* userRef;
+	};
+
+	struct MessageBundle
+	{
+		entt::entity* userRef;
+		std::string   message;
+	};
+
+	class Iris
+	{
+	public:
+		Iris(entt::registry* registry, bool* running);
+		~Iris();
+
+		void run();
+
+		void auth();
+		void disconnect(entt::entity* userRef);
+
+		void parseEvent(entt::entity* userRef, enet_uint8* data,
+		                std::size_t dataLength);
+		void parseState(entt::entity* userRef, enet_uint8* data,
+		                std::size_t dataLength);
+		void parseMessage(entt::entity* userRef, enet_uint8* data,
+		                  std::size_t dataLength);
+
+		void sendEvent(entt::entity* userRef, enet_uint8* data);
+		void sendState(std::size_t sequence);
+		void sendMessage(entt::entity* userRef, const std::string& message);
+
+		std::list<StateBundle>   stateQueue;
+		std::list<EventBundle>   eventQueue;
+		std::list<MessageBundle> messageQueue;
+
+	private:
+		bool* m_running;
+
+		entt::registry* m_registry;
+
+		ENetHost*   m_server;
+		ENetEvent   m_event;
+		ENetAddress m_address;
+	};
+} // namespace phx::server::networking

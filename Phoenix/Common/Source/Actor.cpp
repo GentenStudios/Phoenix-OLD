@@ -26,45 +26,62 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Server/Server.hpp>
-#include <Common/Settings.hpp>
+#include <Common/Actor.hpp>
 
-#include <iostream>
-#include <thread>
-#include <utility>
+#include <Common/Movement.hpp>
+#include <Common/Position.hpp>
 
-using namespace phx::server;
 using namespace phx;
 
-Server::Server(std::string save) : m_save(std::move(save))
+entt::entity ActorSystem::registerActor(entt::registry* registry)
 {
-	m_iris = new networking::Iris(&m_registry, &m_running);
-	m_game = new Game(&m_registry, &m_running, m_iris);
+	auto entity = registry->create();
+	registry->emplace<Position>(entity, math::vec3 {0, 0, 0},
+	                            math::vec3 {0, 0, 0});
+	registry->emplace<Movement>(entity, DEFAULT_MOVE_SPEED);
+	return entity;
 }
-
-void Server::run()
+void ActorSystem::tick(entt::registry* registry, entt::entity entity,
+                       const float dt, InputState input)
 {
-	std::cout << "Hello, Server!" << std::endl;
-	Settings::get()->load("config.txt");
-	m_running = true;
+	auto& pos = registry->get<Position>(entity);
 
-	std::thread t_iris(&networking::Iris::run, m_iris);
-	std::thread t_game(&Game::run, m_game);
+    /// conversion from 1/1000 of degres to rad
+	pos.rotation.x = static_cast<float>(input.rotation.x) / 360000.0;
+	pos.rotation.y = static_cast<float>(input.rotation.y) / 360000.0;
+	const auto moveSpeed =
+	    static_cast<float>(registry->get<Movement>(entity).moveSpeed);
 
-	std::string input;
-	while (m_running)
+	math::vec3       direction = pos.getDirection();
+	const math::vec3 right     = {std::sin(direction.x - math::PIDIV2), 0.f,
+                              std::cos(direction.x - math::PIDIV2)};
+	const math::vec3 forward   = {std::sin(direction.x), 0.f,
+                                std::cos(direction.x)};
+
+	if (input.forward)
 	{
-		/// @todo Replace simple loop with commander
-		std::cin >> input;
-		if (input == "q")
-		{
-			m_running = false;
-		}
+		pos.position += forward * dt * moveSpeed;
 	}
-	t_iris.join();
-	t_game.join();
-	Settings::get()->save("config.txt");
-}
+	else if (input.backward)
+	{
+		pos.position -= forward * dt * moveSpeed;
+	}
 
-Server::~Server()
-{ delete m_iris; }
+	if (input.left)
+	{
+		pos.position -= right * dt * moveSpeed;
+	}
+	else if (input.right)
+	{
+		pos.position += right * dt * moveSpeed;
+	}
+
+	if (input.up)
+	{
+		pos.position.y += dt * moveSpeed;
+	}
+	else if (input.down)
+	{
+		pos.position.y -= dt * moveSpeed;
+	}
+}

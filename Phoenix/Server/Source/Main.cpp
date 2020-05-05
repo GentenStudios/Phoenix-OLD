@@ -38,86 +38,18 @@
 
 using namespace phx;
 
-static std::vector<std::byte> pack(const std::string& string)
-{
-	std::vector<std::byte> arr(string.length());
-	std::transform(string.begin(), string.end(), arr.begin(),
-	               [](char c) { return std::byte(c); });
-
-	return std::move(arr);
-}
-
-static std::string unpack(const std::vector<std::byte>& data)
-{
-	std::string string;
-	string.resize(data.size());
-	std::transform(data.begin(), data.end(), string.begin(),
-	               [](std::byte c) { return char(c); });
-
-	return string;
-}
-
-std::string descClient(const net::Peer& peer)
-{
-	auto addr = peer.getAddress();
-	auto name = "[" + addr.getIP() + ":" + std::to_string(addr.getPort()) + "]";
-	return name + " # " + std::to_string(peer.getID());
-}
-
 #undef main
 int main(int argc, char** argv)
 {
-	LoggerConfig config;
-	config.verbosity = LogVerbosity::DEBUG;
+    std::string save;
+    if (argc > 0){
+        save = argv[0];
+    } else {
+        save = "save1";
+    }
 
-	Logger::initialize(config);
-
-	const auto port = 1234u;
-
-	net::Host server(net::Address {port}, 32);
-
-	std::vector<std::size_t> users;
-
-	server.onConnect([&users](net::Peer& peer, enet_uint32) {
-		LOG_INFO("SERVER") << "New connection: " << descClient(peer);
-		peer.send({pack("yoyo!"), net::PacketFlags::RELIABLE});
-		users.push_back(peer.getID());
-	});
-
-	server.onDisconnect([&users](std::size_t id, enet_uint32) {
-		LOG_INFO("SERVER") << "A client disconnected.";
-		auto it = std::find(users.begin(), users.end(), id);
-		if (it != users.end())
-		{
-			users.erase(it);
-		}
-	});
-
-	bool work = true;
-	server.onReceive(
-	    [&work, &server, &users](net::Peer& peer, net::Packet&& packet, enet_uint32) {
-		    auto data = unpack(packet.getData());
-		    LOG_INFO("SERVER") << "New packet from: " << descClient(peer)
-		                       << "\n\tContents: " << data;
-		    peer.send({pack("quit"), net::PacketFlags::RELIABLE});
-
-		    if (data == "quit")
-		    {
-			    peer.disconnectImmediately();
-		    }
-	    });
-
-	while (work)
-	{
-		server.poll(2000_ms);
-		LOG_INFO("PLAYERS") << users.size() << " players connected";
-		for (auto user : users)
-		{
-			LOG_DEBUG("PLAYERS") << user << " is connected.";
-		}
-	}
-
-	Logger::teardown();
+	server::Server* server = new server::Server(save);
+	server->run();
 
 	return 0;
 }

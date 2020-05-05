@@ -8,7 +8,8 @@ function hello (args)
         print("with you, the force is not")
     end
 end
-core.command.register("Hello", "Master the arts of the Jedi you must", hello)
+
+--core.command.register("Hello", "Master the arts of the Jedi you must", hello)
 
 block = {}
 block.name = "Dirt"

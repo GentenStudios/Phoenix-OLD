@@ -39,6 +39,9 @@
 
 #include <Common/CMS/ModManager.hpp>
 
+#include <deque>
+#include <enet/enet.h>
+
 namespace phx::client
 {
 	/**
@@ -68,11 +71,23 @@ namespace phx::client
 		void onEvent(events::Event& e) override;
 		void tick(float dt) override;
 
+		/** @brief Sends a message packet to the server for the commander to
+		 * interpret.
+		 *
+		 * @param input The message sent to the server
+		 * @param cout Needs to be depreciated, unused (but required by
+		 * terminal)
+		 */
+		void sendMessage(const std::string& input, std::ostringstream& cout);
+		void parseEvent(enet_uint8* data, std::size_t dataLength);
+		void parseState(enet_uint8* data, std::size_t dataLength);
+		void parseMessage(enet_uint8* data, std::size_t dataLength);
+
 	private:
 		gfx::Window*       m_window;
 		gfx::FPSCamera*    m_camera = nullptr;
-        entt::registry*    m_registry;
-        Player*            m_player;
+		entt::registry*    m_registry;
+		Player*            m_player;
 		voxels::ChunkView* m_world = nullptr;
 
 		gfx::ShaderPipeline m_renderPipeline;
@@ -86,6 +101,16 @@ namespace phx::client
 		bool       m_followCam = true;
 		math::vec3 m_prevPos;
 		int        m_playerHand = 0;
+
+		static constexpr size_t STATE_SIZE = 7;
+		static constexpr size_t LOG_SIZE = 5;
+		std::string stateLog;
+
+		// Networking stuff
+
+		ENetHost*   m_client;
+		ENetEvent   m_event;
+		ENetPeer*   m_peer;
+		ENetAddress m_address;
 	};
 } // namespace phx::client
-

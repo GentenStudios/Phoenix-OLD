@@ -28,18 +28,37 @@
 
 #pragma once
 
+#include <Server/Game.hpp>
+#include <Server/Iris.hpp>
+
+#include <Server/User.hpp>
+
+//#include <Server/Commander.hpp>
+
+#include <entt/entt.hpp>
+#include <enet/enet.h>
+
+#include <array>
+#include <string>
+
 namespace phx::server
 {
 	class Server
 	{
 	public:
-		Server()  = default;
-		~Server() = default;
+		Server(std::string save);
+		~Server();
 
 		void run();
 
 	private:
-	    bool m_running;
+		bool m_running;
+
+		entt::registry m_registry;
+
+		networking::Iris* m_iris;
+		Game*             m_game;
+
+		std::string m_save;
 	};
 } // namespace phx::server
-

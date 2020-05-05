@@ -29,24 +29,21 @@
 #pragma once
 
 #include <Common/Math/Math.hpp>
+#include <Common/Serialization/Serializer.hpp>
+#include <cstddef>
 
 namespace phx
 {
-	/**
-	 * @brief The positioning for an entity
-	 */
-	struct Position
+	struct InputState : public phx::ISerializable
 	{
-		/// @brief The direction the entity is facing
-		math::vec3 rotation;
-		/// @brief The cardinal position of the entity
-		math::vec3 position;
-
-		math::vec3 getDirection()
-		{
-			return math::vec3 {std::cos(rotation.y) * std::sin(rotation.x),
-			                   std::sin(rotation.y),
-			                   std::cos(rotation.y) * std::cos(rotation.x)};
-		};
+		bool        forward{};
+		bool        backward{};
+		bool        left{};
+		bool        right{};
+		bool        up{};
+		bool        down{};
+		math::vec2u rotation{}; // in 1/1000 degres
+		std::size_t sequence{};
+		Serializer& operator&(Serializer& this_) override;
 	};
 } // namespace phx
