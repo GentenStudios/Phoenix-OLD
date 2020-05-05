@@ -46,7 +46,6 @@ void Server::run()
 {
 	std::cout << "Hello, Server!" << std::endl;
 	Settings::get()->load("config.txt");
-	m_running = true;
 
 	std::thread t_iris(&networking::Iris::run, m_iris);
 	std::thread t_game(&Game::run, m_game);

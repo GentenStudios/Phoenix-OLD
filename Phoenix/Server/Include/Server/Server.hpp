@@ -52,7 +52,7 @@ namespace phx::server
 		void run();
 
 	private:
-		bool m_running;
+		bool m_running = true;
 
 		entt::registry m_registry;
 

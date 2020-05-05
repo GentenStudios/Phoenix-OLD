@@ -27,7 +27,6 @@ add_subdirectory (lua)
 add_subdirectory (enet)
 add_subdirectory (entt)
 add_subdirectory (json)
-add_subdirectory (enet)
 
 set_target_properties(SDL2main SDL2-static uninstall Glad ImGui lua liblua enet PROPERTIES FOLDER Dependencies)
 
@@ -43,7 +42,6 @@ set(PHX_THIRD_PARTY_INCLUDES
 	${CMAKE_CURRENT_LIST_DIR}/stb_image
 	${CMAKE_CURRENT_LIST_DIR}/entt/src
 	${CMAKE_CURRENT_LIST_DIR}/json/include
-	${CMAKE_CURRENT_LIST_DIR}/enet/include
 
 	PARENT_SCOPE
 )
@@ -64,3 +62,10 @@ set(PHX_THIRD_PARTY_LIBRARIES
 
 	PARENT_SCOPE
 )
+
+# hide huge list of targets.
+set_target_properties(actor algorithm aob delegate dispatcher emitter entity 
+	family gmock gmock_main group gtest gtest_main hashed_string helper 
+	ident locator meta monostate observer odr process registry resource 
+	runtime_view scheduler sigh snapshot sparse_set storage type_info 
+	type_traits utility view PROPERTIES FOLDER Dependencies/EnTT)
