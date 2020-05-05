@@ -34,6 +34,7 @@
 #include <AL/alc.h>
 
 #pragma warning(disable : 4267 4244)
+#define MINIMP3_ONLY_MP3
 #define MINIMP3_IMPLEMENTATION
 #include <minimp3/minimp3.h>
 #include <minimp3/minimp3_ex.h>
@@ -44,10 +45,18 @@ ALCcontext* Audio::m_context = nullptr;
 ALCdevice*  Audio::m_device  = nullptr;
 mp3dec_t    Audio::m_mp3;
 
-Audio::~Audio() { teardown(); }
+Audio::~Audio()
+{
+	// deletes all buffers of registered sounds.
+	for (auto& it : m_buffers)
+	{
+		alDeleteBuffers(1, &it.second.buffer);
+	}
+}
 
 bool Audio::initialize()
 {
+	// opens an audio device.
 	m_device = alcOpenDevice(nullptr);
 	if (!m_device)
 	{
@@ -56,6 +65,7 @@ bool Audio::initialize()
 		return false;
 	}
 
+	// creates an OpenAL context.
 	m_context = alcCreateContext(m_device, nullptr);
 	if (!m_context)
 	{
@@ -66,6 +76,7 @@ bool Audio::initialize()
 		return false;
 	}
 
+	// makes the context current.
 	if (alcMakeContextCurrent(m_context) == ALC_FALSE)
 	{
 		LOG_FATAL("AUDIO")
@@ -76,9 +87,12 @@ bool Audio::initialize()
 		return false;
 	}
 
+	// initializes the MP3 loaded.
 	mp3dec_init(&m_mp3);
 
-	// Init listener
+	// place some initial values for the listener, this is all changeable and
+	// should be immediately changed to the actual position of the player once
+	// instantiated.
 	ALfloat listenerPos[] = {0.0, 0.0, 0.0};
 	ALfloat listenerVel[] = {0.0, 0.0, 0.0};
 	ALfloat listenerOri[] = {0.0, 0.0, -1.0, 0.0, 1.0, 0.0};
@@ -91,11 +105,7 @@ bool Audio::initialize()
 
 void Audio::teardown()
 {
-	if (m_context == nullptr)
-	{
-		return;
-	}
-
+	// destroys the context and closes the audio device.
 	alcMakeContextCurrent(nullptr);
 	alcDestroyContext(m_context);
 	alcCloseDevice(m_device);
@@ -103,36 +113,64 @@ void Audio::teardown()
 
 void Audio::loadMP3(const std::string& uniqueName, const std::string& filePath)
 {
-	auto it = m_buffers.find(uniqueName);
+	// checks if uniqueName already exists, if so, then overwrite what's there.
+	const auto it = m_buffers.find(uniqueName);
 	if (it != m_buffers.end())
 	{
 		LOG_WARNING("AUDIO") << "The sound with the unique name: " << uniqueName
 		                     << " already exists, but will be overwritten.";
 	}
 
+	// load the mp3 file. will just return empty if the file cannot be read.
 	mp3dec_file_info_t info;
-	int result = mp3dec_load(&m_mp3, filePath.c_str(), &info, nullptr, nullptr);
+	if (mp3dec_load(&m_mp3, filePath.c_str(), &info, nullptr, nullptr))
+	{
+		LOG_FATAL("AUDIO")
+		    << "An unexpected (but recoverable) error occurred while loading: "
+		    << filePath;
 
+		return;
+	}
+
+	// calculates the size of the buffer by the amount of samples and the size of each sample.
 	const unsigned int bufferSize = info.samples * sizeof(mp3d_sample_t);
 
-	const float durationSeconds = bufferSize / (info.avg_bitrate_kbps * 1024.f);
+	// gets the duration of the audio, initially as a simple float, but then converted to minutes and seconds.
+	const float durationSeconds = static_cast<float>(bufferSize) / (static_cast<float>(info.avg_bitrate_kbps) * 1024.f);
 	const Duration duration     = {
         static_cast<unsigned int>(durationSeconds / 60.f),
         static_cast<unsigned int>(durationSeconds) % 60};
 
 	unsigned int buffer;
-	alGenBuffers(1, &buffer);
+
+	// if uniqueName wasn't found, the buffer doesn't exist, otherwise overwrite
+	// the existing buffer to prevent undefined behaviour and wasted memory.
+	if (it == m_buffers.end())
+	{
+		alGenBuffers(1, &buffer);
+	}
+	else
+	{
+		buffer = it->second.buffer;
+	}
+
+	// fill the buffer with the data.
 	alBufferData(buffer,
 	             info.channels == 2 ? AL_FORMAT_STEREO16 : AL_FORMAT_MONO16,
 	             info.buffer, bufferSize, info.hz);
 
+	// checks for an error.
 	if (alGetError() != AL_NO_ERROR)
 	{
 		LOG_FATAL("AUDIO")
 		    << "An unexpected (but recoverable) error occurred while loading: "
 		    << filePath;
+
 	}
 
+	// adds the buffer ID and duration to the unordered_map, where it is
+	// associated with the uniqueName. this can then be retrieved in
+	// getAudioData or [].
 	m_buffers.insert_or_assign(uniqueName, AudioData {buffer, duration});
 }
 
@@ -141,7 +179,8 @@ AudioData Audio::getAudioData(const std::string& uniqueName) const
 	auto it = m_buffers.find(uniqueName);
 	if (it == m_buffers.end())
 	{
-		return {static_cast<unsigned int>(-1), 0u, 0u};
+		// if not found, return some dummy data.
+		return {static_cast<unsigned int>(-1), {0, 0}};
 	}
 
 	return it->second;

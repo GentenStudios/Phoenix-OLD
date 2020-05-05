@@ -88,6 +88,14 @@ void Source::setPitch(float pitch)
 
 Duration Source::getDuration() const { return m_duration; }
 
+Source::State Source::status() const
+{
+	int state;
+	alGetSourcei(m_source, AL_SOURCE_STATE, &state);
+
+	return static_cast<State>(state);
+}
+
 void Source::setAudioData(AudioData data)
 {
 	m_duration = data.duration;

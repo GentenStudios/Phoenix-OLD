@@ -30,6 +30,8 @@
 
 #include <Common/Math/Math.hpp>
 
+#include <AL/al.h>
+
 namespace phx::audio
 {
 	struct Duration
@@ -41,6 +43,14 @@ namespace phx::audio
 	struct AudioData;
 	class Source
 	{
+	public:
+		enum class State
+		{
+			PLAYING = AL_PLAYING,
+			PAUSED  = AL_PAUSED,
+			STOPPED = AL_STOPPED
+		};
+		
 	public:
 		Source();
 		explicit Source(AudioData data);
@@ -57,6 +67,7 @@ namespace phx::audio
 
 		Duration getDuration() const;
 
+		State status() const;
 		void setAudioData(AudioData buffer);
 		void play() const;
 
