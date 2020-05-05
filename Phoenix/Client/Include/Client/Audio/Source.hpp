@@ -34,6 +34,12 @@
 
 namespace phx::audio
 {
+	/**
+	 * @brief A struct holding the duration of an audio clip, in minutes and
+	 * seconds.
+	 *
+	 * @ref AudioData
+	 */
 	struct Duration
 	{
 		unsigned int minutes;
@@ -41,37 +47,181 @@ namespace phx::audio
 	};
 
 	struct AudioData;
+
+	/**
+	 * @brief The source of audio.
+	 *
+	 * This class represents an audio source, like a speaker or a sheep...
+	 *
+	 * The source initially has spatial support disabled, as well as looping.
+	 * This is idea mainly for things like background music, since they can be
+	 * looped and shouldn't be affected by the player's position.
+	 *
+	 * @paragraph Usage
+	 * @code
+	 * audio::Audio manager;
+	 * manager.loadMP3("core:song", "Assets/song.mp3");
+	 * manager.loadMP3("core:song2", "Assets/song.mp3");
+	 *
+	 * audio::Source source;
+	 * source.setAudioData(manager["core:song"]);
+	 * source.enableSpatial(true);
+	 * source.enableLoop(true);
+	 *
+	 * // one is same as input.
+	 * source.setGain(1.f);
+	 * source.setPitch(1.f);
+	 *
+	 * source.play();
+	 *
+	 * // wait for source to finish playing whatever it's playing.
+	 * while (source.status() != Source::State::Stopped)
+	 * {
+	 *     ;
+	 * }
+	 *
+	 * source.setAudioData(manager["core:song2"]);
+	 * ...
+	 * @endcode
+	 */
 	class Source
 	{
 	public:
+		/**
+		 * @brief The current playing state of the Source.
+		 */
 		enum class State
 		{
+			/**
+			 * @brief The Source is playing.
+			 */
 			PLAYING = AL_PLAYING,
+			
+			/**
+			 * @brief The source is paused.
+			 */
 			PAUSED  = AL_PAUSED,
+			
+			/**
+			 * @brief The source is stopped, so either it hasn't been started,
+			 * or it has finished.
+			 */
 			STOPPED = AL_STOPPED
 		};
 		
 	public:
+		/**
+		 * @brief Constructs a Source object.
+		 */
 		Source();
+		
+		/**
+		 * @brief Constructs a Source object but with AudioData from the start.
+		 * @param data The audio data to use.
+		 *
+		 * This one is useful if you know exactly what audio needs to be played.
+		 * The AudioData can be set later on so using this constructor is not
+		 * particularly necessary.
+		 */
 		explicit Source(AudioData data);
+
+		/**
+		 * @brief Destroys a Source object.
+		 */
 		~Source();
 
-		void enableSpatial(bool enabled);
-		void enableLoop(bool enabled);
+		/**
+		 * @brief Allows for enabling/disabling spatial audio as required.
+		 * @param enable Whether to enable spatial audio or not.
+		 *
+		 * Spatial audio is disabled by default. This is useful for things like
+		 * background music, etc... Spatial audio is required for position-based
+		 * audio, such as surrounding entities, world audio, etc...
+		 */
+		void enableSpatial(bool enable);
 
+		/**
+		 * @brief Allows for enabling/disabling the audio from looping.
+		 * @param enable Whether to enable looping or not.
+		 *
+		 * Looping is disabled by default, since most sounds are a
+		 * play-on-demand rather than all the time. Things like ambient audio or
+		 * background music are more likely to be looped, so enabling this is
+		 * necessary.
+		 */
+		void enableLoop(bool enable);
+
+		/**
+		 * @brief Sets the position of the source.
+		 * @param pos The position of the source.
+		 */
 		void setPos(math::vec3 pos);
+
+		/**
+		 * @brief Sets the direction of the source.
+		 * @param direction The direction the source is facing.
+		 */
 		void setDirection(math::vec3 direction);
+
+		/**
+		 * @brief Sets the velocity of the source.
+		 * @param velocity The velocity of the source.
+		 *
+		 * Velocity is a vector quantity, this means it contains direction and
+		 * magnitude. The velocity is a combination of speed and the direction
+		 * in which it is moving.
+		 *
+		 * Velocity is also important in the applying the "Doppler Effect".
+		 */
 		void setVelocity(math::vec3 velocity);
+
+		/**
+		 * @brief Sets the gain of the source.
+		 * @param gain The gain the audio will be played back at.
+		 */
 		void setGain(float gain);
+		
+		/**
+		 * @brief Sets the pitch of the source.
+		 * @param pitch The pitch the audio will be played back at.
+		 */
 		void setPitch(float pitch);
 
+		/**
+		 * @brief Returns the duration of the audio clip.
+		 * @return The duration of the audio clip.
+		 *
+		 * This can return 0, 0 due to the seconds being an unsigned int,
+		 * lacking the precision of a float.
+		 *
+		 * @todo Increase the resolution of Duration, to allow for telling the
+		 * duration of clips shorter than a second.
+		 */
 		Duration getDuration() const;
 
+		/**
+		 * @brief Returns the playing status of the source.
+		 * @return The status of the source: playing, paused or finished.
+		 */
 		State status() const;
+
+		/**
+		 * @brief Sets the audio for the source to use, comes from audio::Audio.
+		 * @param buffer The data associated to the audio requested.
+		 *
+		 * This method should be used with the audio::Audio class.
+		 * audio::Audio::getAudioData("core:song") will return an AudioData
+		 * object for the source to use and play.
+		 */
 		void setAudioData(AudioData buffer);
+
+		/**
+		 * @brief Plays the audio. Calling again will pause.
+		 */
 		void play() const;
 
 	private:
+		// internal variable for OpenAL.
 		unsigned int m_source = 0;
 
 		math::vec3 m_position;

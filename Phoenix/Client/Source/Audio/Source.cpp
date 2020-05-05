@@ -34,26 +34,37 @@
 
 using namespace phx::audio;
 
-Source::Source() { alGenSources(1, &m_source); }
+Source::Source()
+{
+	// creates an OpenAL source, ready for setting a buffer and playing back.
+	alGenSources(1, &m_source);
+}
 
 Source::Source(AudioData data)
 {
+	// generates an OpenAL source and sets the buffer to be used during
+	// playback.
 	alGenSources(1, &m_source);
 	alSourcei(m_source, AL_BUFFER, data.buffer);
 	m_duration = data.duration;
 }
 
-Source::~Source() { alDeleteSources(1, &m_source); }
-
-void Source::enableSpatial(bool enabled)
+Source::~Source()
 {
-	alSourcei(m_source, AL_SOURCE_SPATIALIZE_SOFT,
-	          enabled ? AL_TRUE : AL_FALSE);
+	// deletes the OpenAL source that was created.
+	// this will NOT delete the buffer (the storage for the actual audio).
+	alDeleteSources(1, &m_source);
 }
 
-void Source::enableLoop(bool enabled)
+void Source::enableSpatial(bool enable)
 {
-	alSourcei(m_source, AL_LOOPING, enabled ? AL_TRUE : AL_FALSE);
+	alSourcei(m_source, AL_SOURCE_SPATIALIZE_SOFT,
+	          enable ? AL_TRUE : AL_FALSE);
+}
+
+void Source::enableLoop(bool enable)
+{
+	alSourcei(m_source, AL_LOOPING, enable ? AL_TRUE : AL_FALSE);
 }
 
 void Source::setPos(math::vec3 pos)
