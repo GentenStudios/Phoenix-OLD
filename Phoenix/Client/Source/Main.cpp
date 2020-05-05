@@ -32,80 +32,12 @@
 #include <Common/Network/Host.hpp>
 #include <Common/Network/Packet.hpp>
 
-static std::vector<std::byte> pack(const std::string& string)
-{
-	std::vector<std::byte> arr(string.length());
-	std::transform(string.begin(), string.end(), arr.begin(),
-	               [](char c) { return std::byte(c); });
-
-	return arr;
-}
-
-static std::string unpack(const std::vector<std::byte>& data)
-{
-	std::string string;
-	string.resize(data.size());
-	std::transform(data.begin(), data.end(), string.begin(),
-	               [](std::byte c) { return char(c); });
-
-	return string;
-}
-
 using namespace phx;
 
 #undef main
 int main(int argc, char** argv)
 {
-	LoggerConfig config;
-	config.verbosity = LogVerbosity::DEBUG;
+	client::Client::get()->run();
 
-	Logger::initialize(config);
-
-	// client::Client::get()->run();
-
-	const auto hostname = "127.0.0.1";
-	const auto port     = 1234u;
-
-	net::Host client;
-	auto server = client.connect({hostname, port}).value().get();
-
-	client.onConnect(
-	    [](net::Peer&, enet_uint32) { LOG_INFO("CLIENT") << "Connected."; });
-	client.onDisconnect([](std::size_t, enet_uint32) {
-		LOG_INFO("CLIENT") << "Disconnected.";
-	});
-
-	bool work = true;
-	client.onReceive([&work, &server](net::Peer&, net::Packet&& packet, enet_uint32) {
-		auto data = unpack(packet.getData());
-		if (data == "quit")
-		{
-
-		}
-
-		LOG_INFO("CLIENT") << "Server says: (" << data.size() << ") " << data;
-		std::cout << ">> ";
-	});
-
-
-	std::thread t1([&work, &client]() {
-		while (work)
-		{
-			client.poll(100_ms);
-		}
-	});
-
-	while (work)
-	{
-		std::string input;
-		std::cout << ">> ";
-		std::getline(std::cin, input);
-
-		auto data = pack(input);
-		server.send({data, net::PacketFlags::RELIABLE}, 0);
-	}
-
-	t1.join();
-	
 	return 0;
 }
