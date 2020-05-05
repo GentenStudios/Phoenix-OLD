@@ -26,16 +26,48 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Client/Client.hpp>
+#pragma once
 
-#include <Client/Audio/Audio.hpp>
+#include <Common/Math/Math.hpp>
 
-using namespace phx;
-
-#undef main
-int main(int argc, char** argv)
+namespace phx::audio
 {
-	client::Client::get()->run();
+	struct Duration
+	{
+		unsigned int minutes;
+		unsigned int seconds;
+	};
 
-	return 0;
-}
+	struct AudioData;
+	class Source
+	{
+	public:
+		Source();
+		explicit Source(AudioData data);
+		~Source();
+
+		void enableSpatial(bool enabled);
+		void enableLoop(bool enabled);
+
+		void setPos(math::vec3 pos);
+		void setDirection(math::vec3 direction);
+		void setVelocity(math::vec3 velocity);
+		void setGain(float gain);
+		void setPitch(float pitch);
+
+		Duration getDuration() const;
+
+		void setAudioData(AudioData buffer);
+		void play() const;
+
+	private:
+		unsigned int m_source = 0;
+
+		math::vec3 m_position;
+		math::vec3 m_direction;
+		math::vec3 m_velocity;
+		float      m_gain  = 1.f;
+		float      m_pitch = 1.f;
+		Duration   m_duration;
+	};
+} // namespace phx::audio

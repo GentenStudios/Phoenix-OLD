@@ -26,16 +26,27 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Client/Client.hpp>
+#include <Client/Audio/Listener.hpp>
 
-#include <Client/Audio/Audio.hpp>
+#include <AL/al.h>
 
-using namespace phx;
+using namespace phx::audio;
 
-#undef main
-int main(int argc, char** argv)
+void Listener::setGain(float gain) { alListenerf(AL_GAIN, gain); }
+
+void Listener::setPosition(math::vec3 position)
 {
-	client::Client::get()->run();
+	alListenerfv(AL_POSITION, &position.x);
+}
 
-	return 0;
+void Listener::setVelocity(math::vec3 velocity)
+{
+	alListenerfv(AL_VELOCITY, &velocity.x);
+}
+
+void Listener::setOrientation(math::vec3 direction, math::vec3 up)
+{
+	float orientation[6] = {direction.x, direction.y, direction.z,
+	                        up.x,        up.y,        up.z};
+	alListenerfv(AL_ORIENTATION, orientation);
 }

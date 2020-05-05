@@ -26,16 +26,24 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Client/Client.hpp>
+#pragma once
 
-#include <Client/Audio/Audio.hpp>
+#include <Common/Math/Math.hpp>
 
-using namespace phx;
-
-#undef main
-int main(int argc, char** argv)
+namespace phx::audio
 {
-	client::Client::get()->run();
+	class Listener
+	{
+	public:
+		void setGain(float gain);
+		void setPosition(math::vec3 position);
+		void setVelocity(math::vec3 velocity);
+		void setOrientation(math::vec3 direction, math::vec3 up);
 
-	return 0;
-}
+	private:
+		Listener()  = default;
+		~Listener() = default;
+
+		friend class Audio;
+	};
+} // namespace phx::audio

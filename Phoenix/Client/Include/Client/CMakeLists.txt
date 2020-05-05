@@ -1,10 +1,12 @@
 add_subdirectory(Events)
 add_subdirectory(Graphics)
+add_subdirectory(Audio)
 
 set(currentDir ${CMAKE_CURRENT_LIST_DIR})
 set(Headers
 		${eventHeaders}
 		${graphicsHeaders}
+		${audioHeaders}
 
 		${currentDir}/Player.hpp
 

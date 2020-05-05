@@ -26,16 +26,46 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Client/Client.hpp>
+#pragma once
 
-#include <Client/Audio/Audio.hpp>
+#include <Client/Audio/Source.hpp>
+#include <Client/Audio/Listener.hpp>
 
-using namespace phx;
+#include <AL/alc.h>
+#include <minimp3/minimp3.h>
 
-#undef main
-int main(int argc, char** argv)
+#include <unordered_map>
+
+namespace phx::audio
 {
-	client::Client::get()->run();
+	struct AudioData
+	{
+		unsigned int buffer;
+		Duration     duration;
+	};
+	
+	class Audio
+	{
+	public:
+		Audio() = default;
+		~Audio();
+		
+		static bool initialize();
+		static void teardown();
 
-	return 0;
-}
+		void loadMP3(const std::string& uniqueName, const std::string& filePath);
+		AudioData getAudioData(const std::string& uniqueName) const;
+
+		Listener* getListener() { return &m_listener; }
+
+	private:
+		static ALCcontext* m_context;
+		static ALCdevice*  m_device;
+		static mp3dec_t    m_mp3;
+
+		Listener m_listener;
+
+		// maps uniqueName from loadMP3 to a buffer id.
+		std::unordered_map<std::string, AudioData> m_buffers;
+	};
+} // namespace phx::audio

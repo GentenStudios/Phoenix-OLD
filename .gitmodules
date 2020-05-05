@@ -10,3 +10,6 @@
 [submodule "Phoenix/ThirdParty/json"]
 	path = Phoenix/ThirdParty/json
 	url = https://github.com/nlohmann/json.git
+[submodule "Phoenix/ThirdParty/openal-soft"]
+	path = Phoenix/ThirdParty/openal-soft
+	url = https://github.com/kcat/openal-soft.git

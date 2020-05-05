@@ -26,16 +26,72 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Client/Client.hpp>
-
+#include <Client/Audio/Source.hpp>
 #include <Client/Audio/Audio.hpp>
 
-using namespace phx;
+#include <AL/al.h>
+#include <AL/alext.h>
 
-#undef main
-int main(int argc, char** argv)
+using namespace phx::audio;
+
+Source::Source() { alGenSources(1, &m_source); }
+
+Source::Source(AudioData data)
 {
-	client::Client::get()->run();
-
-	return 0;
+	alGenSources(1, &m_source);
+	alSourcei(m_source, AL_BUFFER, data.buffer);
+	m_duration = data.duration;
 }
+
+Source::~Source() { alDeleteSources(1, &m_source); }
+
+void Source::enableSpatial(bool enabled)
+{
+	alSourcei(m_source, AL_SOURCE_SPATIALIZE_SOFT,
+	          enabled ? AL_TRUE : AL_FALSE);
+}
+
+void Source::enableLoop(bool enabled)
+{
+	alSourcei(m_source, AL_LOOPING, enabled ? AL_TRUE : AL_FALSE);
+}
+
+void Source::setPos(math::vec3 pos)
+{
+	m_position = pos;
+	alSourcefv(m_source, AL_POSITION, &m_position.x);
+}
+
+void Source::setDirection(math::vec3 direction)
+{
+	m_direction = direction;
+	alSourcefv(m_source, AL_DIRECTION, &m_direction.x);
+}
+
+void Source::setVelocity(math::vec3 velocity)
+{
+	m_velocity = velocity;
+	alSourcefv(m_source, AL_VELOCITY, &velocity.x);
+}
+
+void Source::setGain(float gain)
+{
+	m_gain = gain;
+	alSourcef(m_source, AL_GAIN, gain);
+}
+
+void Source::setPitch(float pitch)
+{
+	m_pitch = pitch;
+	alSourcef(m_source, AL_PITCH, pitch);
+}
+
+Duration Source::getDuration() const { return m_duration; }
+
+void Source::setAudioData(AudioData data)
+{
+	m_duration = data.duration;
+	alSourcei(m_source, AL_BUFFER, data.buffer);
+}
+
+void Source::play() const { alSourcePlay(m_source); }
