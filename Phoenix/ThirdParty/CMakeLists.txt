@@ -23,6 +23,9 @@ set(JSON_BuildTests OFF CACHE INTERNAL "")
 set(ALSOFT_UTILS OFF)
 set(ALSOFT_EXAMPLES OFF)
 
+# for OpenAL-soft
+find_package(Threads REQUIRED)
+
 add_subdirectory (SDL2)
 add_subdirectory (Glad)
 add_subdirectory (ImGui)
@@ -69,6 +72,11 @@ set(PHX_THIRD_PARTY_LIBRARIES
 
 	PARENT_SCOPE
 )
+
+if(UNIX)
+	find_package(Threads REQUIRED)
+	target_link_libraries(${PROJECT_NAME} PRIVATE Threads::Threads)
+endif()
 
 target_compile_options(sol2 INTERFACE
   $<$<CXX_COMPILER_ID:MSVC>:/wd4996>
