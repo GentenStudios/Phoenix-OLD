@@ -28,38 +28,47 @@
 
 #pragma once
 
-#include <Server/Game.hpp>
-#include <Server/Iris.hpp>
-
-#include <Server/User.hpp>
-
-#include <Common/CMS/ModManager.hpp>
-
-#include <entt/entt.hpp>
 #include <enet/enet.h>
 
-#include <array>
-#include <string>
+#include <chrono>
 
-namespace phx::server
+namespace phx
 {
-	class Server
+	namespace time
 	{
-	public:
-		Server(std::string save);
-		~Server();
+		// milliseconds
+		using ms = std::chrono::duration<unsigned int, std::milli>;
+	} // namespace time
 
-		void run();
+	namespace net
+	{
+		struct Timeout
+		{
+			time::ms limit;
+			time::ms minimum;
+			time::ms maximum;
+		};
 
-	private:
-		bool m_running = true;
+		struct Throttle
+		{
+			time::ms    interval;
+			enet_uint32 acceleration;
+			enet_uint32 deceleration;
+		};
 
-		entt::registry m_registry;
+		using speed = enet_uint32;
 
-		networking::Iris* m_iris;
-		Game*             m_game;
+		struct Bandwidth
+		{
+			// in bytes.
+			speed incoming;
+			speed outgoing;
+		};
+	} // namespace net
+} // namespace phx
 
-		cms::ModManager* m_modManager;
-		std::string      m_save;
-	};
-} // namespace phx::server
+// cool postfix operator, you can do 1000_ms instead of time::ms{1000}!
+constexpr phx::time::ms operator"" _ms(unsigned long long ms)
+{
+	return phx::time::ms {ms};
+}
