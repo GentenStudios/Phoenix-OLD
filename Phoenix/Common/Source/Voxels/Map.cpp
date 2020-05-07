@@ -32,14 +32,13 @@
 #include <utility>
 
 using namespace phx::voxels;
-using namespace phx;
 
 Map::Map(std::string save, std::string name)
     : m_save(std::move(save)), m_mapName(std::move(name))
 {
 }
 
-Chunk Map::getChunk(math::vec3 pos)
+Chunk Map::getChunk(phx::math::vec3 pos)
 {
 	if (m_chunks.find(pos) != m_chunks.end())
 	{

@@ -19,6 +19,9 @@ add_definitions(-DSDL_MAIN_HANDLED)
 # turn off the JSON tests
 set(JSON_BuildTests OFF CACHE INTERNAL "")
 
+# turn off the EnTT tests.
+set(BUILD_TESTING OFF)
+
 add_subdirectory (SDL2)
 add_subdirectory (Glad)
 add_subdirectory (ImGui)
@@ -28,7 +31,7 @@ add_subdirectory (enet)
 add_subdirectory (entt)
 add_subdirectory (json)
 
-set_target_properties(SDL2main SDL2-static uninstall Glad ImGui lua liblua PROPERTIES FOLDER Dependencies)
+set_target_properties(SDL2main SDL2-static uninstall Glad ImGui lua liblua enet aob PROPERTIES FOLDER Dependencies)
 
 # utility thing to make phoenix cmake tidier
 set(PHX_THIRD_PARTY_INCLUDES
@@ -40,7 +43,6 @@ set(PHX_THIRD_PARTY_INCLUDES
 	${CMAKE_CURRENT_LIST_DIR}/enet/include
 	${CMAKE_CURRENT_LIST_DIR}/sol2/include
 	${CMAKE_CURRENT_LIST_DIR}/stb_image
-	${CMAKE_CURRENT_LIST_DIR}/stb_rectpack
 	${CMAKE_CURRENT_LIST_DIR}/entt/src
 	${CMAKE_CURRENT_LIST_DIR}/json/include
 

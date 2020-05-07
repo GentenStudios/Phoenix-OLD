@@ -118,7 +118,9 @@ void Client::onEvent(events::Event e)
 
 void Client::run()
 {
-	Logger::get()->initialize({});
+	LoggerConfig config;
+	config.verbosity = LogVerbosity::DEBUG;
+	Logger::initialize(config);
 
 	Settings::get()->load("settings.txt");
 
