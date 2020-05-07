@@ -28,10 +28,6 @@
 
 #include <Client/Client.hpp>
 
-#include <Common/Logger.hpp>
-#include <Common/Network/Host.hpp>
-#include <Common/Network/Packet.hpp>
-
 using namespace phx;
 
 #undef main

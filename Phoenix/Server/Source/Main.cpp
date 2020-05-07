@@ -28,14 +28,6 @@
 
 #include <Server/Server.hpp>
 
-#include <Common/Logger.hpp>
-#include <Common/Network/Host.hpp>
-#include <Common/Network/Packet.hpp>
-
-#include <algorithm>
-#include <string>
-#include <thread>
-
 using namespace phx;
 
 #undef main

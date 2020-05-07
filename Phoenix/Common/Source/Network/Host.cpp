@@ -87,12 +87,12 @@ Host::OptionalPeer Host::connect(const Address& address, enet_uint8 channels,
 	return createPeer(*peer);
 }
 
-Bandwidth Host::getBandwidth() const
+Bandwidth Host::getBandwidthLimit() const
 {
 	return {m_host->incomingBandwidth, m_host->outgoingBandwidth};
 }
 
-void Host::setBandwidth(const Bandwidth& bandwidth)
+void Host::setBandwidthLimit(const Bandwidth& bandwidth)
 {
 	enet_host_bandwidth_limit(m_host, bandwidth.incoming, bandwidth.outgoing);
 }

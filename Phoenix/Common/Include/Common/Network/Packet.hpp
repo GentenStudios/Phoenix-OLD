@@ -66,6 +66,9 @@ namespace phx::net
 		UNRELIABLE = ENET_PACKET_FLAG_SENT,
 	};
 
+	/**
+	 * @brief Represents a packet that will be sent to a host/peer.
+	 */
 	class Packet
 	{
 	public:
@@ -73,26 +76,74 @@ namespace phx::net
 
 	public:
 		Packet() = default;
+
+		/**
+		 * @brief Constructs a packet with some default data.
+		 * @param data The data to send within the packet.
+		 * @param flags The method with which the packet should be sent.
+		 */
 		Packet(const Data& data, PacketFlags flags);
+
+		/**
+		 * @brief Constructs a packet with a predetermined size.
+		 * @param size The size of the data which will be set later.
+		 * @param flags The method with which the packet should be sent.
+		 */
 		Packet(std::size_t size, PacketFlags flags);
+
+		// internal use.
 		Packet(ENetPacket& packet, bool sent);
 
 		~Packet();
 
+		/**
+		 * @brief Sets the data the packet will have.
+		 * @param data The data to set within the packet.
+		 *
+		 * This method will implicitly resize the packet if required.
+		 */
 		void setData(const Data& data);
 		Packet& operator=(const Data& data);
 
-		// if wanted, i can implement a << operator too for data.
+		/// @todo Implement a stream (<<) operator for adding data.
 
+		/*
+		 * @brief Gets the data the packet is storing.
+		 * @return The packet's data.
+		 *
+		 * This method is useful on the receiving end. It will return a copy of
+		 * the data since the packet's lifetime cannot be determined.
+		 */
 		Data getData() const;
 
+		/**
+		 * @brief Resizes the packet.
+		 * @param size The new size for the packet.
+		 */
 		void        resize(std::size_t size);
+		
+		/**
+		 * @brief Gets the size of the packet.
+		 * @return The size of the packet.
+		 */
 		std::size_t getSize() const;
 
 		operator ENetPacket*() const { return m_packet; }
 
-		// use when you wanna get something ready to send.
+		/**
+		 * @brief Prepares a packet for sending.
+		 *
+		 * Note: this currently doesn't do much but set a variable, but this
+		 * variable is important to guarantee that a packet is only destroyed
+		 * once ready. Without this, the destructor may prematurely delete the
+		 * packet's data.
+		 */
 		void prepareForSend();
+		
+		/**
+		 * @brief Checks whether the packet has been sent.
+		 * @return Whether the packet has been sent or not.
+		 */
 		bool isSent() const { return m_sent; }
 
 	private:

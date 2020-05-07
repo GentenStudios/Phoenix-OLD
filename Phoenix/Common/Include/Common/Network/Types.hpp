@@ -36,6 +36,7 @@ namespace phx
 {
 	namespace time
 	{
+		// milliseconds
 		using ms = std::chrono::duration<unsigned int, std::milli>;
 	} // namespace time
 
@@ -59,12 +60,14 @@ namespace phx
 
 		struct Bandwidth
 		{
+			// in bytes.
 			speed incoming;
 			speed outgoing;
 		};
 	} // namespace net
 } // namespace phx
 
+// cool postfix operator, you can do 1000_ms instead of time::ms{1000}!
 constexpr phx::time::ms operator"" _ms(unsigned long long ms)
 {
 	return phx::time::ms {ms};
