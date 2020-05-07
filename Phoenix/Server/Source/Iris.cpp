@@ -226,7 +226,10 @@ void Iris::parseMessage(entt::entity* userRef, enet_uint8* data, std::size_t dat
 	User user = m_registry->get<User>(*userRef);
 	if (data[0] == '/')
 	{
-		printf("Received command %s from %s.", data, user.userName.c_str());
+		MessageBundle message;
+		message.message = reinterpret_cast<char*>(data);
+		message.userRef = userRef;
+		messageQueue.push_back(message);
 	}
 	else
 	{
@@ -269,4 +272,10 @@ void Iris::sendState(std::size_t sequence)
 	}
 	enet_host_flush(m_server);
 }
-void Iris::sendMessage(entt::entity* userRef, const std::string& message) {}
+void Iris::sendMessage(entt::entity* userRef, const std::string& message)
+{
+	ENetPacket* packet = enet_packet_create(
+	    message.c_str(), message.length() + 1, ENET_PACKET_FLAG_RELIABLE);
+	enet_peer_send(m_registry->get<User>(*userRef).peer, 2, packet);
+	enet_host_flush(m_server);
+}

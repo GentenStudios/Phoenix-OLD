@@ -102,10 +102,6 @@ namespace phx::client
 		math::vec3 m_prevPos;
 		int        m_playerHand = 0;
 
-		static constexpr size_t STATE_SIZE = 7;
-		static constexpr size_t LOG_SIZE = 5;
-		std::string stateLog;
-
 		// Networking stuff
 
 		ENetHost*   m_client;

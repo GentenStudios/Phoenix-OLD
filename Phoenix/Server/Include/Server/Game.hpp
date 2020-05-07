@@ -40,6 +40,8 @@ namespace phx::server
 	public:
 		Game(entt::registry* registry, bool* running, networking::Iris* iris);
 
+		void registerAPI(cms::ModManager* manager);
+
 		void run();
 
 		static constexpr float dt = 1.f / 20.f;
