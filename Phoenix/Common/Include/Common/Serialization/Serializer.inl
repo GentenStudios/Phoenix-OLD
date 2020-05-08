@@ -73,7 +73,7 @@ namespace phx
 	}
 
 
-	inline data::Data Serializer::endp(Serializer& serializer)
+	inline data::Data Serializer::end(Serializer& serializer)
 	{
 		return serializer.m_buffer;
 	}

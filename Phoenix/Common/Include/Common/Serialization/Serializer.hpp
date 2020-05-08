@@ -78,7 +78,7 @@ namespace phx
 
 		Serializer& operator&(ISerializable& value);
 
-		static data::Data endp(Serializer& serializer);
+		static data::Data end(Serializer& serializer);
 		
 	private:
 		template <typename T>
