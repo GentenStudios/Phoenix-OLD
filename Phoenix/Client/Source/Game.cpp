@@ -377,8 +377,9 @@ void Game::tick(float dt)
         static_cast<unsigned>(m_registry->get<Position>(m_player->getEntity()).rotation.y * 360000.0);
 
 	Serializer ser(Serializer::Mode::WRITE);
-	auto state = ser & inputState & Serializer::end;
-
+	ser&       inputState;
+	auto       state = ser.getBuffer();
+	
 	ENetPacket* packet;
 	packet = enet_packet_create(state.data(), state.size(),
 	                            ENET_PACKET_FLAG_UNRELIABLE_FRAGMENT);

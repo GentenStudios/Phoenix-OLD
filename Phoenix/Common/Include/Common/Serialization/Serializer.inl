@@ -161,7 +161,9 @@ namespace phx
 	{
 		if constexpr (sizeof(T) == CHAR_BIT)
 		{
-			const unsigned int size = pop<unsigned int>();
+			unsigned int size;
+			pop(size);
+
 			data.resize(size);
 
 			std::transform(m_buffer.begin(), m_buffer.begin() + size,
@@ -178,7 +180,8 @@ namespace phx
 				T         c;
 			} values;
 
-			const unsigned int size = pop<unsigned int>();
+			unsigned int size;
+			pop(size);
 
 			data.reserve(size);
 

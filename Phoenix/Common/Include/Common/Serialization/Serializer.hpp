@@ -93,7 +93,7 @@ namespace phx
 		void pop(T& data);
 
 		template <typename T>
-		void pop(std::basic_string<T>& data);		
+		void pop(std::basic_string<T>& data);
 	
 	private:		
 		Mode m_mode;
