@@ -10,12 +10,11 @@ set(Sources
 	${cmsSources}
 	${networkSources}
 
-		${currentDir}/Actor.cpp
-		${currentDir}/Settings.cpp
-		${currentDir}/Logger.cpp
-		${currentDir}/Commander.cpp
-		${currentDir}/Input.cpp
-		${currentDir}/Serialization/Serializer.cpp
+	${currentDir}/Actor.cpp
+	${currentDir}/Settings.cpp
+	${currentDir}/Logger.cpp
+	${currentDir}/Commander.cpp
+	${currentDir}/Input.cpp
 
 	PARENT_SCOPE
 )
