@@ -26,21 +26,6 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#define IMPLEMENT_OPERATOR(X)                          \
-	inline Serializer& Serializer::operator&((X)& value) \
-	{                                                  \
-		if (m_mode == Mode::READ)                      \
-		{                                              \
-			pop(value);                                \
-		}                                              \
-		else                                           \
-		{                                              \
-			push(value);                               \
-		}                                              \
-                                                       \
-		return *this;                                  \
-	}
-
 namespace phx
 {
 	inline void Serializer::setBuffer(std::byte* data, std::size_t dataLength)
@@ -49,23 +34,162 @@ namespace phx
 		m_buffer.insert(m_buffer.begin(), data, data + dataLength);
 	}
 
-	IMPLEMENT_OPERATOR(bool)
-	IMPLEMENT_OPERATOR(char)
-	IMPLEMENT_OPERATOR(unsigned char)
-	IMPLEMENT_OPERATOR(float)
-	IMPLEMENT_OPERATOR(double)
+	inline Serializer& Serializer::operator&(bool& value)
+	{
+		if (m_mode == Mode::READ)
+		{
+			pop(value);
+		}
+		else
+		{
+			push(value);
+		}
+		return *this;
+	}
 
-	IMPLEMENT_OPERATOR(signed short)
-	IMPLEMENT_OPERATOR(signed int)
-	IMPLEMENT_OPERATOR(signed long long)
-	IMPLEMENT_OPERATOR(unsigned short)
-	IMPLEMENT_OPERATOR(unsigned int)
-	IMPLEMENT_OPERATOR(unsigned long long)
+	inline Serializer& Serializer::operator&(char& value)
+	{
+		if (m_mode == Mode::READ)
+		{
+			pop(value);
+		}
+		else
+		{
+			push(value);
+		}
+		return *this;
+	}
+
+	inline Serializer& Serializer::operator&(unsigned char& value)
+	{
+		if (m_mode == Mode::READ)
+		{
+			pop(value);
+		}
+		else
+		{
+			push(value);
+		}
+		return *this;
+	}
+
+	inline Serializer& Serializer::operator&(float& value)
+	{
+		if (m_mode == Mode::READ)
+		{
+			pop(value);
+		}
+		else
+		{
+			push(value);
+		}
+		return *this;
+	}
+
+	inline Serializer& Serializer::operator&(double& value)
+	{
+		if (m_mode == Mode::READ)
+		{
+			pop(value);
+		}
+		else
+		{
+			push(value);
+		}
+		return *this;
+	}
+
+	inline Serializer& Serializer::operator&(signed short& value)
+	{
+		if (m_mode == Mode::READ)
+		{
+			pop(value);
+		}
+		else
+		{
+			push(value);
+		}
+		return *this;
+	}
+
+	inline Serializer& Serializer::operator&(signed int& value)
+	{
+		if (m_mode == Mode::READ)
+		{
+			pop(value);
+		}
+		else
+		{
+			push(value);
+		}
+		return *this;
+	}
+
+	inline Serializer& Serializer::operator&(signed long long& value)
+	{
+		if (m_mode == Mode::READ)
+		{
+			pop(value);
+		}
+		else
+		{
+			push(value);
+		}
+		return *this;
+	}
+	
+	inline Serializer& Serializer::operator&(unsigned short& value)
+	{
+		if (m_mode == Mode::READ)
+		{
+			pop(value);
+		}
+		else
+		{
+			push(value);
+		}
+		return *this;
+	}
+
+	inline Serializer& Serializer::operator&(unsigned int& value)
+	{
+		if (m_mode == Mode::READ)
+		{
+			pop(value);
+		}
+		else
+		{
+			push(value);
+		}
+		return *this;
+	}
+
+	inline Serializer& Serializer::operator&(unsigned long long& value)
+	{
+		if (m_mode == Mode::READ)
+		{
+			pop(value);
+		}
+		else
+		{
+			push(value);
+		}
+		return *this;
+	}
 
 	template <typename T>
-	IMPLEMENT_OPERATOR(std::basic_string<T>)
-
-#undef IMPLEMENT_OPERATOR
+	inline Serializer& Serializer::operator&(std::basic_string<T>& value)
+	{
+		if (m_mode == Mode::READ)
+		{
+			pop(value);
+		}
+		else
+		{
+			push(value);
+		}
+		return *this;
+	}
 
 	inline Serializer& Serializer::operator&(ISerializable& value)
 	{
