@@ -99,7 +99,7 @@ namespace phx
 		return *this;
 	}
 
-	inline Serializer& Serializer::operator&(signed short& value)
+	inline Serializer& Serializer::operator&(std::int16_t& value)
 	{
 		if (m_mode == Mode::READ)
 		{
@@ -112,7 +112,7 @@ namespace phx
 		return *this;
 	}
 
-	inline Serializer& Serializer::operator&(signed int& value)
+	inline Serializer& Serializer::operator&(std::int32_t& value)
 	{
 		if (m_mode == Mode::READ)
 		{
@@ -125,7 +125,7 @@ namespace phx
 		return *this;
 	}
 
-	inline Serializer& Serializer::operator&(signed long long& value)
+	inline Serializer& Serializer::operator&(std::int64_t& value)
 	{
 		if (m_mode == Mode::READ)
 		{
@@ -138,7 +138,7 @@ namespace phx
 		return *this;
 	}
 	
-	inline Serializer& Serializer::operator&(unsigned short& value)
+	inline Serializer& Serializer::operator&(std::uint16_t& value)
 	{
 		if (m_mode == Mode::READ)
 		{
@@ -151,7 +151,7 @@ namespace phx
 		return *this;
 	}
 
-	inline Serializer& Serializer::operator&(unsigned int& value)
+	inline Serializer& Serializer::operator&(std::uint32_t& value)
 	{
 		if (m_mode == Mode::READ)
 		{
@@ -164,7 +164,7 @@ namespace phx
 		return *this;
 	}
 
-	inline Serializer& Serializer::operator&(unsigned long long& value)
+	inline Serializer& Serializer::operator&(std::uint64_t& value)
 	{
 		if (m_mode == Mode::READ)
 		{

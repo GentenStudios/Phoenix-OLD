@@ -67,12 +67,12 @@ namespace phx
 		Serializer& operator&(float& value);
 		Serializer& operator&(double& value);
 
-		Serializer& operator&(signed short& value);
-		Serializer& operator&(signed int& value);
-		Serializer& operator&(signed long long& value);
-		Serializer& operator&(unsigned short& value);
-		Serializer& operator&(unsigned int& value);
-		Serializer& operator&(unsigned long long& value);
+		Serializer& operator&(std::int16_t& value);
+		Serializer& operator&(std::int32_t& value);
+		Serializer& operator&(std::int64_t& value);
+		Serializer& operator&(std::uint16_t& value);
+		Serializer& operator&(std::uint32_t& value);
+		Serializer& operator&(std::uint64_t& value);
 
 		template <typename T>
 		Serializer& operator&(std::basic_string<T>& value);
