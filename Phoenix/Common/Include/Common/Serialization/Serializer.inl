@@ -27,7 +27,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #define IMPLEMENT_OPERATOR(X)                          \
-	inline Serializer& Serializer::operator&(X& value) \
+	inline Serializer& Serializer::operator&((X)& value) \
 	{                                                  \
 		if (m_mode == Mode::READ)                      \
 		{                                              \
