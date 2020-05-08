@@ -26,103 +26,167 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#pragma once
-#include <Common/Serialization/Endian.hpp>
-#include <cstddef>
-#include <functional>
-#include <vector>
-
-#if defined(__APPLE__)
-#	define __INT32_EQUAL_LONG__ 1
-#elif defined(_WIN32)
-#	define __INT32_EQUAL_LONG__ 1
-#else
-#	define __INT32_EQUAL_LONG__ 0
-#endif
+#define IMPLEMENT_OPERATOR(X)                          \
+	inline Serializer& Serializer::operator&(X& value) \
+	{                                                  \
+		if (m_mode == Mode::READ)                      \
+		{                                              \
+			pop(value);                                \
+		}                                              \
+		else                                           \
+		{                                              \
+			push(value);                               \
+		}                                              \
+                                                       \
+		return *this;                                  \
+	}
 
 namespace phx
 {
-	class Serializer;
-
-	class ISerializable
+	inline void Serializer::setBuffer(std::byte* data, std::size_t dataLength)
 	{
-	public:
-		virtual phx::Serializer& operator&(phx::Serializer& this_) = 0;
-	};
+		m_buffer.clear();
+		m_buffer.insert(m_buffer.begin(), data, data + dataLength);
+	}
 
-	class Serializer
+	IMPLEMENT_OPERATOR(bool)
+	IMPLEMENT_OPERATOR(char)
+	IMPLEMENT_OPERATOR(unsigned char)
+	IMPLEMENT_OPERATOR(float)
+	IMPLEMENT_OPERATOR(double)
+
+	IMPLEMENT_OPERATOR(signed short)
+	IMPLEMENT_OPERATOR(signed int)
+	IMPLEMENT_OPERATOR(signed long long)
+	IMPLEMENT_OPERATOR(unsigned short)
+	IMPLEMENT_OPERATOR(unsigned int)
+	IMPLEMENT_OPERATOR(unsigned long long)
+
+	template <typename T>
+	IMPLEMENT_OPERATOR(std::basic_string<T>)
+
+#undef IMPLEMENT_OPERATOR
+
+	inline Serializer& Serializer::operator&(ISerializable& value)
 	{
-	public:
-		enum class Mode
-		{
-			READ,
-			WRITE
-		};
-		void setBuffer(std::byte* data_, size_t dataLength_);
-		explicit Serializer(Mode mode_);
-		phx::Serializer& operator&(ISerializable& value_);
-		phx::Serializer& operator&(bool& value_);
-		phx::Serializer& operator&(char& value_);
-#if __INT32_EQUAL_LONG__
-		phx::Serializer& operator&(long& value_);
-		phx::Serializer& operator&(unsigned long& value_);
-#endif
-		phx::Serializer&              operator&(std::uint8_t& value_);
-		phx::Serializer&              operator&(std::int8_t& value_);
-		phx::Serializer&              operator&(std::uint16_t& value_);
-		phx::Serializer&              operator&(std::int16_t& value_);
-		phx::Serializer&              operator&(std::uint32_t& value_);
-		phx::Serializer&              operator&(std::int32_t& value_);
-		phx::Serializer&              operator&(std::uint64_t& value_);
-		phx::Serializer&              operator&(std::int64_t& value_);
-		phx::Serializer&              operator&(std::string& value_);
-		phx::Serializer&              operator&(std::wstring& value_);
-		static std::vector<std::byte> endp(phx::Serializer& this_);
-		std::vector<std::byte>        operator&(
-            std::function<std::vector<std::byte>(phx::Serializer&)> function);
+		return value & *this;
+	}
 
-	private:
-		template <typename T>
-		void read(T& value_)
-		{
-			phx::word<T> word(buffer.data(), 1);
-			value_ = word.from_network();
-			buffer.erase(buffer.begin(), buffer.begin() + word.size);
-		}
-		template <typename char_type>
-		void read(std::basic_string<char_type>& value_)
-		{
-			std::size_t size;
-			read(size);
-			phx::word<char_type*> word((std::byte*) buffer.data(), size);
-			word.from_network();
-			value_ = std::basic_string<char_type>(word.value.data, size);
-			buffer.erase(buffer.begin(), buffer.begin() + size + 1);
-		}
-		template <typename T>
-		void write(T& value_)
-		{
-			phx::word<T> word(value_);
-			word.to_network();
-			buffer.insert(buffer.end(), word.value.bytes,
-			              word.value.bytes + word.size);
-		}
-		template <typename char_type>
-		void write(std::basic_string<char_type>& value_)
-		{
-			std::size_t size = value_.size();
-			write(size);
-			phx::word<char_type*> word((std::byte*) value_.data(), size);
-			word.to_network();
-			buffer.insert(buffer.end(), word.value.bytes,
-			              word.value.bytes + word.size);
-			char_type char0 {};
-			/// @todo: check if next line is needed
-			write(char0);
-		}
 
-	private:
-		Mode                   m_mode;
-		std::vector<std::byte> buffer;
-	};
+	inline data::Data Serializer::endp(Serializer& serializer)
+	{
+		return serializer.m_buffer;
+	}
+
+
+	template <typename T>
+	void Serializer::push(const T& data)
+	{
+		union {
+			std::byte bytes[sizeof(T)];
+			T         value;
+		} value;
+
+		value.value = data::endian::swapForNetwork(data);
+
+		for (std::size_t i = 0; i < sizeof(T); ++i)
+		{
+			m_buffer.push_back(value.bytes[i]);
+		}
+	}
+
+	template <typename T>
+	void Serializer::push(const std::basic_string<T>& data)
+	{
+		// if T is the same as the number of bits in a char, it's a normal
+		// std::string. This means that there is only 1 byte per character and
+		// so you don't need to factor in any endianness changes.
+		if constexpr (sizeof(T) == CHAR_BIT)
+		{
+			// this is faster than iterating through every character and
+			// swapping endianness and essentially doing an unnecessary
+			// endianness swap.
+
+			// previous end of the array, so we can append onto that - rather
+			// than the new end.
+			const std::size_t prevEnd = m_buffer.size();
+
+			// +1 for null terminator.
+			m_buffer.resize(m_buffer.size() + data.length() + 1);
+
+			// convert string to array of std::byte and append to data array.
+			std::transform(data.begin(), data.end(), m_buffer.begin() + prevEnd,
+			               [](char c) { return std::byte(c); });
+
+			// push size of string onto data at the end.
+			// specify unsigned int otherwise it will waste space allocating a
+			// 64 bit variable.
+			push(static_cast<unsigned int>(data.length()));
+		}
+		else
+		{
+			// push a new value for each character in the string.
+			// the reason this exists is because there are different strings in
+			// the standard library, them being 16bit and 32bit character
+			// strings.
+			for (auto c : data)
+			{
+				push(c);
+			}
+
+			push(static_cast<unsigned int>(data.length()));
+		}
+	}
+
+	inline void Serializer::push(ISerializable& data) { data&* this; }
+
+	template <typename T>
+	void Serializer::pop(T& data)
+	{
+		union {
+			std::byte bytes[sizeof(T)];
+			T         value;
+		} value;
+
+		std::memcpy(value.bytes, m_buffer.data(), sizeof(T));
+
+		// basically pop front for the amount of bytes of data we're taking.
+		m_buffer.erase(m_buffer.begin(), m_buffer.begin() + sizeof(T));
+
+		data = data::endian::swapForHost(value.value);
+	}
+
+	template <typename T>
+	void Serializer::pop(std::basic_string<T>& data)
+	{
+		if constexpr (sizeof(T) == CHAR_BIT)
+		{
+			const unsigned int size = pop<unsigned int>();
+			data.resize(size);
+
+			std::transform(m_buffer.begin(), m_buffer.begin() + size,
+			               data.begin(),
+			               [](std::byte byte) { return char(byte); });
+
+			// basically pop front for the amount of bytes of data we're taking.
+			m_buffer.erase(m_buffer.begin(), m_buffer.begin() + size);
+		}
+		else
+		{
+			union {
+				std::byte bytes[sizeof(T)];
+				T         c;
+			} values;
+
+			const unsigned int size = pop<unsigned int>();
+
+			data.reserve(size);
+
+			for (unsigned int i = 0; i < size; ++i)
+			{
+				pop(values.c);
+				data.push_back(values.c);
+			}
+		}
+	}
 } // namespace phx

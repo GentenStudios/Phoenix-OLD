@@ -157,7 +157,7 @@ void Iris::parseState(entt::entity* userRef, enet_uint8* data, std::size_t dataL
 	InputState input;
 
 	phx::Serializer ser(Serializer::Mode::READ);
-	ser.setBuffer((std::byte*) data, dataLength);
+	ser.setBuffer(reinterpret_cast<std::byte*>(data), dataLength);
 	ser& input;
 
 	// If the queue is empty we need to add a new bundle

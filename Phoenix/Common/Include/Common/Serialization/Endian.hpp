@@ -28,268 +28,242 @@
 
 #pragma once
 
-#include <climits>
+#include <Common/CoreIntrinsics.hpp>
+#include <Common/Serialization/SharedTypes.hpp>
+
 #include <cstddef>
 #include <cstdint>
-#include <cstring>
-#include <iostream>
-#include <sstream>
-#include <string>
 
-#ifndef __clang__
-#	ifdef _MSC_VER
-#		define __LITTLE_ENDIAN__ 1
-#		define __BIG_ENDIAN__ 2
-#		define __PDP_ENDIAN__ 3
-#		if REG_DWORD == REG_DWORD_LITTLE_ENDIAN
-#			define __BYTE_ORDER__ __LITTLE_ENDIAN__
-#		else
-#			define __BYTE_ORDER__ __BIG_ENDIAN__
-#		endif
+// for potential GCC defines.
+#include <limits.h>
+
+// by the end of this preprocessor cluster fuck, there should be an
+// ENGINE_NATIVE_ENDIAN that is defined. The static assert in the namespace will
+// make sure it's not ENGINE_UNKNOWN_ENDIAN, since if we cannot determine the
+// platform's endianness we do be in a bit of a pickle.
+
+#define ENGINE_UNKNOWN_ENDIAN -1
+#define ENGINE_LITTLE_ENDIAN 0
+#define ENGINE_BIG_ENDIAN 1
+#define ENGINE_NET_ENDIAN ENGINE_BIG_ENDIAN
+
+// c++17 feature, C++11 extension in CLang, GCC 5+, VS2015+
+// you should be fine even without it.
+#ifdef __has_include
+#	if __has_include(<endian.h>)
+#		include <endian.h> // gnu libc normally provides, linux
+#	elif __has_include(<machine/endian.h>)
+#		include <machine/endian.h> //open bsd, macos
+#	elif __has_include(<sys/param.h>)
+#		include <sys/param.h> // mingw, some bsd (not open/macos)
+#	elif __has_include(<sys/isadefs.h>)
+#		include <sys/isadefs.h> // solaris
+#	endif
+#endif
+#if defined(__BIG_ENDIAN__)
+#	define ENGINE_NATIVE_ENDIAN ENGINE_BIG_ENDIAN
+#elif defined(__LITTLE_ENDIAN__)
+#	define ENGINE_NATIVE_ENDIAN ENGINE_LITTLE_ENDIAN
+#endif
+
+// this should exhaust literally every possibility.
+#if !defined(__LITTLE_ENDIAN__) && !defined(__BIG_ENDIAN__)
+#	if (defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__) || \
+	    (defined(__BYTE_ORDER) && __BYTE_ORDER == __BIG_ENDIAN) ||             \
+	    (defined(_BYTE_ORDER) && _BYTE_ORDER == _BIG_ENDIAN) ||                \
+	    (defined(BYTE_ORDER) && BYTE_ORDER == BIG_ENDIAN) ||                   \
+	    (defined(__sun) && defined(__SVR4) && defined(_BIG_ENDIAN)) ||         \
+	    defined(__ARMEB__) || defined(__THUMBEB__) ||                          \
+	    defined(__AARCH64EB__) || defined(_MIBSEB) || defined(__MIBSEB) ||     \
+	    defined(__MIBSEB__) || defined(_M_PPC)
+#		define ENGINE_NATIVE_ENDIAN ENGINE_BIG_ENDIAN
+#	elif (defined(__BYTE_ORDER__) &&                                          \
+	       __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__) || /* gcc */             \
+	    (defined(__BYTE_ORDER) &&                                              \
+	     __BYTE_ORDER == __LITTLE_ENDIAN) /* linux header */                   \
+	    || (defined(_BYTE_ORDER) && _BYTE_ORDER == _LITTLE_ENDIAN) ||          \
+	    (defined(BYTE_ORDER) &&                                                \
+	     BYTE_ORDER == LITTLE_ENDIAN) /* mingw header */                       \
+	    || (defined(__sun) && defined(__SVR4) &&                               \
+	        defined(_LITTLE_ENDIAN)) || /* solaris */                          \
+	    defined(__ARMEL__) ||                                                  \
+	    defined(__THUMBEL__) || defined(__AARCH64EL__) || defined(_MIPSEL) ||  \
+	    defined(__MIPSEL) || defined(__MIPSEL__) || defined(_M_IX86) ||        \
+	    defined(_M_X64) || defined(_M_IA64) || /* msvc for intel processors */ \
+	    defined(_M_ARM) /* msvc code on arm executes in little endian mode */
+#		define ENGINE_NATIVE_ENDIAN ENGINE_LITTLE_ENDIAN
 #	endif
 #endif
 
-#ifndef __LITTLE_ENDIAN__
-#	if defined(__ORDER_LITTLE_ENDIAN__)
-#		define __LITTLE_ENDIAN__ __ORDER_LITTLE_ENDIAN__
-#	elif defined(__LITTLE_ENDIAN)
-#		define __LITTLE_ENDIAN__ __LITTLE_ENDIAN
-#	elif defined(_LITTLE_ENDIAN)
-#		define __LITTLE_ENDIAN__ _LITTLE_ENDIAN
-#	elif defined(G_LITTLE_ENDIAN)
-#		define __LITTLE_ENDIAN__ G_LITTLE_ENDIAN
-#	endif
+// something is wrong, it hasn't been defined yet.
+#ifndef ENGINE_NATIVE_ENDIAN
+#	define ENGINE_NATIVE_ENDIAN ENGINE_UNKNOWN_ENDIAN
+#	warning \
+	    "Unknown platform endianness. Network/Host byte swaps will not occur - bugs may be present."
 #endif
 
-#ifndef __BIG_ENDIAN__
-#	if defined(__ORDER_BIG_ENDIAN__)
-#		define __BIG_ENDIAN__ __ORDER_BIG_ENDIAN__
-#	elif defined(__BIG_ENDIAN)
-#		define __BIG_ENDIAN__ __BIG_ENDIAN
-#	elif defined(_BIG_ENDIAN)
-#		define __BIG_ENDIAN__ _BIG_ENDIAN
-#	elif defined(G_BIG_ENDIAN)
-#		define __BIG_ENDIAN__ G_BIG_ENDIAN
-#	endif
+// define builtin byte swapping methods, much faster than custom methods.
+// will work for signed as well.
+// clang-format off
+#if defined(ENGINE_MSVC)
+#	define byteswap16(x) _byteswap_ushort((x))
+#	define byteswap32(x) _byteswap_ulong((x))
+#	define byteswap64(x) _byteswap_uint64((x))
+#elif defined(ENGINE_GNUC) && \
+    ((__GNUC__ >= 5) || (__GNUC__ == 4 && __GNUC_MINOR__ >= 8))
+#	define byteswap16(x) __builtin_bswap16((x))
+#	define byteswap32(x) __builtin_bswap32((x))
+#	define byteswap64(x) __builtin_bswap64((x))
+#elif defined(__has_builtin) && __has_builtin(__builtin_bswap64)
+#	define byteswap16(x) __builtin_bswap16((x))
+#	define byteswap32(x) __builtin_bswap32((x))
+#	define byteswap64(x) __builtin_bswap64((x))
+#else
+	// compilers will most likely optimise this out - even if the builtin's don't
+	// exist.
+	static inline uint16_t byteswap16(uint16_t x)
+	{
+		return (((x >> 8) & 0xffu) | ((x & 0xffu) << 8));
+	}
+	static inline uint32_t byteswap32(uint32_t x)
+	{
+		return (((x & 0xff000000u) >> 24) | ((x & 0x00ff0000u) >> 8) |
+		        ((x & 0x0000ff00u) << 8) | ((x & 0x000000ffu) << 24));
+	}
+	static inline uint64_t byteswap64(uint64_t x)
+	{
+		return (((x & 0xff00000000000000ull) >> 56) |
+		        ((x & 0x00ff000000000000ull) >> 40) |
+		        ((x & 0x0000ff0000000000ull) >> 24) |
+		        ((x & 0x000000ff00000000ull) >> 8) |
+		        ((x & 0x00000000ff000000ull) << 8) |
+		        ((x & 0x0000000000ff0000ull) << 24) |
+		        ((x & 0x000000000000ff00ull) << 40) |
+		        ((x & 0x00000000000000ffull) << 56));
+	}
 #endif
+// clang-format on
 
-#ifndef __PDP_ENDIAN__
-#	if defined(__ORDER_PDP_ENDIAN__)
-#		define __PDP_ENDIAN__ __ORDER_PDP_ENDIAN__
-#	elif defined(__PDP_ENDIAN)
-#		define __PDP_ENDIAN__ __PDP_ENDIAN
-#	elif defined(_PDP_ENDIAN)
-#		define __PDP_ENDIAN__ _PDP_ENDIAN
-#	elif defined(G_PDP_ENDIAN)
-#		define __PDP_ENDIAN__ G_PDP_ENDIAN
-#	endif
-#endif
+#include <type_traits>
 
-#ifndef __BYTE_ORDER__
-#	if defined(__ORDER_ENDIAN__)
-#		define __BYTE_ORDER__ __ORDER_ENDIAN__
-#	elif defined(__BYTE_ORDER)
-#		define __BYTE_ORDER__ __BYTE_ORDER
-#	elif defined(_BYTE_ORDER)
-#		define __BYTE_ORDER__ _BYTE_ORDER
-#	elif defined(G_BYTE_ORDER)
-#		define __BYTE_ORDER__ G_BYTE_ORDER
-#	endif
-#endif
-
-namespace phx
+namespace phx::data::endian
 {
 	enum class Endian
 	{
-		LITTLE  = __LITTLE_ENDIAN__,
-		BIG     = __BIG_ENDIAN__,
-		NETWORK = __BIG_ENDIAN__,
-		PDP     = __PDP_ENDIAN__,
-		NATIVE  = __BYTE_ORDER__
+		LITTLE = ENGINE_LITTLE_ENDIAN,
+		BIG    = ENGINE_BIG_ENDIAN,
+		NET    = ENGINE_NET_ENDIAN,
+		NATIVE = ENGINE_NATIVE_ENDIAN
 	};
 
-	template <typename T, phx::Endian from = phx::Endian::NATIVE>
-	struct word
+	namespace detail
 	{
-		static_assert(CHAR_BIT == 8, "CHAR_BIT != 8");
-		std::size_t size;
-		union value_type
+		template <typename T>
+		struct IsEndianChangable
 		{
-			std::byte bytes[sizeof(T)];
-			T         data[1];
-			T         numeric;
-		} value;
+			static constexpr bool value = std::is_integral_v<T> || std::is_floating_point_v<T>;
+		};
 
-		explicit word(T const& value_)
+		template <std::size_t N>
+		struct ByteSwapper
 		{
-			value.numeric = value_;
-			size          = sizeof(T);
-		}
+		};
 
-		explicit word(std::byte const* bytes_, const std::size_t size_)
+		// you don't swap the byte order if there's only one byte.
+		template <>
+		struct ByteSwapper<1>
 		{
-			size = size_ * sizeof(T);
-			std::memcpy(value.bytes, bytes_, size_ * sizeof(T));
-		}
+			template <typename T>
+			T operator()(const T& t)
+			{
+				return t;
+			}
+		};
 
-		inline T to_big()
+		template <>
+		struct ByteSwapper<2>
 		{
-			if constexpr (from != phx::Endian::BIG)
+			template <typename T>
+			T operator()(const T& t)
 			{
-				swapEndian();
+				return byteswap16(t);
 			}
-			return value.numeric;
-		}
-		inline T toLittle()
-		{
-			if constexpr (from != phx::Endian::LITTLE)
-			{
-				swapEndian();
-			}
-			return value.numeric;
-		}
-		inline T from_network()
-		{
-			if constexpr (from != phx::Endian::NETWORK)
-			{
-				swapEndian();
-			}
-			return value.numeric;
-		}
-		inline T to_network()
-		{
-			if constexpr (from != phx::Endian::NETWORK)
-			{
-				swapEndian();
-			}
-			return value.numeric;
-		}
-		inline T to_native()
-		{
-			if (from != phx::Endian::NATIVE)
-			{
-				swapEndian();
-			}
-			return value.numeric;
-		}
+		};
 
-		void swapEndian()
+		template <>
+		struct ByteSwapper<4>
 		{
-			if constexpr (sizeof(T) > 1)
+			template <typename T>
+			T operator()(const T& t)
 			{
-				for (size_t init = 0; init < size / sizeof(T); ++init)
-				{
-					for (size_t k = 0; k < sizeof(T) / 2; ++k)
-					{
-						std::swap(
-						    value.bytes[k],
-						    value.bytes[init * sizeof(T) + sizeof(T) - k - 1]);
-					}
-				}
+				return byteswap32(t);
 			}
-		}
-	};
-	template <typename T, phx::Endian from>
-	struct word<T*, from>
+
+			// special operator for float since it needs to be turned into an
+			// integer first.
+			float operator()(float f)
+			{
+				uint64_t t = byteswap32(*reinterpret_cast<const uint32_t*>(&f));
+				return *reinterpret_cast<const float*>(&t);
+			}
+		};
+
+		template <>
+		struct ByteSwapper<8>
+		{
+			template <typename T>
+			T operator()(const T& t)
+			{
+				return byteswap64(t);
+			}
+
+			// special operator for double since it needs to be turned into an
+			// integer first.
+			double operator()(double d)
+			{
+				uint64_t t = byteswap64(*reinterpret_cast<const uint64_t*>(&d));
+				return *reinterpret_cast<const double*>(&t);
+			}
+		};
+	} // namespace detail
+
+	/**
+	 * @brief Swaps the endianness of data for sending over a network.
+	 * @tparam T The type of data being converted. (must be integral type)
+	 * @tparam from The endianness that the data currently is.
+	 * @param t The value to check/swap for endianness
+	 * @return The endian-safe value.
+	 */
+	template <typename T, Endian from = Endian::NATIVE,
+	          typename U =
+	              std::enable_if_t<detail::IsEndianChangable<T>::value, void>>
+	T swapForNetwork(const T& t)
 	{
-		static_assert(CHAR_BIT == 8, "CHAR_BIT != 8");
-		std::size_t size;
-		union value_type
+		if constexpr (from != Endian::NET)
 		{
-			std::byte* bytes;
-			T*         data;
-			T*         numeric;
-		} value;
-
-		explicit word(std::byte* bytes_, const std::size_t size_)
-		{
-			size        = size_ * sizeof(T);
-			value.bytes = bytes_;
+			return detail::ByteSwapper<sizeof(T)>()(t);
 		}
 
-		inline T toBig()
+		return t;
+	}
+
+	/**
+	 * @brief Swaps the endianness of data after receiving from a network.
+	 * @tparam T The type of data being converted. (must be integral type)
+	 * @tparam from The endianness that the data currently is.
+	 * @param t The value to check/swap for endianness
+	 * @return The endian-safe value.
+	 */
+	template <typename T, Endian from = Endian::NET,
+	          typename U =
+	              std::enable_if_t<detail::IsEndianChangable<T>::value, void>>
+	T swapForHost(const T& t)
+	{
+		if constexpr (from != Endian::NATIVE)
 		{
-			if constexpr (from != phx::Endian::BIG)
-			{
-				swapEndian();
-			}
-			return value.numeric[0];
-		}
-		inline T toLittle()
-		{
-			if constexpr (from != phx::Endian::LITTLE)
-			{
-				swapEndian();
-			}
-			return value.numeric[0];
-		}
-		inline T from_network()
-		{
-			if constexpr (from != phx::Endian::NETWORK)
-			{
-				swapEndian();
-			}
-			return value.numeric[0];
-		}
-		inline T to_network()
-		{
-			if constexpr (from != phx::Endian::NETWORK)
-			{
-				swapEndian();
-			}
-			return value.numeric[0];
-		}
-		inline T to_native()
-		{
-			if (from != phx::Endian::NATIVE)
-			{
-				swapEndian();
-			}
-			return value.numeric[0];
+			return detail::ByteSwapper<sizeof(T)>()(t);
 		}
 
-		void swapEndian()
-		{
-			if constexpr (sizeof(T) > 1)
-			{
-				for (size_t init = 0; init < size / sizeof(T); ++init)
-				{
-					for (size_t k = 0; k < sizeof(T) / 2; ++k)
-					{
-						std::swap(
-						    value.bytes[k],
-						    value.bytes[init * sizeof(T) + sizeof(T) - k - 1]);
-					}
-				}
-			}
-		}
-	};
-} // namespace phx
-
-template <typename T>
-T bigEndian(T value_)
-{
-	phx::word<T, phx::Endian::NATIVE> value(value_);
-	return value.toBig();
-}
-
-template <typename T>
-T littleEndian(T value_)
-{
-	phx::word<T, phx::Endian::NATIVE> value(value_);
-	return value.toLittle();
-}
-
-template <typename T>
-T fromNetwork(T value_)
-{
-	phx::word<T, phx::Endian::BIG> value(value_);
-	return value.from_network();
-}
-
-template <typename T>
-T toNetwork(T value_)
-{
-	phx::word<T, phx::Endian::NATIVE> value(value_);
-	return value.to_network();
-}
+		return t;
+	}
+} // namespace phx::data::endian

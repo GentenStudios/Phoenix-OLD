@@ -376,7 +376,7 @@ void Game::tick(float dt)
 	inputState.rotation.y =
         static_cast<unsigned>(m_registry->get<Position>(m_player->getEntity()).rotation.y * 360000.0);
 
-	phx::Serializer ser(Serializer::Mode::WRITE);
+	Serializer ser(Serializer::Mode::WRITE);
 	auto state = ser & inputState & Serializer::endp;
 
 	ENetPacket* packet;
