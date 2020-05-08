@@ -43,6 +43,11 @@ Game::Game(entt::registry* registry, bool* running, networking::Iris* iris)
 	m_commander = new Commander(m_iris);
 }
 
+void Game::registerAPI(cms::ModManager* manager)
+{
+	m_commander->registerAPI(manager);
+}
+
 void Game::run()
 {
 	while (m_running)
@@ -55,7 +60,7 @@ void Game::run()
 		}
 		else
 		{
-			// Process everybodies input first
+			// Process everybody's input first
 			networking::StateBundle m_currentState = m_iris->stateQueue.front();
 			m_iris->stateQueue.pop_front();
 

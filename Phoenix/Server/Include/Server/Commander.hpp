@@ -39,6 +39,8 @@
 
 #include <Server/Iris.hpp>
 
+#include <Common/CMS/ModManager.hpp>
+
 #include <entt/entity/registry.hpp>
 
 #include <functional>
@@ -70,7 +72,9 @@ namespace phx::server
 	class Commander
 	{
 	public:
-		Commander(networking::Iris* iris);
+		explicit Commander(networking::Iris* iris);
+
+		void registerAPI(cms::ModManager* manager);
 
 		/**
 		 * @brief Registers a command in the command registry.
@@ -90,8 +94,7 @@ namespace phx::server
 		 *
 		 * @param command The keyword for calling the command.
 		 * @param args The arguments to be passed to the command.
-		 * @param out An output stream to output any return from internal.
-		 * commander functions
+		 * @param userRef The user who ran the command
 		 * @return Returns True if the function was called and False if the
 		 * function could not be found
 		 */
@@ -102,7 +105,7 @@ namespace phx::server
 		 *
 		 * @param args array of input, args[0] is the command helpstring is
 		 * returned for, all other array values are not used.
-		 * @param out An output stream to output any help text to.
+		 * @param userRef The user who ran the command
 		 * @return Returns True if successful and False if it could not find
 		 * the inputted command.
 		 */
@@ -111,7 +114,7 @@ namespace phx::server
 		/**
 		 * @brief Outputs a string listing available commands.
 		 *
-		 * @param out The output stream the list of commands is sent to.
+		 * @param userRef The user who ran the command
 		 */
 		void list(entt::entity* userRef);
 
