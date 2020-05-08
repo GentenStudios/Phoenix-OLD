@@ -36,6 +36,14 @@
 #include <string>
 #include <cstring>
 
+#if defined(__APPLE__)
+#	define __INT32_EQUAL_LONG__ 1
+#elif defined(_WIN32)
+#	define __INT32_EQUAL_LONG__ 1
+#else
+#	define __INT32_EQUAL_LONG__ 0
+#endif
+
 namespace phx
 {
 	class Serializer;
@@ -67,6 +75,11 @@ namespace phx
 		Serializer& operator&(float& value);
 		Serializer& operator&(double& value);
 
+#if __INT32_EQUAL_LONG__
+		Serializer& operator&(long& value);
+		Serializer& operator&(unsigned long& value);
+#endif
+		
 		Serializer& operator&(std::int16_t& value);
 		Serializer& operator&(std::int32_t& value);
 		Serializer& operator&(std::int64_t& value);

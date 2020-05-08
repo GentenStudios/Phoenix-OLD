@@ -99,6 +99,35 @@ namespace phx
 		return *this;
 	}
 
+#if __INT32_EQUAL_LONG__
+	inline Serializer& Serializer::operator&(long& value)
+	{
+		if (m_mode == Mode::READ)
+		{
+			pop(value);
+		}
+		else
+		{
+			push(value);
+		}
+		return *this;
+	}
+	
+	inline Serializer& Serializer::operator&(unsigned long& value)
+	{
+		if (m_mode == Mode::READ)
+		{
+			pop(value);
+		}
+		else
+		{
+			push(value);
+		}
+		return *this;
+
+	}
+#endif
+	
 	inline Serializer& Serializer::operator&(std::int16_t& value)
 	{
 		if (m_mode == Mode::READ)
