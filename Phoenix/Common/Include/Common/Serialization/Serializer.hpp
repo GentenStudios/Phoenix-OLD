@@ -34,6 +34,7 @@
 #include <cstddef>
 #include <vector>
 #include <string>
+#include <cstring>
 
 namespace phx
 {
