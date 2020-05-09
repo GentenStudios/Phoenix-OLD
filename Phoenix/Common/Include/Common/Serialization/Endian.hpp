@@ -66,7 +66,7 @@
 #	define ENGINE_NATIVE_ENDIAN ENGINE_LITTLE_ENDIAN
 #endif
 
-// this should exhaust literally every possibility.
+// this should exhaust literally every possibility of byte order
 #if !defined(__LITTLE_ENDIAN__) && !defined(__BIG_ENDIAN__)
 #	if (defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__) || \
 	    (defined(__BYTE_ORDER) && __BYTE_ORDER == __BIG_ENDIAN) ||             \
@@ -148,22 +148,35 @@
 
 namespace phx::data::endian
 {
+	/**
+	 * @brief Represents the different Endianness types.
+	 */
 	enum class Endian
 	{
 		LITTLE = ENGINE_LITTLE_ENDIAN,
 		BIG    = ENGINE_BIG_ENDIAN,
+
+		// The de-facto for networking endianness is big endian.
 		NET    = ENGINE_NET_ENDIAN,
+
+		// This is the native endianness of the platform, the huge clusterfuck
+		// of a preprocessor if statement up above is how we figure this out.
 		NATIVE = ENGINE_NATIVE_ENDIAN
 	};
 
 	namespace detail
 	{
+		// struct for internal use dictating whether a piece of data can be
+		// changed in endianness. this is basically, an PoD and Floating Points.
 		template <typename T>
 		struct IsEndianChangable
 		{
 			static constexpr bool value = std::is_integral_v<T> || std::is_floating_point_v<T>;
 		};
 
+		// handy template specialized way of handling byteswapping, so we don't
+		// have to manually write code within the netToHost and hostToNet
+		// functions at the bottom of this file.
 		template <std::size_t N>
 		struct ByteSwapper
 		{
@@ -208,6 +221,8 @@ namespace phx::data::endian
 			}
 		};
 
+		// anything bigger than 8 is bigger than 64bits and if we're there we've
+		// fucked up already.
 		template <>
 		struct ByteSwapper<8>
 		{

@@ -47,12 +47,79 @@
 namespace phx
 {
 	class Serializer;
+
+	/**
+	 * @brief Interface class for helping with data structures.
+	 *
+	 * This function must be overridden, usage for the Serializer can be found
+	 * below.
+	 */
 	class ISerializable
 	{
 	public:
 		virtual Serializer& operator&(Serializer& serializer) = 0;
 	};
 
+	/**
+	 * @brief Serializes data with Endianness correction for network transfer.
+	 *
+	 * This class provides a way to safely accumulate data with automatic
+	 * correction for system endianness for transfer over a network. You can use
+	 * this class on both sides of the system.
+	 *
+	 * @paragraph Usage
+	 * If preparing data to send, the mode used must be Mode::WRITE, since
+	 * you're writing to the buffer. If you've just received data and funneled
+	 * the Packet's data into the serializer, you should use the Mode::READ
+	 * mode. This will prevent you from writing to the buffer (and vice versa
+	 * for the write mode).
+	 *
+	 * To pack a value into the buffer, use the & operator and write mode. The &
+	 * operator is small so you can have a chain of things like: ``serializer &
+	 * var & var2 & var3;``. The buffer can then be retrieved using ``getBuffer()``
+	 *
+	 * To retrieve a value from the buffer, again, use the & operator and read
+	 * mode. You should read **in the same direction of variables than when
+	 * you packed the buffer**. For example, pack the buffer like this:
+	 * @code
+	 * Serializer ser(Serializer::Mode::WRITE);
+	 * ser & var1 & var2 & var3 & var4;
+	 * @endcode
+	 * And unpack the buffer like this:
+	 * @code
+	 * Serializer ser(Serializer::Mode::READ);
+	 * ser & var1 & var2 & var3 & var4;
+	 * @endcode
+	 *
+	 * Usage with a packet:
+	 * @code
+	 * // client:
+	 * int status = 5;
+	 * bool moving = true;
+	 * float wowee = 0.01f;
+	 * std::size_t sequence = 100355;
+	 *
+	 * Serializer ser(Serializer::Mode::WRITE)
+	 * ser & status & moving & wowee & sequence;
+	 *
+	 * send_packet(ser.getBuffer());
+	 *
+	 * // server:
+	 * int status;
+	 * bool moving;
+	 * float wowee;
+	 * std::size_t sequence;
+	 *
+	 * Packet packet = receive_packet();
+	 *
+	 * Serializer ser(Serializer::Mode::READ)
+	 * ser.setBuffer(packet.getData());
+	 * ser & status & moving & wowee & sequence;
+	 *
+	 * // status, moving, wowee and sequence will be equal to their client
+	 * // counterparts.
+	 * @endcode
+	 */
 	class Serializer
 	{
 	public:
