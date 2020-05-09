@@ -28,21 +28,36 @@
 
 #pragma once
 
-#include <Phoenix/GUI/Component.hpp>
+#include <Client/Graphics/GUI/Container.hpp>
+#include <Client/Graphics/GUI/IComponent.hpp>
+
+#include <Common/Math/Math.hpp>
+
+#include <string>
+#include <vector>
 
 namespace phx::gui
 {
-    class Button : public Component
-    {
-    public:
-        explicit Button(math::detail::Vector2<int> ButtonSize);
+	class Button : IComponent
+	{
+	public:
+		Button();
+		virtual ~Button() = default;
 
-        void draw(math::detail::Vector2<int> position) override;
-        void click(math::detail::Vector2<int> position) override;
+		void setSize(math::vec2 size);
+		void setPosition(math::vec2 pos);
 
-        void setOnClick(std::function<void()> function);
+		void onEvent(events::Event event) override;
+		void tick(float dt) override;
 
-    private:
-        std::function<void()> m_onClick;
-    };
-}
+		void updateSize(math::vec2i size) override;
+		void updatePosition(math::vec2i size) override;
+
+	private:
+		math::vec2i m_size;
+		math::vec2i m_pos;
+
+		unsigned int m_buffer;
+		unsigned int m_vao;
+	};
+} // namespace phx::gui

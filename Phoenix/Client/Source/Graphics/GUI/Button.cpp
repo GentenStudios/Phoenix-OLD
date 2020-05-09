@@ -26,25 +26,13 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Phoenix/GUI/Button.hpp>
-#include <iostream>
-#include <utility>
+#include <Client/Graphics/GUI/Button.hpp>
 
-using namespace phx;
+#include <iostream>
+
 using namespace phx::gui;
 
-Button::Button(math::detail::Vector2<int> buttonSize){
-    size = buttonSize;
-}
+Button::Button()
+{
 
-void Button::draw(math::detail::Vector2<int> position) {
-    std::cout << "Draw a " << size.x << "x" << size.y << " Button at " << position;
-}
-
-void Button::click(math::detail::Vector2<int> position) {
-    m_onClick();
-}
-
-void Button::setOnClick(std::function<void()> function) {
-    m_onClick = std::move(function);
 }

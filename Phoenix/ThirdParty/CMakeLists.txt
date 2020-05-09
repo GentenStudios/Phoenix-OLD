@@ -27,6 +27,7 @@ add_subdirectory (json)
 set_target_properties(SDL2main SDL2-static uninstall
 		Glad ImGui
 		lua liblua
+		build_version native-tools
 		OpenAL common ex-common
 		PROPERTIES FOLDER Dependencies)
 

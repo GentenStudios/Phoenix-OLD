@@ -28,12 +28,20 @@
 
 #include <Client/Client.hpp>
 
+#include <Client/Graphics/GUI/Widget.hpp>
+#include <Client/Graphics/GUI/Button.hpp>
+
 using namespace phx;
 
 #undef main
 int main(int argc, char** argv)
 {
-	client::Client::get()->run();
+	//client::Client::get()->run();
 
+	gfx::Window window("okely dokely", 1280, 720);
+	
+	gui::Widget widget(&window, { 600, 400 }, { window.getSize() / 2 });
+	auto        button = new gui::Button(gui::Button::Shape::RECTANGLE, { 640, 360 }, { 640, 360 }, widget);
+	
 	return 0;
 }

@@ -1,6 +1,6 @@
 set(currentDir ${CMAKE_CURRENT_LIST_DIR})
 set(guiHeaders
-	${currentDir}/Component.hpp
+	${currentDir}/IComponent.hpp
 	${currentDir}/Container.hpp
 	${currentDir}/Button.hpp
 

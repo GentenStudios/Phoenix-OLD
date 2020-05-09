@@ -28,25 +28,31 @@
 
 #pragma once
 
-#include <Phoenix/Math/Vector2.hpp>
+#include <Client/Events/Event.hpp>
+#include <Client/Graphics/ShaderPipeline.hpp>
 
-namespace phx::gui{
-    class Component{
-    public:
-        /**
-        * @brief draw call to draw the button on the screen
-        *
-        * @param pos the position of the origin of the parent container
-        */
-        virtual void draw(math::detail::Vector2<int> position){};
-        /**
-        * @brief click call to execute a callback if present
-        *
-        * @param pos The position of the click relative to the components origin
-        */
-        virtual void click(math::detail::Vector2<int> position){};
+#include <Common/Math/Math.hpp>
 
-        math::detail::Vector2<int> size;
-        bool visible = true;
-    };
-}
+namespace phx::gui
+{
+	class Container;
+	struct IComponent
+	{
+		IComponent() = default;
+		virtual ~IComponent() = default;
+
+		static std::vector<gfx::ShaderLayout> getBufferLayout()
+		{
+			return {{"a_Vertex", 0}, { "a_Color", 1 }};
+		}
+		
+		virtual void updateSize(math::vec2i size) = 0;
+		virtual void updatePosition(math::vec2i size) = 0;
+
+		virtual void onEvent(events::Event event) = 0;
+		virtual void tick(float dt)               = 0;
+
+		bool enabled = true;
+		Container* container = nullptr;
+	};
+} // namespace phx::gui

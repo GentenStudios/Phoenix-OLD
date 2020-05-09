@@ -28,30 +28,75 @@
 
 #pragma once
 
-#include <Phoenix/GUI/Component.hpp>
+#include <Client/Events/IEventListener.hpp>
+#include <Client/Graphics/GUI/IComponent.hpp>
+#include <Client/Graphics/Window.hpp>
+#include <Client/Graphics/ShaderPipeline.hpp>
+
+#include <Common/EnumTools.hpp>
+#include <Common/Logger.hpp>
+#include <Common/Math/Math.hpp>
+
+#include <algorithm>
+#include <string>
 #include <vector>
+#include <type_traits>
 
 namespace phx::gui
 {
-    class Container : public Component
-    {
-    public:
-        explicit Container(math::detail::Vector2<int> containerSize);
-        /**
-         * @brief draw call to draw the button on the screen
-         *
-         * @param pos the position of the origin of the parent container
-         */
-        void draw(math::detail::Vector2<int> position) override;
-        /**
-         * @brief click call to execute a callback if present
-         *
-         * @param pos The position of the click relative to the components origin
-         */
-        void click(math::detail::Vector2<int> position) override;
-        void addComponent(Component& component, math::detail::Vector2<int> position);
+	class Container : public events::IEventListener
+	{
+	public:
+		enum class Flags
+		{
+			WITH_TITLE,
+			COLLAPSIBLE
+		};
+	public:
+		Container(const std::string& name, math::vec2 pos, math::vec2 size,
+		          gfx::Window* window);
+		~Container();
 
-    private:
-        std::vector<std::pair<Component&, math::detail::Vector2<int>>> m_components;
-    };
-}
+		template <typename T, typename U = std::enable_if_t<
+		                          std::is_base_of<IComponent, T>::value>>
+		T* create()
+		{
+			IComponent* component = new T();
+			m_components.push_back(component);
+
+			component->container = this;
+
+			return static_cast<T*>(component);
+		}
+
+		template <typename T, typename U = std::enable_if_t<
+		                          std::is_base_of<IComponent, T>::value>>
+		void destroy(T* component)
+		{
+			const auto it = std::find(m_components.begin(), m_components.end(),
+			                    static_cast<IComponent*>(component));
+			if (it == m_components.end())
+			{
+				return;
+			}
+
+			m_components.erase(it);
+			delete component;
+		}
+
+		void tick(float dt);
+
+	private:
+		unsigned int m_buffer;
+		unsigned int m_vao;
+
+		// used if we collapse the window.
+		std::size_t m_numVertsInContextBar = 0;
+
+		gfx::ShaderPipeline m_shaderPipeline;
+		
+		std::vector<IComponent*> m_components;
+	};
+} // namespace phx::gui
+
+ENABLE_BITWISE_OPERATORS(phx::gui::Container::Flags);

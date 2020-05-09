@@ -26,42 +26,7 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Phoenix/GUI/Container.hpp>
-#include <iostream>
+#include <Client/Graphics/GUI/Container.hpp>
 
-using namespace phx;
 using namespace phx::gui;
 
-Container::Container(math::detail::Vector2<int> containerSize)
-{
-    size = containerSize;
-}
-
-void Container::draw(math::detail::Vector2<int> position)
-{
-    std::cout << "Draw a " << size.x << "x" << size.y << " Container at " << position;
-    for(auto component: m_components)
-    {
-        if (component.first.visible)
-		{
-			component.first.draw(component.second + position);
-		}
-    }
-}
-
-void Container::click(math::detail::Vector2<int> position) {
-
-    std::cout << "Click in container at " << position;
-    for(auto component: m_components)
-    {
-        if (component.first.visible)
-        {
-            component.first.click(position - component.second);
-        }
-    }
-}
-
-void Container::addComponent(Component& component, math::detail::Vector2<int> position)
-{
-    m_components.emplace_back(component, position);
-}
