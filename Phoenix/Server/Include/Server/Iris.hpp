@@ -62,32 +62,106 @@ namespace phx::server::networking
 	class Iris
 	{
 	public:
+		/**
+		 * @brief Creates a networking object to handle listening for packets
+		 *
+		 * @param registry The shared EnTT registry
+		 * @param running Pointer to a boolean, the threaded function only runs
+		 * if this is true
+		 */
 		Iris(entt::registry* registry, bool* running);
+
+		/**
+		 * @brief Cleans up any internal only objects
+		 */
 		~Iris();
 
+		/**
+		 * @brief Loops listening to the netowork and populates queues for data
+		 * consumption
+		 */
 		void run();
 
 		void auth();
+		/**
+		 * @brief Actions taken when a user disconnects
+		 *
+		 * @param userRef The user who disconnected
+		 */
 		void disconnect(entt::entity* userRef);
 
+		/**
+		 * @brief Actions taken when an event is received
+		 *
+		 * @param userRef The user who sent the event packet
+		 * @param data The data in the event packet
+		 * @param dataLength The length of the data in the event packet
+		 */
 		void parseEvent(entt::entity* userRef, enet_uint8* data,
 		                std::size_t dataLength);
+
+		/**
+		 * @brief Actions taken when a state is received
+		 *
+		 * @param userRef The user who sent the state packet
+		 * @param data The data in the state packet
+		 * @param dataLength The length of the data in the state packet
+		 */
 		void parseState(entt::entity* userRef, enet_uint8* data,
 		                std::size_t dataLength);
+
+		/**
+		 * @brief Actions taken when a message is received
+		 *
+		 * @param userRef The user who sent the message packet
+		 * @param data The data in the message packet
+		 * @param dataLength The length of the data in the message packet
+		 */
 		void parseMessage(entt::entity* userRef, enet_uint8* data,
 		                  std::size_t dataLength);
 
+		/**
+		 * @brief Sends an event packet to a client
+		 *
+		 * @param userRef The user to sent the event to
+		 * @param data The event packet data
+		 */
 		void sendEvent(entt::entity* userRef, enet_uint8* data);
+
+		/**
+		 * @brief Sends a state packet to a client
+		 *
+		 * @param userRef The user to sent the state to
+		 * @param data The state packet data
+		 */
 		void sendState(std::size_t sequence);
+
+		/**
+		 * @brief Sends a message packet to a client
+		 *
+		 * @param userRef The user to sent the message to
+		 * @param data The message packet data
+		 */
 		void sendMessage(entt::entity* userRef, const std::string& message);
 
-		std::list<StateBundle>   stateQueue;
-		std::list<EventBundle>   eventQueue;
+		/**
+		 * @brief The Queue of bundled states received
+		 */
+		std::list<StateBundle> stateQueue;
+		/**
+		 * @brief The Queue of events received
+		 */
+		std::list<EventBundle> eventQueue;
+		/**
+		 * @brief The Queue of messages received
+		 */
 		std::list<MessageBundle> messageQueue;
 
 	private:
+		/// @brief The main loop runs while this is true
 		bool* m_running;
 
+		/// @breif An EnTT registry to store various data in
 		entt::registry* m_registry;
 
 		ENetHost*   m_server;

@@ -46,20 +46,35 @@ namespace phx::server
 	class Server
 	{
 	public:
+		/**
+		 * @brief Core object for the server
+		 *
+		 * @param save The save we are loading
+		 */
 		Server(std::string save);
 		~Server();
 
+		/// @brief Main loop for the server
 		void run();
 
 	private:
+		/// @brief central boolean to control if the game is running or not
 		bool m_running = true;
 
+		/// @breif An EnTT registry to store various data in
 		entt::registry m_registry;
 
+		/// @brief The networking object, this listens for incoming data
 		networking::Iris* m_iris;
-		Game*             m_game;
+		/** @brief @brief The server side game object, this handles all of the
+		 * core game logic.
+		 */
+		Game* m_game;
 
+		/// @brief The mod manager providing LUA API functionality
 		cms::ModManager* m_modManager;
-		std::string      m_save;
+
+		/// The name of the save we are running
+		std::string m_save;
 	};
 } // namespace phx::server
