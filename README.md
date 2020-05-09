@@ -30,14 +30,14 @@ Now follow the platform specific instructions detailed below.
 
 ### Visual Studio
   - Open the generated solution file in the `Build/` folder in Visual Studio
-  - Set the Startup Project to `Phoenix`.
+  - Set the Startup Project to `PhoenixClient`.
   - At this point you should be able to run, since the project should have already been
     built in step 2. above. You can always build the traditional way with Visual Studio.
   - And voila, all done. Now you should be able to run the project!
 
 ### Linux, Mac OS X, MSYS
  
-  - Navigate to the `Build/Phoenix` folder and run `./Phoenix` to run the executable.
+  - Navigate to the `Build/Phoenix/PhoenixClient` folder and run `./PhoenixClient` to run the executable.
 
 ## Contributing
 We encourage everyone to contribute, this is an open source project that will ultimately be powered by its community. If you are interested in contributing check out [our contributing guidelines](./CONTRIBUTING.md) for information on how we work and our coding standards. Before you get started, reach out on #programming on discord to collaborate so you aren't duplicating any work. Finally check out [Our issues on GitHub](https://github.com/GentenStudios/Phoenix/issues) for a list of what we currently have planned/ need help with.
