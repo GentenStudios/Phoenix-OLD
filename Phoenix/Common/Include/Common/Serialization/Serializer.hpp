@@ -27,10 +27,14 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #pragma once
+
 #include <Common/Serialization/Endian.hpp>
+#include <Common/Serialization/SharedTypes.hpp>
+
 #include <cstddef>
-#include <functional>
 #include <vector>
+#include <string>
+#include <cstring>
 
 #if defined(__APPLE__)
 #	define __INT32_EQUAL_LONG__ 1
@@ -44,12 +48,78 @@ namespace phx
 {
 	class Serializer;
 
+	/**
+	 * @brief Interface class for helping with data structures.
+	 *
+	 * This function must be overridden, usage for the Serializer can be found
+	 * below.
+	 */
 	class ISerializable
 	{
 	public:
-		virtual phx::Serializer& operator&(phx::Serializer& this_) = 0;
+		virtual Serializer& operator&(Serializer& serializer) = 0;
 	};
 
+	/**
+	 * @brief Serializes data with Endianness correction for network transfer.
+	 *
+	 * This class provides a way to safely accumulate data with automatic
+	 * correction for system endianness for transfer over a network. You can use
+	 * this class on both sides of the system.
+	 *
+	 * @paragraph Usage
+	 * If preparing data to send, the mode used must be Mode::WRITE, since
+	 * you're writing to the buffer. If you've just received data and funneled
+	 * the Packet's data into the serializer, you should use the Mode::READ
+	 * mode. This will prevent you from writing to the buffer (and vice versa
+	 * for the write mode).
+	 *
+	 * To pack a value into the buffer, use the & operator and write mode. The &
+	 * operator is small so you can have a chain of things like: ``serializer &
+	 * var & var2 & var3;``. The buffer can then be retrieved using ``getBuffer()``
+	 *
+	 * To retrieve a value from the buffer, again, use the & operator and read
+	 * mode. You should read **in the same direction of variables than when
+	 * you packed the buffer**. For example, pack the buffer like this:
+	 * @code
+	 * Serializer ser(Serializer::Mode::WRITE);
+	 * ser & var1 & var2 & var3 & var4;
+	 * @endcode
+	 * And unpack the buffer like this:
+	 * @code
+	 * Serializer ser(Serializer::Mode::READ);
+	 * ser & var1 & var2 & var3 & var4;
+	 * @endcode
+	 *
+	 * Usage with a packet:
+	 * @code
+	 * // client:
+	 * int status = 5;
+	 * bool moving = true;
+	 * float wowee = 0.01f;
+	 * std::size_t sequence = 100355;
+	 *
+	 * Serializer ser(Serializer::Mode::WRITE)
+	 * ser & status & moving & wowee & sequence;
+	 *
+	 * send_packet(ser.getBuffer());
+	 *
+	 * // server:
+	 * int status;
+	 * bool moving;
+	 * float wowee;
+	 * std::size_t sequence;
+	 *
+	 * Packet packet = receive_packet();
+	 *
+	 * Serializer ser(Serializer::Mode::READ)
+	 * ser.setBuffer(packet.getData());
+	 * ser & status & moving & wowee & sequence;
+	 *
+	 * // status, moving, wowee and sequence will be equal to their client
+	 * // counterparts.
+	 * @endcode
+	 */
 	class Serializer
 	{
 	public:
@@ -58,71 +128,58 @@ namespace phx
 			READ,
 			WRITE
 		};
-		void setBuffer(std::byte* data_, size_t dataLength_);
-		explicit Serializer(Mode mode_);
-		phx::Serializer& operator&(ISerializable& value_);
-		phx::Serializer& operator&(bool& value_);
-		phx::Serializer& operator&(char& value_);
+
+	public:
+		explicit Serializer(Mode mode) : m_mode(mode) {}
+
+		data::Data& getBuffer() { return m_buffer; }
+		void  setBuffer(std::byte* data, std::size_t dataLength);
+		void  setBuffer(const data::Data& data) { m_buffer = data; }
+
+		Serializer& operator&(bool& value);
+		Serializer& operator&(char& value);
+		Serializer& operator&(unsigned char& value);
+		Serializer& operator&(float& value);
+		Serializer& operator&(double& value);
+
 #if __INT32_EQUAL_LONG__
-		phx::Serializer& operator&(long& value_);
-		phx::Serializer& operator&(unsigned long& value_);
+		Serializer& operator&(long& value);
+		Serializer& operator&(unsigned long& value);
 #endif
-		phx::Serializer&              operator&(std::uint8_t& value_);
-		phx::Serializer&              operator&(std::int8_t& value_);
-		phx::Serializer&              operator&(std::uint16_t& value_);
-		phx::Serializer&              operator&(std::int16_t& value_);
-		phx::Serializer&              operator&(std::uint32_t& value_);
-		phx::Serializer&              operator&(std::int32_t& value_);
-		phx::Serializer&              operator&(std::uint64_t& value_);
-		phx::Serializer&              operator&(std::int64_t& value_);
-		phx::Serializer&              operator&(std::string& value_);
-		phx::Serializer&              operator&(std::wstring& value_);
-		static std::vector<std::byte> endp(phx::Serializer& this_);
-		std::vector<std::byte>        operator&(
-            std::function<std::vector<std::byte>(phx::Serializer&)> function);
+		
+		Serializer& operator&(std::int16_t& value);
+		Serializer& operator&(std::int32_t& value);
+		Serializer& operator&(std::int64_t& value);
+		Serializer& operator&(std::uint16_t& value);
+		Serializer& operator&(std::uint32_t& value);
+		Serializer& operator&(std::uint64_t& value);
 
+		template <typename T>
+		Serializer& operator&(std::basic_string<T>& value);
+
+		Serializer& operator&(ISerializable& value);
+
+		static data::Data end(Serializer& serializer);
+		
 	private:
 		template <typename T>
-		void read(T& value_)
-		{
-			phx::word<T> word(buffer.data(), 1);
-			value_ = word.from_network();
-			buffer.erase(buffer.begin(), buffer.begin() + word.size);
-		}
-		template <typename char_type>
-		void read(std::basic_string<char_type>& value_)
-		{
-			std::size_t size;
-			read(size);
-			phx::word<char_type*> word((std::byte*) buffer.data(), size);
-			word.from_network();
-			value_ = std::basic_string<char_type>(word.value.data, size);
-			buffer.erase(buffer.begin(), buffer.begin() + size + 1);
-		}
-		template <typename T>
-		void write(T& value_)
-		{
-			phx::word<T> word(value_);
-			word.to_network();
-			buffer.insert(buffer.end(), word.value.bytes,
-			              word.value.bytes + word.size);
-		}
-		template <typename char_type>
-		void write(std::basic_string<char_type>& value_)
-		{
-			std::size_t size = value_.size();
-			write(size);
-			phx::word<char_type*> word((std::byte*) value_.data(), size);
-			word.to_network();
-			buffer.insert(buffer.end(), word.value.bytes,
-			              word.value.bytes + word.size);
-			char_type char0 {};
-			/// @todo: check if next line is needed
-			write(char0);
-		}
+		void push(const T& data);
 
-	private:
-		Mode                   m_mode;
-		std::vector<std::byte> buffer;
+		template <typename T>
+		void push(const std::basic_string<T>& data);
+
+		void push(ISerializable& data);
+
+		template <typename T>
+		void pop(T& data);
+
+		template <typename T>
+		void pop(std::basic_string<T>& data);
+	
+	private:		
+		Mode m_mode;
+		data::Data m_buffer;
 	};
-} // namespace phx
+} // namespace phx::data
+
+#include <Common/Serialization/Serializer.inl>
