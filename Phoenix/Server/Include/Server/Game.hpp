@@ -38,18 +38,39 @@ namespace phx::server
 	class Game
 	{
 	public:
+		/** @brief The server side game object, this handles all of the core
+		 * game logic.
+		 *
+		 * @param registry The shared EnTT registry
+		 * @param running Pointer to a boolean, the threaded function only runs
+		 * if this is true
+		 * @param iris Pointer to the nextworking system
+		 */
 		Game(entt::registry* registry, bool* running, networking::Iris* iris);
 
+		/** @brief Loads all API's that the game utilizes into a CMS ModManager
+		 *
+		 * @param manager The mod manager to load the API into
+		 */
 		void registerAPI(cms::ModManager* manager);
 
+		/**
+		 * @brief Runs the main game loop as long as running is true
+		 */
 		void run();
 
+		/// @brief Just a temporary static storage for the DT
+		/// @TODO Move this to a config file
 		static constexpr float dt = 1.f / 20.f;
 
 	private:
-		bool*             m_running;
-		entt::registry*   m_registry;
+		/// @brief The main loop runs while this is true
+		bool* m_running;
+		/// @breif An EnTT registry to store various data in
+		entt::registry* m_registry;
+		/// @brief The networking object to get data from
 		networking::Iris* m_iris;
-		Commander*        m_commander;
+		/// @brief A commander object to process commands
+		Commander* m_commander;
 	};
 } // namespace phx::server
