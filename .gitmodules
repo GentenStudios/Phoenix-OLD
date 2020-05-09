@@ -4,3 +4,12 @@
 [submodule "Engine/ThirdParty/sol2"]
 	path = Phoenix/ThirdParty/sol2
 	url = https://github.com/ThePhD/sol2.git
+[submodule "Phoenix/ThirdParty/entt"]
+	path = Phoenix/ThirdParty/entt
+	url = https://github.com/skypjack/entt.git
+[submodule "Phoenix/ThirdParty/json"]
+	path = Phoenix/ThirdParty/json
+	url = https://github.com/nlohmann/json.git
+[submodule "Phoenix/ThirdParty/openal-soft"]
+	path = Phoenix/ThirdParty/openal-soft
+	url = https://github.com/kcat/openal-soft.git
