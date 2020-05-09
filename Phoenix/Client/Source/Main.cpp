@@ -28,7 +28,7 @@
 
 #include <Client/Client.hpp>
 
-#include <Client/Graphics/GUI/Widget.hpp>
+#include <Client/Graphics/GUI/Container.hpp>
 #include <Client/Graphics/GUI/Button.hpp>
 
 using namespace phx;
@@ -39,9 +39,18 @@ int main(int argc, char** argv)
 	//client::Client::get()->run();
 
 	gfx::Window window("okely dokely", 1280, 720);
+
+	// positioning is done on a scale of 0 to 100.
+	gui::Container container("", {50, 50}, {50, 50}, &window);
+
+	// button won't render until you call setSize and setPos.
+	auto button = container.create<gui::Button>();
 	
-	gui::Widget widget(&window, { 600, 400 }, { window.getSize() / 2 });
-	auto        button = new gui::Button(gui::Button::Shape::RECTANGLE, { 640, 360 }, { 640, 360 }, widget);
+	// 50% across the container, 50% through the height of the container.
+	button->setPosition({50, 50});
+
+	// size is 10% of the x of the container, 10% of the y of the container.
+	button->setSize({10, 10});
 	
 	return 0;
 }

@@ -84,6 +84,7 @@ namespace phx::gui
 			delete component;
 		}
 
+		void onEvent(events::Event e) override;
 		void tick(float dt);
 
 	private:

@@ -30,3 +30,20 @@
 
 using namespace phx::gui;
 
+Container::Container(const std::string& name, math::vec2 pos, math::vec2 size,
+	gfx::Window* window)
+{
+	
+}
+
+Container::~Container()
+{
+}
+
+void Container::onEvent(events::Event e)
+{
+}
+
+void Container::tick(float dt)
+{
+}
