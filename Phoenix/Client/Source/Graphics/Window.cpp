@@ -110,6 +110,8 @@ Window::Window(const std::string& title, int width, int height)
 
 	SDL_SetRelativeMouseMode(SDL_FALSE);
 
+	glViewport(0, 0, width, height);
+	
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGuiIO& imguiIO = ImGui::GetIO();

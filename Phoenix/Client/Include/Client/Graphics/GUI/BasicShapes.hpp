@@ -28,36 +28,64 @@
 
 #pragma once
 
-#include <Client/Graphics/GUI/Container.hpp>
 #include <Client/Graphics/GUI/IComponent.hpp>
 
 #include <Common/Math/Math.hpp>
 
-#include <string>
-#include <vector>
-
 namespace phx::gui
 {
-	class Button : IComponent
+	// shape instead of component because we don't need onEvent on a normal
+	// shape.
+	class Container;
+	struct Shape
+	{
+		virtual ~Shape() = 0;
+
+		virtual void update(math::vec2 moved, math::vec2 scale) = 0;
+
+		// to check is a point is in the object, for example if you clicked in
+		// it.
+		virtual bool isPointInObject(math::vec2 pos) = 0;
+
+		Container* container;
+	};
+
+	class Rectangle : public Shape
 	{
 	public:
-		Button();
-		virtual ~Button() = default;
+		enum class Corner
+		{
+			TOP_RIGHT,
+			BOTTOM_RIGHT,
+			BOTTOM_LEFT,
+			TOP_LEFT
+		};
 
-		void setSize(math::vec2 size);
-		void setPosition(math::vec2 pos);
+	public:
+		Rectangle();
+		virtual ~Rectangle();
 
-		void onEvent(events::Event event) override {};
-		void tick(float dt) override {};
+		void init(math::vec2 position, math::vec2 size);
 
-		void updateSize(math::vec2i size) override {};
-		void updatePosition(math::vec2i size) override {};
+		Vertex getCorner(Corner corner);
+		void   setCorner(Corner corner, Vertex position);
+
+		// this is relative.
+		// if you move it left and down, position is NEGATIVE (pixelsMoved /
+		// windowSize) if it shrinks, scale is between 0 and 1. if it grows,
+		// scale is >1. - it's a scaling thing.
+		void update(math::vec2 moved, math::vec2 scale);
+
+		bool isPointInObject(math::vec2 pos);
+		void tick(float dt);
 
 	private:
-		math::vec2i m_size;
-		math::vec2i m_pos;
+		std::vector<Vertex> m_vertices;
 
-		unsigned int m_buffer;
-		unsigned int m_vao;
+		math::vec2 m_pos;
+		math::vec2 m_size;
+
+		unsigned int m_vao    = 0;
+		unsigned int m_buffer = 0;
 	};
 } // namespace phx::gui

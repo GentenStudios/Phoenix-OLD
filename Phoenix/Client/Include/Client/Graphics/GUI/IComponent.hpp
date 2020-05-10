@@ -35,24 +35,30 @@
 
 namespace phx::gui
 {
+	struct Vertex
+	{
+		math::vec2 vert;
+		math::vec3 color;
+		float      alpha = 0.f;
+		math::vec2 uv;
+	};
+
 	class Container;
 	struct IComponent
 	{
-		IComponent() = default;
+		IComponent()          = default;
 		virtual ~IComponent() = default;
 
 		static std::vector<gfx::ShaderLayout> getBufferLayout()
 		{
-			return {{"a_Vertex", 0}, { "a_Color", 1 }};
+			return {{"a_Vertex", 0}, {"a_Color", 1}, {"a_UV", 2}};
 		}
-		
-		virtual void updateSize(math::vec2i size) = 0;
-		virtual void updatePosition(math::vec2i size) = 0;
 
+		virtual void update(math::vec2 position, math::vec2 size);
 		virtual void onEvent(events::Event event) = 0;
 		virtual void tick(float dt)               = 0;
 
-		bool enabled = true;
+		bool       enabled   = true;
 		Container* container = nullptr;
 	};
 } // namespace phx::gui
