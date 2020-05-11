@@ -30,6 +30,7 @@
 #include <Server/User.hpp>
 
 #include <Common/Actor.hpp>
+#include <Common/Logger.hpp>
 #include <Common/Movement.hpp>
 #include <Common/Position.hpp>
 #include <Common/Serialization/Serializer.hpp>
@@ -37,127 +38,76 @@
 #include <cstring> //For std::memcpy on non-mac machines
 
 using namespace phx;
-using namespace phx::server::networking;
+using namespace phx::net;
+using namespace phx::server::net;
 
 /// @todo Replace this with the config system
 static const std::size_t MAX_USERS = 32;
 
-Iris::Iris(entt::registry* registry, bool* running)
-    : m_registry(registry), m_running(running)
+Iris::Iris()
 {
-	if (enet_initialize() != 0)
-	{
-		/// @TODO replace this with the logger
-		fprintf(stderr, "An error occurred while initializing ENet.\n");
-		exit(0);
-	}
-	atexit(enet_deinitialize);
+	m_server = new phx::net::Host(phx::net::Address(7777), MAX_USERS, 3);
 
-	m_address.host = ENET_HOST_ANY;
-	m_address.port = 7777;
+	m_server->onConnect([this](Peer& peer, enet_uint32) {
+		LOG_INFO("NETWORK")
+		    << "Client connected from: " << peer.getAddress().getIP();
+	});
 
-	m_server = enet_host_create(&m_address, MAX_USERS, 3, 0, 0);
-	if (m_server == NULL)
-	{
-		fprintf(
-		    stderr,
-		    "An error occurred while trying to create an ENet server host.\n");
-		exit(EXIT_FAILURE);
-	}
+	m_server->onReceive(
+	    [this](Peer& peer, Packet&& packet, enet_uint32 channelID) {
+		    switch (channelID)
+		    {
+		    case 0:
+			    parseEvent(peer.getID(), packet);
+			    break;
+		    case 1:
+			    parseState(peer.getID(), packet);
+			    break;
+		    case 2:
+			    parseMessage(peer.getID(), packet);
+			    break;
+		    }
+	    });
+
+	m_server->onDisconnect(
+	    [this](std::size_t peerID, enet_uint32) { disconnect(peerID); });
 }
 
-Iris::~Iris() { enet_host_destroy(m_server); }
+Iris::~Iris() { delete m_server; }
 
 void Iris::run()
 {
+	m_running = true;
 	while (m_running)
 	{
-		while (enet_host_service(m_server, &m_event, 50) > 0 && m_running)
-		{
-			switch (m_event.type)
-			{
-			case ENET_EVENT_TYPE_CONNECT:
-				printf("A new client connected from %x:%u.\n",
-				       m_event.peer->address.host, m_event.peer->address.port);
-				{
-					auto entity = m_registry->create();
-					m_registry->emplace<User>(entity, "toby", m_event.peer);
-					m_event.peer->data = static_cast<void*>(&entity);
-					m_registry->emplace<Player>(
-					    entity, ActorSystem::registerActor(m_registry));
-				}
-				break;
-
-			case ENET_EVENT_TYPE_RECEIVE:
-				//                printf ("A packet of length %u containing %s
-				//                was received from %s on channel %u.\n",
-				//                        m_event.packet -> dataLength,
-				//                        m_event.packet -> data,
-				//                        m_event.peer -> data -> userName,
-				//                        m_event.channelID);
-
-				switch (m_event.channelID)
-				{
-				case 0:
-					parseEvent(static_cast<entt::entity*>(m_event.peer->data),
-					           m_event.packet->data,
-					           m_event.packet->dataLength);
-					break;
-				case 1:
-					parseState(static_cast<entt::entity*>(m_event.peer->data),
-					           m_event.packet->data,
-					           m_event.packet->dataLength);
-					break;
-				case 2:
-					parseMessage(static_cast<entt::entity*>(m_event.peer->data),
-					             m_event.packet->data,
-					             m_event.packet->dataLength);
-					break;
-				}
-
-				/* Clean up the packet now that we're done using it. */
-				enet_packet_destroy(m_event.packet);
-				break;
-
-			case ENET_EVENT_TYPE_DISCONNECT:
-				disconnect(static_cast<entt::entity*>(m_event.peer->data));
-				break;
-
-			case ENET_EVENT_TYPE_NONE:
-				break;
-			}
-		}
+		m_server->poll()
 	}
 }
 
 void Iris::auth() {}
 
-void Iris::disconnect(entt::entity* userRef)
+void Iris::disconnect(std::size_t peerID)
 {
-	printf("%s disconnected.\n",
-	       m_registry->get<User>(*userRef).userName.c_str());
-	m_registry->destroy(*userRef);
+	printf("%lu disconnected.\n", peerID);
 }
-void Iris::parseEvent(entt::entity* userRef, enet_uint8* data,
-                      std::size_t dataLength)
-{
-	User user = m_registry->get<User>(*userRef);
-	printf("Event received");
-	printf("An Event packet containing %s was received from %s\n", data,
-	       user.userName.c_str());
-}
-void Iris::parseState(entt::entity* userRef, enet_uint8* data, std::size_t dataLength)
-{
-	User user = m_registry->get<User>(*userRef);
-	//	printf("A State packet containing %s was received from %s\n", data,
-	//	       user.userName.c_str());
 
+void Iris::parseEvent(std::size_t userID, Packet&& packet)
+{
+	printf("Event received");
+	printf("An Event packet containing %s was received from %lu\n",
+	       packet.getData(), userID);
+}
+
+void Iris::parseState(std::size_t userID, phx::net::Packet&& packet)
+{
 	const float dt = 1.f / 20.f;
 
 	InputState input;
 
+	auto data = packet.getData();
+
 	phx::Serializer ser(Serializer::Mode::READ);
-	ser.setBuffer(reinterpret_cast<std::byte*>(data), dataLength);
+	ser.setBuffer(reinterpret_cast<std::byte*>(&data), packet.getSize());
 	ser& input;
 
 	// If the queue is empty we need to add a new bundle
@@ -175,7 +125,7 @@ void Iris::parseState(entt::entity* userRef, enet_uint8* data, std::size_t dataL
 	if (input.sequence < stateQueue.front().sequence &&
 	    stateQueue.back().sequence - input.sequence < 10)
 	{
-		printf("discard %u \n", input.sequence);
+		printf("discard %lu \n", input.sequence);
 		return;
 	}
 
@@ -194,7 +144,6 @@ void Iris::parseState(entt::entity* userRef, enet_uint8* data, std::size_t dataL
 	}
 
 	{
-		//		printf("insert existing %lu \n", input.sequence);
 		for (auto bundle : stateQueue)
 		{
 			if (bundle.sequence == input.sequence)
@@ -202,7 +151,7 @@ void Iris::parseState(entt::entity* userRef, enet_uint8* data, std::size_t dataL
 				// Thread safety! If we said a bundle is ready, were too late
 				if (!bundle.ready)
 				{
-					bundle.states[userRef] = input;
+					bundle.states[userID] = input;
 					// If we have all the states we need, then the bundle is
 					// ready
 					if (bundle.states.size() >= bundle.users)
@@ -221,61 +170,51 @@ void Iris::parseState(entt::entity* userRef, enet_uint8* data, std::size_t dataL
 		stateQueue.front().ready = true;
 	}
 }
-void Iris::parseMessage(entt::entity* userRef, enet_uint8* data, std::size_t dataLength)
+
+void Iris::parseMessage(std::size_t userID, phx::net::Packet&& packet)
 {
-	User user = m_registry->get<User>(*userRef);
-	if (data[0] == '/')
+	std::string input;
+
+	phx::Serializer ser(Serializer::Mode::READ);
+	ser.setBuffer(packet.getData());
+	ser& input;
+
+	if (input[0] == '/')
 	{
 		MessageBundle message;
-		message.message = reinterpret_cast<char*>(data);
-		message.userRef = userRef;
+		message.message = input.substr(1);
+		message.userID  = userID;
 		messageQueue.push_back(message);
 	}
 	else
 	{
-		std::string message =
-		    user.userName + ": " + reinterpret_cast<char*>(data) + "\n";
+		printf("%s", input.c_str());
 
-		printf("%s", message.c_str());
-		
-		// + 1 for the \0 null terminator at the end of the string. Size/Length doesn't include it.
-		ENetPacket* packet = enet_packet_create(message.c_str(), message.length() + 1,
-		                                        ENET_PACKET_FLAG_RELIABLE);
-		auto        view   = m_registry->view<User>();
-		for (auto entity : view)
-		{
-			enet_peer_send(view.get<User>(entity).peer, 2, packet);
-		}
-		enet_host_flush(m_server);
+		sendMessage(userId, input);
 	}
 }
-void Iris::sendEvent(entt::entity* userRef, enet_uint8* data) {}
-void Iris::sendState(std::size_t sequence)
+
+void Iris::sendEvent(std::size_t userID, enet_uint8* data) {}
+
+void Iris::sendState(entt::registry* registry, std::size_t sequence)
 {
-	auto view = m_registry->view<Position, Movement>();
-	char state[13];
+	auto       view = registry->view<Position, Movement>();
+	Serializer ser(Serializer::Mode::WRITE);
+	ser&       sequence;
 	for (auto entity : view)
 	{
-		std::memcpy(state, &sequence, 1);
 		auto pos = view.get<Position>(entity);
-		std::memcpy(state + 1, &pos.position.x, 4);
-		std::memcpy(state + 5, &pos.position.y, 4);
-		std::memcpy(state + 9, &pos.position.z, 4);
+		ser& pos.position.x& pos.position.y& pos.position.z;
 	}
-	ENetPacket* packet = enet_packet_create(
-	    state, sizeof(state), ENET_PACKET_FLAG_UNRELIABLE_FRAGMENT);
-
-	auto users = m_registry->view<User>();
-	for (auto user : users)
-	{
-		enet_peer_send(users.get<User>(user).peer, 1, packet);
-	}
-	enet_host_flush(m_server);
+	Packet packet = Packet(ser.getBuffer(), PacketFlags::UNRELIABLE);
+	m_server->broadcast(packet, 1);
 }
-void Iris::sendMessage(entt::entity* userRef, const std::string& message)
+
+void Iris::sendMessage(std::size_t userID, const std::string& message)
 {
-	ENetPacket* packet = enet_packet_create(
-	    message.c_str(), message.length() + 1, ENET_PACKET_FLAG_RELIABLE);
-	enet_peer_send(m_registry->get<User>(*userRef).peer, 2, packet);
-	enet_host_flush(m_server);
+	Serializer ser(Serializer::Mode::WRITE);
+	ser&       message;
+	Packet     packet = Packet(ser.getBuffer(), PacketFlags::RELIABLE);
+	Peer*      peer   = m_server->getPeer(userID);
+	peer->send(packet, 3);
 }

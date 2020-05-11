@@ -34,29 +34,25 @@
 #endif
 
 #include <Common/Input.hpp>
+#include <Common/Network/Host.hpp>
 
 #include <enet/enet.h>
 #include <entt/entt.hpp>
 
-namespace phx::server::networking
+namespace phx::server::net
 {
 	struct StateBundle
 	{
-		bool                                          ready;
-		std::size_t                                   users;
-		std::size_t                                   sequence;
-		std::unordered_map<entt::entity*, InputState> states;
-	};
-
-	struct EventBundle
-	{
-		entt::entity* userRef;
+		bool                    ready;
+		std::size_t             users;
+		std::size_t             sequence;
+		std::vector<InputState> states;
 	};
 
 	struct MessageBundle
 	{
-		entt::entity* userRef;
-		std::string   message;
+		size_t      userID;
+		std::string message;
 	};
 
 	class Iris
@@ -69,7 +65,7 @@ namespace phx::server::networking
 		 * @param running Pointer to a boolean, the threaded function only runs
 		 * if this is true
 		 */
-		Iris(entt::registry* registry, bool* running);
+		Iris();
 
 		/**
 		 * @brief Cleans up any internal only objects
@@ -82,13 +78,15 @@ namespace phx::server::networking
 		 */
 		void run();
 
+		void kill() {m_running = false};
+
 		void auth();
 		/**
 		 * @brief Actions taken when a user disconnects
 		 *
 		 * @param userRef The user who disconnected
 		 */
-		void disconnect(entt::entity* userRef);
+		void disconnect(std::size_t peerID);
 
 		/**
 		 * @brief Actions taken when an event is received
@@ -97,8 +95,7 @@ namespace phx::server::networking
 		 * @param data The data in the event packet
 		 * @param dataLength The length of the data in the event packet
 		 */
-		void parseEvent(entt::entity* userRef, enet_uint8* data,
-		                std::size_t dataLength);
+		void parseEvent(std::size_t userID, phx::net::Packet&& packet);
 
 		/**
 		 * @brief Actions taken when a state is received
@@ -107,8 +104,7 @@ namespace phx::server::networking
 		 * @param data The data in the state packet
 		 * @param dataLength The length of the data in the state packet
 		 */
-		void parseState(entt::entity* userRef, enet_uint8* data,
-		                std::size_t dataLength);
+		void parseState(std::size_t userID, phx::net::Packet&& packet);
 
 		/**
 		 * @brief Actions taken when a message is received
@@ -117,8 +113,7 @@ namespace phx::server::networking
 		 * @param data The data in the message packet
 		 * @param dataLength The length of the data in the message packet
 		 */
-		void parseMessage(entt::entity* userRef, enet_uint8* data,
-		                  std::size_t dataLength);
+		void parseMessage(std::size_t userID, phx::net::Packet&& packet);
 
 		/**
 		 * @brief Sends an event packet to a client
@@ -126,7 +121,7 @@ namespace phx::server::networking
 		 * @param userRef The user to sent the event to
 		 * @param data The event packet data
 		 */
-		void sendEvent(entt::entity* userRef, enet_uint8* data);
+		void sendEvent(std::size_t userID, enet_uint8* data);
 
 		/**
 		 * @brief Sends a state packet to a client
@@ -134,7 +129,7 @@ namespace phx::server::networking
 		 * @param userRef The user to sent the state to
 		 * @param data The state packet data
 		 */
-		void sendState(std::size_t sequence);
+		void sendState(entt::registry* registry, std::size_t sequence);
 
 		/**
 		 * @brief Sends a message packet to a client
@@ -142,30 +137,19 @@ namespace phx::server::networking
 		 * @param userRef The user to sent the message to
 		 * @param data The message packet data
 		 */
-		void sendMessage(entt::entity* userRef, const std::string& message);
+		void sendMessage(std::size_t userID, const std::string& message);
 
 		/**
 		 * @brief The Queue of bundled states received
 		 */
 		std::list<StateBundle> stateQueue;
 		/**
-		 * @brief The Queue of events received
-		 */
-		std::list<EventBundle> eventQueue;
-		/**
 		 * @brief The Queue of messages received
 		 */
 		std::list<MessageBundle> messageQueue;
 
 	private:
-		/// @brief The main loop runs while this is true
-		bool* m_running;
-
-		/// @breif An EnTT registry to store various data in
-		entt::registry* m_registry;
-
-		ENetHost*   m_server;
-		ENetEvent   m_event;
-		ENetAddress m_address;
+		bool            m_running;
+		phx::net::Host* m_server;
 	};
 } // namespace phx::server::networking

@@ -154,6 +154,15 @@ std::size_t Host::getPeerLimit() const { return m_host->peerCount; }
 
 const Address& Host::getAddress() const { return m_address; }
 
+Peer* Host::getPeer(std::size_t id) const
+{
+	if (m_peers.find(id) != m_peers.end())
+	{
+		return &m_peers.at(id);
+	}
+	return nullptr;
+}
+
 enet_uint32 Host::getTotalReceievedData() const
 {
 	return m_host->totalReceivedData;
