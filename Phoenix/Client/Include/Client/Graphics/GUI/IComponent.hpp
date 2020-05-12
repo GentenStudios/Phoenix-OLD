@@ -35,6 +35,12 @@
 
 namespace phx::gui
 {
+	enum class Mode
+	{
+		RELATIVE,
+		STATIC
+	};
+	
 	struct Vertex
 	{
 		math::vec2 vert;
@@ -46,7 +52,7 @@ namespace phx::gui
 	class Container;
 	struct IComponent
 	{
-		IComponent()          = default;
+		IComponent(Container* container) : container(container) {}
 		virtual ~IComponent() = default;
 
 		static std::vector<gfx::ShaderLayout> getBufferLayout()
@@ -54,7 +60,12 @@ namespace phx::gui
 			return {{"a_Vertex", 0}, {"a_Color", 1}, {"a_UV", 2}};
 		}
 
-		virtual void update(math::vec2 position, math::vec2 size);
+		virtual math::vec2 getPosition(Mode mode = Mode::RELATIVE) = 0;
+		virtual void       setPosition(math::vec2 position, Mode mode = Mode::RELATIVE) = 0;
+		
+		virtual math::vec2 getSize(Mode mode = Mode::RELATIVE) = 0;
+		virtual void setSize(math::vec2 size, Mode mode = Mode::RELATIVE) = 0;
+		
 		virtual void onEvent(events::Event event) = 0;
 		virtual void tick(float dt)               = 0;
 

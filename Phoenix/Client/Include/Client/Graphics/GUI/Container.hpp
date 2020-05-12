@@ -30,6 +30,7 @@
 
 #include <Client/Events/IEventListener.hpp>
 #include <Client/Graphics/GUI/IComponent.hpp>
+#include <Client/Graphics/GUI/BasicShapes.hpp>
 #include <Client/Graphics/Window.hpp>
 #include <Client/Graphics/ShaderPipeline.hpp>
 
@@ -58,65 +59,41 @@ namespace phx::gui
 		};
 
 	public:
-		Container(const std::string& name, math::vec2 pos, math::vec2 size,
-		          gfx::Window* window, Flags flags);
+		Container(const std::string& name, math::vec2 position, math::vec2 size,
+		          math::vec3 color, float alpha, gfx::Window* window,
+		          Mode mode = Mode::RELATIVE, Flags flags = Flags::CLEAN);
 		~Container();
 
-		template <typename T, typename U = IsDerivedFrom<T, IComponent>>
-		T* create();
+		void attachComponent(IComponent* component);
+		void detachComponent(IComponent* component);
 
-		template <typename T, typename U = IsDerivedFrom<T, IComponent>>
-		void destroy(T* component);
+		math::vec2 getPosition(Mode mode) const;
+		math::vec2 getSize(Mode mode) const;
 
-		math::vec2 getPosition() const;
-		math::vec2 getSize() const;
-		
+		gfx::Window* getWindow() const;
+
 		void onEvent(events::Event e) override;
 		void tick(float dt);
 
 	private:
-		unsigned int m_buffer;
-		unsigned int m_vao;
+		bool m_collapsed = false;
+		bool m_collapsible = false;
 
-		// temporary
-		unsigned int m_texture;
+		Rectangle* m_mainBox = nullptr;
+		Rectangle* m_collapseBox = nullptr;
 
+		// relative position & size.
 		math::vec2 m_position;
 		math::vec2 m_size;
 
-		// used if we collapse the window.
-		std::size_t m_numVertsInContextBar = 0;
-
-		gfx::ShaderPipeline m_shaderPipeline;
-		std::vector<Vertex> m_vertices;
+		gfx::Window* m_window;
 		
+		// temporary
+		unsigned int m_texture;
+		gfx::ShaderPipeline m_shaderPipeline;
+
 		std::vector<IComponent*> m_components;
 	};
-
-	template <typename T, typename U>
-	T* Container::create()
-	{
-		IComponent* component = new T();
-		m_components.push_back(component);
-
-		component->container = this;
-
-		return static_cast<T*>(component);
-	}
-
-	template <typename T, typename U>
-	void Container::destroy(T* component)
-	{
-		const auto it = std::find(m_components.begin(), m_components.end(),
-		                          static_cast<IComponent*>(component));
-		if (it == m_components.end())
-		{
-			return;
-		}
-
-		m_components.erase(it);
-		delete component;
-	}
 } // namespace phx::gui
 
 ENABLE_BITWISE_OPERATORS(phx::gui::Container::Flags);

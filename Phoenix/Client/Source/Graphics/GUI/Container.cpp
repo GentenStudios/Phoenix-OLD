@@ -32,135 +32,61 @@
 
 using namespace phx::gui;
 
-Container::Container(const std::string& name, math::vec2 pos, math::vec2 size,
-                     gfx::Window* window, Flags flags)
-    : m_position(pos), m_size(size)
+Container::Container(const std::string& name, math::vec2 position,
+                     math::vec2 size, math::vec3 color, float alpha,
+                     gfx::Window* window, Mode mode, Flags flags)
+    : m_window(window)
 {
-	const auto windowSize = window->getSize();
+	// coordinate system:
+	// 50, 50 is the CENTER of the screen.
+	// 00, 00 is bottom left.
+	//
+	// in OpenGL,
+	// 0.0, 0.0 is the center of the screen.
+	// -1, -1 is the bottom left of the screen.
 
-	// the size on the screen the element will be, opengl loves values between 0
-	// and 1.
-	const auto screenSize = (size / 100.f);
-
-	// the amount across the screen the element will be, opengl loves values
-	// between 0 and 1.
-	const auto screenPos = (pos / 100.f) - 0.5f;
-
-	// main box
-	math::vec2 topRight = {screenPos.x + (screenSize.x / 2.f),
-	                       screenPos.y + (screenSize.y / 2.f)};
-
-	math::vec2 bottomRight = {screenPos.x + (screenSize.x / 2.f),
-	                          screenPos.y - (screenSize.y / 2.f)};
-
-	math::vec2 bottomLeft = {screenPos.x - (screenSize.x / 2.f),
-	                         screenPos.y - (screenSize.y / 2.f)};
-
-	math::vec2 topLeft = {screenPos.x - (screenSize.x / 2.f),
-	                      screenPos.y + (screenSize.y / 2.f)};
-
-	// title
-	if (phx::ENUMhasFlag(flags, Flags::WITH_TITLE) ||
-	    phx::ENUMhasFlag(flags, Flags::COLLAPSIBLE))
+	if (mode == Mode::RELATIVE)
 	{
-		// gui font size, needs to be fixed at some point.
-		const float fontSize = 16; // (pixels)
-
-		// we want padding.
-		const float padding = 10; // (pixels)
-
-		const math::vec2 barSize = {screenSize.x,
-		                            ((fontSize + padding) / windowSize.y)};
-
-		const math::vec2 centerOfBar = {
-		    screenPos.x, screenPos.y + (screenSize.y / 2.f) +
-		                     ((padding + (fontSize / 2.f)) / windowSize.y)};
-
-		// main verts for the menu bar.
-		math::vec2 barTopRight    = {centerOfBar.x + (barSize.x / 2.f),
-                                  centerOfBar.y + (barSize.y / 2.f)};
-		math::vec2 barBottomRight = topRight;
-		math::vec2 barBottomLeft  = topLeft;
-		math::vec2 barTopLeft     = {centerOfBar.x - (barSize.x / 2.f),
-                                 centerOfBar.y + (barSize.y / 2.f)};
-
-		if (phx::ENUMhasFlag(flags, Flags::COLLAPSIBLE))
-		{
-			// triangle for the menu bar, pointing downwards because it's open
-			// right now, not collapsed.
-			math::vec2 triangleTopLeft = {
-			    barTopRight.x -
-			        (static_cast<float>(padding + fontSize) / windowSize.y),
-			    barTopRight.y - (static_cast<float>(padding) / windowSize.y)};
-
-			math::vec2 triangleTopRight = {
-			    barTopRight.x - (static_cast<float>(padding) / windowSize.y),
-			    barTopRight.y - (static_cast<float>(padding) / windowSize.y)};
-
-			math::vec2 triangleBottomMiddle = {
-			    barTopRight.x -
-			        (static_cast<float>(padding + (fontSize / 2.f)) /
-			         windowSize.y),
-			    barTopRight.y -
-			        (static_cast<float>(padding + fontSize) / windowSize.y)};
-
-			// make sure this is pushed first, since if we collapse, we can just
-			// turn this more easily.
-			m_vertices.push_back({triangleTopLeft, {1, 1, 1}, 1, {}});
-			m_vertices.push_back({triangleTopRight, {1, 1, 1}, 1, {}});
-			m_vertices.push_back({triangleBottomMiddle, {1, 1, 1}, 1, {}});
-		}
-
-		if (phx::ENUMhasFlag(flags, Flags::WITH_TITLE))
-		{
-			// push_back text vertices.
-		}
-
-		// 128, 128, 128 is grey.
-		// push 2 triangles for the bar.
-		m_vertices.push_back({barTopRight, {0.5, 0.5, 0.5}, 1, {}});
-		m_vertices.push_back({barBottomRight, {0.5, 0.5, 0.5}, 1, {}});
-		m_vertices.push_back({barTopLeft, {0.5, 0.5, 0.5}, 1, {}});
-		m_vertices.push_back({barBottomRight, {0.5, 0.5, 0.5}, 1, {}});
-		m_vertices.push_back({barBottomLeft, {0.5, 0.5, 0.5}, 1, {}});
-		m_vertices.push_back({barTopLeft, {0.5, 0.5, 0.5}, 1, {}});
+		// mode relative means we use the 50,50 is center.
+		m_position = position / 100.f;
+		m_size     = size / 100.f;
 	}
-
-	m_numVertsInContextBar = m_vertices.size();
-
-	// push vertices for main box. 90, 90, 90 is a darker grey so we can see the
-	// distinction.
-	m_vertices.push_back({topRight, {0.35, 0.35, 0.35}, 1, {}});
-	m_vertices.push_back({bottomRight, {0.35, 0.35, 0.35}, 1, {}});
-	m_vertices.push_back({topLeft, {0.35, 0.35, 0.35}, 1, {}});
-	m_vertices.push_back({bottomRight, {0.35, 0.35, 0.35}, 1, {}});
-	m_vertices.push_back({bottomLeft, {0.35, 0.35, 0.35}, 1, {}});
-	m_vertices.push_back({topLeft, {0.35, 0.35, 0.35}, 1, {}});
-
-	glGenVertexArrays(1, &m_vao);
-	glBindVertexArray(m_vao);
-
-	glGenBuffers(1, &m_buffer);
-	glBindBuffer(GL_ARRAY_BUFFER, m_buffer);
-	glBufferData(GL_ARRAY_BUFFER, m_vertices.size() * sizeof(Vertex),
-	             m_vertices.data(), GL_DYNAMIC_DRAW);
-
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex),
-	                      reinterpret_cast<void*>(offsetof(Vertex, vert)));
-	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex),
-	                      reinterpret_cast<void*>(offsetof(Vertex, color)));
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex),
-	                      reinterpret_cast<void*>(offsetof(Vertex, uv)));
-
-	glEnableVertexAttribArray(0);
-	glEnableVertexAttribArray(1);
-	glEnableVertexAttribArray(2);
+	else if (mode == Mode::STATIC)
+	{
+		// mode static means we use pixels as coordinates.
+		// we divide by the window size to get the relative position within the
+		// screen, since OpenGL does not work with pixels, but rather
+		// homogeneous coordinates.
+		m_position = position / m_window->getSize();
+		m_size     = size / m_window->getSize();
+	}
 
 	m_shaderPipeline.prepare("Assets/GUIShader.vert", "Assets/GUIShader.frag",
 	                         IComponent::getBufferLayout());
 
-	// initialize a texture with nothing to prevent a crash, but a texture can't
-	// just be non-existant, there has to be something.
+	m_mainBox = new Rectangle(this, {50, 50}, {100, 100}, color, alpha);
+
+	if (phx::ENUMhasFlag(flags, Flags::WITH_TITLE) ||
+	    phx::ENUMhasFlag(flags, Flags::COLLAPSIBLE))
+	{
+		const math::vec2 fontSize {8.f}; // px
+		const math::vec2 padding {3.f};   // px;
+
+		const math::vec2 windowSize       = m_window->getSize();
+		const math::vec2 relativeFontSize = (fontSize / windowSize) * size;
+		const math::vec2 relativePadding  = (padding / windowSize) * size;
+
+		m_collapseBox = new Rectangle(this, {50.f, 100.f + ((relativePadding.y + relativeFontSize.y))},
+		    {100.f, 10},
+		                              {0, 255, 0}, alpha);
+
+		// add triangle if collapsible.
+		// add text if with title.
+	}
+
+	// initialize a texture with nothing to prevent a
+	// crash, but a texture can't just be non-existent,
+	// there has to be something.
 	std::vector<float> emptyData(10 * 10 * 4, 1);
 	glGenTextures(1, &m_texture);
 	glBindTexture(GL_TEXTURE_2D, m_texture);
@@ -170,13 +96,47 @@ Container::Container(const std::string& name, math::vec2 pos, math::vec2 size,
 
 Container::~Container()
 {
-	glDeleteBuffers(1, &m_buffer);
-	glDeleteTextures(1, &m_texture);
-	glDeleteVertexArrays(1, &m_vao);
+	delete m_mainBox;
+	delete m_collapseBox;
 }
 
-phx::math::vec2 Container::getPosition() const { return m_position; }
-phx::math::vec2 Container::getSize() const { return m_size; }
+void Container::attachComponent(IComponent* component)
+{
+	m_components.push_back(component);
+}
+
+void Container::detachComponent(IComponent* component)
+{
+	auto it = std::find(m_components.begin(), m_components.end(), component);
+	if (it == m_components.end())
+	{
+		return;
+	}
+
+	m_components.erase(it);
+}
+
+phx::math::vec2 Container::getPosition(Mode mode) const
+{
+	if (mode == Mode::RELATIVE)
+	{
+		return m_position;
+	}
+
+	return m_position * static_cast<math::vec2>(m_window->getSize());
+}
+
+phx::math::vec2 Container::getSize(Mode mode) const
+{
+	if (mode == Mode::RELATIVE)
+	{
+		return m_size;
+	}
+
+	return m_size * static_cast<math::vec2>(m_window->getSize());
+}
+
+phx::gfx::Window* Container::getWindow() const { return m_window; }
 
 void Container::onEvent(events::Event e) {}
 
@@ -185,6 +145,12 @@ void Container::tick(float dt)
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, m_texture);
 	m_shaderPipeline.activate();
-	glBindVertexArray(m_vao);
-	glDrawArrays(GL_TRIANGLES, 0, m_vertices.size());
+
+	m_mainBox->tick(dt);
+	m_collapseBox->tick(dt);
+	
+	//for (auto it = m_components.rbegin(); it != m_components.rend(); ++it)
+	//{
+	//	(*it)->tick(dt);
+	//}
 }

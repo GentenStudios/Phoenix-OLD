@@ -28,8 +28,9 @@
 
 #include <Client/Client.hpp>
 
-#include <Client/Graphics/GUI/Button.hpp>
 #include <Client/Graphics/GUI/Container.hpp>
+
+#include <glad/glad.h>
 
 using namespace phx;
 
@@ -41,24 +42,17 @@ int main(int argc, char** argv)
 	gfx::Window window("okely dokely", 1280, 720);
 
 	// positioning is done on a scale of 0 to 100.
-	gui::Container container("", {50, 50}, {50, 50}, &window,
-	                         gui::Container::Flags::CLEAN);
+	gui::Container container("", {50, 50}, {100, 100}, {255, 0, 255}, 1.f, &window,
+	                         gui::Mode::RELATIVE, gui::Container::Flags::COLLAPSIBLE);
 
-	//// button won't render until you call setSize and setPos.
-	// auto button = container.create<gui::Button>();
-	//
-	//// 50% across the container, 50% through the height of the container.
-	// button->setPosition({50, 50});
-
-	//// size is 10% of the x of the container, 10% of the y of the container.
-	// button->setSize({10, 10});
+	// top left is already white.
 	
 	while (window.isRunning())
 	{
 		window.startFrame();
 
 		// dummy dt.
-		container.tick(16.6);
+		container.tick(16.6f);
 		
 		window.endFrame();
 	}

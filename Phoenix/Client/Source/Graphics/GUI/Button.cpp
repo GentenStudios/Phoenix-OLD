@@ -32,7 +32,4 @@
 
 using namespace phx::gui;
 
-Button::Button()
-{
 
-}

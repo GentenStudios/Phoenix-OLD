@@ -34,23 +34,14 @@
 
 namespace phx::gui
 {
-	// shape instead of component because we don't need onEvent on a normal
-	// shape.
-	class Container;
 	struct Shape
 	{
-		virtual ~Shape() = 0;
-
-		virtual void update(math::vec2 moved, math::vec2 scale) = 0;
-
 		// to check is a point is in the object, for example if you clicked in
 		// it.
 		virtual bool isPointInObject(math::vec2 pos) = 0;
-
-		Container* container;
 	};
 
-	class Rectangle : public Shape
+	class Rectangle : public Shape, IComponent
 	{
 	public:
 		enum class Corner
@@ -62,21 +53,23 @@ namespace phx::gui
 		};
 
 	public:
-		Rectangle();
+		Rectangle(Container* container, math::vec2 pos, math::vec2 size,
+		          math::vec3 color, float alpha,
+		          Mode mode = Mode::RELATIVE);
 		virtual ~Rectangle();
 
-		void init(math::vec2 position, math::vec2 size);
-
 		Vertex getCorner(Corner corner);
-		void   setCorner(Corner corner, Vertex position);
+		void   setCorner(Corner corner, Vertex vertex);
 
-		// this is relative.
-		// if you move it left and down, position is NEGATIVE (pixelsMoved /
-		// windowSize) if it shrinks, scale is between 0 and 1. if it grows,
-		// scale is >1. - it's a scaling thing.
-		void update(math::vec2 moved, math::vec2 scale);
+		virtual bool isPointInObject(math::vec2 pos) override;
 
-		bool isPointInObject(math::vec2 pos);
+		math::vec2 getPosition(Mode mode) override;
+		void       setPosition(math::vec2 position, Mode mode) override;
+
+		math::vec2 getSize(Mode mode) override;
+		void       setSize(math::vec2 size, Mode mode) override;
+
+		void onEvent(events::Event event) override;
 		void tick(float dt);
 
 	private:
