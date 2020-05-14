@@ -37,7 +37,7 @@ using namespace phx;
 EscapeMenu::EscapeMenu(gfx::Window* window)
     : gfx::Overlay("EscapeMenu"), m_window(window)
 {
-	const math::vec2i size = window->getSize();
+	const math::vec2 size = window->getSize();
 	m_windowCentre         = {size.x / 2, size.y / 2};
 }
 

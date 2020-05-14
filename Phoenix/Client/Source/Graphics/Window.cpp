@@ -288,13 +288,13 @@ void Window::minimize() const { SDL_MinimizeWindow(m_window); }
 void Window::focus() const { SDL_SetWindowInputFocus(m_window); }
 void Window::close() { m_running = false; }
 
-void Window::resize(math::vec2i size)
+void Window::resize(math::vec2 size)
 {
 	SDL_SetWindowSize(m_window, static_cast<int>(size.x),
 	                  static_cast<int>(size.y));
 }
 
-math::vec2i Window::getSize() const
+math::vec2 Window::getSize() const
 {
 	math::vec2i size;
 	SDL_GetWindowSize(m_window, &size.x, &size.y);

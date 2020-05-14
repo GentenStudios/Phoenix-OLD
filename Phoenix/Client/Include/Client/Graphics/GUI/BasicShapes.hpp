@@ -54,20 +54,19 @@ namespace phx::gui
 
 	public:
 		Rectangle(Container* container, math::vec2 pos, math::vec2 size,
-		          math::vec3 color, float alpha,
-		          Mode mode = Mode::RELATIVE);
+		          math::vec3 color, float alpha);
 		virtual ~Rectangle();
 
 		Vertex getCorner(Corner corner);
 		void   setCorner(Corner corner, Vertex vertex);
 
-		virtual bool isPointInObject(math::vec2 pos) override;
+		bool isPointInObject(math::vec2 pos) override;
 
-		math::vec2 getPosition(Mode mode) override;
-		void       setPosition(math::vec2 position, Mode mode) override;
+		math::vec2 getPosition() const override;
+		void       setPosition(math::vec2 position) override;
 
-		math::vec2 getSize(Mode mode) override;
-		void       setSize(math::vec2 size, Mode mode) override;
+		math::vec2 getSize() const override;
+		void       setSize(math::vec2 size) override;
 
 		void onEvent(events::Event event) override;
 		void tick(float dt);

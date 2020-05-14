@@ -34,56 +34,22 @@ using namespace phx::gui;
 
 Container::Container(const std::string& name, math::vec2 position,
                      math::vec2 size, math::vec3 color, float alpha,
-                     gfx::Window* window, Mode mode, Flags flags)
-    : m_window(window)
+                     gfx::Window* window, Flags flags)
+    : m_window(window), m_position(position), m_size(size)
 {
 	// coordinate system:
+	// 100, 100 is top right.
 	// 50, 50 is the CENTER of the screen.
 	// 00, 00 is bottom left.
 	//
 	// in OpenGL,
+	// 1, 1 is the top right of the screen.
 	// 0.0, 0.0 is the center of the screen.
 	// -1, -1 is the bottom left of the screen.
 
-	if (mode == Mode::RELATIVE)
-	{
-		// mode relative means we use the 50,50 is center.
-		m_position = position / 100.f;
-		m_size     = size / 100.f;
-	}
-	else if (mode == Mode::STATIC)
-	{
-		// mode static means we use pixels as coordinates.
-		// we divide by the window size to get the relative position within the
-		// screen, since OpenGL does not work with pixels, but rather
-		// homogeneous coordinates.
-		m_position = position / m_window->getSize();
-		m_size     = size / m_window->getSize();
-	}
-
 	m_shaderPipeline.prepare("Assets/GUIShader.vert", "Assets/GUIShader.frag",
 	                         IComponent::getBufferLayout());
-
-	m_mainBox = new Rectangle(this, {50, 50}, {100, 100}, color, alpha);
-
-	if (phx::ENUMhasFlag(flags, Flags::WITH_TITLE) ||
-	    phx::ENUMhasFlag(flags, Flags::COLLAPSIBLE))
-	{
-		const math::vec2 fontSize {8.f}; // px
-		const math::vec2 padding {3.f};   // px;
-
-		const math::vec2 windowSize       = m_window->getSize();
-		const math::vec2 relativeFontSize = (fontSize / windowSize) * size;
-		const math::vec2 relativePadding  = (padding / windowSize) * size;
-
-		m_collapseBox = new Rectangle(this, {50.f, 100.f + ((relativePadding.y + relativeFontSize.y))},
-		    {100.f, 10},
-		                              {0, 255, 0}, alpha);
-
-		// add triangle if collapsible.
-		// add text if with title.
-	}
-
+	
 	// initialize a texture with nothing to prevent a
 	// crash, but a texture can't just be non-existent,
 	// there has to be something.
@@ -107,7 +73,7 @@ void Container::attachComponent(IComponent* component)
 
 void Container::detachComponent(IComponent* component)
 {
-	auto it = std::find(m_components.begin(), m_components.end(), component);
+	const auto it = std::find(m_components.begin(), m_components.end(), component);
 	if (it == m_components.end())
 	{
 		return;
@@ -116,24 +82,14 @@ void Container::detachComponent(IComponent* component)
 	m_components.erase(it);
 }
 
-phx::math::vec2 Container::getPosition(Mode mode) const
+phx::math::vec2 Container::getPosition() const
 {
-	if (mode == Mode::RELATIVE)
-	{
-		return m_position;
-	}
-
-	return m_position * static_cast<math::vec2>(m_window->getSize());
+	return m_position;
 }
 
-phx::math::vec2 Container::getSize(Mode mode) const
+phx::math::vec2 Container::getSize() const
 {
-	if (mode == Mode::RELATIVE)
-	{
-		return m_size;
-	}
-
-	return m_size * static_cast<math::vec2>(m_window->getSize());
+	return m_size;
 }
 
 phx::gfx::Window* Container::getWindow() const { return m_window; }
@@ -146,11 +102,11 @@ void Container::tick(float dt)
 	glBindTexture(GL_TEXTURE_2D, m_texture);
 	m_shaderPipeline.activate();
 
-	m_mainBox->tick(dt);
-	m_collapseBox->tick(dt);
+	//m_mainBox->tick(dt);
+	//m_collapseBox->tick(dt);
 	
-	//for (auto it = m_components.rbegin(); it != m_components.rend(); ++it)
-	//{
-	//	(*it)->tick(dt);
-	//}
+	for (auto it = m_components.rbegin(); it != m_components.rend(); ++it)
+	{
+		(*it)->tick(dt);
+	}
 }

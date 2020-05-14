@@ -35,7 +35,6 @@
 #include <Client/Graphics/ShaderPipeline.hpp>
 
 #include <Common/EnumTools.hpp>
-#include <Common/Logger.hpp>
 #include <Common/Math/Math.hpp>
 
 #include <algorithm>
@@ -61,14 +60,14 @@ namespace phx::gui
 	public:
 		Container(const std::string& name, math::vec2 position, math::vec2 size,
 		          math::vec3 color, float alpha, gfx::Window* window,
-		          Mode mode = Mode::RELATIVE, Flags flags = Flags::CLEAN);
+		          Flags flags = Flags::CLEAN);
 		~Container();
 
 		void attachComponent(IComponent* component);
 		void detachComponent(IComponent* component);
 
-		math::vec2 getPosition(Mode mode) const;
-		math::vec2 getSize(Mode mode) const;
+		math::vec2 getPosition() const;
+		math::vec2 getSize() const;
 
 		gfx::Window* getWindow() const;
 

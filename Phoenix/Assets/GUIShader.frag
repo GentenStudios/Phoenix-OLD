@@ -9,6 +9,5 @@ out vec4 out_FragColor;
 
 void main()
 {
-	//out_FragColor = texture(u_Tex, pass_UV) * vec4(pass_Color / 255.f);
-	out_FragColor = pass_Color;
+	out_FragColor = vec4(pass_Color.rgb / 255.f, pass_Color.a);
 }

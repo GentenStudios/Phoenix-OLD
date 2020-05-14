@@ -27,8 +27,10 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <Client/Client.hpp>
-
 #include <Client/Graphics/GUI/Container.hpp>
+
+#include <Common/Logger.hpp>
+#include <iostream>
 
 #include <glad/glad.h>
 
@@ -37,15 +39,34 @@ using namespace phx;
 #undef main
 int main(int argc, char** argv)
 {
+	std::cout << "Um ok?" << std::endl;
+	
+	LoggerConfig config;
+	config.logToConsole = true;
+	config.threaded     = false;
+	config.verbosity    = LogVerbosity::DEBUG;
+
+	Logger::initialize(config);
+
+	LOG_INFO("What the fuck?") << "okely dokely do";
+	
 	// client::Client::get()->run();
 
 	gfx::Window window("okely dokely", 1280, 720);
 
 	// positioning is done on a scale of 0 to 100.
 	gui::Container container("", {50, 50}, {100, 100}, {255, 0, 255}, 1.f, &window,
-	                         gui::Mode::RELATIVE, gui::Container::Flags::COLLAPSIBLE);
+	                         gui::Container::Flags::COLLAPSIBLE);
 
-	// top left is already white.
+	auto rect = new gui::Rectangle(&container, {50, 50}, {100, 100},
+	                               {255, 128, 255}, 1.f);
+
+	// position.y is 70, because size is in each direction, so for the previous
+	// rectangle, it's 50 + size.y which is 60. And, because it's still 10 in
+	// each direction for this rectangle, you add 10 that to get 70.
+	auto rect2 = new gui::Rectangle(&container, {50, 100}, {50, 10},
+                               {255, 0, 255}, 1.f);
+
 	
 	while (window.isRunning())
 	{
@@ -53,9 +74,12 @@ int main(int argc, char** argv)
 
 		// dummy dt.
 		container.tick(16.6f);
+		//rect->tick(16.6);
 		
 		window.endFrame();
 	}
+
+	delete rect;
 
 	return 0;
 }

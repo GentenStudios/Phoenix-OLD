@@ -29,14 +29,15 @@
 #include <Client/Graphics/GUI/BasicShapes.hpp>
 #include <Client/Graphics/GUI/Container.hpp>
 
+#include <Common/Logger.hpp>
+
 #include <glad/glad.h>
 
 using namespace phx::gui;
 
 Rectangle::Rectangle(Container* container, math::vec2 pos, math::vec2 size,
-                     math::vec3 color, float alpha,
-                     Mode mode)
-    : IComponent(container)
+                     math::vec3 color, float alpha)
+    : IComponent(container), m_pos(pos), m_size(size)
 {
 	glGenVertexArrays(1, &m_vao);
 	glGenBuffers(1, &m_buffer);
@@ -55,49 +56,49 @@ Rectangle::Rectangle(Container* container, math::vec2 pos, math::vec2 size,
 	glEnableVertexAttribArray(1);
 	glEnableVertexAttribArray(2);
 
-	math::vec2 relativePos;
-	math::vec2 relativeSize;
+	/*
+	 * The method used to generate the vertices here aren't the most efficient,
+	 * we can combine a lot of the calculations at an earlier stage but it is
+	 * all spread out to aid the future maintenance and reading of this code.
+	 */
+	
+	math::vec2 containerPos  = container->getPosition();
+	math::vec2 containerSize = container->getSize();
 
-	if (mode == Mode::RELATIVE)
-	{
-		m_pos  = pos / 100.f;
-		m_size = size / 100.f;
+	// don't remove redundant brackets, they help the math flow while reading
+	// since some people tend to forget how it works... -_-
+	// 
+	// linearly interpolate to convert relative x position in the container to
+	// an absolute x position within the window (still a percentage).
+	math::vec2 relativePos = (containerPos - (containerSize / 2.f)) +
+	                         ((m_pos / 100.f) * containerSize);
 
-		// take away 0.5 since opengl likes -1 to 1.
-		// relativePos  = container->getPosition(Mode::RELATIVE);
-		relativePos  = (m_pos - 0.5f) * container->getPosition(Mode::RELATIVE);
-		relativeSize = m_size * container->getSize(Mode::RELATIVE);
-	}
-	else
-	{
-		relativePos  = pos / container->getWindow()->getSize();
-		relativeSize = size / container->getWindow()->getSize();
+	// relativePos will still be between 0 and 100, so we need divide by 100.
+	relativePos /= 100.f;
 
-		// convert and store positions relative to the CONTAINER, instead of
-		// window.
-		m_pos  = relativePos / container->getPosition(Mode::RELATIVE);
-		m_size = relativeSize / container->getPosition(Mode::RELATIVE);
-	}
+	// get the size relative to the parent container.
+	// this way, if you have:
+	// 100 / 100 = 1.f
+	// 1.f * container size = the container size.
+	// 0.5f * container size = half the container size.
+	// it's a directly proportional value.
+	math::vec2 relativeSize = (m_size / 100.f) * (containerSize / 100.f) * 2.f;
 
-	math::vec2 topRight = {
-	    relativePos.x + relativeSize.x / 2.f,
-	    relativePos.y + relativeSize.y / 2.f,
-	};
+	// converts the relative size and position into pixels.
+	math::vec2 staticObjectPos =
+	    relativePos - 0.5f /** container->getWindow()->getSize()*/;
+	math::vec2 staticObjectSize =
+	    relativeSize /** container->getWindow()->getSize()*/;
 
-	math::vec2 bottomRight = {
-	    relativePos.x + relativeSize.x / 2.f,
-	    relativePos.y - relativeSize.y / 2.f,
-	};
+	// calculate top left, and calculate everything from there.
+	math::vec2 topLeft = {staticObjectPos.x - staticObjectSize.x / 2.f,
+	                      staticObjectPos.y + staticObjectSize.y / 2.f};
 
-	math::vec2 bottomLeft = {
-	    relativePos.x - relativeSize.x / 2.f,
-	    relativePos.y - relativeSize.y / 2.f,
-	};
+	math::vec2 topRight = {topLeft.x + staticObjectSize.x, topLeft.y};
 
-	math::vec2 topLeft = {
-	    relativePos.x - relativeSize.x / 2.f,
-	    relativePos.y + relativeSize.y / 2.f,
-	};
+	math::vec2 bottomRight = {topRight.x, topRight.y - staticObjectSize.y};
+
+	math::vec2 bottomLeft = {topLeft.x, topLeft.y - staticObjectSize.y};
 
 	m_vertices.push_back({topRight,    color, alpha, {}});
 	m_vertices.push_back({bottomRight, color, alpha, {}});
@@ -229,21 +230,14 @@ bool Rectangle::isPointInObject(math::vec2 pos)
 	return false;
 }
 
-phx::math::vec2 Rectangle::getPosition(Mode mode)
+phx::math::vec2 Rectangle::getPosition() const
 {
-	if (mode == Mode::RELATIVE)
-	{
-		// returns relative to the CONTAINER.
-		return m_pos;
-	}
-
-	// relative position * container's relative position * window's actual size
-	// gets the static size in pixels.
-	return m_pos * container->getPosition(Mode::RELATIVE) *
-	       container->getWindow()->getSize();
+	// returns a percentage, the percentage within the container that this
+	// object is.
+	return m_pos;
 }
 
-void Rectangle::setPosition(math::vec2 position, Mode mode)
+void Rectangle::setPosition(math::vec2 position)
 {
 	// vertices haven't actually been generated.
 	if (m_vertices.size() != 6)
@@ -251,42 +245,20 @@ void Rectangle::setPosition(math::vec2 position, Mode mode)
 		return;
 	}
 
-	if (mode == Mode::RELATIVE)
+	position /= 100.f;
+
+	// don't process anything if the position's are equivalent.
+	if (position == m_pos)
 	{
-		position /= 100.f;
-
-		// don't process anything if the position's are equivalent.
-		if (position == m_pos)
-		{
-			return;
-		}
-
-		// get the difference in position.
-		position = position - m_pos;
-
-		// get OpenGL-like coords, relative to the window (it becomes relative
-		// to the window BECAUSE we multiply by the container position).
-		position *= container->getPosition(Mode::RELATIVE);
+		return;
 	}
-	else
-	{
-		// get position relative to window, skip container part since we're
-		// using pixels.
-		position /= container->getWindow()->getSize();
 
-		// get current size, relative to the window rather than to the
-		// container.
-		auto currentRelativeToWindowSize =
-		    m_pos * container->getSize(Mode::RELATIVE);
+	// get the difference in position.
+	position = position - m_pos;
 
-		if (position == currentRelativeToWindowSize)
-		{
-			return;
-		}
-
-		// get difference in pixels.
-		position = currentRelativeToWindowSize - position;
-	}
+	// get OpenGL-like coords, relative to the window (it becomes relative
+	// to the window BECAUSE we multiply by the container position).
+	position *= container->getPosition();
 
 	// opengl likes -1 to 1 so we take away 0.5
 	position -= 0.5f;
@@ -303,21 +275,14 @@ void Rectangle::setPosition(math::vec2 position, Mode mode)
 	             m_vertices.data(), GL_DYNAMIC_DRAW);
 }
 
-phx::math::vec2 Rectangle::getSize(Mode mode)
+phx::math::vec2 Rectangle::getSize() const
 {
-	if (mode == Mode::RELATIVE)
-	{
-		// returns size RELATIVE to the container.
-		return m_size;
-	}
-
-	// relative size * container's relative size * window's actual size gets the
-	// static size in pixels.
-	return m_size * container->getSize(Mode::RELATIVE) *
-	       container->getWindow()->getSize();
+	// returns size RELATIVE to the container.
+	return m_size;
 }
 
-void Rectangle::setSize(math::vec2 size, Mode mode)
+/// @todo fix this function!!!!
+void Rectangle::setSize(math::vec2 size)
 {
 	// vertices haven't actually been generated.
 	if (m_vertices.size() != 6)
@@ -325,29 +290,26 @@ void Rectangle::setSize(math::vec2 size, Mode mode)
 		return;
 	}
 
-	if (mode == Mode::RELATIVE)
+	size /= 100.f;
+
+	if (size == m_size)
 	{
-		size /= 100.f;
-
-		if (size == m_size)
-		{
-			return;
-		}
-
-		// can be negative, so it just gets smaller or something.
-		const auto difference = size - m_size;
-
-		// apply the tranformation to each vertex.
-		for (auto& vertex : m_vertices)
-		{
-			vertex.vert += difference;
-		}
-
-		// upload this new data to the GPU.
-		glBindBuffer(GL_ARRAY_BUFFER, m_buffer);
-		glBufferData(GL_ARRAY_BUFFER, m_vertices.size() * sizeof(Vertex),
-		             m_vertices.data(), GL_DYNAMIC_DRAW);
+		return;
 	}
+
+	// can be negative, so it just gets smaller or something.
+	const auto difference = size - m_size;
+
+	// apply the tranformation to each vertex.
+	for (auto& vertex : m_vertices)
+	{
+		vertex.vert += difference;
+	}
+
+	// upload this new data to the GPU.
+	glBindBuffer(GL_ARRAY_BUFFER, m_buffer);
+	glBufferData(GL_ARRAY_BUFFER, m_vertices.size() * sizeof(Vertex),
+	             m_vertices.data(), GL_DYNAMIC_DRAW);
 }
 
 void Rectangle::onEvent(events::Event event) {}
