@@ -27,68 +27,15 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <Client/Client.hpp>
-#include <Client/Graphics/GUI/Container.hpp>
-#include <Client/Graphics/GUI/Button.hpp>
 
 #include <Common/Logger.hpp>
-#include <iostream>
-
-#include <glad/glad.h>
 
 using namespace phx;
 
 #undef main
 int main(int argc, char** argv)
 {
-	std::cout << "Um ok?" << std::endl;
-	
-	LoggerConfig config;
-	config.logToConsole = true;
-	config.threaded     = false;
-	config.verbosity    = LogVerbosity::DEBUG;
-
-	Logger::initialize(config);
-
-	// client::Client::get()->run();
-
-	gfx::Window window("okely dokely", 1280, 720);
-
-	// positioning is done on a scale of 0 to 100.
-	gui::Container container("", {50, 50}, {100, 100}, {255, 0, 255}, 1.f, &window,
-	                         gui::Container::Flags::COLLAPSIBLE);
-
-	window.registerEventListener(&container);
-	
-	auto rect = new gui::Rectangle(&container, {50, 50}, {100, 100},
-	                               {128, 128, 128}, 1.f);
-
-	auto button =
-	    new gui::Button(&container, {50, 50}, {30, 30}, {255, 0, 0}, 1.f);
-
-	button->setCallback([](events::Event& event)
-	{
-		if (ENUMhasFlag(event.mouse.mods, events::Mods::MOD_LEFT_CTRL))
-		{
-			LOG_INFO("Button clicked with Left Control pressed.");
-		}
-		else
-		{
-			LOG_INFO("Button clicked without an implemented modifier pressed.");
-		}
-	});
-	
-	while (window.isRunning())
-	{
-		window.startFrame();
-
-		// dummy dt.
-		container.tick(16.6f);
-		//rect->tick(16.6);
-		
-		window.endFrame();
-	}
-
-	delete rect;
+	client::Client::get()->run();
 
 	return 0;
 }
