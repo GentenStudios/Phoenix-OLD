@@ -78,7 +78,7 @@ namespace phx::client
 		 * @param cout Needs to be depreciated, unused (but required by
 		 * terminal)
 		 */
-		void sendMessage(const std::string& input, std::ostringstream& cout);
+		void sendMessage(std::string input, std::ostringstream& cout);
 		void parseEvent(enet_uint8* data, std::size_t dataLength);
 		void parseState(enet_uint8* data, std::size_t dataLength);
 		void parseMessage(enet_uint8* data, std::size_t dataLength);

@@ -411,16 +411,18 @@ void Game::tick(float dt)
 	m_player->renderSelectionBox(m_camera->calculateViewMatrix(), m_camera->getProjection());
 }
 
-void Game::sendMessage(const std::string& input, std::ostringstream& cout)
+void Game::sendMessage(std::string input, std::ostringstream& cout)
 {
+	Serializer ser(Serializer::Mode::WRITE);
+	ser&       input;
+	auto       state = ser.getBuffer();
+
 	ENetPacket* packet;
-	packet = enet_packet_create(input.c_str(), input.length() + 1,
+	packet = enet_packet_create(state.data(), state.size() + 1,
 	                            ENET_PACKET_FLAG_RELIABLE);
-	LOG_INFO("TEST") << "Send Message: " << input;
+
 	enet_peer_send(m_peer, 2, packet);
-	LOG_INFO("TEST") << "Sending Message";
 	enet_host_flush(m_client);
-	LOG_INFO("TEST") << "Sent Message";
 }
 void Game::parseEvent(enet_uint8* data, std::size_t dataLength)
 {

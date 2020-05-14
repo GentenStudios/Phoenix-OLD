@@ -213,7 +213,11 @@ void Host::handleEvent(ENetEvent& event)
 
 Peer& Host::getPeer(ENetPeer& peer)
 {
-	return m_peers.at(std::size_t(peer.data));
+	if (m_peers.find(std::size_t(peer.data)) != m_peers.end())
+	{
+		return m_peers.at(std::size_t(peer.data));
+	}
+	return nullptr;
 }
 
 Peer& Host::createPeer(ENetPeer& peer)
