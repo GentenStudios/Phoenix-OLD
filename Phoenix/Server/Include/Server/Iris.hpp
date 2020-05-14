@@ -39,7 +39,6 @@
 #include <enet/enet.h>
 #include <entt/entt.hpp>
 
-#include <array>
 
 namespace phx::server::networking
 {
