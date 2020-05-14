@@ -69,7 +69,7 @@ namespace phx::gui
 		math::vec2 getSize() const override;
 		void       setSize(math::vec2 size) override;
 
-		void onEvent(events::Event event) override;
+		void onEvent(events::Event& event) override;
 		void tick(float dt);
 
 	private:

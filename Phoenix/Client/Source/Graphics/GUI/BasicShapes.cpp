@@ -238,7 +238,6 @@ bool Rectangle::isPointInObject(math::vec2 pos)
 			{
 				if (pos.x <= bottomRight.x && pos.y >= bottomRight.y)
 				{
-					LOG_INFO("GUI") << "Point is within the rectangle";
 					return true;
 				}
 			}
@@ -351,7 +350,7 @@ void Rectangle::setSize(math::vec2 size)
 	             m_vertices.data(), GL_DYNAMIC_DRAW);
 }
 
-void Rectangle::onEvent(events::Event event) {}
+void Rectangle::onEvent(events::Event& event) {}
 
 void Rectangle::tick(float dt)
 {

@@ -64,6 +64,18 @@ int main(int argc, char** argv)
 
 	auto button =
 	    new gui::Button(&container, {50, 50}, {30, 30}, {255, 0, 0}, 1.f);
+
+	button->setCallback([](events::Event& event)
+	{
+		if (ENUMhasFlag(event.mouse.mods, events::Mods::MOD_LEFT_CTRL))
+		{
+			LOG_INFO("Button clicked with Left Control pressed.");
+		}
+		else
+		{
+			LOG_INFO("Button clicked without an implemented modifier pressed.");
+		}
+	});
 	
 	while (window.isRunning())
 	{

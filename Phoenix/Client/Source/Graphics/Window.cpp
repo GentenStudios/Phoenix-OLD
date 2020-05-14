@@ -159,6 +159,7 @@ void Window::pollEvents()
 			e.mouse.button = static_cast<MouseButtons>(event.button.button);
 			e.mouse.x      = event.button.x;
 			e.mouse.y      = event.button.y;
+			e.mouse.mods   = static_cast<Mods>(SDL_GetModState());
 			dispatchToListeners(e);
 			break;
 		case SDL_MOUSEBUTTONUP:
@@ -166,6 +167,7 @@ void Window::pollEvents()
 				break;
 			e.type         = EventType::MOUSE_BUTTON_RELEASED;
 			e.mouse.button = static_cast<MouseButtons>(event.button.button);
+			e.mouse.mods   = static_cast<Mods>(SDL_GetModState());
 			dispatchToListeners(e);
 			break;
 		case SDL_MOUSEMOTION:

@@ -33,16 +33,20 @@
 
 #include <Common/Math/Math.hpp>
 
-#include <string>
-#include <vector>
+#include <functional>
 
 namespace phx::gui
 {
 	class Button : IComponent
 	{
 	public:
+		using Callback = std::function<void(events::Event& event)>;
+		
+	public:
 		Button(Container* container, math::vec2 pos, math::vec2 size, math::vec3 color, float alpha);
 		virtual ~Button();
+
+		void setCallback(const Callback& callback);
 
 		math::vec2 getPosition() const override;
 		void setPosition(math::vec2 position) override;
@@ -53,9 +57,10 @@ namespace phx::gui
 		void tick(float dt) override;
 
 	private:
+		math::vec2i m_pos;
+		math::vec2i m_size;
 		Rectangle m_rectangle;
 		
-		math::vec2i m_size;
-		math::vec2i m_pos;
+		Callback m_callback;
 	};
 } // namespace phx::gui

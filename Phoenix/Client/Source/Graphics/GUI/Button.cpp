@@ -48,6 +48,11 @@ Button::Button(Container* container, math::vec2 pos, math::vec2 size,
 
 Button::~Button() { container->detachComponent(this); }
 
+void Button::setCallback(const Callback& callback)
+{
+	m_callback = callback;
+}
+
 phx::math::vec2 Button::getPosition() const { return m_pos; }
 
 void Button::setPosition(math::vec2 position)
@@ -72,12 +77,10 @@ void Button::onEvent(events::Event& event)
 		{
 			if (m_rectangle.isPointInObject({event.mouse.x, event.mouse.y}))
 			{
-				if (ENUMhasFlag(event.mouse.mods, events::Mods::MOD_LEFT_CTRL))
+				if (m_callback)
 				{
-					LOG_INFO("GUI") << "Button clicked with CTRL pressed.";
+					m_callback(event);
 				}
-
-				LOG_INFO("GUI") << "Button clicked without CTRL pressed.";
 
 				event.handled = true;
 			}
