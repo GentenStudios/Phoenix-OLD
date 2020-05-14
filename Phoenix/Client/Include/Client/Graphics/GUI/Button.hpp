@@ -38,23 +38,24 @@
 
 namespace phx::gui
 {
-	//class Button : IComponent
-	//{
-	//public:
-	//	Button();
-	//	virtual ~Button() = default;
+	class Button : IComponent
+	{
+	public:
+		Button(Container* container, math::vec2 pos, math::vec2 size, math::vec3 color, float alpha);
+		virtual ~Button();
 
-	//	void setSize(math::vec2 size);
-	//	void setPosition(math::vec2 pos);
+		math::vec2 getPosition() const override;
+		void setPosition(math::vec2 position) override;
+		math::vec2 getSize() const override;
+		void setSize(math::vec2 size) override;
 
-	//	void onEvent(events::Event event) override {};
-	//	void tick(float dt) override {};
+		void onEvent(events::Event& event) override;
+		void tick(float dt) override;
 
-	//private:
-	//	math::vec2i m_size;
-	//	math::vec2i m_pos;
-
-	//	unsigned int m_buffer;
-	//	unsigned int m_vao;
-	//};
+	private:
+		Rectangle m_rectangle;
+		
+		math::vec2i m_size;
+		math::vec2i m_pos;
+	};
 } // namespace phx::gui

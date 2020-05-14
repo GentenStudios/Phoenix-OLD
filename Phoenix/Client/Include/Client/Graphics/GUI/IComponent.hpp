@@ -61,7 +61,7 @@ namespace phx::gui
 		virtual math::vec2 getSize() const          = 0;
 		virtual void       setSize(math::vec2 size) = 0;
 
-		virtual void onEvent(events::Event event) = 0;
+		virtual void onEvent(events::Event& event) = 0;
 		virtual void tick(float dt)               = 0;
 
 		bool       enabled   = true;

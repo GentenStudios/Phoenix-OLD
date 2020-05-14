@@ -94,7 +94,17 @@ phx::math::vec2 Container::getSize() const
 
 phx::gfx::Window* Container::getWindow() const { return m_window; }
 
-void Container::onEvent(events::Event e) {}
+void Container::onEvent(events::Event e)
+{
+	for (auto it = m_components.rbegin(); it != m_components.rend(); ++it)
+	{
+		(*it)->onEvent(e);
+		if (e.handled)
+		{
+			break;
+		}
+	}
+}
 
 void Container::tick(float dt)
 {

@@ -36,7 +36,7 @@
 using namespace phx::gui;
 
 Rectangle::Rectangle(Container* container, math::vec2 pos, math::vec2 size,
-                     math::vec3 color, float alpha)
+                     math::vec3 color, float alpha, bool hasParent)
     : IComponent(container), m_pos(pos), m_size(size)
 {
 	glGenVertexArrays(1, &m_vao);
@@ -75,6 +75,7 @@ Rectangle::Rectangle(Container* container, math::vec2 pos, math::vec2 size,
 
 	// relativePos will still be between 0 and 100, so we need divide by 100.
 	relativePos /= 100.f;
+	relativePos -= 0.5;
 
 	// get the size relative to the parent container.
 	// this way, if you have:
@@ -84,21 +85,15 @@ Rectangle::Rectangle(Container* container, math::vec2 pos, math::vec2 size,
 	// it's a directly proportional value.
 	math::vec2 relativeSize = (m_size / 100.f) * (containerSize / 100.f) * 2.f;
 
-	// converts the relative size and position into pixels.
-	math::vec2 staticObjectPos =
-	    relativePos - 0.5f /** container->getWindow()->getSize()*/;
-	math::vec2 staticObjectSize =
-	    relativeSize /** container->getWindow()->getSize()*/;
-
 	// calculate top left, and calculate everything from there.
-	math::vec2 topLeft = {staticObjectPos.x - staticObjectSize.x / 2.f,
-	                      staticObjectPos.y + staticObjectSize.y / 2.f};
+	math::vec2 topLeft = {relativePos.x - relativeSize.x / 2.f,
+	                      relativePos.y + relativeSize.y / 2.f};
 
-	math::vec2 topRight = {topLeft.x + staticObjectSize.x, topLeft.y};
+	math::vec2 topRight = {topLeft.x + relativeSize.x, topLeft.y};
 
-	math::vec2 bottomRight = {topRight.x, topRight.y - staticObjectSize.y};
+	math::vec2 bottomRight = {topRight.x, topRight.y - relativeSize.y};
 
-	math::vec2 bottomLeft = {topLeft.x, topLeft.y - staticObjectSize.y};
+	math::vec2 bottomLeft = {topLeft.x, topLeft.y - relativeSize.y};
 
 	m_vertices.push_back({topRight,    color, alpha, {}});
 	m_vertices.push_back({bottomRight, color, alpha, {}});
@@ -110,7 +105,13 @@ Rectangle::Rectangle(Container* container, math::vec2 pos, math::vec2 size,
 	glBufferData(GL_ARRAY_BUFFER, m_vertices.size() * sizeof(Vertex),
 	             m_vertices.data(), GL_DYNAMIC_DRAW);
 
-	container->attachComponent(this);
+	// if it has a parent object, that object should be registered, not this
+	// one, otherwise there could be duplicate actions occurring (like moving
+	// things about, etc..)
+	if (!hasParent)
+	{
+		container->attachComponent(this);
+	}
 }
 
 Rectangle::~Rectangle()
@@ -123,11 +124,6 @@ Rectangle::~Rectangle()
 
 Vertex Rectangle::getCorner(Corner corner)
 {
-	if (m_vertices.size() != 6)
-	{
-		return {};
-	}
-
 	/**
 	 * 1st OpenGL Vertex: Top Right     (0)
 	 * 2nd OpenGL Vertex: Bottom Right  (1)
@@ -164,11 +160,6 @@ Vertex Rectangle::getCorner(Corner corner)
 
 void Rectangle::setCorner(Corner corner, Vertex vertex)
 {
-	if (m_vertices.size() != 6)
-	{
-		m_vertices.resize(6);
-	}
-
 	/**
 	 * 1st OpenGL Vertex: Top Right     (0)
 	 * 2nd OpenGL Vertex: Bottom Right  (1)
@@ -220,11 +211,38 @@ void Rectangle::setCorner(Corner corner, Vertex vertex)
 
 bool Rectangle::isPointInObject(math::vec2 pos)
 {
-	/// @todo implement to check whether a position is within the square.
+	pos /= container->getWindow()->getSize();
+	pos -= 0.5f;
 
-	if (m_vertices.empty())
+	/**
+	 * 1st OpenGL Vertex: Top Right     (0)
+	 * 2nd OpenGL Vertex: Bottom Right  (1)
+	 * 3rd OpenGL Vertex: Top Left      (2)
+	 * 4th OpenGL Vertex: Bottom Right  (3)
+	 * 5th OpenGL Vertex: Bottom Left   (4)
+	 * 6th OpenGL Vertex: Top Left      (5)
+	 *
+	 * The numbers in the brackets are the positions within the vector.
+	 */
+	
+	math::vec2 topRight = m_vertices[0].vert;
+	math::vec2 bottomRight = m_vertices[1].vert;
+	math::vec2 bottomLeft = m_vertices[4].vert;
+	math::vec2 topLeft = m_vertices[2].vert;
+
+	if (pos.x >= topLeft.x && pos.y <= topLeft.y)
 	{
-		return false;
+		if (pos.x >= bottomLeft.x && pos.y >= bottomLeft.y)
+		{
+			if (pos.x <= topRight.x && pos.y <= topRight.y)
+			{
+				if (pos.x <= bottomRight.x && pos.y >= bottomRight.y)
+				{
+					LOG_INFO("GUI") << "Point is within the rectangle";
+					return true;
+				}
+			}
+		}
 	}
 
 	return false;
@@ -239,40 +257,67 @@ phx::math::vec2 Rectangle::getPosition() const
 
 void Rectangle::setPosition(math::vec2 position)
 {
-	// vertices haven't actually been generated.
-	if (m_vertices.size() != 6)
-	{
-		return;
-	}
+	m_pos = position;
 
-	position /= 100.f;
+	///////////////////////////////////////////////////
+	/// USE CODE FROM CONSTRUCTOR SINCE IT'S EASIER ///
+	///////////////////////////////////////////////////
+	
+	/*
+	 * The method used to generate the vertices here aren't the most efficient,
+	 * we can combine a lot of the calculations at an earlier stage but it is
+	 * all spread out to aid the future maintenance and reading of this code.
+	 */
 
-	// don't process anything if the position's are equivalent.
-	if (position == m_pos)
-	{
-		return;
-	}
+	math::vec2 containerPos  = container->getPosition();
+	math::vec2 containerSize = container->getSize();
 
-	// get the difference in position.
-	position = position - m_pos;
+	// don't remove redundant brackets, they help the math flow while reading
+	// since some people tend to forget how it works... -_-
+	//
+	// linearly interpolate to convert relative x position in the container to
+	// an absolute x position within the window (still a percentage).
+	math::vec2 relativePos = (containerPos - (containerSize / 2.f)) +
+	                         ((m_pos / 100.f) * containerSize);
 
-	// get OpenGL-like coords, relative to the window (it becomes relative
-	// to the window BECAUSE we multiply by the container position).
-	position *= container->getPosition();
+	// relativePos will still be between 0 and 100, so we need divide by 100.
+	relativePos /= 100.f;
 
-	// opengl likes -1 to 1 so we take away 0.5
-	position -= 0.5f;
+	// get the size relative to the parent container.
+	// this way, if you have:
+	// 100 / 100 = 1.f
+	// 1.f * container size = the container size.
+	// 0.5f * container size = half the container size.
+	// it's a directly proportional value.
+	math::vec2 relativeSize = (m_size / 100.f) * (containerSize / 100.f) * 2.f;
 
-	// apply the transformation to each vertex.
-	for (auto& vertex : m_vertices)
-	{
-		vertex.vert += position;
-	}
+	// converts the relative size and position into pixels.
+	math::vec2 staticObjectPos =
+	    relativePos - 0.5f /** container->getWindow()->getSize()*/;
+	math::vec2 staticObjectSize =
+	    relativeSize /** container->getWindow()->getSize()*/;
 
+	// calculate top left, and calculate everything from there.
+	math::vec2 topLeft = {staticObjectPos.x - staticObjectSize.x / 2.f,
+	                      staticObjectPos.y + staticObjectSize.y / 2.f};
+
+	math::vec2 topRight = {topLeft.x + staticObjectSize.x, topLeft.y};
+
+	math::vec2 bottomRight = {topRight.x, topRight.y - staticObjectSize.y};
+
+	math::vec2 bottomLeft = {topLeft.x, topLeft.y - staticObjectSize.y};
+
+	m_vertices[0].vert = topRight;
+	m_vertices[1].vert = bottomRight;
+	m_vertices[3].vert = topLeft;
+	m_vertices[1].vert = bottomRight;
+	m_vertices[2].vert = bottomLeft;
+	m_vertices[3].vert = topLeft;
+	
 	// upload this new data to the GPU.
 	glBindBuffer(GL_ARRAY_BUFFER, m_buffer);
-	glBufferData(GL_ARRAY_BUFFER, m_vertices.size() * sizeof(Vertex),
-	             m_vertices.data(), GL_DYNAMIC_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, m_vertices.size() * sizeof(Vertex),
+	                m_vertices.data());
 }
 
 phx::math::vec2 Rectangle::getSize() const
@@ -284,12 +329,6 @@ phx::math::vec2 Rectangle::getSize() const
 /// @todo fix this function!!!!
 void Rectangle::setSize(math::vec2 size)
 {
-	// vertices haven't actually been generated.
-	if (m_vertices.size() != 6)
-	{
-		return;
-	}
-
 	size /= 100.f;
 
 	if (size == m_size)
@@ -316,12 +355,6 @@ void Rectangle::onEvent(events::Event event) {}
 
 void Rectangle::tick(float dt)
 {
-	// don't waste a draw call if there aren't any vertices.
-	if (m_vertices.empty())
-	{
-		return;
-	}
-
 	// render vertices.
 	glBindVertexArray(m_vao);
 	glDrawArrays(GL_TRIANGLES, 0, m_vertices.size());

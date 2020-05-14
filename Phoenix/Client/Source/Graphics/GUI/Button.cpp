@@ -28,8 +28,61 @@
 
 #include <Client/Graphics/GUI/Button.hpp>
 
+#include <Common/Logger.hpp>
+
 #include <iostream>
 
 using namespace phx::gui;
 
+Button::Button(Container* container, math::vec2 pos, math::vec2 size,
+               math::vec3 color, float alpha)
+    : IComponent(container), m_pos(pos), m_size(size),
+      m_rectangle(container, pos, size, color, alpha, true)
+{
+	// we are putting rectangle in the initializer list since we don't really
+	// want to heap allocate it for memory locality and because there is no
+	// default constructor for it.
 
+	container->attachComponent(this);
+}
+
+Button::~Button() { container->detachComponent(this); }
+
+phx::math::vec2 Button::getPosition() const { return m_pos; }
+
+void Button::setPosition(math::vec2 position)
+{
+	m_pos = position;
+	m_rectangle.setPosition(position);
+}
+
+phx::math::vec2 Button::getSize() const { return m_size; }
+
+void Button::setSize(math::vec2 size)
+{
+	m_size = size;
+	m_rectangle.setSize(size);
+}
+
+void Button::onEvent(events::Event& event)
+{
+	if (event.type == events::EventType::MOUSE_BUTTON_PRESSED)
+	{
+		if (event.mouse.button == events::MouseButtons::LEFT)
+		{
+			if (m_rectangle.isPointInObject({event.mouse.x, event.mouse.y}))
+			{
+				if (ENUMhasFlag(event.mouse.mods, events::Mods::MOD_LEFT_CTRL))
+				{
+					LOG_INFO("GUI") << "Button clicked with CTRL pressed.";
+				}
+
+				LOG_INFO("GUI") << "Button clicked without CTRL pressed.";
+
+				event.handled = true;
+			}
+		}
+	}
+}
+
+void Button::tick(float dt) { m_rectangle.tick(dt); }

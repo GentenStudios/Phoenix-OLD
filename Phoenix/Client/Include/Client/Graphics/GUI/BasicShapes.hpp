@@ -41,6 +41,7 @@ namespace phx::gui
 		virtual bool isPointInObject(math::vec2 pos) = 0;
 	};
 
+	// @todo Improve texture registry for packing and then implement textures here.
 	class Rectangle : public Shape, IComponent
 	{
 	public:
@@ -54,7 +55,7 @@ namespace phx::gui
 
 	public:
 		Rectangle(Container* container, math::vec2 pos, math::vec2 size,
-		          math::vec3 color, float alpha);
+		          math::vec3 color, float alpha, bool hasParent = false);
 		virtual ~Rectangle();
 
 		Vertex getCorner(Corner corner);

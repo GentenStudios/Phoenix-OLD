@@ -28,6 +28,7 @@
 
 #include <Client/Client.hpp>
 #include <Client/Graphics/GUI/Container.hpp>
+#include <Client/Graphics/GUI/Button.hpp>
 
 #include <Common/Logger.hpp>
 #include <iostream>
@@ -48,8 +49,6 @@ int main(int argc, char** argv)
 
 	Logger::initialize(config);
 
-	LOG_INFO("What the fuck?") << "okely dokely do";
-	
 	// client::Client::get()->run();
 
 	gfx::Window window("okely dokely", 1280, 720);
@@ -58,15 +57,13 @@ int main(int argc, char** argv)
 	gui::Container container("", {50, 50}, {100, 100}, {255, 0, 255}, 1.f, &window,
 	                         gui::Container::Flags::COLLAPSIBLE);
 
+	window.registerEventListener(&container);
+	
 	auto rect = new gui::Rectangle(&container, {50, 50}, {100, 100},
-	                               {255, 128, 255}, 1.f);
+	                               {128, 128, 128}, 1.f);
 
-	// position.y is 70, because size is in each direction, so for the previous
-	// rectangle, it's 50 + size.y which is 60. And, because it's still 10 in
-	// each direction for this rectangle, you add 10 that to get 70.
-	auto rect2 = new gui::Rectangle(&container, {50, 100}, {50, 10},
-                               {255, 0, 255}, 1.f);
-
+	auto button =
+	    new gui::Button(&container, {50, 50}, {30, 30}, {255, 0, 0}, 1.f);
 	
 	while (window.isRunning())
 	{
