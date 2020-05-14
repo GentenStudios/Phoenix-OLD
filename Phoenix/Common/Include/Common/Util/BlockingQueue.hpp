@@ -162,7 +162,7 @@ namespace phx
 			{
 				unlock = true;
 			}
-			Container::emplace(args...);
+			Container::emplace(std::forward(args)...);
 			if (unlock)
 			{
 				m_cond.notify_one();
