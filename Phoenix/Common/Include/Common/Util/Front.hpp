@@ -41,7 +41,7 @@ namespace
         template <>
         struct front<std::string>
         {
-            static auto process(std::string& t) { return t.at(1); }
+            static auto process(std::string& t) { return t.front(); }
         };
 
         template <class T>
