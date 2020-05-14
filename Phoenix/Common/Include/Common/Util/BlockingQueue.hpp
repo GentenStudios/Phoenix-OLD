@@ -130,24 +130,42 @@ namespace phx
 			return true;
 		}
 
-		void push(T value)
-		{
-			std::lock_guard<std::mutex> lock(m_mutex);
-			if (m_done)
-			{
-				return;
-			}
-			bool unlock = false;
-			if (Container::empty())
-			{
-				unlock = true;
-			}
-			Container::push(value);
-			if (unlock)
-			{
-				m_cond.notify_one();
-			}
-		}
+        void push(const T& value)
+        {
+            std::lock_guard<std::mutex> lock(m_mutex);
+            if (m_done)
+            {
+                return;
+            }
+            bool unlock = false;
+            if (Container::empty())
+            {
+                unlock = true;
+            }
+            Container::push(value);
+            if (unlock)
+            {
+                m_cond.notify_one();
+            }
+        }
+        void push(T&& value)
+        {
+            std::lock_guard<std::mutex> lock(m_mutex);
+            if (m_done)
+            {
+                return;
+            }
+            bool unlock = false;
+            if (Container::empty())
+            {
+                unlock = true;
+            }
+            Container::push(std::move(value));
+            if (unlock)
+            {
+                m_cond.notify_one();
+            }
+        }
 
 		template <class... Args>
 		void emplace(Args&&... args)
