@@ -46,7 +46,7 @@ namespace phx::server
 		 * if this is true
 		 * @param iris Pointer to the nextworking system
 		 */
-		Game(entt::registry* registry, bool* running, networking::Iris* iris);
+		Game(entt::registry* registry, bool* running, net::Iris* iris);
 
 		/** @brief Loads all API's that the game utilizes into a CMS ModManager
 		 *
@@ -69,7 +69,7 @@ namespace phx::server
 		/// @breif An EnTT registry to store various data in
 		entt::registry* m_registry;
 		/// @brief The networking object to get data from
-		networking::Iris* m_iris;
+		net::Iris* m_iris;
 		/// @brief A commander object to process commands
 		Commander* m_commander;
 	};

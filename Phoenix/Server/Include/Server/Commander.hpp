@@ -72,7 +72,7 @@ namespace phx::server
 	class Commander
 	{
 	public:
-		explicit Commander(networking::Iris* iris);
+		explicit Commander(net::Iris* iris);
 
 		void registerAPI(cms::ModManager* manager);
 
@@ -98,7 +98,7 @@ namespace phx::server
 		 * @return Returns True if the function was called and False if the
 		 * function could not be found
 		 */
-		bool run(entt::entity* userRef, const std::string& input);
+		bool run(std::size_t userRef, const std::string& input);
 
 		/**
 		 * @brief Returns helpstring for command.
@@ -109,17 +109,17 @@ namespace phx::server
 		 * @return Returns True if successful and False if it could not find
 		 * the inputted command.
 		 */
-		bool help(entt::entity* userRef, const std::vector<std::string>& args);
+		bool help(std::size_t userRef, const std::vector<std::string>& args);
 
 		/**
 		 * @brief Outputs a string listing available commands.
 		 *
 		 * @param userRef The user who ran the command
 		 */
-		void list(entt::entity* userRef);
+		void list(std::size_t userRef);
 
 	private:
-		networking::Iris*                        m_iris;
+		net::Iris*                               m_iris;
 		std::unordered_map<std::string, Command> m_commands;
 	};
 } // namespace phx

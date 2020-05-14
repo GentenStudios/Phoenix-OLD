@@ -154,11 +154,11 @@ std::size_t Host::getPeerLimit() const { return m_host->peerCount; }
 
 const Address& Host::getAddress() const { return m_address; }
 
-Peer* Host::getPeer(std::size_t id) const
+Peer* Host::getPeer(std::size_t id)
 {
 	if (m_peers.find(id) != m_peers.end())
 	{
-		return &m_peers.at(id);
+		return &m_peers[id];
 	}
 	return nullptr;
 }

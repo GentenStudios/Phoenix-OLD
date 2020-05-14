@@ -44,13 +44,19 @@ using namespace phx::server::net;
 /// @todo Replace this with the config system
 static const std::size_t MAX_USERS = 32;
 
-Iris::Iris()
+Iris::Iris(entt::registry* registry) : m_registry(registry)
 {
 	m_server = new phx::net::Host(phx::net::Address(7777), MAX_USERS, 3);
 
 	m_server->onConnect([this](Peer& peer, enet_uint32) {
 		LOG_INFO("NETWORK")
 		    << "Client connected from: " << peer.getAddress().getIP();
+		{
+			auto entity = m_registry->create();
+			m_registry->emplace<Player>(entity,
+			                            ActorSystem::registerActor(m_registry));
+			m_users.emplace(peer.getID(), entity);
+		}
 	});
 
 	m_server->onReceive(
@@ -80,7 +86,7 @@ void Iris::run()
 	m_running = true;
 	while (m_running)
 	{
-		m_server->poll()
+		m_server->poll();
 	}
 }
 
@@ -91,14 +97,20 @@ void Iris::disconnect(std::size_t peerID)
 	printf("%lu disconnected.\n", peerID);
 }
 
-void Iris::parseEvent(std::size_t userID, Packet&& packet)
+void Iris::parseEvent(std::size_t userID, Packet& packet)
 {
+	std::string data;
+
+	phx::Serializer ser(Serializer::Mode::READ);
+	ser.setBuffer(packet.getData());
+	ser& data;
+
 	printf("Event received");
 	printf("An Event packet containing %s was received from %lu\n",
-	       packet.getData(), userID);
+	       data.c_str(), userID);
 }
 
-void Iris::parseState(std::size_t userID, phx::net::Packet&& packet)
+void Iris::parseState(std::size_t userID, phx::net::Packet& packet)
 {
 	const float dt = 1.f / 20.f;
 
@@ -151,7 +163,7 @@ void Iris::parseState(std::size_t userID, phx::net::Packet&& packet)
 				// Thread safety! If we said a bundle is ready, were too late
 				if (!bundle.ready)
 				{
-					bundle.states[userID] = input;
+					bundle.states[m_users[userID]] = input;
 					// If we have all the states we need, then the bundle is
 					// ready
 					if (bundle.states.size() >= bundle.users)
@@ -171,7 +183,7 @@ void Iris::parseState(std::size_t userID, phx::net::Packet&& packet)
 	}
 }
 
-void Iris::parseMessage(std::size_t userID, phx::net::Packet&& packet)
+void Iris::parseMessage(std::size_t userID, phx::net::Packet& packet)
 {
 	std::string input;
 
@@ -190,7 +202,7 @@ void Iris::parseMessage(std::size_t userID, phx::net::Packet&& packet)
 	{
 		printf("%s", input.c_str());
 
-		sendMessage(userId, input);
+		sendMessage(userID, input);
 	}
 }
 
@@ -210,7 +222,7 @@ void Iris::sendState(entt::registry* registry, std::size_t sequence)
 	m_server->broadcast(packet, 1);
 }
 
-void Iris::sendMessage(std::size_t userID, const std::string& message)
+void Iris::sendMessage(std::size_t userID, std::string message)
 {
 	Serializer ser(Serializer::Mode::WRITE);
 	ser&       message;

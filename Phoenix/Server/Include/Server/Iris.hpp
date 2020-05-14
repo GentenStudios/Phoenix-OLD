@@ -43,10 +43,10 @@ namespace phx::server::net
 {
 	struct StateBundle
 	{
-		bool                    ready;
-		std::size_t             users;
-		std::size_t             sequence;
-		std::vector<InputState> states;
+		bool                                         ready;
+		std::size_t                                  users;
+		std::size_t                                  sequence;
+		std::unordered_map<entt::entity, InputState> states;
 	};
 
 	struct MessageBundle
@@ -65,7 +65,7 @@ namespace phx::server::net
 		 * @param running Pointer to a boolean, the threaded function only runs
 		 * if this is true
 		 */
-		Iris();
+		Iris(entt::registry* registry);
 
 		/**
 		 * @brief Cleans up any internal only objects
@@ -78,7 +78,7 @@ namespace phx::server::net
 		 */
 		void run();
 
-		void kill() {m_running = false};
+		void kill() { m_running = false; };
 
 		void auth();
 		/**
@@ -95,7 +95,7 @@ namespace phx::server::net
 		 * @param data The data in the event packet
 		 * @param dataLength The length of the data in the event packet
 		 */
-		void parseEvent(std::size_t userID, phx::net::Packet&& packet);
+		void parseEvent(std::size_t userID, phx::net::Packet& packet);
 
 		/**
 		 * @brief Actions taken when a state is received
@@ -104,7 +104,7 @@ namespace phx::server::net
 		 * @param data The data in the state packet
 		 * @param dataLength The length of the data in the state packet
 		 */
-		void parseState(std::size_t userID, phx::net::Packet&& packet);
+		void parseState(std::size_t userID, phx::net::Packet& packet);
 
 		/**
 		 * @brief Actions taken when a message is received
@@ -113,7 +113,7 @@ namespace phx::server::net
 		 * @param data The data in the message packet
 		 * @param dataLength The length of the data in the message packet
 		 */
-		void parseMessage(std::size_t userID, phx::net::Packet&& packet);
+		void parseMessage(std::size_t userID, phx::net::Packet& packet);
 
 		/**
 		 * @brief Sends an event packet to a client
@@ -137,7 +137,7 @@ namespace phx::server::net
 		 * @param userRef The user to sent the message to
 		 * @param data The message packet data
 		 */
-		void sendMessage(std::size_t userID, const std::string& message);
+		void sendMessage(std::size_t userID, std::string message);
 
 		/**
 		 * @brief The Queue of bundled states received
@@ -149,7 +149,9 @@ namespace phx::server::net
 		std::list<MessageBundle> messageQueue;
 
 	private:
-		bool            m_running;
-		phx::net::Host* m_server;
+		bool                                          m_running;
+		phx::net::Host*                               m_server;
+		entt::registry*                               m_registry;
+		std::unordered_map<std::size_t, entt::entity> m_users;
 	};
 } // namespace phx::server::networking

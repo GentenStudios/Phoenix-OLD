@@ -292,7 +292,7 @@ namespace phx::net
 		 * @param id The ID of the Peer.
 		 * @return A pointer to the peer, or a nullptr if it doesnt exit.
 		 */
-		Peer* getPeer(std::size_t id) const;
+		Peer* getPeer(std::size_t id);
 
 		/**
 		 * @brief Gets the total amount of data received.
