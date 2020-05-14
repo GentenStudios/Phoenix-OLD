@@ -34,9 +34,11 @@
 #endif
 
 #include <Common/Input.hpp>
+#include <Common/Util/BlockingQueue.hpp>
 
 #include <enet/enet.h>
 #include <entt/entt.hpp>
+
 
 namespace phx::server::networking
 {
@@ -147,7 +149,8 @@ namespace phx::server::networking
 		/**
 		 * @brief The Queue of bundled states received
 		 */
-		std::list<StateBundle> stateQueue;
+		std::vector<StateBundle> currentBundles;
+		BlockingQueue<StateBundle> stateQueue;
 		/**
 		 * @brief The Queue of events received
 		 */
