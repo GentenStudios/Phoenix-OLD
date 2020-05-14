@@ -161,42 +161,44 @@ void Iris::parseState(entt::entity* userRef, enet_uint8* data, std::size_t dataL
 	ser& input;
 
 	// If the queue is empty we need to add a new bundle
-	if (stateQueue.empty())
+	if (currentBundles.empty())
 	{
 		StateBundle bundle;
 		bundle.sequence = input.sequence;
 		bundle.ready    = false;
 		bundle.users    = 1; ///@todo We need to capture how many users we are
 		/// expecting packets from
-		stateQueue.push_back(bundle);
+		currentBundles.push_back(bundle);
 	}
 
 	// Discard state if its older that the oldest stateBundle
-	if (input.sequence < stateQueue.front().sequence &&
-	    stateQueue.back().sequence - input.sequence < 10)
+	if (input.sequence < currentBundles.front().sequence &&
+	    currentBundles.back().sequence - input.sequence < 10)
 	{
 		printf("discard %u \n", input.sequence);
 		return;
 	}
 
 	// Fill the stateBundles up to the current input sequence
-	while ((input.sequence > stateQueue.back().sequence &&
-	        input.sequence - stateQueue.back().sequence > 10) ||
-	       stateQueue.back().sequence == 255)
+	while ((input.sequence > currentBundles.back().sequence &&
+	        input.sequence - currentBundles.back().sequence > 10) ||
+	       currentBundles.back().sequence == 255)
 	{
 		// Insert a new bundle if this is the first packet in this sequence
 		StateBundle bundle;
-		bundle.sequence = stateQueue.back().sequence + 1;
+		bundle.sequence = currentBundles.back().sequence + 1;
 		bundle.ready    = false;
 		bundle.users    = 1; ///@todo We need to capture how many users we are
 		/// expecting packets from
-		stateQueue.push_back(bundle);
+		currentBundles.push_back(bundle);
 	}
 
 	{
 		//		printf("insert existing %lu \n", input.sequence);
-		for (auto bundle : stateQueue)
+		auto begin = currentBundles.begin();
+        for (auto it = begin; it != currentBundles.end(); ++it)
 		{
+			StateBundle& bundle = *it;
 			if (bundle.sequence == input.sequence)
 			{
 				// Thread safety! If we said a bundle is ready, were too late
@@ -208,6 +210,8 @@ void Iris::parseState(entt::entity* userRef, enet_uint8* data, std::size_t dataL
 					if (bundle.states.size() >= bundle.users)
 					{
 						bundle.ready = true;
+                        stateQueue.push(bundle);
+                        currentBundles.erase(it);
 					}
 				}
 				break;
@@ -216,9 +220,11 @@ void Iris::parseState(entt::entity* userRef, enet_uint8* data, std::size_t dataL
 	}
 
 	// If we have more than 10 states enqueued, assume we lost a packet
-	if (stateQueue.size() > 10)
+	if (currentBundles.size() > 10)
 	{
-		stateQueue.front().ready = true;
+		currentBundles.front().ready = true;
+        stateQueue.push(currentBundles.front());
+        currentBundles.erase(currentBundles.begin());
 	}
 }
 void Iris::parseMessage(entt::entity* userRef, enet_uint8* data, std::size_t dataLength)

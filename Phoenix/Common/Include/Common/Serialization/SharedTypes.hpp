@@ -28,44 +28,11 @@
 
 #pragma once
 
-namespace
+#include <cstddef>
+#include <vector>
+
+namespace phx::data
 {
-    namespace internal
-    {
-        template <class Container>
-        struct front
-        {
-            static auto process(Container& t) { return t.front(); }
-        };
-
-        template <>
-        struct front<std::string>
-        {
-            static auto process(std::string& t) { return t.at(1); }
-        };
-
-        template <class T>
-        struct front<std::queue<T>>
-        {
-            static const T& process(std::queue<T>& t) { return t.front(); }
-        };
-
-        template <class T, class... Args>
-        struct front<std::priority_queue<T, Args...>>
-        {
-            static auto process(std::priority_queue<T, Args...>& t)
-            {
-                return t.top();
-            }
-        };
-    } // namespace internal
-} // namespace
-
-namespace phx
-{
-    template <class Container>
-    auto front(Container& t)
-    {
-        return internal::front<Container>::process(std::forward<Container&>(t));
-    }
-} // namespace phx
+	using Data = std::vector<std::byte>;
+	using Byte = std::byte;
+}
