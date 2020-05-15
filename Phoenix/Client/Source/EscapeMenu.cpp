@@ -41,6 +41,13 @@ EscapeMenu::EscapeMenu(gfx::Window* window)
 	m_windowCentre         = {size.x / 2, size.y / 2};
 }
 
+EscapeMenu::~EscapeMenu()
+{
+	// delete them just in case onDetach is never called.
+	delete m_button;
+	delete m_container;
+}
+
 void EscapeMenu::onEvent(events::Event& e)
 {
 	if (e.type == events::EventType::WINDOW_RESIZED)
@@ -49,32 +56,34 @@ void EscapeMenu::onEvent(events::Event& e)
 		// dont set handled because we want this to propagate down, this event
 		// isn't being handled, we're just using the data for our own help.
 	}
+
+	m_container->onEvent(e);
 }
 
-void EscapeMenu::onAttach() {}
-
-void EscapeMenu::onDetach() {}
-
-void EscapeMenu::tick(float dt)
+void EscapeMenu::onAttach()
 {
-	static bool p_open = true;
+	m_container =
+	    new gui::Container("", {50, 50}, {30, 30}, {0, 0, 0}, 1.f, m_window);
 
-	ImGui::SetNextWindowPos({static_cast<float>(m_windowCentre.x),
-	                         static_cast<float>(m_windowCentre.y)},
-	                        0, ImVec2(0.5f, 0.5f));
-	ImGui::SetNextWindowBgAlpha(0.6f);
+	m_button = new gui::Button(m_container, {50, 50}, {90, 100},
+	                           {128, 128, 128}, 1.f);
 
-	if (ImGui::Begin(
-	        "Escape Menu", &p_open,
-	        ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar |
-	            ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize |
-	            ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoNav))
+	m_button->setCallback([this](events::Event e)
 	{
-		if (ImGui::Button("Exit"))
+		if (e.mouse.button == events::MouseButtons::LEFT)
 		{
 			m_window->close();
 		}
-	}
-
-	ImGui::End();
+	});
 }
+
+void EscapeMenu::onDetach()
+{
+	delete m_button;
+	m_button = nullptr;
+
+	delete m_container;
+	m_container = nullptr;
+}
+
+void EscapeMenu::tick(float dt) { m_container->tick(dt); }

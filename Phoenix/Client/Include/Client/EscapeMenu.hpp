@@ -30,6 +30,8 @@
 
 #include <Client/Graphics/Layer.hpp>
 #include <Client/Graphics/Window.hpp>
+#include <Client/Graphics/GUI/Container.hpp>
+#include <Client/Graphics/GUI/Button.hpp>
 
 namespace phx::client
 {
@@ -43,7 +45,7 @@ namespace phx::client
 	{
 	public:
 		EscapeMenu(gfx::Window* window);
-		~EscapeMenu() override = default;
+		~EscapeMenu() override;
 
 		void onEvent(events::Event& e) override;
 		void onAttach() override;
@@ -54,6 +56,8 @@ namespace phx::client
 	private:
 		math::vec2i m_windowCentre;
 		gfx::Window* m_window;
+		gui::Container* m_container;
+		gui::Button* m_button;
 	};
 } // namespace phx::client
 

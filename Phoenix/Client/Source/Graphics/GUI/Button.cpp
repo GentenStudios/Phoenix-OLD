@@ -48,10 +48,7 @@ Button::Button(Container* container, math::vec2 pos, math::vec2 size,
 
 Button::~Button() { container->detachComponent(this); }
 
-void Button::setCallback(const Callback& callback)
-{
-	m_callback = callback;
-}
+void Button::setCallback(const Callback& callback) { m_callback = callback; }
 
 phx::math::vec2 Button::getPosition() const { return m_pos; }
 
@@ -73,17 +70,14 @@ void Button::onEvent(events::Event& event)
 {
 	if (event.type == events::EventType::MOUSE_BUTTON_PRESSED)
 	{
-		if (event.mouse.button == events::MouseButtons::LEFT)
+		if (m_rectangle.isPointInObject({event.mouse.x, event.mouse.y}))
 		{
-			if (m_rectangle.isPointInObject({event.mouse.x, event.mouse.y}))
+			if (m_callback)
 			{
-				if (m_callback)
-				{
-					m_callback(event);
-				}
-
-				event.handled = true;
+				m_callback(event);
 			}
+
+			event.handled = true;
 		}
 	}
 }
