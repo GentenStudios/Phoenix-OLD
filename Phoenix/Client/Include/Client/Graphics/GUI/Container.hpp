@@ -44,12 +44,48 @@
 
 namespace phx::gui
 {
+	/**
+	 * @brief The class surrounding all GUI components.
+	 *
+	 * This class is a way of containing GUI elements and placing them
+	 * relatively throughout the size of the container.
+	 *
+	 * @paragraph Usage
+	 *
+	 * When creating the container, you must provide a window title (text
+	 * currently is not rendered), relative position and relative size within the
+	 * window.
+	 *
+	 * The scale of the "relative" measurement is between 0 to 100, with 50
+	 * being the center. When creating a container and/or component, using 50,
+	 * 50 for position would indicate the center of the screen/container and
+	 * using 50, 50 for size would indicate half the screen/container in size.
+	 * 
+	 * @code
+	 * gui::Container container = gui::Container("", { 50, 50 }, { 50, 50 },
+	 *					{ 255, 255, 255 }, 1.f, window);
+	 *
+	 * gui::Button button = gui::Button(container, { 50, 50 }, { 50, 50 },
+	 *					{ 255, 255, 255 }, 1.f);
+	 *
+	 *	while (window->isRunning())
+	 *	{
+	 *		container.tick();
+	 *	}
+	 * @endcode
+	 */
 	class Container : public events::IEventListener
 	{
 		template <class Derived, class Base>
 		using IsDerivedFrom = std::enable_if_t<std::is_base_of_v<Base, Derived>>;
 
 	public:
+		/**
+		 * @brief Flags for the style of window.
+		 *
+		 * Currently unimplemented, will document once implementation is
+		 * completed.
+		 */
 		enum class Flags
 		{
 			WITH_TITLE = 1,
@@ -58,20 +94,61 @@ namespace phx::gui
 		};
 
 	public:
+		/**
+		 * @brief Constructs a container of a specific position and size.
+		 * @param name The name of the container.
+		 * @param position The position of the container (between 0 and 100).
+		 * @param size The size of the container (between 0 and 100).
+		 * @param color The color of the container.
+		 * @param alpha The alpha (translucency) of the container.
+		 * @param window The window it is attached to.
+		 * @param flags The style of the container.
+		 */
 		Container(const std::string& name, math::vec2 position, math::vec2 size,
 		          math::vec3 color, float alpha, gfx::Window* window,
 		          Flags flags = Flags::CLEAN);
 		~Container();
 
+		/**
+		 * @brief Detaches a component to the GUI.
+		 * @param component The component to attach.
+		 */
 		void attachComponent(IComponent* component);
+
+		/**
+		 * @brief Detaches a component from the container.
+		 * @param component The component to detach.
+		 */
 		void detachComponent(IComponent* component);
 
-		math::vec2 getPosition() const;
-		math::vec2 getSize() const;
+		/**
+		 * @brief Gets the position of the container.
+		 * @return The position of the container.
+		 */
+		const math::vec2& getPosition() const;
 
+		/**
+		 * @brief Gets the size of the container.
+		 * @return The size of the container.
+		 */
+		const math::vec2& getSize() const;
+
+		/**
+		 * @brief Gets the window the container is tied to.
+		 * @return The window object the container is tied to.
+		 */
 		gfx::Window* getWindow() const;
 
+		/**
+		 * @brief Processes an event.
+		 * @param e The event to process.
+		 */
 		void onEvent(events::Event e) override;
+
+		/**
+		 * @brief Ticks the GUI, re-renders and updates any elements needing it.
+		 * @param dt The change in time since the previous frame.
+		 */
 		void tick(float dt);
 
 	private:

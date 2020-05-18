@@ -49,7 +49,9 @@ Container::Container(const std::string& name, math::vec2 position,
 
 	m_shaderPipeline.prepare("Assets/GUIShader.vert", "Assets/GUIShader.frag",
 	                         IComponent::getBufferLayout());
-	
+
+	m_mainBox = new Rectangle(this, {50, 50}, {100, 100}, color, alpha);
+
 	// initialize a texture with nothing to prevent a
 	// crash, but a texture can't just be non-existent,
 	// there has to be something.
@@ -73,7 +75,8 @@ void Container::attachComponent(IComponent* component)
 
 void Container::detachComponent(IComponent* component)
 {
-	const auto it = std::find(m_components.begin(), m_components.end(), component);
+	const auto it =
+	    std::find(m_components.begin(), m_components.end(), component);
 	if (it == m_components.end())
 	{
 		return;
@@ -82,15 +85,9 @@ void Container::detachComponent(IComponent* component)
 	m_components.erase(it);
 }
 
-phx::math::vec2 Container::getPosition() const
-{
-	return m_position;
-}
+const phx::math::vec2& Container::getPosition() const { return m_position; }
 
-phx::math::vec2 Container::getSize() const
-{
-	return m_size;
-}
+const phx::math::vec2& Container::getSize() const { return m_size; }
 
 phx::gfx::Window* Container::getWindow() const { return m_window; }
 
@@ -112,11 +109,11 @@ void Container::tick(float dt)
 	glBindTexture(GL_TEXTURE_2D, m_texture);
 	m_shaderPipeline.activate();
 
-	//m_mainBox->tick(dt);
-	//m_collapseBox->tick(dt);
-	
 	for (auto it = m_components.rbegin(); it != m_components.rend(); ++it)
 	{
+		if (!(*it)->enabled)
+			return;
+
 		(*it)->tick(dt);
 	}
 }

@@ -37,23 +37,67 @@
 
 namespace phx::gui
 {
+	/**
+	 * @brief A clickable button allowing custom callbacks.
+	 */
 	class Button : IComponent
 	{
 	public:
-		using Callback = std::function<void(events::Event& event)>;
+		using Callback = std::function<void(const events::Event& event)>;
 		
 	public:
+		/**
+		 * @brief Creates a renderable, clickable button.
+		 * @param container The container the button is tied to.
+		 * @param pos The position of the button within the container.
+		 * @param size The size of the button within the container.
+		 * @param color The color of the button.
+		 * @param alpha The alpha (translucency) of the button.
+		 */
 		Button(Container* container, math::vec2 pos, math::vec2 size, math::vec3 color, float alpha);
+
 		virtual ~Button();
 
+		/**
+		 * @brief Sets a new callback to be used on click.
+		 * @param callback The callback to use on click.
+		 */
 		void setCallback(const Callback& callback);
 
+		/**
+		 * @brief Gets the position of the button (relative to container).
+		 * @return The position of the button.
+		 */
 		math::vec2 getPosition() const override;
-		void setPosition(math::vec2 position) override;
-		math::vec2 getSize() const override;
-		void setSize(math::vec2 size) override;
 
+		/**
+		 * @brief Sets the position of the button (relative to container).
+		 * @param position The new position of the button.
+		 */
+		void setPosition(const math::vec2& position) override;
+
+		/**
+		 * @brief Gets the size of the button (relative to container).
+		 * @return The size of the button.
+		 */
+		math::vec2 getSize() const override;
+
+		/**
+		 * @brief Sets the size of the button (relative to container).
+		 * @param size The new size of the button.
+		 */
+		void setSize(const math::vec2& size) override;
+
+		/**
+		 * @brief Processes an event.
+		 * @param event The event to process.
+		 */
 		void onEvent(events::Event& event) override;
+
+		/**
+		 * @brief Ticks the button (re-renders it).
+		 * @param dt The time since the last frame.
+		 */
 		void tick(float dt) override;
 
 	private:

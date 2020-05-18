@@ -52,7 +52,7 @@ void Button::setCallback(const Callback& callback) { m_callback = callback; }
 
 phx::math::vec2 Button::getPosition() const { return m_pos; }
 
-void Button::setPosition(math::vec2 position)
+void Button::setPosition(const math::vec2& position)
 {
 	m_pos = position;
 	m_rectangle.setPosition(position);
@@ -60,7 +60,7 @@ void Button::setPosition(math::vec2 position)
 
 phx::math::vec2 Button::getSize() const { return m_size; }
 
-void Button::setSize(math::vec2 size)
+void Button::setSize(const math::vec2& size)
 {
 	m_size = size;
 	m_rectangle.setSize(size);

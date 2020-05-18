@@ -61,13 +61,13 @@ Rectangle::Rectangle(Container* container, math::vec2 pos, math::vec2 size,
 	 * we can combine a lot of the calculations at an earlier stage but it is
 	 * all spread out to aid the future maintenance and reading of this code.
 	 */
-	
+
 	math::vec2 containerPos  = container->getPosition();
 	math::vec2 containerSize = container->getSize();
 
 	// don't remove redundant brackets, they help the math flow while reading
 	// since some people tend to forget how it works... -_-
-	// 
+	//
 	// linearly interpolate to convert relative x position in the container to
 	// an absolute x position within the window (still a percentage).
 	math::vec2 relativePos = (containerPos - (containerSize / 2.f)) +
@@ -95,12 +95,12 @@ Rectangle::Rectangle(Container* container, math::vec2 pos, math::vec2 size,
 
 	math::vec2 bottomLeft = {topLeft.x, topLeft.y - relativeSize.y};
 
-	m_vertices.push_back({topRight,    color, alpha, {}});
+	m_vertices.push_back({topRight, color, alpha, {}});
 	m_vertices.push_back({bottomRight, color, alpha, {}});
-	m_vertices.push_back({topLeft,     color, alpha, {}});
+	m_vertices.push_back({topLeft, color, alpha, {}});
 	m_vertices.push_back({bottomRight, color, alpha, {}});
-	m_vertices.push_back({bottomLeft,  color, alpha, {}});
-	m_vertices.push_back({topLeft,     color, alpha, {}});
+	m_vertices.push_back({bottomLeft, color, alpha, {}});
+	m_vertices.push_back({topLeft, color, alpha, {}});
 
 	glBufferData(GL_ARRAY_BUFFER, m_vertices.size() * sizeof(Vertex),
 	             m_vertices.data(), GL_DYNAMIC_DRAW);
@@ -158,7 +158,7 @@ Vertex Rectangle::getCorner(Corner corner)
 	}
 }
 
-void Rectangle::setCorner(Corner corner, Vertex vertex)
+void Rectangle::setCorner(Corner corner, const Vertex& vertex)
 {
 	/**
 	 * 1st OpenGL Vertex: Top Right     (0)
@@ -209,10 +209,11 @@ void Rectangle::setCorner(Corner corner, Vertex vertex)
 	}
 }
 
-bool Rectangle::isPointInObject(math::vec2 pos)
+bool Rectangle::isPointInObject(const math::vec2& pos)
 {
-	pos /= container->getWindow()->getSize();
-	pos -= 0.5f;
+	math::vec2 newPos = pos;
+	newPos /= container->getWindow()->getSize();
+	newPos -= 0.5f;
 
 	/**
 	 * 1st OpenGL Vertex: Top Right     (0)
@@ -224,19 +225,19 @@ bool Rectangle::isPointInObject(math::vec2 pos)
 	 *
 	 * The numbers in the brackets are the positions within the vector.
 	 */
-	
-	math::vec2 topRight = m_vertices[0].vert;
-	math::vec2 bottomRight = m_vertices[1].vert;
-	math::vec2 bottomLeft = m_vertices[4].vert;
-	math::vec2 topLeft = m_vertices[2].vert;
 
-	if (pos.x >= topLeft.x && pos.y <= topLeft.y)
+	math::vec2 topRight    = m_vertices[0].vert;
+	math::vec2 bottomRight = m_vertices[1].vert;
+	math::vec2 bottomLeft  = m_vertices[4].vert;
+	math::vec2 topLeft     = m_vertices[2].vert;
+
+	if (newPos.x >= topLeft.x && newPos.y <= topLeft.y)
 	{
-		if (pos.x >= bottomLeft.x && pos.y >= bottomLeft.y)
+		if (newPos.x >= bottomLeft.x && newPos.y >= bottomLeft.y)
 		{
-			if (pos.x <= topRight.x && pos.y <= topRight.y)
+			if (newPos.x <= topRight.x && newPos.y <= topRight.y)
 			{
-				if (pos.x <= bottomRight.x && pos.y >= bottomRight.y)
+				if (newPos.x <= bottomRight.x && newPos.y >= bottomRight.y)
 				{
 					return true;
 				}
@@ -254,14 +255,14 @@ phx::math::vec2 Rectangle::getPosition() const
 	return m_pos;
 }
 
-void Rectangle::setPosition(math::vec2 position)
+void Rectangle::setPosition(const math::vec2& position)
 {
 	m_pos = position;
 
 	///////////////////////////////////////////////////
 	/// USE CODE FROM CONSTRUCTOR SINCE IT'S EASIER ///
 	///////////////////////////////////////////////////
-	
+
 	/*
 	 * The method used to generate the vertices here aren't the most efficient,
 	 * we can combine a lot of the calculations at an earlier stage but it is
@@ -288,23 +289,24 @@ void Rectangle::setPosition(math::vec2 position)
 	// 1.f * container size = the container size.
 	// 0.5f * container size = half the container size.
 	// it's a directly proportional value.
-	math::vec2 relativeSize = (m_size / 100.f) * (containerSize / 100.f) * 2.f;
+	const math::vec2 relativeSize = (m_size / 100.f) * (containerSize / 100.f) * 2.f;
 
 	// converts the relative size and position into pixels.
-	math::vec2 staticObjectPos =
+	const math::vec2 staticObjectPos =
 	    relativePos - 0.5f /** container->getWindow()->getSize()*/;
-	math::vec2 staticObjectSize =
+	const math::vec2 staticObjectSize =
 	    relativeSize /** container->getWindow()->getSize()*/;
 
 	// calculate top left, and calculate everything from there.
-	math::vec2 topLeft = {staticObjectPos.x - staticObjectSize.x / 2.f,
-	                      staticObjectPos.y + staticObjectSize.y / 2.f};
+	const math::vec2 topLeft = {staticObjectPos.x - staticObjectSize.x / 2.f,
+	                            staticObjectPos.y + staticObjectSize.y / 2.f};
 
-	math::vec2 topRight = {topLeft.x + staticObjectSize.x, topLeft.y};
+	const math::vec2 topRight = {topLeft.x + staticObjectSize.x, topLeft.y};
 
-	math::vec2 bottomRight = {topRight.x, topRight.y - staticObjectSize.y};
+	const math::vec2 bottomRight = {topRight.x,
+	                                topRight.y - staticObjectSize.y};
 
-	math::vec2 bottomLeft = {topLeft.x, topLeft.y - staticObjectSize.y};
+	const math::vec2 bottomLeft = {topLeft.x, topLeft.y - staticObjectSize.y};
 
 	m_vertices[0].vert = topRight;
 	m_vertices[1].vert = bottomRight;
@@ -312,7 +314,7 @@ void Rectangle::setPosition(math::vec2 position)
 	m_vertices[1].vert = bottomRight;
 	m_vertices[2].vert = bottomLeft;
 	m_vertices[3].vert = topLeft;
-	
+
 	// upload this new data to the GPU.
 	glBindBuffer(GL_ARRAY_BUFFER, m_buffer);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, m_vertices.size() * sizeof(Vertex),
@@ -326,17 +328,15 @@ phx::math::vec2 Rectangle::getSize() const
 }
 
 /// @todo fix this function!!!!
-void Rectangle::setSize(math::vec2 size)
+void Rectangle::setSize(const math::vec2& size)
 {
-	size /= 100.f;
-
 	if (size == m_size)
 	{
 		return;
 	}
 
 	// can be negative, so it just gets smaller or something.
-	const auto difference = size - m_size;
+	const auto difference = (size - m_size) / 100.f;
 
 	// apply the tranformation to each vertex.
 	for (auto& vertex : m_vertices)

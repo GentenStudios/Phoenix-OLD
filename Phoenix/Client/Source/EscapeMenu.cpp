@@ -68,7 +68,7 @@ void EscapeMenu::onAttach()
 	m_button = new gui::Button(m_container, {50, 50}, {90, 100},
 	                           {128, 128, 128}, 1.f);
 
-	m_button->setCallback([this](events::Event e)
+	m_button->setCallback([this](const events::Event& e)
 	{
 		if (e.mouse.button == events::MouseButtons::LEFT)
 		{

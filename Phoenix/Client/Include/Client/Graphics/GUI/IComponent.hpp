@@ -37,6 +37,9 @@ namespace phx::gui
 {
 	class Container;
 
+	/**
+	 * @brief Data layout for each vertex in the GUI.
+	 */
 	struct Vertex
 	{
 		math::vec2 vert;
@@ -45,21 +48,37 @@ namespace phx::gui
 		math::vec2 uv;
 	};
 
+	/**
+	 * @brief The Interface for a GUI Component.
+	 *
+	 * The GUI is built up of containers and components. Containers contain
+	 * components and each component is ticked in order to produce the layout
+	 * required.
+	 */
 	struct IComponent
 	{
+		/**
+		 * @brief Constructs a component, no extra functionality.
+		 * @param container The container to set the internal pointer to.
+		 */
 		IComponent(Container* container) : container(container) {}
+
 		virtual ~IComponent() = default;
 
+		/**
+		 * @brief Gets the layout of the buffer required by the shader.
+		 * @return The layout of the data that the shader should expect.
+		 */
 		static std::vector<gfx::ShaderLayout> getBufferLayout()
 		{
 			return {{"a_Vertex", 0}, {"a_Color", 1}, {"a_UV", 2}};
 		}
 
 		virtual math::vec2 getPosition() const              = 0;
-		virtual void       setPosition(math::vec2 position) = 0;
+		virtual void       setPosition(const math::vec2& position) = 0;
 
 		virtual math::vec2 getSize() const          = 0;
-		virtual void       setSize(math::vec2 size) = 0;
+		virtual void       setSize(const math::vec2& size) = 0;
 
 		virtual void onEvent(events::Event& event) = 0;
 		virtual void tick(float dt)               = 0;
