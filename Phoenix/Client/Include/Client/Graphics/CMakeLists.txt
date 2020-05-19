@@ -1,5 +1,9 @@
+add_subdirectory(GUI)
+
 set(currentDir ${CMAKE_CURRENT_LIST_DIR})
 set(graphicsHeaders
+	${guiHeaders}
+
 	${currentDir}/OpenGLTools.hpp
 	${currentDir}/ImGuiExtensions.hpp
 
