@@ -413,6 +413,7 @@ void Game::tick(float dt)
 
 void Game::sendMessage(std::string input, std::ostringstream& cout)
 {
+	std::cout << "Sending Message: " << input << "\n";
 	Serializer ser(Serializer::Mode::WRITE);
 	ser&       input;
 	auto       state = ser.getBuffer();

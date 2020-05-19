@@ -217,12 +217,13 @@ Peer& Host::getPeer(ENetPeer& peer)
 	{
 		return m_peers.at(std::size_t(peer.data));
 	}
-	return nullptr;
+	std::cout << "peer not found";
 }
 
 Peer& Host::createPeer(ENetPeer& peer)
 {
-	peer.data    = reinterpret_cast<void*>(m_peerID++);
+	m_peerID++;
+	peer.data = reinterpret_cast<void*>(m_peerID);
 	m_peers.insert({m_peerID, {*this, peer}});
 	return m_peers.at(m_peerID);
 }

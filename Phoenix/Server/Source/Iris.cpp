@@ -61,6 +61,7 @@ Iris::Iris(entt::registry* registry) : m_registry(registry)
 
 	m_server->onReceive(
 	    [this](Peer& peer, Packet&& packet, enet_uint32 channelID) {
+		    std::cout << "packet received\n";
 		    switch (channelID)
 		    {
 		    case 0:
@@ -191,6 +192,9 @@ void Iris::parseMessage(std::size_t userID, phx::net::Packet& packet)
 	ser.setBuffer(packet.getData());
 	ser& input;
 
+	/// @TODO replace userID with userName
+	std::cout << userID << ": " << input << "\n";
+
 	if (input[0] == '/')
 	{
 		MessageBundle message;
@@ -228,5 +232,5 @@ void Iris::sendMessage(std::size_t userID, std::string message)
 	ser&       message;
 	Packet     packet = Packet(ser.getBuffer(), PacketFlags::RELIABLE);
 	Peer*      peer   = m_server->getPeer(userID);
-	peer->send(packet, 3);
+	peer->send(packet, 2);
 }
