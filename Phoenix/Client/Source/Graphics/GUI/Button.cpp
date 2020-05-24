@@ -62,7 +62,7 @@ void Button::setSize(const phx::math::vec2& size)
 	m_rectangle.setSize(size);
 }
 
-void Button::onEvent(events::Event& event)
+void Button::onEvent(phx::events::Event& event)
 {
 	if (event.type == events::EventType::MOUSE_BUTTON_PRESSED)
 	{
