@@ -34,7 +34,7 @@ using namespace phx::gui;
 
 Container::Container(const std::string& name, phx::math::vec2 position,
                      phx::math::vec2 size, phx::math::vec3 color, float alpha,
-                     gfx::Window* window, Flags flags)
+                     phx::gfx::Window* window, Flags flags)
     : m_window(window), m_position(position), m_size(size)
 {
 	// coordinate system:
@@ -91,7 +91,7 @@ const phx::math::vec2& Container::getSize() const { return m_size; }
 
 phx::gfx::Window* Container::getWindow() const { return m_window; }
 
-void Container::onEvent(events::Event e)
+void Container::onEvent(phx::events::Event e)
 {
 	for (auto it = m_components.rbegin(); it != m_components.rend(); ++it)
 	{

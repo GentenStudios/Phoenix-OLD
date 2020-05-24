@@ -67,19 +67,19 @@ void Source::enableLoop(bool enable)
 	alSourcei(m_source, AL_LOOPING, enable ? AL_TRUE : AL_FALSE);
 }
 
-void Source::setPos(math::vec3 pos)
+void Source::setPos(phx::math::vec3 pos)
 {
 	m_position = pos;
 	alSourcefv(m_source, AL_POSITION, &m_position.x);
 }
 
-void Source::setDirection(math::vec3 direction)
+void Source::setDirection(phx::math::vec3 direction)
 {
 	m_direction = direction;
 	alSourcefv(m_source, AL_DIRECTION, &m_direction.x);
 }
 
-void Source::setVelocity(math::vec3 velocity)
+void Source::setVelocity(phx::math::vec3 velocity)
 {
 	m_velocity = velocity;
 	alSourcefv(m_source, AL_VELOCITY, &velocity.x);

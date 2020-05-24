@@ -350,7 +350,7 @@ void Rectangle::setSize(const phx::math::vec2& size)
 	             m_vertices.data(), GL_DYNAMIC_DRAW);
 }
 
-void Rectangle::onEvent(events::Event& event) {}
+void Rectangle::onEvent(phx::events::Event& event) {}
 
 void Rectangle::tick(float dt)
 {
