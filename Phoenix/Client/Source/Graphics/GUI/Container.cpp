@@ -32,8 +32,8 @@
 
 using namespace phx::gui;
 
-Container::Container(const std::string& name, math::vec2 position,
-                     math::vec2 size, math::vec3 color, float alpha,
+Container::Container(const std::string& name, phx::math::vec2 position,
+                     phx::math::vec2 size, phx::math::vec3 color, float alpha,
                      gfx::Window* window, Flags flags)
     : m_window(window), m_position(position), m_size(size)
 {
