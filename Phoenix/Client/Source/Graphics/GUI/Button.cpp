@@ -28,14 +28,10 @@
 
 #include <Client/Graphics/GUI/Button.hpp>
 
-#include <Common/Logger.hpp>
-
-#include <iostream>
-
 using namespace phx::gui;
 
-Button::Button(Container* container, math::vec2 pos, math::vec2 size,
-               math::vec3 color, float alpha)
+Button::Button(Container* container, phx::math::vec2 pos, phx::math::vec2 size,
+               phx::math::vec3 color, float alpha)
     : IComponent(container), m_pos(pos), m_size(size),
       m_rectangle(container, pos, size, color, alpha, true)
 {
@@ -52,7 +48,7 @@ void Button::setCallback(const Callback& callback) { m_callback = callback; }
 
 phx::math::vec2 Button::getPosition() const { return m_pos; }
 
-void Button::setPosition(const math::vec2& position)
+void Button::setPosition(const phx::math::vec2& position)
 {
 	m_pos = position;
 	m_rectangle.setPosition(position);
@@ -60,7 +56,7 @@ void Button::setPosition(const math::vec2& position)
 
 phx::math::vec2 Button::getSize() const { return m_size; }
 
-void Button::setSize(const math::vec2& size)
+void Button::setSize(const phx::math::vec2& size)
 {
 	m_size = size;
 	m_rectangle.setSize(size);
