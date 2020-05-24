@@ -157,7 +157,7 @@ void Iris::parseState(std::size_t userID, phx::net::Packet& packet)
 	}
 
 	{
-		//		printf("insert existing %lu \n", input.sequence);
+		// printf("insert existing %lu \n", input.sequence);
 		auto begin = currentBundles.begin();
 		for (auto it = begin; it != currentBundles.end(); ++it)
 		{
@@ -195,8 +195,10 @@ void Iris::parseMessage(std::size_t userID, phx::net::Packet& packet)
 {
 	std::string input;
 
+	auto data = packet.getData();
+
 	phx::Serializer ser(Serializer::Mode::READ);
-	ser.setBuffer(packet.getData());
+	ser.setBuffer(reinterpret_cast<std::byte*>(&data), packet.getSize());
 	ser& input;
 
 	/// @TODO replace userID with userName
@@ -207,7 +209,7 @@ void Iris::parseMessage(std::size_t userID, phx::net::Packet& packet)
 		MessageBundle message;
 		message.message = input.substr(1);
 		message.userID  = userID;
-		messageQueue.push_back(message);
+		messageQueue.push(message);
 	}
 	else
 	{

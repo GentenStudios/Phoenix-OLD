@@ -44,10 +44,10 @@ namespace phx::server::net
 {
 	struct StateBundle
 	{
-		bool                                          ready;
-		std::size_t                                   users;
-		std::size_t                                   sequence;
-		std::unordered_map<entt::entity*, InputState> states;
+		bool                                         ready;
+		std::size_t                                  users;
+		std::size_t                                  sequence;
+		std::unordered_map<entt::entity, InputState> states;
 	};
 
 	struct EventBundle
@@ -153,7 +153,7 @@ namespace phx::server::net
 		/**
 		 * @brief The Queue of messages received
 		 */
-		std::list<MessageBundle> messageQueue;
+		BlockingQueue<MessageBundle> messageQueue;
 
 	private:
 		bool                                          m_running;
@@ -161,4 +161,4 @@ namespace phx::server::net
 		entt::registry*                               m_registry;
 		std::unordered_map<std::size_t, entt::entity> m_users;
 	};
-} // namespace phx::server::networking
+} // namespace phx::server::net

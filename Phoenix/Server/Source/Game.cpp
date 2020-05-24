@@ -58,13 +58,13 @@ void Game::run()
 		for (const auto& state : m_currentState.states)
 		{
 			ActorSystem::tick(m_registry,
-			                  m_registry->get<Player>(*state.first).actor, dt,
+			                  m_registry->get<Player>(state.first).actor, dt,
 			                  state.second);
 
 			// @todo remove this debug statement before merging to develop
 			std::cout << m_registry
 			                 ->get<Position>(
-			                     m_registry->get<Player>(*state.first).actor)
+			                     m_registry->get<Player>(state.first).actor)
 			                 .position
 			          << "\n";
 		}
@@ -76,9 +76,9 @@ void Game::run()
 		{
 			net::MessageBundle message = m_iris->messageQueue.front();
 			m_commander->run(message.userID, message.message);
-			m_iris->messageQueue.pop_front();
+			m_iris->messageQueue.pop();
 		}
 
-		m_iris->sendState(m_currentState.sequence);
+		m_iris->sendState(m_registry, m_currentState.sequence);
 	}
 }
