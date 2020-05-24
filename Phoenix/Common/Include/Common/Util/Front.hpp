@@ -26,59 +26,46 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Server/Game.hpp>
-#include <Server/User.hpp>
+#pragma once
 
-#include <Common/Actor.hpp>
-#include <Common/Movement.hpp>
-#include <Common/Position.hpp>
-#include <thread>
-
-using namespace phx;
-using namespace phx::server;
-
-Game::Game(entt::registry* registry, bool* running, net::Iris* iris)
-    : m_registry(registry), m_running(running), m_iris(iris)
+namespace
 {
-	m_commander = new Commander(m_iris);
-}
-
-void Game::registerAPI(cms::ModManager* manager)
-{
-	m_commander->registerAPI(manager);
-}
-
-void Game::run()
-{
-	while (m_running)
+	namespace internal
 	{
-		// Process everybody's input first
-		net::StateBundle m_currentState = m_iris->stateQueue.pop();
-
-		for (const auto& state : m_currentState.states)
+		template <class Container>
+		struct front
 		{
-			ActorSystem::tick(m_registry,
-			                  m_registry->get<Player>(*state.first).actor, dt,
-			                  state.second);
+			static auto process(Container& t) { return t.front(); }
+		};
 
-			// @todo remove this debug statement before merging to develop
-			std::cout << m_registry
-			                 ->get<Position>(
-			                     m_registry->get<Player>(*state.first).actor)
-			                 .position
-			          << "\n";
-		}
-		// Process events second
-
-		// Process messages last
-		size_t size = m_iris->messageQueue.size();
-		for (size_t i = 0; i < size; i++)
+		template <>
+		struct front<std::string>
 		{
-			net::MessageBundle message = m_iris->messageQueue.front();
-			m_commander->run(message.userID, message.message);
-			m_iris->messageQueue.pop_front();
-		}
+			static auto process(std::string& t) { return t.front(); }
+		};
 
-		m_iris->sendState(m_currentState.sequence);
+		template <class T>
+		struct front<std::queue<T>>
+		{
+			static const T& process(std::queue<T>& t) { return t.front(); }
+		};
+
+		template <class T, class... Args>
+		struct front<std::priority_queue<T, Args...>>
+		{
+			static auto process(std::priority_queue<T, Args...>& t)
+			{
+				return t.top();
+			}
+		};
+	} // namespace internal
+} // namespace
+
+namespace phx
+{
+	template <class Container>
+	auto front(Container& t)
+	{
+		return internal::front<Container>::process(std::forward<Container&>(t));
 	}
-}
+} // namespace phx

@@ -35,6 +35,7 @@
 
 #include <Common/Input.hpp>
 #include <Common/Network/Host.hpp>
+#include <Common/Util/BlockingQueue.hpp>
 
 #include <enet/enet.h>
 #include <entt/entt.hpp>
@@ -43,10 +44,15 @@ namespace phx::server::net
 {
 	struct StateBundle
 	{
-		bool                                         ready;
-		std::size_t                                  users;
-		std::size_t                                  sequence;
-		std::unordered_map<entt::entity, InputState> states;
+		bool                                          ready;
+		std::size_t                                   users;
+		std::size_t                                   sequence;
+		std::unordered_map<entt::entity*, InputState> states;
+	};
+
+	struct EventBundle
+	{
+		entt::entity* userRef;
 	};
 
 	struct MessageBundle
@@ -142,7 +148,8 @@ namespace phx::server::net
 		/**
 		 * @brief The Queue of bundled states received
 		 */
-		std::list<StateBundle> stateQueue;
+		std::vector<StateBundle>   currentBundles;
+		BlockingQueue<StateBundle> stateQueue;
 		/**
 		 * @brief The Queue of messages received
 		 */
