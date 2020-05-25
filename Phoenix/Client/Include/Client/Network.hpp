@@ -26,59 +26,67 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Server/Game.hpp>
-#include <Server/User.hpp>
+#pragma once
 
-#include <Common/Actor.hpp>
-#include <Common/Movement.hpp>
-#include <Common/Position.hpp>
-#include <thread>
+#include <Common/Input.hpp>
+#include <Common/Network/Host.hpp>
+#include <Common/Util/BlockingQueue.hpp>
 
-using namespace phx;
-using namespace phx::server;
-
-Game::Game(entt::registry* registry, bool* running, net::Iris* iris)
-    : m_registry(registry), m_running(running), m_iris(iris)
+namespace phx::client::net
 {
-	m_commander = new Commander(m_iris);
-}
-
-void Game::registerAPI(cms::ModManager* manager)
-{
-	m_commander->registerAPI(manager);
-}
-
-void Game::run()
-{
-	while (m_running)
+	class Network
 	{
-		// Process everybody's input first
-		net::StateBundle m_currentState = m_iris->stateQueue.pop();
+	public:
+		Network(std::ostringstream& chat);
+		~Network();
 
-		for (const auto& state : m_currentState.states)
-		{
-			ActorSystem::tick(m_registry,
-			                  m_registry->get<Player>(state.first).actor, dt,
-			                  state.second);
+		void tick();
 
-			// @todo remove this debug statement before merging to develop
-			//			std::cout << m_registry
-			//			                 ->get<Position>(
-			//			                     m_registry->get<Player>(state.first).actor)
-			//			                 .position
-			//			          << "\n";
-		}
-		// Process events second
+		void kill() { m_running = false; };
 
-		// Process messages last
-		size_t size = m_iris->messageQueue.size();
-		for (size_t i = 0; i < size; i++)
-		{
-			net::MessageBundle message = m_iris->messageQueue.front();
-			m_commander->run(message.userID, message.message);
-			m_iris->messageQueue.pop();
-		}
+		/**
+		 * @brief Actions taken when a state is received
+		 *
+		 * @param data The data in the state packet
+		 * @param dataLength The length of the data in the state packet
+		 */
+		void parseEvent(phx::net::Packet& packet);
 
-		m_iris->sendState(m_registry, m_currentState.sequence);
-	}
-}
+		/**
+		 * @brief Actions taken when a state is received
+		 *
+		 * @param data The data in the state packet
+		 * @param dataLength The length of the data in the state packet
+		 */
+		void parseState(phx::net::Packet& packet);
+
+		/**
+		 * @brief Actions taken when a message is received
+		 *
+		 * @param data The data in the message packet
+		 * @param dataLength The length of the data in the message packet
+		 */
+		void parseMessage(phx::net::Packet& packet);
+
+		/**
+		 * @brief Sends a state packet to a client
+		 *
+		 * @param userRef The user to sent the state to
+		 * @param data The state packet data
+		 */
+		void sendState(InputState inputState);
+
+		/**
+		 * @brief Sends a message packet to a client
+		 *
+		 * @param userRef The user to sent the message to
+		 * @param data The message packet data
+		 */
+		void sendMessage(std::string message);
+
+	private:
+		bool                m_running;
+		phx::net::Host*     m_client;
+		std::ostringstream& m_chat;
+	};
+} // namespace phx::client::net

@@ -28,14 +28,15 @@
 
 #pragma once
 
+#include <Client/EscapeMenu.hpp>
 #include <Client/GameTools.hpp>
 #include <Client/Graphics/Camera.hpp>
 #include <Client/Graphics/Layer.hpp>
 #include <Client/Graphics/ShaderPipeline.hpp>
 #include <Client/Graphics/UI.hpp>
 #include <Client/Graphics/Window.hpp>
+#include <Client/Network.hpp>
 #include <Client/Player.hpp>
-#include <Client/EscapeMenu.hpp>
 
 #include <Common/CMS/ModManager.hpp>
 
@@ -79,9 +80,6 @@ namespace phx::client
 		 * terminal)
 		 */
 		void sendMessage(std::string input, std::ostringstream& cout);
-		void parseEvent(enet_uint8* data, std::size_t dataLength);
-		void parseState(enet_uint8* data, std::size_t dataLength);
-		void parseMessage(enet_uint8* data, std::size_t dataLength);
 
 	private:
 		gfx::Window*       m_window;
@@ -97,16 +95,11 @@ namespace phx::client
 		cms::ModManager* m_modManager;
 
 		EscapeMenu* m_escapeMenu = nullptr;
-		GameTools* m_gameDebug = nullptr;
-		bool       m_followCam = true;
-		math::vec3 m_prevPos;
-		int        m_playerHand = 0;
+		GameTools*  m_gameDebug  = nullptr;
+		bool        m_followCam  = true;
+		math::vec3  m_prevPos;
+		int         m_playerHand = 0;
 
-		// Networking stuff
-
-		ENetHost*   m_client;
-		ENetEvent   m_event;
-		ENetPeer*   m_peer;
-		ENetAddress m_address;
+		client::net::Network* m_network;
 	};
 } // namespace phx::client

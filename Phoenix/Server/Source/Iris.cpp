@@ -61,7 +61,6 @@ Iris::Iris(entt::registry* registry) : m_registry(registry)
 
 	m_server->onReceive(
 	    [this](Peer& peer, Packet&& packet, enet_uint32 channelID) {
-		    std::cout << "packet received\n";
 		    switch (channelID)
 		    {
 		    case 0:
