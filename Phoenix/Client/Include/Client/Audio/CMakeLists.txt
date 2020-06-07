@@ -4,5 +4,7 @@ set(audioHeaders
 	${currentDir}/Listener.hpp
 	${currentDir}/Audio.hpp
 
+	${currentDir}/SourcePool.hpp
+
 	PARENT_SCOPE
 )

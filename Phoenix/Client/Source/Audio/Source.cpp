@@ -36,65 +36,57 @@ using namespace phx::audio;
 
 Source::Source()
 {
+	m_source = { new unsigned int{}, Deleter() };
+	
 	// creates an OpenAL source, ready for setting a buffer and playing back.
-	alGenSources(1, &m_source);
+	alGenSources(1, &*m_source);
 }
 
 Source::Source(AudioData data)
 {
+	m_source = {new unsigned int {}, Deleter()};
+
 	// generates an OpenAL source and sets the buffer to be used during
 	// playback.
-	alGenSources(1, &m_source);
-	alSourcei(m_source, AL_BUFFER, data.buffer);
+	alGenSources(1, &*m_source);
+	alSourcei(*m_source, AL_BUFFER, data.buffer);
 	m_duration = data.duration;
-}
-
-Source::~Source()
-{
-	// deletes the OpenAL source that was created.
-	// this will NOT delete the buffer (the storage for the actual audio).
-	alDeleteSources(1, &m_source);
 }
 
 void Source::enableSpatial(bool enable)
 {
-	alSourcei(m_source, AL_SOURCE_SPATIALIZE_SOFT,
+	alSourcei(*m_source, AL_SOURCE_SPATIALIZE_SOFT,
 	          enable ? AL_TRUE : AL_FALSE);
 }
 
 void Source::enableLoop(bool enable)
 {
-	alSourcei(m_source, AL_LOOPING, enable ? AL_TRUE : AL_FALSE);
+	alSourcei(*m_source, AL_LOOPING, enable ? AL_TRUE : AL_FALSE);
 }
 
-void Source::setPos(phx::math::vec3 pos)
+void Source::setPos(phx::math::vec3 position)
 {
-	m_position = pos;
-	alSourcefv(m_source, AL_POSITION, &m_position.x);
+	alSourcefv(*m_source, AL_POSITION, &position.x);
 }
 
 void Source::setDirection(phx::math::vec3 direction)
 {
-	m_direction = direction;
-	alSourcefv(m_source, AL_DIRECTION, &m_direction.x);
+	alSourcefv(*m_source, AL_DIRECTION, &direction.x);
 }
 
 void Source::setVelocity(phx::math::vec3 velocity)
 {
-	m_velocity = velocity;
-	alSourcefv(m_source, AL_VELOCITY, &velocity.x);
+	alSourcefv(*m_source, AL_VELOCITY, &velocity.x);
 }
 
 void Source::setGain(float gain)
 {
-	m_gain = gain;
-	alSourcef(m_source, AL_GAIN, gain);
+	alSourcef(*m_source, AL_GAIN, gain);
 }
 
 void Source::setPitch(float pitch)
 {
-	m_pitch = pitch;
-	alSourcef(m_source, AL_PITCH, pitch);
+	alSourcef(*m_source, AL_PITCH, pitch);
 }
 
 Duration Source::getDuration() const { return m_duration; }
@@ -102,7 +94,7 @@ Duration Source::getDuration() const { return m_duration; }
 Source::State Source::status() const
 {
 	int state;
-	alGetSourcei(m_source, AL_SOURCE_STATE, &state);
+	alGetSourcei(*m_source, AL_SOURCE_STATE, &state);
 
 	return static_cast<State>(state);
 }
@@ -110,7 +102,11 @@ Source::State Source::status() const
 void Source::setAudioData(AudioData data)
 {
 	m_duration = data.duration;
-	alSourcei(m_source, AL_BUFFER, data.buffer);
+	alSourcei(*m_source, AL_BUFFER, data.buffer);
 }
 
-void Source::play() const { alSourcePlay(m_source); }
+void Source::play() const { alSourcePlay(*m_source); }
+
+void Source::pause() const { alSourcePause(*m_source); }
+
+void Source::stop() const { alSourceStop(*m_source); }

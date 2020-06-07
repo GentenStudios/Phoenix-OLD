@@ -38,6 +38,8 @@
 
 #include <Common/Math/Math.hpp>
 
+#include <sol/sol.hpp>
+
 #include <array>
 #include <functional>
 #include <string>
@@ -67,7 +69,7 @@ namespace phx::voxels
 	 * this is VERY likely to change as we further develop implementations
 	 * of this feature.
 	 */
-	using BlockCallback = std::function<void(math::vec3 pos)>;
+	using BlockCallback = sol::function;
 
 	/**
 	 * @brief The universal data for blocks.

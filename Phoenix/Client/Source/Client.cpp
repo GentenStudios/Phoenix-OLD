@@ -118,10 +118,12 @@ void Client::onEvent(events::Event e)
 
 void Client::run()
 {
-	Logger::get()->initialize({});
-
 	Settings::get()->load("settings.txt");
+	Logger::initialize({});
 
+	audio::Audio::initialize();
+	m_audio = new audio::Audio();
+	
 	SplashScreen* splashScreen = new SplashScreen();
 	m_layerStack.pushLayer(splashScreen);
 
@@ -138,8 +140,12 @@ void Client::run()
 		if (!m_layerStack.empty())
 			m_layerStack.tick(dt);
 
+		m_audioPool.tick();
+
 		m_window.endFrame();
 	}
+
+	audio::Audio::teardown();
 
 	Settings::get()->save("settings.txt");
 }

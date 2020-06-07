@@ -32,6 +32,8 @@
 
 #include <AL/al.h>
 
+#include <atomic>
+
 namespace phx::audio
 {
 	/**
@@ -42,8 +44,8 @@ namespace phx::audio
 	 */
 	struct Duration
 	{
-		unsigned int minutes;
-		unsigned int seconds;
+		unsigned int minutes = 0;
+		unsigned int seconds = 0;
 	};
 
 	struct AudioData;
@@ -86,6 +88,16 @@ namespace phx::audio
 	 */
 	class Source
 	{
+	private:
+		struct Deleter
+		{
+			void operator()(unsigned int* source) const
+			{
+				alDeleteSources(1, source);
+				delete source;
+			}
+		};
+		
 	public:
 		/**
 		 * @brief The current playing state of the Source.
@@ -96,25 +108,25 @@ namespace phx::audio
 			 * @brief The Source is playing.
 			 */
 			PLAYING = AL_PLAYING,
-			
+
 			/**
 			 * @brief The source is paused.
 			 */
-			PAUSED  = AL_PAUSED,
-			
+			PAUSED = AL_PAUSED,
+
 			/**
 			 * @brief The source is stopped, so either it hasn't been started,
 			 * or it has finished.
 			 */
 			STOPPED = AL_STOPPED
 		};
-		
+
 	public:
 		/**
 		 * @brief Constructs a Source object.
 		 */
 		Source();
-		
+
 		/**
 		 * @brief Constructs a Source object but with AudioData from the start.
 		 * @param data The audio data to use.
@@ -125,10 +137,7 @@ namespace phx::audio
 		 */
 		explicit Source(AudioData data);
 
-		/**
-		 * @brief Destroys a Source object.
-		 */
-		~Source();
+		~Source() = default;
 
 		/**
 		 * @brief Allows for enabling/disabling spatial audio as required.
@@ -153,9 +162,9 @@ namespace phx::audio
 
 		/**
 		 * @brief Sets the position of the source.
-		 * @param pos The position of the source.
+		 * @param position The position of the source.
 		 */
-		void setPos(math::vec3 pos);
+		void setPos(math::vec3 position);
 
 		/**
 		 * @brief Sets the direction of the source.
@@ -180,7 +189,7 @@ namespace phx::audio
 		 * @param gain The gain the audio will be played back at.
 		 */
 		void setGain(float gain);
-		
+
 		/**
 		 * @brief Sets the pitch of the source.
 		 * @param pitch The pitch the audio will be played back at.
@@ -220,15 +229,19 @@ namespace phx::audio
 		 */
 		void play() const;
 
+		/**
+		 * @brief Pauses the audio.
+		 */
+		void pause() const;
+
+		/**
+		 * @brief Stops the audio.
+		 */
+		void stop() const;
+
 	private:
 		// internal variable for OpenAL.
-		unsigned int m_source = 0;
-
-		math::vec3 m_position;
-		math::vec3 m_direction;
-		math::vec3 m_velocity;
-		float      m_gain  = 1.f;
-		float      m_pitch = 1.f;
-		Duration   m_duration;
+		std::shared_ptr<unsigned int> m_source;
+		Duration     m_duration;
 	};
 } // namespace phx::audio
