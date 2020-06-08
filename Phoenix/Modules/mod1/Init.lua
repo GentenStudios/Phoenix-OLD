@@ -10,7 +10,7 @@ function hello (args)
 end
 core.command.register("Hello", "Master the arts of the Jedi you must", hello)
 
-local dirtAudioRef = audio.loadMP3("core.dirt_place", "Assets/Audio/dirt_place.mp3");
+local dirtAudioRef = audio.loadMP3("core.dirt_place", "Modules/mod1/Assets/Audio/dirt_place.mp3");
 
 dirt = {}
 dirt.name = "Dirt"
