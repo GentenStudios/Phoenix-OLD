@@ -195,5 +195,7 @@ namespace phx::audio
 		// maps uniqueName from loadMP3 to a buffer id + duration.
 		std::unordered_map<std::string, Handle> m_handles;
 		std::unordered_map<Handle, Duration>    m_buffers;
+
+		std::string m_unknownHandle = "core:unknown";
 	};
 } // namespace phx::audio

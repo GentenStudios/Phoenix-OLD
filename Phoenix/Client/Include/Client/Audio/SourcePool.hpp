@@ -32,6 +32,7 @@
 #include <Client/Audio/Source.hpp>
 
 #include <deque>
+#include <vector>
 #include <mutex>
 
 namespace phx::audio

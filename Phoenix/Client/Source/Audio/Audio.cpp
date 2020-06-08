@@ -191,7 +191,7 @@ const std::string& Audio::getUniqueName(Handle handle) const
 		}
 	}
 
-	return std::string();
+	return m_unknownHandle;
 }
 
 AudioData Audio::getAudioData(const std::string& uniqueName) const
