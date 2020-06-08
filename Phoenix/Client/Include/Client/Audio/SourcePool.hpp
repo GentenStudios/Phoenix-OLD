@@ -46,7 +46,7 @@ namespace phx::audio
 		 * sources on iOS devices. 32 should be fairly generous for a voxel game
 		 * anyways.
 		 */
-		constexpr static std::size_t MAX_SIMULTANEOUS_SOURCES = 3;
+		constexpr static std::size_t MAX_SIMULTANEOUS_SOURCES = 32;
 
 	public:
 		SourcePool();
