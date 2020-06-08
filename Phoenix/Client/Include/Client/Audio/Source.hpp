@@ -32,7 +32,7 @@
 
 #include <AL/al.h>
 
-#include <atomic>
+#include <memory>
 
 namespace phx::audio
 {
