@@ -135,7 +135,7 @@ namespace phx::audio
 		 * The AudioData can be set later on so using this constructor is not
 		 * particularly necessary.
 		 */
-		explicit Source(AudioData data);
+		explicit Source(const AudioData& data);
 
 		~Source() = default;
 
@@ -164,13 +164,13 @@ namespace phx::audio
 		 * @brief Sets the position of the source.
 		 * @param position The position of the source.
 		 */
-		void setPos(math::vec3 position);
+		void setPos(const math::vec3& position);
 
 		/**
 		 * @brief Sets the direction of the source.
 		 * @param direction The direction the source is facing.
 		 */
-		void setDirection(math::vec3 direction);
+		void setDirection(const math::vec3& direction);
 
 		/**
 		 * @brief Sets the velocity of the source.
@@ -182,7 +182,7 @@ namespace phx::audio
 		 *
 		 * Velocity is also important in the applying the "Doppler Effect".
 		 */
-		void setVelocity(math::vec3 velocity);
+		void setVelocity(const math::vec3& velocity);
 
 		/**
 		 * @brief Sets the gain of the source.
@@ -222,7 +222,7 @@ namespace phx::audio
 		 * audio::Audio::getAudioData("core:song") will return an AudioData
 		 * object for the source to use and play.
 		 */
-		void setAudioData(AudioData buffer);
+		void setAudioData(const AudioData& buffer);
 
 		/**
 		 * @brief Plays the audio. Calling again will pause.

@@ -42,7 +42,7 @@ Source::Source()
 	alGenSources(1, &*m_source);
 }
 
-Source::Source(AudioData data)
+Source::Source(const AudioData& data)
 {
 	m_source = {new unsigned int {}, Deleter()};
 
@@ -64,17 +64,17 @@ void Source::enableLoop(bool enable)
 	alSourcei(*m_source, AL_LOOPING, enable ? AL_TRUE : AL_FALSE);
 }
 
-void Source::setPos(phx::math::vec3 position)
+void Source::setPos(const phx::math::vec3& position)
 {
 	alSourcefv(*m_source, AL_POSITION, &position.x);
 }
 
-void Source::setDirection(phx::math::vec3 direction)
+void Source::setDirection(const phx::math::vec3& direction)
 {
 	alSourcefv(*m_source, AL_DIRECTION, &direction.x);
 }
 
-void Source::setVelocity(phx::math::vec3 velocity)
+void Source::setVelocity(const phx::math::vec3& velocity)
 {
 	alSourcefv(*m_source, AL_VELOCITY, &velocity.x);
 }
@@ -99,7 +99,7 @@ Source::State Source::status() const
 	return static_cast<State>(state);
 }
 
-void Source::setAudioData(AudioData data)
+void Source::setAudioData(const AudioData& data)
 {
 	m_duration = data.duration;
 	alSourcei(*m_source, AL_BUFFER, data.buffer);
