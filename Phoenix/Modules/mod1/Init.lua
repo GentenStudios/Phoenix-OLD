@@ -1,4 +1,5 @@
 print ("Load mod 1")
+
 function hello (args)
     if args[1] == "there" then
         print("General Kenobi")
@@ -42,9 +43,24 @@ block.id = "core.grass"
 block.textures = {"Assets/grass_side.png", "Assets/grass_side.png",
 "Assets/grass_side.png", "Assets/grass_side.png",
 "Assets/grass_top.png",  "Assets/dirt.png"}
-block.onBreak = function (x, y, z)
-	print("grass broken")
-end
+block.onPlace = function(x, y, z)
+                    source = {}
+                    source.id = dirtAudioRef
+                    source.position = {}
+                    source.position.x = x
+                    source.position.y = y
+                    source.position.z = z
+                    audio.play(source)
+                end
+block.onBreak = function(x, y, z)
+                    source = {}
+                    source.id = dirtAudioRef
+                    source.position = {}
+                    source.position.x = x
+                    source.position.y = y
+                    source.position.z = z
+                    audio.play(source)
+                end
 voxel.block.register(block)
 
 air = {}
