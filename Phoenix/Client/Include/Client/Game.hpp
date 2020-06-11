@@ -88,6 +88,10 @@ namespace phx::client
 		bool       m_followCam = true;
 		math::vec3 m_prevPos;
 		int        m_playerHand = 0;
+
+		// intermediary variables to prevent getting the pointer from the client
+		// singleton every tick.
+		audio::Audio* m_audio;
+		audio::Listener* m_listener;
 	};
 } // namespace phx::client
-

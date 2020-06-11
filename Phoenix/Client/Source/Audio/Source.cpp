@@ -40,6 +40,7 @@ Source::Source()
 	
 	// creates an OpenAL source, ready for setting a buffer and playing back.
 	alGenSources(1, &*m_source);
+	alSourcei(*m_source, AL_SOURCE_RELATIVE, false);
 }
 
 Source::Source(const AudioData& data)
@@ -49,6 +50,7 @@ Source::Source(const AudioData& data)
 	// generates an OpenAL source and sets the buffer to be used during
 	// playback.
 	alGenSources(1, &*m_source);
+	alSourcei(*m_source, AL_SOURCE_RELATIVE, false);
 	alSourcei(*m_source, AL_BUFFER, data.buffer);
 	m_duration = data.duration;
 }

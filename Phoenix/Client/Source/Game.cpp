@@ -77,12 +77,14 @@ Game::Game(gfx::Window* window, entt::registry* registry)
 		m_chat->cout << text << "\n";
 	});
 
-	// play background music
-	audio::Audio* audio  = Client::get()->getAudioHandler();
-	auto          handle = audio->loadMP3("core:background_music1",
-                                 "Assets/Audio/background_music.mp3");
+	m_audio    = Client::get()->getAudioHandler();
+	m_listener = m_audio->getListener();
 
-	audio::Source backMusic((*audio)[handle]);
+	// play background music
+	auto handle = m_audio->loadMP3("core:background_music1",
+	                               "Assets/Audio/background_music.mp3");
+
+	audio::Source backMusic((*m_audio)[handle]);
 	backMusic.enableLoop(true);
 
 	// background music shouldn't be spatial.
@@ -141,7 +143,7 @@ Game::Game(gfx::Window* window, entt::registry* registry)
 			float x = source["position"]["x"];
 			float y = source["position"]["y"];
 			float z = source["position"]["z"];
-
+			
 			audioSource.setPos({x, y, z});
 		}
 
@@ -386,10 +388,15 @@ void Game::tick(float dt)
 
 	m_camera->tick(dt);
 
+	const Position& position = m_registry->get<Position>(m_player->getEntity());
+	
 	if (m_followCam)
 	{
-		m_prevPos = m_registry->get<Position>(m_player->getEntity()).position;
+		m_prevPos = position.position;
 	}
+
+	m_listener->setPosition(position.position);
+	m_listener->setVelocity({ 0, 0, 0 });
 
 	m_world->tick(m_prevPos);
 
