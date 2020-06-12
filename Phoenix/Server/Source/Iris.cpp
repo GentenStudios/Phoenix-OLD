@@ -94,7 +94,7 @@ void Iris::auth() {}
 
 void Iris::disconnect(std::size_t peerID)
 {
-	printf("%lu disconnected.\n", peerID);
+	LOG_INFO("NETWORK") << peerID << " disconnected";
 }
 
 void Iris::parseEvent(std::size_t userID, Packet& packet)
@@ -212,8 +212,6 @@ void Iris::parseMessage(std::size_t userID, phx::net::Packet& packet)
 	}
 	else
 	{
-		printf("%s", input.c_str());
-
 		sendMessage(userID, input);
 	}
 }

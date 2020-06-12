@@ -28,6 +28,9 @@
 
 #pragma once
 
+#include <Client/Crosshair.hpp>
+#include <Client/EscapeMenu.hpp>
+#include <Client/GameTools.hpp>
 #include <Client/Graphics/Camera.hpp>
 #include <Client/Graphics/Layer.hpp>
 #include <Client/Graphics/ShaderPipeline.hpp>
@@ -35,8 +38,6 @@
 #include <Client/Graphics/Window.hpp>
 #include <Client/Network.hpp>
 #include <Client/Player.hpp>
-#include <Client/Crosshair.hpp>#include <Client/EscapeMenu.hpp>
-#include <Client/GameTools.hpp>
 
 #include <Common/CMS/ModManager.hpp>
 

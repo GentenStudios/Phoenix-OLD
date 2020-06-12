@@ -84,6 +84,7 @@ void Network::parseMessage(phx::net::Packet& packet)
 
 	LOG_INFO("Messenger") << input;
 	m_chat << input;
+	m_chat << "\n";
 }
 
 void Network::sendState(InputState inputState)
