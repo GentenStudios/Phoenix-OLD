@@ -1,4 +1,4 @@
-// Copyright 2019-20 Genten Studios
+// Copyright 2019-2020 Genten Studios
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -28,36 +28,62 @@
 
 #pragma once
 
-#include <Client/Graphics/Layer.hpp>
-#include <Client/Graphics/Window.hpp>
-#include <Client/Graphics/GUI/Container.hpp>
-#include <Client/Graphics/GUI/Button.hpp>
+#include <Client/Events/Event.hpp>
+#include <Client/Graphics/ShaderPipeline.hpp>
 
-namespace phx::client
+#include <Common/Math/Math.hpp>
+
+namespace phx::gui
 {
+	class Container;
+
 	/**
-	 * @brief The escape menu within the game.
-	 *
-	 * @see Layer
-	 * @see LayerStack
+	 * @brief Data layout for each vertex in the GUI.
 	 */
-	class EscapeMenu : public gfx::Overlay
+	struct Vertex
 	{
-	public:
-		EscapeMenu(gfx::Window* window);
-		~EscapeMenu() override;
-
-		void onEvent(events::Event& e) override;
-		void onAttach() override;
-		void onDetach() override;
-
-		void tick(float dt) override;
-
-	private:
-		math::vec2i m_windowCentre;
-		gfx::Window* m_window;
-		gui::Container* m_container;
-		gui::Button* m_button;
+		math::vec2 vert;
+		math::vec3 color;
+		float      alpha = 0.f;
+		math::vec2 uv;
 	};
-} // namespace phx::client
 
+	/**
+	 * @brief The Interface for a GUI Component.
+	 *
+	 * The GUI is built up of containers and components. Containers contain
+	 * components and each component is ticked in order to produce the layout
+	 * required.
+	 */
+	struct IComponent
+	{
+		/**
+		 * @brief Constructs a component, no extra functionality.
+		 * @param container The container to set the internal pointer to.
+		 */
+		IComponent(Container* container) : container(container) {}
+
+		virtual ~IComponent() = default;
+
+		/**
+		 * @brief Gets the layout of the buffer required by the shader.
+		 * @return The layout of the data that the shader should expect.
+		 */
+		static std::vector<gfx::ShaderLayout> getBufferLayout()
+		{
+			return {{"a_Vertex", 0}, {"a_Color", 1}, {"a_UV", 2}};
+		}
+
+		virtual math::vec2 getPosition() const              = 0;
+		virtual void       setPosition(const math::vec2& position) = 0;
+
+		virtual math::vec2 getSize() const          = 0;
+		virtual void       setSize(const math::vec2& size) = 0;
+
+		virtual void onEvent(events::Event& event) = 0;
+		virtual void tick(float dt)               = 0;
+
+		bool       enabled   = true;
+		Container* container = nullptr;
+	};
+} // namespace phx::gui

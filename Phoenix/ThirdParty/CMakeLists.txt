@@ -32,9 +32,9 @@ add_subdirectory (entt)
 add_subdirectory (json)
 
 # new line for each group of dependencies. Currently SDL, OpenGL, Lua and then OpenAL.
-set_target_properties(SDL2main SDL2-static uninstall 
-	Glad ImGui 
-	lua liblua 
+set_target_properties(SDL2main SDL2-static uninstall
+	Glad ImGui
+	lua liblua
 	enet aob build_version native-tools
 	OpenAL common ex-common
 	PROPERTIES FOLDER Dependencies)
@@ -49,6 +49,7 @@ set(PHX_THIRD_PARTY_INCLUDES
 	${CMAKE_CURRENT_LIST_DIR}/enet/include
 	${CMAKE_CURRENT_LIST_DIR}/sol2/include
 	${CMAKE_CURRENT_LIST_DIR}/stb_image
+	${CMAKE_CURRENT_LIST_DIR}/stb_rectpack
 	${CMAKE_CURRENT_LIST_DIR}/entt/src
 	${CMAKE_CURRENT_LIST_DIR}/json/include
 	${CMAKE_CURRENT_LIST_DIR}/openal-soft/include
@@ -72,4 +73,9 @@ set(PHX_THIRD_PARTY_LIBRARIES
 	$<$<PLATFORM_ID:Windows>:winmm.lib> # link to winmm.lib if windows.
 
 	PARENT_SCOPE
+)
+
+target_compile_options(sol2 INTERFACE
+  $<$<CXX_COMPILER_ID:MSVC>:/wd4996>
+  $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-W>
 )

@@ -43,7 +43,7 @@ m_registry(registry)
 	m_window->setCursorState(CursorState::DISABLED);
 
 	// Calculates the perspective projection
-	const math::vec2f windowSize = static_cast<math::vec2f>(window->getSize());
+	const math::vec2 windowSize = window->getSize();
 	m_projection = math::mat4::perspective(windowSize.x / windowSize.y, 45.f,
 	                                       1000.f, 0.1f);
 
@@ -179,9 +179,8 @@ void FPSCamera::enable(bool enabled)
 void FPSCamera::onWindowResize(events::Event e)
 {
 	// recalculate window size again, to not be inefficient.
-	const math::vec2i windowSize = m_window->getSize();
-	m_projection = math::mat4::perspective(static_cast<float>(windowSize.x) /
-	                                           static_cast<float>(windowSize.y),
+	const math::vec2 windowSize = m_window->getSize();
+	m_projection = math::mat4::perspective(windowSize.x / windowSize.y,
 	                                       45.f, 1000.f, 0.1f);
 
 	m_windowCentre = {static_cast<float>(static_cast<int>(windowSize.x / 2)),
