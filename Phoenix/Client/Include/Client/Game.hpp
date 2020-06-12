@@ -36,6 +36,7 @@
 #include <Client/Graphics/Window.hpp>
 #include <Client/Player.hpp>
 #include <Client/EscapeMenu.hpp>
+#include <Client/Crosshair.hpp>
 
 #include <Common/CMS/ModManager.hpp>
 
@@ -95,7 +96,8 @@ namespace phx::client
 		ui::ChatWindow* m_chat = nullptr;
 
 		cms::ModManager* m_modManager;
-
+		
+		Crosshair* m_crosshair = nullptr;
 		EscapeMenu* m_escapeMenu = nullptr;
 		GameTools* m_gameDebug = nullptr;
 		bool       m_followCam = true;

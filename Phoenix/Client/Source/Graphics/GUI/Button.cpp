@@ -1,4 +1,4 @@
-// Copyright 2019-20 Genten Studios
+// Copyright 2019-2020 Genten Studios
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -26,16 +26,56 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Client/Client.hpp>
+#include <Client/Graphics/GUI/Button.hpp>
 
-#include <Common/Logger.hpp>
+using namespace phx::gui;
 
-using namespace phx;
-
-#undef main
-int main(int argc, char** argv)
+Button::Button(Container* container, phx::math::vec2 pos, phx::math::vec2 size,
+               phx::math::vec3 color, float alpha)
+    : IComponent(container), m_pos(pos), m_size(size),
+      m_rectangle(container, pos, size, color, alpha, true)
 {
-	client::Client::get()->run();
+	// we are putting rectangle in the initializer list since we don't really
+	// want to heap allocate it for memory locality and because there is no
+	// default constructor for it.
 
-	return 0;
+	container->attachComponent(this);
 }
+
+Button::~Button() { container->detachComponent(this); }
+
+void Button::setCallback(const Callback& callback) { m_callback = callback; }
+
+phx::math::vec2 Button::getPosition() const { return m_pos; }
+
+void Button::setPosition(const phx::math::vec2& position)
+{
+	m_pos = position;
+	m_rectangle.setPosition(position);
+}
+
+phx::math::vec2 Button::getSize() const { return m_size; }
+
+void Button::setSize(const phx::math::vec2& size)
+{
+	m_size = size;
+	m_rectangle.setSize(size);
+}
+
+void Button::onEvent(phx::events::Event& event)
+{
+	if (event.type == events::EventType::MOUSE_BUTTON_PRESSED)
+	{
+		if (m_rectangle.isPointInObject({event.mouse.x, event.mouse.y}))
+		{
+			if (m_callback)
+			{
+				m_callback(event);
+			}
+
+			event.handled = true;
+		}
+	}
+}
+
+void Button::tick(float dt) { m_rectangle.tick(dt); }
