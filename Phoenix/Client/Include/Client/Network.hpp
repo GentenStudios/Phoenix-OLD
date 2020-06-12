@@ -32,7 +32,7 @@
 #include <Common/Network/Host.hpp>
 #include <Common/Util/BlockingQueue.hpp>
 
-namespace phx::client::net
+namespace phx::client
 {
 	class Network
 	{

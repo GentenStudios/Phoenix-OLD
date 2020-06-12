@@ -95,13 +95,13 @@ namespace phx::client
 
 		cms::ModManager* m_modManager;
 
-		Crosshair* m_crosshair = nullptr;
+		Crosshair*  m_crosshair  = nullptr;
 		EscapeMenu* m_escapeMenu = nullptr;
 		GameTools*  m_gameDebug  = nullptr;
 		bool        m_followCam  = true;
 		math::vec3  m_prevPos;
 		int         m_playerHand = 0;
 
-		client::net::Network* m_network;
+		client::Network* m_network;
 	};
 } // namespace phx::client

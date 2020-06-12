@@ -107,7 +107,7 @@ void Game::onAttach()
 	/// @TODO replace with network callback
 	m_chat->registerCallback(rawEcho);
 
-	m_network = new client::net::Network(m_chat->cout);
+	m_network = new client::Network(m_chat->cout);
 
 	m_player = new Player(m_registry);
 	m_player->registerAPI(m_modManager);

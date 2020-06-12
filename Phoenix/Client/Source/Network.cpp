@@ -30,7 +30,7 @@
 
 #include <Common/Logger.hpp>
 
-using namespace phx::client::net;
+using namespace phx::client;
 
 Network::Network(std::ostringstream& chat) : m_chat(chat)
 {
