@@ -39,8 +39,7 @@ using namespace phx;
 
 static const float RAY_INCREMENT = 0.5f;
 
-Player::Player(entt::registry* registry)
-    : m_registry(registry)
+Player::Player(entt::registry* registry) : m_registry(registry)
 {
 	m_entity = m_registry->create();
 	m_registry->emplace<Position>(m_entity, math::vec3 {0, 0, 0},
@@ -53,13 +52,14 @@ Player::Player(entt::registry* registry)
 		    m_registry->get<Position>(m_entity).position = {
 		        std::stoi(args[0]), std::stoi(args[1]), std::stoi(args[2])};
 	    });
-      
+
 	glGenVertexArrays(1, &m_vao);
 	glGenBuffers(1, &m_vbo);
 
 	std::vector<gfx::ShaderLayout> layout;
 	layout.emplace_back("position", 0);
-	m_pipeline.prepare("Assets/SimpleLines.vert", "Assets/SimpleLines.frag", layout);
+	m_pipeline.prepare("Assets/SimpleLines.vert", "Assets/SimpleLines.frag",
+	                   layout);
 }
 
 void Player::registerAPI(cms::ModManager* manager)
@@ -119,10 +119,16 @@ bool Player::action1()
 	{
 		pos.floor();
 
-		if (m_world->getBlockAt(pos)->category == voxels::BlockCategory::SOLID)
+		const auto currentBlock = m_world->getBlockAt(pos);
+		if (currentBlock->category == voxels::BlockCategory::SOLID)
 		{
 			m_world->setBlockAt(
 			    pos, voxels::BlockRegistry::get()->getFromID("core.air"));
+
+			if (currentBlock->onBreak)
+			{
+				currentBlock->onBreak(pos.x, pos.y, pos.z);
+			}
 
 			return true;
 		}
@@ -143,12 +149,19 @@ bool Player::action2()
 	{
 		pos.floor();
 
-		if (m_world->getBlockAt(pos)->category == voxels::BlockCategory::SOLID)
+		const auto currentBlock = m_world->getBlockAt(pos);
+		if (currentBlock->category == voxels::BlockCategory::SOLID)
 		{
 			math::vec3 back = ray.backtrace(RAY_INCREMENT);
 			back.floor();
 
 			m_world->setBlockAt(back, m_registry->get<Hand>(getEntity()).hand);
+
+			if (m_registry->get<Hand>(getEntity()).hand->onPlace)
+			{
+				m_registry->get<Hand>(getEntity())
+				    .hand->onPlace(back.x, back.y, back.z);
+			}
 
 			return true;
 		}
@@ -181,56 +194,54 @@ void Player::renderSelectionBox(const math::mat4 view, const math::mat4 proj)
 
 	/*
 	       1 +--------+ 2
-		    /|       /|
-		   / |   3  / |
-		0 +--------+  |
-		  |  |6    |  |
-		  |  x-----|--+ 7
-		  | /      | /
-		  |/       |/
-		5 +--------+ 4
+	        /|       /|
+	       / |   3  / |
+	    0 +--------+  |
+	      |  |6    |  |
+	      |  x-----|--+ 7
+	      | /      | /
+	      |/       |/
+	    5 +--------+ 4
 	 */
-	
+
 	const float more = 2.001f;
 	const float less = 0.001f;
 
-	float vertices[] = {
-		pos.x + more, pos.y + more, pos.z - less,  // 0-1
-		pos.x - less, pos.y + more, pos.z - less,
+	float vertices[] = {pos.x + more, pos.y + more, pos.z - less, // 0-1
+	                    pos.x - less, pos.y + more, pos.z - less,
 
-		pos.x - less, pos.y + more, pos.z - less,  // 1-2
-		pos.x - less, pos.y + more, pos.z + more,
+	                    pos.x - less, pos.y + more, pos.z - less, // 1-2
+	                    pos.x - less, pos.y + more, pos.z + more,
 
-		pos.x - less, pos.y + more, pos.z + more,  // 2-3
-		pos.x + more, pos.y + more, pos.z + more,
+	                    pos.x - less, pos.y + more, pos.z + more, // 2-3
+	                    pos.x + more, pos.y + more, pos.z + more,
 
-		pos.x + more, pos.y + more, pos.z + more,  // 3-4
-		pos.x + more, pos.y - less, pos.z + more,
+	                    pos.x + more, pos.y + more, pos.z + more, // 3-4
+	                    pos.x + more, pos.y - less, pos.z + more,
 
-		pos.x + more, pos.y - less, pos.z + more,  // 4-5
-		pos.x + more, pos.y - less, pos.z - less,
+	                    pos.x + more, pos.y - less, pos.z + more, // 4-5
+	                    pos.x + more, pos.y - less, pos.z - less,
 
-		pos.x + more, pos.y - less, pos.z - less,  // 5-6
-		pos.x - less, pos.y - less, pos.z - less,
+	                    pos.x + more, pos.y - less, pos.z - less, // 5-6
+	                    pos.x - less, pos.y - less, pos.z - less,
 
-		pos.x - less, pos.y - less, pos.z - less,  // 6-7
-		pos.x - less, pos.y - less, pos.z + more,
+	                    pos.x - less, pos.y - less, pos.z - less, // 6-7
+	                    pos.x - less, pos.y - less, pos.z + more,
 
-		pos.x - less, pos.y - less, pos.z + more,  // 7-4
-		pos.x + more, pos.y - less, pos.z + more,
+	                    pos.x - less, pos.y - less, pos.z + more, // 7-4
+	                    pos.x + more, pos.y - less, pos.z + more,
 
-		pos.x - less, pos.y - less, pos.z + more,  // 7-2
-		pos.x - less, pos.y + more, pos.z + more,
+	                    pos.x - less, pos.y - less, pos.z + more, // 7-2
+	                    pos.x - less, pos.y + more, pos.z + more,
 
-		pos.x - less, pos.y + more, pos.z - less,  // 1-6
-		pos.x - less, pos.y - less, pos.z - less,
+	                    pos.x - less, pos.y + more, pos.z - less, // 1-6
+	                    pos.x - less, pos.y - less, pos.z - less,
 
-		pos.x + more, pos.y + more, pos.z - less,  // 0-3
-		pos.x + more, pos.y + more, pos.z + more,
+	                    pos.x + more, pos.y + more, pos.z - less, // 0-3
+	                    pos.x + more, pos.y + more, pos.z + more,
 
-		pos.x + more, pos.y + more, pos.z - less,  // 0-5
-		pos.x + more, pos.y - less, pos.z - less
-	};
+	                    pos.x + more, pos.y + more, pos.z - less, // 0-5
+	                    pos.x + more, pos.y - less, pos.z - less};
 
 	glBindVertexArray(m_vao);
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);

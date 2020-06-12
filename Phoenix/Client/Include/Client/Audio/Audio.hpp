@@ -47,11 +47,11 @@ namespace phx::audio
 		 * @brief The buffer ID, more for internal use.
 		 */
 		unsigned int buffer;
-		
+
 		/**
 		 * @brief The duration of the audio, minutes and seconds.
 		 */
-		Duration     duration;
+		Duration duration;
 	};
 
 	/**
@@ -99,6 +99,9 @@ namespace phx::audio
 	class Audio
 	{
 	public:
+		using Handle = unsigned int;
+
+	public:
 		Audio() = default;
 
 		/**
@@ -143,9 +146,11 @@ namespace phx::audio
 		 * logged. This function will load an MP3 file into an OpenAL buffer
 		 * ready for use in Sources.
 		 */
-		void      loadMP3(const std::string& uniqueName,
-		                  const std::string& filePath);
+		Handle loadMP3(const std::string& uniqueName,
+		               const std::string& filePath);
 
+		const std::string& getUniqueName(Handle handle) const;
+		
 		/**
 		 * @brief Gets the audio data for a Source to use before playing.
 		 * @param uniqueName The unique name of the audio clip being retrieved.
@@ -158,12 +163,20 @@ namespace phx::audio
 		 * buffer is -1 before using on an actual Source.
 		 */
 		AudioData getAudioData(const std::string& uniqueName) const;
+		AudioData getAudioData(Handle handle) const;
 
 		// [] operator, like an unordered_map, just redirected to getAudioData,
 		// essentially just a QoL feature.
 		AudioData operator[](const std::string& uniqueName) const
 		{
 			return getAudioData(uniqueName);
+		}
+
+		// [] operator, like an unordered_map, just redirected to getAudioData,
+		// essentially just a QoL feature.
+		AudioData operator[](Handle handle) const
+		{
+			return getAudioData(handle);
 		}
 
 		/**
@@ -180,6 +193,9 @@ namespace phx::audio
 		Listener m_listener;
 
 		// maps uniqueName from loadMP3 to a buffer id + duration.
-		std::unordered_map<std::string, AudioData> m_buffers;
+		std::unordered_map<std::string, Handle> m_handles;
+		std::unordered_map<Handle, Duration>    m_buffers;
+
+		std::string m_unknownHandle = "core:unknown";
 	};
 } // namespace phx::audio

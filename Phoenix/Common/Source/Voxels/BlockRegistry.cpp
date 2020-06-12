@@ -73,22 +73,22 @@ void BlockRegistry::registerAPI(cms::ModManager* manager)
 				    block.category = BlockCategory::SOLID;
 			    }
 
-			    if (luaBlock["onPlace"])
+			    if (luaBlock["onPlace"].valid())
 			    {
 				    block.onPlace = luaBlock["onPlace"];
 			    }
 
-			    if (luaBlock["onBreak"])
+			    if (luaBlock["onBreak"].valid())
 			    {
-				    block.onPlace = luaBlock["onPlace"];
+				    block.onBreak = luaBlock["onBreak"];
 			    }
 
-			    if (luaBlock["onInteract"])
+			    if (luaBlock["onInteract"].valid())
 			    {
-				    block.onPlace = luaBlock["onPlace"];
+				    block.onInteract = luaBlock["onInteract"];
 			    }
 
-			    if (luaBlock["textures"])
+			    if (luaBlock["textures"].valid())
 			    {
 				    std::array<std::string, 6> textures;
 				    for (int i = 0; i < 6; i++)
