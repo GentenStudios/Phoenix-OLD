@@ -27,7 +27,6 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <Client/Client.hpp>
-#include <Client/Crosshair.hpp>
 #include <Client/Game.hpp>
 
 #include <Common/CMS/ModManager.hpp>
@@ -144,8 +143,9 @@ void Game::onAttach()
 	m_renderPipeline.setMatrix("u_model", model);
 
 	LOG_INFO("MAIN") << "Register GUI";
-	Client::get()->pushLayer(new Crosshair(m_window));
+	m_crosshair  = new Crosshair(m_window);
 	m_escapeMenu = new EscapeMenu(m_window);
+	Client::get()->pushLayer(m_crosshair);
 
 	if (Client::get()->isDebugLayerActive())
 	{
@@ -176,10 +176,12 @@ void Game::onEvent(events::Event& e)
 			if (!m_camera->isEnabled())
 			{
 				Client::get()->pushLayer(m_escapeMenu);
+				Client::get()->popLayer(m_crosshair);
 			}
 			else
 			{
 				Client::get()->popLayer(m_escapeMenu);
+				Client::get()->pushLayer(m_crosshair);
 			}
 			e.handled = true;
 			break;

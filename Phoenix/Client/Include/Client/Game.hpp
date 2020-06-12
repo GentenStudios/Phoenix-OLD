@@ -28,8 +28,6 @@
 
 #pragma once
 
-#include <Client/EscapeMenu.hpp>
-#include <Client/GameTools.hpp>
 #include <Client/Graphics/Camera.hpp>
 #include <Client/Graphics/Layer.hpp>
 #include <Client/Graphics/ShaderPipeline.hpp>
@@ -37,6 +35,8 @@
 #include <Client/Graphics/Window.hpp>
 #include <Client/Network.hpp>
 #include <Client/Player.hpp>
+#include <Client/Crosshair.hpp>#include <Client/EscapeMenu.hpp>
+#include <Client/GameTools.hpp>
 
 #include <Common/CMS/ModManager.hpp>
 
@@ -94,6 +94,7 @@ namespace phx::client
 
 		cms::ModManager* m_modManager;
 
+		Crosshair* m_crosshair = nullptr;
 		EscapeMenu* m_escapeMenu = nullptr;
 		GameTools*  m_gameDebug  = nullptr;
 		bool        m_followCam  = true;

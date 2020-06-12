@@ -195,13 +195,13 @@ namespace phx::gfx
 		 * @brief Resizes the window.
 		 * @param size The size to set the window.
 		 */
-		void resize(math::vec2i size);
+		void resize(math::vec2 size);
 
 		/**
 		 * @brief Gets the size of the window.
 		 * @return The size of the window.
 		 */
-		math::vec2i getSize() const;
+		math::vec2 getSize() const;
 
 		/**
 		 * @brief Enables or Disables the ability to resize the window.
@@ -307,7 +307,7 @@ namespace phx::gfx
 		bool m_vsync = false;
 		bool m_fullscreen = false;
 
-		math::vec2i m_cachedScreenSize;
+		math::vec2 m_cachedScreenSize;
 
 	private:
 		void dispatchToListeners(events::Event& event);

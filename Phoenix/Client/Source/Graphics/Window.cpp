@@ -110,6 +110,8 @@ Window::Window(const std::string& title, int width, int height)
 
 	SDL_SetRelativeMouseMode(SDL_FALSE);
 
+	glViewport(0, 0, width, height);
+	
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGuiIO& imguiIO = ImGui::GetIO();
@@ -157,6 +159,7 @@ void Window::pollEvents()
 			e.mouse.button = static_cast<MouseButtons>(event.button.button);
 			e.mouse.x      = event.button.x;
 			e.mouse.y      = event.button.y;
+			e.mouse.mods   = static_cast<Mods>(SDL_GetModState());
 			dispatchToListeners(e);
 			break;
 		case SDL_MOUSEBUTTONUP:
@@ -164,6 +167,7 @@ void Window::pollEvents()
 				break;
 			e.type         = EventType::MOUSE_BUTTON_RELEASED;
 			e.mouse.button = static_cast<MouseButtons>(event.button.button);
+			e.mouse.mods   = static_cast<Mods>(SDL_GetModState());
 			dispatchToListeners(e);
 			break;
 		case SDL_MOUSEMOTION:
@@ -286,13 +290,13 @@ void Window::minimize() const { SDL_MinimizeWindow(m_window); }
 void Window::focus() const { SDL_SetWindowInputFocus(m_window); }
 void Window::close() { m_running = false; }
 
-void Window::resize(math::vec2i size)
+void Window::resize(math::vec2 size)
 {
 	SDL_SetWindowSize(m_window, static_cast<int>(size.x),
 	                  static_cast<int>(size.y));
 }
 
-math::vec2i Window::getSize() const
+math::vec2 Window::getSize() const
 {
 	math::vec2i size;
 	SDL_GetWindowSize(m_window, &size.x, &size.y);
