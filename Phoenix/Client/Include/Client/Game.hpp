@@ -95,7 +95,7 @@ namespace phx::client
 
 		cms::ModManager* m_modManager;
 
-		Crosshair* m_crosshair = nullptr;
+		Crosshair*  m_crosshair  = nullptr;
 		EscapeMenu* m_escapeMenu = nullptr;
 		GameTools*  m_gameDebug  = nullptr;
 		bool        m_followCam  = true;

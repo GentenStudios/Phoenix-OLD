@@ -108,6 +108,7 @@ void Game::onAttach()
 	m_chat->registerCallback(rawEcho);
 
 	m_network = new client::net::Network(m_chat->cout);
+	m_network->start();
 
 	m_player = new Player(m_registry);
 	m_player->registerAPI(m_modManager);
@@ -158,6 +159,7 @@ void Game::onAttach()
 
 void Game::onDetach()
 {
+	m_network->stop();
 	delete m_world;
 	delete m_player;
 	delete m_camera;
@@ -257,11 +259,6 @@ void Game::onEvent(events::Event& e)
 
 void Game::tick(float dt)
 {
-	//	std::cout << "tick";
-	//  LOG_WARNING("MAINLOOP") << "WTF";
-	/// @TODO convert this into thread
-	m_network->tick();
-
 	// temp, will change in the future, based on game time
 	static math::vec3 lightdir(0.f, -1.f, 0.f);
 	static float      time = 0.f;

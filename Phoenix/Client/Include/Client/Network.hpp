@@ -31,6 +31,7 @@
 #include <Common/Input.hpp>
 #include <Common/Network/Host.hpp>
 #include <Common/Util/BlockingQueue.hpp>
+#include <thread>
 
 namespace phx::client::net
 {
@@ -40,10 +41,14 @@ namespace phx::client::net
 		Network(std::ostringstream& chat);
 		~Network();
 
-		void tick();
+	private:
+		void run();
 
-		void kill() { m_running = false; };
+	public:
+		void start();
+		void stop();
 
+	private:
 		/**
 		 * @brief Actions taken when a state is received
 		 *
@@ -68,6 +73,7 @@ namespace phx::client::net
 		 */
 		void parseMessage(phx::net::Packet& packet);
 
+	public:
 		/**
 		 * @brief Sends a state packet to a client
 		 *
@@ -88,5 +94,6 @@ namespace phx::client::net
 		bool                m_running;
 		phx::net::Host*     m_client;
 		std::ostringstream& m_chat;
+		std::thread*        m_thread = nullptr;
 	};
 } // namespace phx::client::net

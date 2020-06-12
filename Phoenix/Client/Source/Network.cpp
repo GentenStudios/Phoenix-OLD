@@ -61,9 +61,33 @@ Network::Network(std::ostringstream& chat) : m_chat(chat)
 	m_client->poll(5000_ms);
 }
 
-Network::~Network() {}
+Network::~Network()
+{
+	if (m_running)
+		stop();
+	delete m_client;
+}
 
-void Network::tick() { m_client->poll(); }
+void Network::run()
+{
+	while (m_running)
+	{
+		m_client->poll();
+	}
+}
+
+void Network::start()
+{
+	m_running = true;
+	m_thread  = new std::thread(&Network::run, this);
+}
+
+void Network::stop()
+{
+	m_running = false;
+	m_thread->join();
+	delete m_thread;
+}
 
 void Network::parseEvent(phx::net::Packet& packet)
 {
