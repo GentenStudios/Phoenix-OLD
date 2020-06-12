@@ -102,6 +102,6 @@ namespace phx::client
 		math::vec3  m_prevPos;
 		int         m_playerHand = 0;
 
-		client::net::Network* m_network;
+		client::Network* m_network;
 	};
 } // namespace phx::client
