@@ -50,7 +50,7 @@ namespace phx::client
 		 * @param data The data in the state packet
 		 * @param dataLength The length of the data in the state packet
 		 */
-		void parseEvent(phx::net::Packet& packet);
+		void parseEvent(net::Packet& packet);
 
 		/**
 		 * @brief Actions taken when a state is received
@@ -58,7 +58,7 @@ namespace phx::client
 		 * @param data The data in the state packet
 		 * @param dataLength The length of the data in the state packet
 		 */
-		void parseState(phx::net::Packet& packet);
+		void parseState(net::Packet& packet);
 
 		/**
 		 * @brief Actions taken when a message is received

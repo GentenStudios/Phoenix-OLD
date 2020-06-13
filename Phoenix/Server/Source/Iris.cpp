@@ -157,8 +157,7 @@ void Iris::parseState(std::size_t userID, phx::net::Packet& packet)
 
 	{
 		// printf("insert existing %lu \n", input.sequence);
-		auto begin = currentBundles.begin();
-		for (auto it = begin; it != currentBundles.end(); ++it)
+		for (auto it = currentBundles.begin(); it != currentBundles.end(); ++it)
 		{
 			StateBundle& bundle = *it;
 			if (bundle.sequence == input.sequence)

@@ -222,7 +222,7 @@ Peer& Host::getPeer(ENetPeer& peer)
 
 Peer& Host::createPeer(ENetPeer& peer)
 {
-	m_peerID++;
+	++m_peerID;
 	peer.data = reinterpret_cast<void*>(m_peerID);
 	m_peers.insert({m_peerID, {*this, peer}});
 	return m_peers.at(m_peerID);

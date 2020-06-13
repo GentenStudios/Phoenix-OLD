@@ -289,10 +289,10 @@ void Game::tick(float dt)
 		inputState.down     = m_window->isKeyDown(events::Keys::KEY_LEFT_SHIFT);
 
 		/// conversion from rad to 1/1000 of degrees
-		inputState.rotation.x = static_cast<unsigned>(
+		inputState.rotation.x = static_cast<unsigned int>(
 		    m_registry->get<Position>(m_player->getEntity()).rotation.x *
 		    360000.0);
-		inputState.rotation.y = static_cast<unsigned>(
+		inputState.rotation.y = static_cast<unsigned int>(
 		    m_registry->get<Position>(m_player->getEntity()).rotation.y *
 		    360000.0);
 
