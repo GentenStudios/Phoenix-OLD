@@ -65,7 +65,7 @@ namespace phx::server
 		entt::registry m_registry;
 
 		/// @brief The networking object, this listens for incoming data
-		networking::Iris* m_iris;
+		net::Iris* m_iris;
 		/** @brief @brief The server side game object, this handles all of the
 		 * core game logic.
 		 */

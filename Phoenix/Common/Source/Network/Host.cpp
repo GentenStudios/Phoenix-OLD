@@ -154,6 +154,15 @@ std::size_t Host::getPeerLimit() const { return m_host->peerCount; }
 
 const Address& Host::getAddress() const { return m_address; }
 
+Peer* Host::getPeer(std::size_t id)
+{
+	if (m_peers.find(id) != m_peers.end())
+	{
+		return &m_peers[id];
+	}
+	return nullptr;
+}
+
 enet_uint32 Host::getTotalReceievedData() const
 {
 	return m_host->totalReceivedData;
@@ -204,12 +213,17 @@ void Host::handleEvent(ENetEvent& event)
 
 Peer& Host::getPeer(ENetPeer& peer)
 {
-	return m_peers.at(std::size_t(peer.data));
+	if (m_peers.find(std::size_t(peer.data)) != m_peers.end())
+	{
+		return m_peers.at(std::size_t(peer.data));
+	}
+	std::cout << "peer not found";
 }
 
 Peer& Host::createPeer(ENetPeer& peer)
 {
-	peer.data    = reinterpret_cast<void*>(m_peerID++);
+	++m_peerID;
+	peer.data = reinterpret_cast<void*>(m_peerID);
 	m_peers.insert({m_peerID, {*this, peer}});
 	return m_peers.at(m_peerID);
 }

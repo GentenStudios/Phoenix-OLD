@@ -35,6 +35,7 @@
 #include <enet/enet.h>
 
 #include <chrono>
+#include <iostream>
 
 namespace phx::net
 {
@@ -211,7 +212,7 @@ namespace phx::net
 		 * @brief The current state of the peer.
 		 * @return Gets the current state of the peer.
 		 */
-		PeerStatus     getState() const;
+		PeerStatus getState() const;
 
 		/**
 		 * @brief Gets the peer's unique ID.
@@ -221,7 +222,7 @@ namespace phx::net
 		 * this can be used to uniquely identify a peer with a user or something
 		 * similar.
 		 */
-		std::size_t    getID() const { return std::size_t(m_peer->data); }
+		std::size_t getID() const { return std::size_t(m_peer->data); }
 
 		operator ENetPeer*() const { return m_peer; }
 
