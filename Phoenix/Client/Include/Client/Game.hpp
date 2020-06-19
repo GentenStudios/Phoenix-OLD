@@ -110,5 +110,10 @@ namespace phx::client
 		ENetEvent   m_event;
 		ENetPeer*   m_peer;
 		ENetAddress m_address;
+
+		// intermediary variables to prevent getting the pointer from the client
+		// singleton every tick.
+		audio::Audio* m_audio;
+		audio::Listener* m_listener;
 	};
 } // namespace phx::client

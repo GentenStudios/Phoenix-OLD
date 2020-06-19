@@ -118,11 +118,13 @@ void Client::onEvent(events::Event e)
 
 void Client::run()
 {
-	LoggerConfig config;
-	config.verbosity = LogVerbosity::DEBUG;
-	Logger::initialize(config);
-
 	Settings::get()->load("settings.txt");
+    LoggerConfig config;
+    config.verbosity = LogVerbosity::DEBUG;
+    Logger::initialize(config);
+
+	audio::Audio::initialize();
+	m_audio = new audio::Audio();
 
 	SplashScreen* splashScreen = new SplashScreen();
 	m_layerStack.pushLayer(splashScreen);
@@ -140,8 +142,12 @@ void Client::run()
 		if (!m_layerStack.empty())
 			m_layerStack.tick(dt);
 
+		m_audioPool.tick();
+
 		m_window.endFrame();
 	}
+
+	audio::Audio::teardown();
 
 	Settings::get()->save("settings.txt");
 }

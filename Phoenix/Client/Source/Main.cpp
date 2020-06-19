@@ -28,6 +28,9 @@
 
 #include <Client/Client.hpp>
 
+#include <Client/Audio/Audio.hpp>
+#include <Client/Audio/SourcePool.hpp>
+
 #include <Common/Logger.hpp>
 
 using namespace phx;

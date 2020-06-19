@@ -30,6 +30,8 @@
 #include <Common/CMS/Mod.hpp>
 #include <Common/Logger.hpp>
 
+#include <Common/Math/Math.hpp>
+
 using namespace phx::cms;
 
 static void CustomPanicHandler(sol::optional<std::string> maybe_msg)

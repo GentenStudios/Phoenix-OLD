@@ -28,25 +28,52 @@
 
 #pragma once
 
-#include <Common/Math/Math.hpp>
+#include <Client/Audio/Audio.hpp>
+#include <Client/Audio/Source.hpp>
 
-namespace phx
+#include <deque>
+#include <vector>
+#include <mutex>
+
+namespace phx::audio
 {
-	/**
-	 * @brief The positioning for an entity
-	 */
-	struct Position
+	class SourcePool
 	{
-		/// @brief The direction the entity is facing
-		math::vec3 rotation;
-		/// @brief The cardinal position of the entity
-		math::vec3 position;
+	public:
+		/**
+		 * @brief The maximum amount of sources that can be played at once.
+		 *
+		 * This is set to 32 since that's the maximum concurrently playing
+		 * sources on iOS devices. 32 should be fairly generous for a voxel game
+		 * anyways.
+		 */
+		constexpr static std::size_t MAX_SIMULTANEOUS_SOURCES = 32;
 
-		math::vec3 getDirection()
-		{
-			return math::vec3 {std::cos(rotation.y) * std::sin(rotation.x),
-			                   std::sin(rotation.y),
-			                   std::cos(rotation.y) * std::cos(rotation.x)};
-		};
+	public:
+		SourcePool();
+		~SourcePool() = default;
+
+		void queue(const Source& source);
+		void queue(Source&& source);
+
+		void forceNext(const Source& source);
+		void forceNext(Source&& source);
+
+		void clear();
+		std::size_t playingCount() const;
+		
+		void pause();
+		void play();
+		void stop();
+
+		void tick();
+
+	private:
+		bool m_paused = false;
+		
+		std::mutex m_mutex;
+		
+		std::deque<Source> m_sourcesToPlay;
+		std::vector<Source> m_playingSources;
 	};
-} // namespace phx
+} // namespace phx::audio
