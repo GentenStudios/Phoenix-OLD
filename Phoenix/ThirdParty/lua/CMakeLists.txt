@@ -47,9 +47,7 @@ add_library(liblua STATIC ${lualib_SRC_CORE} ${lualib_SRC_LIB})
 target_include_directories(liblua PUBLIC ${CMAKE_CURRENT_LIST_DIR})
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-	if (NOT(WIN32))
-		target_link_libraries(liblua m)
-	endif()
+	target_link_libraries(liblua m)
 endif()
 
 set_target_properties (liblua PROPERTIES OUTPUT_NAME lua)

@@ -69,7 +69,7 @@ Game::Game(gfx::Window* window, entt::registry* registry)
 	fileStream.open("Saves/" + save + "/Mods.txt");
 	if (!fileStream.is_open())
 	{
-		std::cout << "Error opening save file";
+		LOG_FATAL("CMS") << "Error opening save file";
 		exit(EXIT_FAILURE);
 	}
 
@@ -239,51 +239,13 @@ Game::~Game() { delete m_chat; }
 
 void Game::onAttach()
 {
-	if (enet_initialize () != 0)
-	{
-		fprintf (stderr, "An error occurred while initializing ENet.\n");
-		exit(0);
-	}
-	atexit (enet_deinitialize);
-
-	m_client = enet_host_create (NULL /* the address to bind the server host to */,
-							1      /* connect to a single server */,
-							3      /* allow up to 3 channels to be used */,
-							0      /* assume any amount of incoming bandwidth */,
-							0      /* assume any amount of outgoing bandwidth */);
-	if (m_client == NULL)
-	{
-		fprintf (stderr,
-				"An error occurred while trying to create an ENet client host.\n");
-		exit (EXIT_FAILURE);
-	}
-
-	enet_address_set_host(&m_address, "127.0.0.1");
-	m_address.port = 7777;
-
-	m_peer = enet_host_connect(m_client, &m_address, 3, 0);
-	if (m_peer == NULL)
-	{
-		fprintf (stderr,
-				"No available peers for initiating an ENet connection\n");
-		exit (EXIT_FAILURE);
-	}
-
-	if(enet_host_service(m_client, &m_event, 5000) > 0 && m_event.type == ENET_EVENT_TYPE_CONNECT)
-	{
-		puts("Connection to 127.0.0.1:7777 made");
-	}
-	else
-	{
-		enet_peer_reset(m_peer);
-		puts("Connection to 127.0.0.1:7777 failed.");
-	}
-
 	m_chat = new ui::ChatWindow("Chat Window", 5,
 	                            "Type /help for a command list and help.");
 
 	/// @TODO replace with network callback
 	m_chat->registerCallback(rawEcho);
+
+	m_network = new client::Network(m_chat->cout);
 
 	m_player = new Player(m_registry);
 	m_player->registerAPI(m_modManager);
@@ -297,7 +259,7 @@ void Game::onAttach()
 		exit(EXIT_FAILURE);
 	}
 
-	printf("%s", "Registering world\n");
+	LOG_INFO("MAIN") << "Registering world";
 	const std::string save = "save1";
 	m_world = new voxels::ChunkView(3, voxels::Map(save, "map1"));
 	m_player->setWorld(m_world);
@@ -308,7 +270,7 @@ void Game::onAttach()
 	    m_player->getEntity(),
 	    voxels::BlockRegistry::get()->getFromRegistryID(0));
 
-	printf("%s", "Prepare rendering\n");
+	LOG_INFO("MAIN") << "Prepare rendering";
 	m_renderPipeline.prepare("Assets/SimpleWorld.vert",
 	                         "Assets/SimpleWorld.frag",
 	                         gfx::ChunkRenderer::getRequiredShaderLayout());
@@ -318,7 +280,7 @@ void Game::onAttach()
 	const math::mat4 model;
 	m_renderPipeline.setMatrix("u_model", model);
 
-	printf("%s", "Register GUI\n");
+	LOG_INFO("MAIN") << "Register GUI";
 	m_crosshair  = new Crosshair(m_window);
 	m_escapeMenu = new EscapeMenu(m_window);
 	Client::get()->pushLayer(m_crosshair);
@@ -329,29 +291,15 @@ void Game::onAttach()
 		    new GameTools(&m_followCam, &m_playerHand, m_player, m_registry);
 		Client::get()->pushLayer(m_gameDebug);
 	}
-	printf("%s", "Game layer attached");
+	LOG_INFO("MAIN") << "Game layer attached";
 }
 
 void Game::onDetach()
 {
-	enet_peer_disconnect(m_peer, 0);
-
-	while(enet_host_service(m_client, &m_event, 3000) > 0)
-	{
-		switch(m_event.type)
-		{
-		case ENET_EVENT_TYPE_RECEIVE:
-			enet_packet_destroy(m_event.packet);
-			break;
-		case ENET_EVENT_TYPE_DISCONNECT:
-			puts("Disconnection succeeded.");
-			break;
-		}
-	}
-
 	delete m_world;
 	delete m_player;
 	delete m_camera;
+	delete m_network;
 }
 
 void Game::onEvent(events::Event& e)
@@ -449,44 +397,8 @@ void Game::tick(float dt)
 {
 	//	std::cout << "tick";
 	//  LOG_WARNING("MAINLOOP") << "WTF";
-	if (enet_host_service(m_client, &m_event, 0))
-	{
-		switch (m_event.type)
-		{
-		case ENET_EVENT_TYPE_RECEIVE:
-			//                printf ("A packet of length %u containing %s
-			//                was received from %s on channel %u.\n",
-			//                        m_event.packet -> dataLength,
-			//                        m_event.packet -> data,
-			//                        m_event.peer -> data -> userName,
-			//                        m_event.channelID);
-			switch (m_event.channelID)
-			{
-			case 0:
-				parseEvent(m_event.packet->data, m_event.packet->dataLength);
-				break;
-			case 1:
-				parseState(m_event.packet->data, m_event.packet->dataLength);
-				break;
-			case 2:
-				parseMessage(m_event.packet->data, m_event.packet->dataLength);
-				break;
-			}
-
-			/* Clean up the packet now that we're done using it. */
-			enet_packet_destroy(m_event.packet);
-			break;
-
-		case ENET_EVENT_TYPE_DISCONNECT:
-			printf("%s disconnected.\n",
-			       static_cast<const char*>(m_event.peer->data));
-			/// @todo we should probably kill the game at this point
-			break;
-
-		case ENET_EVENT_TYPE_NONE:
-			break;
-		}
-	}
+	/// @TODO convert this into thread
+	m_network->tick();
 
 	// temp, will change in the future, based on game time
 	static math::vec3 lightdir(0.f, -1.f, 0.f);
@@ -503,33 +415,27 @@ void Game::tick(float dt)
 	sequence++;
 
 	// Build input state
-	// @todo move this to inputQueue.cpp @beeper
+	// @todo move this to inputQueue.cpp
+	{
+		InputState inputState;
+		inputState.sequence = sequence;
+		inputState.forward  = m_window->isKeyDown(events::Keys::KEY_W);
+		inputState.backward = m_window->isKeyDown(events::Keys::KEY_S);
+		inputState.left     = m_window->isKeyDown(events::Keys::KEY_A);
+		inputState.right    = m_window->isKeyDown(events::Keys::KEY_D);
+		inputState.up       = m_window->isKeyDown(events::Keys::KEY_SPACE);
+		inputState.down     = m_window->isKeyDown(events::Keys::KEY_LEFT_SHIFT);
 
-	InputState inputState;
-	inputState.sequence = sequence;
-	inputState.forward  = m_window->isKeyDown(events::Keys::KEY_W);
-	inputState.backward = m_window->isKeyDown(events::Keys::KEY_S);
-	inputState.left     = m_window->isKeyDown(events::Keys::KEY_A);
-	inputState.right    = m_window->isKeyDown(events::Keys::KEY_D);
-	inputState.up       = m_window->isKeyDown(events::Keys::KEY_SPACE);
-	inputState.down     = m_window->isKeyDown(events::Keys::KEY_LEFT_SHIFT);
+		/// conversion from rad to 1/1000 of degrees
+		inputState.rotation.x = static_cast<unsigned int>(
+		    m_registry->get<Position>(m_player->getEntity()).rotation.x *
+		    360000.0);
+		inputState.rotation.y = static_cast<unsigned int>(
+		    m_registry->get<Position>(m_player->getEntity()).rotation.y *
+		    360000.0);
 
-	/// conversion from rad to 1/1000 of degres
-	inputState.rotation.x =
-	    static_cast<unsigned>(m_registry->get<Position>(m_player->getEntity()).rotation.x * 360000.0);
-	inputState.rotation.y =
-        static_cast<unsigned>(m_registry->get<Position>(m_player->getEntity()).rotation.y * 360000.0);
-
-	Serializer ser(Serializer::Mode::WRITE);
-	ser&       inputState;
-	auto       state = ser.getBuffer();
-
-	ENetPacket* packet;
-	packet = enet_packet_create(state.data(), state.size(),
-	                            ENET_PACKET_FLAG_UNRELIABLE_FRAGMENT);
-
-	enet_peer_send(m_peer, 1, packet);
-	enet_host_flush(m_client);
+		m_network->sendState(inputState);
+	}
 
 	const Position& position = m_registry->get<Position>(m_player->getEntity());
 
@@ -557,27 +463,7 @@ void Game::tick(float dt)
 	                             m_camera->getProjection());
 }
 
-void Game::sendMessage(const std::string& input, std::ostringstream& cout)
+void Game::sendMessage(std::string input, std::ostringstream& cout)
 {
-	ENetPacket* packet;
-	packet = enet_packet_create(input.c_str(), input.length() + 1,
-	                            ENET_PACKET_FLAG_RELIABLE);
-	LOG_INFO("TEST") << "Send Message: " << input;
-	enet_peer_send(m_peer, 2, packet);
-	LOG_INFO("TEST") << "Sending Message";
-	enet_host_flush(m_client);
-	LOG_INFO("TEST") << "Sent Message";
-}
-void Game::parseEvent(enet_uint8* data, std::size_t dataLength)
-{
-	printf("Event received");
-}
-void Game::parseState(enet_uint8* data, std::size_t dataLength)
-{
-	// printf("State received");
-}
-void Game::parseMessage(enet_uint8* data, std::size_t dataLength)
-{
-	LOG_INFO("Messenger") << data;
-	m_chat->cout << data;
+	m_network->sendMessage(input);
 }

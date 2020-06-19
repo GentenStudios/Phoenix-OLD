@@ -28,49 +28,65 @@
 
 #pragma once
 
-#include <Server/Commander.hpp>
-#include <Server/Iris.hpp>
+#include <Common/Input.hpp>
+#include <Common/Network/Host.hpp>
+#include <Common/Util/BlockingQueue.hpp>
 
-#include <entt/entt.hpp>
-
-namespace phx::server
+namespace phx::client
 {
-	class Game
+	class Network
 	{
 	public:
-		/** @brief The server side game object, this handles all of the core
-		 * game logic.
-		 *
-		 * @param registry The shared EnTT registry
-		 * @param running Pointer to a boolean, the threaded function only runs
-		 * if this is true
-		 * @param iris Pointer to the nextworking system
-		 */
-		Game(entt::registry* registry, bool* running, net::Iris* iris);
+		Network(std::ostringstream& chat);
+		~Network();
 
-		/** @brief Loads all API's that the game utilizes into a CMS ModManager
-		 *
-		 * @param manager The mod manager to load the API into
-		 */
-		void registerAPI(cms::ModManager* manager);
+		void tick();
+
+		void kill() { m_running = false; };
 
 		/**
-		 * @brief Runs the main game loop as long as running is true
+		 * @brief Actions taken when a state is received
+		 *
+		 * @param data The data in the state packet
+		 * @param dataLength The length of the data in the state packet
 		 */
-		void run();
+		void parseEvent(net::Packet& packet);
 
-		/// @brief Just a temporary static storage for the DT
-		/// @TODO Move this to a config file
-		static constexpr float dt = 1.f / 20.f;
+		/**
+		 * @brief Actions taken when a state is received
+		 *
+		 * @param data The data in the state packet
+		 * @param dataLength The length of the data in the state packet
+		 */
+		void parseState(net::Packet& packet);
+
+		/**
+		 * @brief Actions taken when a message is received
+		 *
+		 * @param data The data in the message packet
+		 * @param dataLength The length of the data in the message packet
+		 */
+		void parseMessage(phx::net::Packet& packet);
+
+		/**
+		 * @brief Sends a state packet to a client
+		 *
+		 * @param userRef The user to sent the state to
+		 * @param data The state packet data
+		 */
+		void sendState(InputState inputState);
+
+		/**
+		 * @brief Sends a message packet to a client
+		 *
+		 * @param userRef The user to sent the message to
+		 * @param data The message packet data
+		 */
+		void sendMessage(std::string message);
 
 	private:
-		/// @brief The main loop runs while this is true
-		bool* m_running;
-		/// @breif An EnTT registry to store various data in
-		entt::registry* m_registry;
-		/// @brief The networking object to get data from
-		net::Iris* m_iris;
-		/// @brief A commander object to process commands
-		Commander* m_commander;
+		bool                m_running;
+		phx::net::Host*     m_client;
+		std::ostringstream& m_chat;
 	};
-} // namespace phx::server
+} // namespace phx::client::net

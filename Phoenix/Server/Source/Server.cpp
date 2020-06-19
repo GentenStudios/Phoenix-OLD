@@ -42,7 +42,7 @@ using namespace phx;
 
 Server::Server(std::string save) : m_save(std::move(save))
 {
-	m_iris = new networking::Iris(&m_registry, &m_running);
+	m_iris = new server::net::Iris(&m_registry);
 	m_game = new Game(&m_registry, &m_running, m_iris);
 }
 
@@ -111,7 +111,7 @@ void Server::run()
 
 	m_running = true;
 
-	std::thread t_iris(&networking::Iris::run, m_iris);
+	std::thread t_iris(&server::net::Iris::run, m_iris);
 	std::thread t_game(&Game::run, m_game);
 
 	// Enter Main Loop //
@@ -124,6 +124,7 @@ void Server::run()
 		if (input == "q")
 		{
 			m_running = false;
+			m_iris->kill();
 		}
 	}
 

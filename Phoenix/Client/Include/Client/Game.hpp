@@ -28,15 +28,16 @@
 
 #pragma once
 
+#include <Client/Crosshair.hpp>
+#include <Client/EscapeMenu.hpp>
 #include <Client/GameTools.hpp>
 #include <Client/Graphics/Camera.hpp>
 #include <Client/Graphics/Layer.hpp>
 #include <Client/Graphics/ShaderPipeline.hpp>
 #include <Client/Graphics/UI.hpp>
 #include <Client/Graphics/Window.hpp>
+#include <Client/Network.hpp>
 #include <Client/Player.hpp>
-#include <Client/EscapeMenu.hpp>
-#include <Client/Crosshair.hpp>
 
 #include <Common/CMS/ModManager.hpp>
 
@@ -79,10 +80,7 @@ namespace phx::client
 		 * @param cout Needs to be depreciated, unused (but required by
 		 * terminal)
 		 */
-		void sendMessage(const std::string& input, std::ostringstream& cout);
-		void parseEvent(enet_uint8* data, std::size_t dataLength);
-		void parseState(enet_uint8* data, std::size_t dataLength);
-		void parseMessage(enet_uint8* data, std::size_t dataLength);
+		void sendMessage(std::string input, std::ostringstream& cout);
 
 	private:
 		gfx::Window*       m_window;
@@ -96,20 +94,15 @@ namespace phx::client
 		ui::ChatWindow* m_chat = nullptr;
 
 		cms::ModManager* m_modManager;
-		
-		Crosshair* m_crosshair = nullptr;
+
+		Crosshair*  m_crosshair  = nullptr;
 		EscapeMenu* m_escapeMenu = nullptr;
-		GameTools* m_gameDebug = nullptr;
-		bool       m_followCam = true;
-		math::vec3 m_prevPos;
-		int        m_playerHand = 0;
+		GameTools*  m_gameDebug  = nullptr;
+		bool        m_followCam  = true;
+		math::vec3  m_prevPos;
+		int         m_playerHand = 0;
 
-		// Networking stuff
-
-		ENetHost*   m_client;
-		ENetEvent   m_event;
-		ENetPeer*   m_peer;
-		ENetAddress m_address;
+		client::Network* m_network;
 
 		// intermediary variables to prevent getting the pointer from the client
 		// singleton every tick.

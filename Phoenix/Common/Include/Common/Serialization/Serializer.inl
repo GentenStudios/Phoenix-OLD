@@ -260,6 +260,11 @@ namespace phx
 			// swapping endianness and essentially doing an unnecessary
 			// endianness swap.
 
+            // push size of string onto data at the end.
+            // specify unsigned int otherwise it will waste space allocating a
+            // 64 bit variable.
+            push(static_cast<unsigned int>(data.length()));
+
 			// previous end of the array, so we can append onto that - rather
 			// than the new end.
 			const std::size_t prevEnd = m_buffer.size();
@@ -270,11 +275,6 @@ namespace phx
 			// convert string to array of std::byte and append to data array.
 			std::transform(data.begin(), data.end(), m_buffer.begin() + prevEnd,
 			               [](char c) { return std::byte(c); });
-
-			// push size of string onto data at the end.
-			// specify unsigned int otherwise it will waste space allocating a
-			// 64 bit variable.
-			push(static_cast<unsigned int>(data.length()));
 		}
 		else
 		{
@@ -282,12 +282,12 @@ namespace phx
 			// the reason this exists is because there are different strings in
 			// the standard library, them being 16bit and 32bit character
 			// strings.
+            push(static_cast<unsigned int>(data.length()));
 			for (auto c : data)
 			{
 				push(c);
 			}
 
-			push(static_cast<unsigned int>(data.length()));
 		}
 	}
 

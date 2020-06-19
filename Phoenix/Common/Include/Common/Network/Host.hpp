@@ -288,6 +288,13 @@ namespace phx::net
 		const Address& getAddress() const;
 
 		/**
+		 * @brief Gets a peer based on its ID.
+		 * @param id The ID of the Peer.
+		 * @return A pointer to the peer, or a nullptr if it doesnt exit.
+		 */
+		Peer* getPeer(std::size_t id);
+
+		/**
 		 * @brief Gets the total amount of data received.
 		 * @return The total amount of data received in bytes.
 		 *

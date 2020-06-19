@@ -40,7 +40,7 @@
 
 using namespace phx::server;
 
-Commander::Commander(networking::Iris* iris) : m_iris(iris) {}
+Commander::Commander(net::Iris* iris) : m_iris(iris) {}
 
 void Commander::registerAPI(phx::cms::ModManager* manager)
 {
@@ -94,7 +94,7 @@ void Commander::add(const std::string& command, const std::string& help,
 	m_commands[command] = {command, help, f};
 }
 
-bool Commander::run(entt::entity* userRef, const std::string& input)
+bool Commander::run(std::size_t userRef, const std::string& input)
 {
 	// Break the command into args
 	std::string_view search = input;
@@ -171,8 +171,7 @@ bool Commander::run(entt::entity* userRef, const std::string& input)
 	return false;
 }
 
-bool Commander::help(entt::entity*                   userRef,
-                     const std::vector<std::string>& args)
+bool Commander::help(std::size_t userRef, const std::vector<std::string>& args)
 {
 	if (args.empty())
 	{
@@ -203,7 +202,7 @@ bool Commander::help(entt::entity*                   userRef,
 	return false;
 }
 
-void Commander::list(entt::entity* userRef)
+void Commander::list(std::size_t userRef)
 {
 	m_iris->sendMessage(userRef, "Available commands:\n");
 	for (const auto& com : m_commands)

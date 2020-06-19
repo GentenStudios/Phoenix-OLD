@@ -37,7 +37,7 @@
 using namespace phx;
 using namespace phx::server;
 
-Game::Game(entt::registry* registry, bool* running, networking::Iris* iris)
+Game::Game(entt::registry* registry, bool* running, net::Iris* iris)
     : m_registry(registry), m_running(running), m_iris(iris)
 {
 	m_commander = new Commander(m_iris);
@@ -52,35 +52,33 @@ void Game::run()
 {
 	while (m_running)
 	{
-        // Process everybody's input first
-        networking::StateBundle m_currentState = m_iris->stateQueue.pop();
+		// Process everybody's input first
+		net::StateBundle m_currentState = m_iris->stateQueue.pop();
 
-        for (const auto& state : m_currentState.states)
-        {
-            ActorSystem::tick(m_registry,
-                              m_registry->get<Player>(*state.first).actor,
-                              dt, state.second);
+		for (const auto& state : m_currentState.states)
+		{
+			ActorSystem::tick(m_registry,
+			                  m_registry->get<Player>(state.first).actor, dt,
+			                  state.second);
 
-            // @todo remove this debug statement before merging to develop
-            std::cout
-                << m_registry
-                       ->get<Position>(
-                           m_registry->get<Player>(*state.first).actor)
-                       .position
-                << "\n";
-        }
-        // Process events second
+			// @todo remove this debug statement before merging to develop
+			//			std::cout << m_registry
+			//			                 ->get<Position>(
+			//			                     m_registry->get<Player>(state.first).actor)
+			//			                 .position
+			//			          << "\n";
+		}
+		// Process events second
 
-        // Process messages last
-        size_t size = m_iris->messageQueue.size();
-        for (size_t i = 0; i < size; i++)
-        {
-            networking::MessageBundle message =
-                m_iris->messageQueue.front();
-            m_commander->run(message.userRef, message.message);
-            m_iris->messageQueue.pop_front();
-        }
+		// Process messages last
+		size_t size = m_iris->messageQueue.size();
+		for (size_t i = 0; i < size; i++)
+		{
+			net::MessageBundle message = m_iris->messageQueue.front();
+			m_commander->run(message.userID, message.message);
+			m_iris->messageQueue.pop();
+		}
 
-        m_iris->sendState(m_currentState.sequence);
+		m_iris->sendState(m_registry, m_currentState.sequence);
 	}
 }
