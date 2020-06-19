@@ -57,6 +57,10 @@ void registerUnusedAPI(cms::ModManager* manager)
 	                          [](std::string uniqueName) {});
 	manager->registerFunction("core.input.registerCallback",
 	                          [](int input, sol::function f) {});
+	manager->registerFunction(
+	    "audio.loadMP3",
+	    [=](const std::string& uniqueName, const std::string& filePath) {});
+	manager->registerFunction("audio.play", [=](sol::table source) {});
 }
 
 void Server::run()
