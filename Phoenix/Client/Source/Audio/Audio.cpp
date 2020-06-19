@@ -48,9 +48,9 @@ mp3dec_t    Audio::m_mp3;
 Audio::~Audio()
 {
 	// deletes all buffers of registered sounds.
-	for (auto& it : m_buffers)
+	for (auto& it : m_handles)
 	{
-		alDeleteBuffers(1, &it.second.buffer);
+		alDeleteBuffers(1, &it.second);
 	}
 }
 
@@ -111,11 +111,12 @@ void Audio::teardown()
 	alcCloseDevice(m_device);
 }
 
-void Audio::loadMP3(const std::string& uniqueName, const std::string& filePath)
+unsigned int Audio::loadMP3(const std::string& uniqueName,
+                            const std::string& filePath)
 {
 	// checks if uniqueName already exists, if so, then overwrite what's there.
-	const auto it = m_buffers.find(uniqueName);
-	if (it != m_buffers.end())
+	const auto it = m_handles.find(uniqueName);
+	if (it != m_handles.end())
 	{
 		LOG_WARNING("AUDIO") << "The sound with the unique name: " << uniqueName
 		                     << " already exists, but will be overwritten.";
@@ -129,29 +130,33 @@ void Audio::loadMP3(const std::string& uniqueName, const std::string& filePath)
 		    << "An unexpected (but recoverable) error occurred while loading: "
 		    << filePath;
 
-		return;
+		return -1;
 	}
 
-	// calculates the size of the buffer by the amount of samples and the size of each sample.
+	// calculates the size of the buffer by the amount of samples and the size
+	// of each sample.
 	const unsigned int bufferSize = info.samples * sizeof(mp3d_sample_t);
 
-	// gets the duration of the audio, initially as a simple float, but then converted to minutes and seconds.
-	const float durationSeconds = static_cast<float>(bufferSize) / (static_cast<float>(info.avg_bitrate_kbps) * 1024.f);
-	const Duration duration     = {
-        static_cast<unsigned int>(durationSeconds / 60.f),
-        static_cast<unsigned int>(durationSeconds) % 60};
+	// gets the duration of the audio, initially as a simple float, but then
+	// converted to minutes and seconds.
+	const float durationSeconds =
+	    static_cast<float>(bufferSize) /
+	    (static_cast<float>(info.avg_bitrate_kbps) * 1024.f);
+	const Duration duration = {
+	    static_cast<unsigned int>(durationSeconds / 60.f),
+	    static_cast<unsigned int>(durationSeconds) % 60};
 
 	unsigned int buffer;
 
 	// if uniqueName wasn't found, the buffer doesn't exist, otherwise overwrite
 	// the existing buffer to prevent undefined behaviour and wasted memory.
-	if (it == m_buffers.end())
+	if (it == m_handles.end())
 	{
 		alGenBuffers(1, &buffer);
 	}
 	else
 	{
-		buffer = it->second.buffer;
+		buffer = it->second;
 	}
 
 	// fill the buffer with the data.
@@ -165,23 +170,50 @@ void Audio::loadMP3(const std::string& uniqueName, const std::string& filePath)
 		LOG_FATAL("AUDIO")
 		    << "An unexpected (but recoverable) error occurred while loading: "
 		    << filePath;
-
 	}
 
 	// adds the buffer ID and duration to the unordered_map, where it is
 	// associated with the uniqueName. this can then be retrieved in
 	// getAudioData or [].
-	m_buffers.insert_or_assign(uniqueName, AudioData {buffer, duration});
+	m_handles.insert_or_assign(uniqueName, buffer);
+	m_buffers.insert_or_assign(buffer, duration);
+
+	return buffer;
+}
+
+const std::string& Audio::getUniqueName(Handle handle) const
+{
+	for (auto& it : m_handles)
+	{
+		if (it.second == handle)
+		{
+			return it.first;
+		}
+	}
+
+	return m_unknownHandle;
 }
 
 AudioData Audio::getAudioData(const std::string& uniqueName) const
 {
-	auto it = m_buffers.find(uniqueName);
+	const auto it = m_handles.find(uniqueName);
+	if (it == m_handles.end())
+	{
+		// if not found, return some dummy data.
+		return {static_cast<unsigned int>(-1), {0, 0}};
+	}
+
+	return {it->second, m_buffers.at(it->second)};
+}
+
+AudioData Audio::getAudioData(Handle handle) const
+{
+	const auto it = m_buffers.find(handle);
 	if (it == m_buffers.end())
 	{
 		// if not found, return some dummy data.
 		return {static_cast<unsigned int>(-1), {0, 0}};
 	}
 
-	return it->second;
+	return {handle, m_buffers.at(handle)};
 }

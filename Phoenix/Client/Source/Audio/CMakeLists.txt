@@ -4,5 +4,7 @@ set(audioSources
 	${currentDir}/Listener.cpp
 	${currentDir}/Audio.cpp
 
+	${currentDir}/SourcePool.cpp
+
 	PARENT_SCOPE
 )

@@ -94,5 +94,7 @@
 		}
 #else
 #	define ENGINE_ASSERT(condition, ...)
-#	define NDEBUG // DISABLE ASSERTIONS.
+#	ifndef NDEBUG
+#		define NDEBUG // DISABLE ASSERTIONS.
+#	endif
 #endif

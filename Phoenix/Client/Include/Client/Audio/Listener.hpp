@@ -82,7 +82,7 @@ namespace phx::audio
 		 * @brief Sets the position of the listener.
 		 * @param position The position of the listener.
 		 */
-		void setPosition(math::vec3 position);
+		void setPosition(const math::vec3& position);
 		
 		/**
 		 * @brief Sets the velocity of the listener.
@@ -94,14 +94,14 @@ namespace phx::audio
 		 *
 		 * Velocity is also important in the applying the "Doppler Effect".
 		 */
-		void setVelocity(math::vec3 velocity);
+		void setVelocity(const math::vec3& velocity);
 
 		/**
 		 * @brief Sets the orientation of the player.
 		 * @param direction The direction of the player.
 		 * @param up The up vector of the player (what way up they are.)
 		 */
-		void setOrientation(math::vec3 direction, math::vec3 up);
+		void setOrientation(const math::vec3& direction, const math::vec3& up);
 
 	private:
 		// private constructor because you shouldn't be able to make a Listener.

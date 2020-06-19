@@ -34,19 +34,20 @@ using namespace phx::audio;
 
 void Listener::setGain(float gain) { alListenerf(AL_GAIN, gain); }
 
-void Listener::setPosition(phx::math::vec3 position)
+void Listener::setPosition(const phx::math::vec3& position)
 {
-	alListenerfv(AL_POSITION, &position.x);
+	alListener3f(AL_POSITION, position.x, position.y, position.z);
 }
 
-void Listener::setVelocity(phx::math::vec3 velocity)
+void Listener::setVelocity(const phx::math::vec3& velocity)
 {
-	alListenerfv(AL_VELOCITY, &velocity.x);
+	alListener3f(AL_VELOCITY, velocity.x, velocity.y, velocity.z);
 }
 
-void Listener::setOrientation(phx::math::vec3 direction, phx::math::vec3 up)
+void Listener::setOrientation(const phx::math::vec3& direction,
+                              const phx::math::vec3& up)
 {
 	float orientation[6] = {direction.x, direction.y, direction.z,
-	                        up.x,        up.y,        up.z};
+	                        -up.x,       -up.y,       -up.z};
 	alListenerfv(AL_ORIENTATION, orientation);
 }

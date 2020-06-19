@@ -77,6 +77,10 @@ namespace phx::cms
 		 * for developers since they can work on their mod and store it
 		 * somewhere much more convenient for them while still being able to use
 		 * it.
+		 *
+		 * Also, this method registers all required base types (such as vec3 and
+		 * the likes since there is no better place to put that stuff without
+		 * coupling completely unrelated components).
 		 */
 		explicit ModManager(const ModList& toLoad, const ModList& paths);
 
@@ -94,7 +98,7 @@ namespace phx::cms
 		 *		core.block.register(...)
 		 */
 		template <typename F>
-		void registerFunction(const std::string& funcName, F func);
+		void registerFunction(const std::string& funcName, const F& func);
 
 		// unimplemented function, exists as a reminder for when we need it.
 		template <typename T>

@@ -103,5 +103,10 @@ namespace phx::client
 		int         m_playerHand = 0;
 
 		client::Network* m_network;
+
+		// intermediary variables to prevent getting the pointer from the client
+		// singleton every tick.
+		audio::Audio* m_audio;
+		audio::Listener* m_listener;
 	};
 } // namespace phx::client
