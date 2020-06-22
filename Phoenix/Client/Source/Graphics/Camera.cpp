@@ -155,7 +155,21 @@ void FPSCamera::tick(float dt)
 		m_position.y -= dt * moveSpeed;
 	}
 
-	m_registry->get<Position>(m_actor).position = m_position;
+	///@todo change this behavior when we'll move the position management out of the camera
+	math::vec3 pos = m_position;
+	// camera position to voxel position
+	pos = (pos / 2.f) + 0.5f;
+
+	voxels::BlockType* blockType = m_world->getBlockAt(pos);
+	if (blockType->category != voxels::BlockCategory::SOLID)  // no collision, update the position
+	{
+		// check if we're grounded before updating
+		///@todo handles Archimedes' principle in LIQUIDs
+		if (m_world->getBlockAt(math::vec3(pos.x, pos.y - 1, pos.z))->category != voxels::BlockCategory::SOLID)
+			///@todo make a constant for gravity
+			m_position.y -= dt * 3.f;
+		m_registry->get<Position>(m_actor).position = m_position;
+	}
 	m_registry->get<Position>(m_actor).rotation = m_rotation;
 }
 
@@ -189,3 +203,4 @@ void FPSCamera::onWindowResize(events::Event e)
 
 void FPSCamera::setActor(entt::entity actor) { m_actor = actor;}
 
+void FPSCamera::setWorld(voxels::ChunkView* world) { m_world = world;}

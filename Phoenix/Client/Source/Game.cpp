@@ -247,6 +247,8 @@ void Game::onAttach()
 	m_world = new voxels::ChunkView(3, voxels::Map(save, "map1"));
 	m_player->setWorld(m_world);
 	m_camera = new gfx::FPSCamera(m_window, m_registry);
+	///@todo change this behavior
+	m_camera->setWorld(m_world);
 	m_camera->setActor(m_player->getEntity());
 
 	m_registry->emplace<Hand>(

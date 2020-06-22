@@ -38,6 +38,7 @@
 #include <Client/Graphics/Window.hpp>
 
 #include <Client/InputMap.hpp>
+#include <Client/Graphics/ChunkView.hpp>
 
 #include <Common/Math/Math.hpp>
 #include <Common/Settings.hpp>
@@ -209,6 +210,12 @@ namespace phx::gfx
 		 */
 		void setActor(entt::entity actor);
 
+		/**
+		 * @brief Sets the world for the camera.
+		 * @param world 
+		 */
+		void setWorld(voxels::ChunkView* world);
+
 	private:
 		Window* m_window;
 
@@ -235,6 +242,7 @@ namespace phx::gfx
 		client::Input* m_right;
 		client::Input* m_fly;
 		client::Input* m_down;
+		voxels::ChunkView* m_world;
 	};
 } // namespace phx::gfx
 
