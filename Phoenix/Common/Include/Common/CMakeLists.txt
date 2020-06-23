@@ -4,8 +4,8 @@ add_subdirectory(CMS)
 
 set(currentDir ${CMAKE_CURRENT_LIST_DIR})
 set(Headers
-	${mathHeaders}
-	${voxelHeaders}
+		${mathHeaders}
+		${voxelHeaders}
 		${cmsHeaders}
 
 		${currentDir}/CoreIntrinsics.hpp
