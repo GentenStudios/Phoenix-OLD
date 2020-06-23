@@ -1,12 +1,14 @@
 add_subdirectory(Math)
 add_subdirectory(Voxels)
 add_subdirectory(CMS)
+add_subdirectory(Serialization)
 
 set(currentDir ${CMAKE_CURRENT_LIST_DIR})
 set(Headers
 	${mathHeaders}
 	${voxelHeaders}
 	${cmsHeaders}
+	${serializationHeaders}
 
 	${currentDir}/CoreIntrinsics.hpp
 	${currentDir}/EnumTools.hpp
