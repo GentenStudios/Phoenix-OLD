@@ -251,9 +251,6 @@ void Game::onAttach()
 	m_player = new Player(m_registry);
 	m_player->registerAPI(m_modManager);
 
-	m_inputQueue = new InputQueue(m_registry, m_player);
-	m_inputQueue->start(std::chrono::milliseconds(50), m_network);
-
 	float progress = 0.f;
 	auto  result   = m_modManager->load(&progress);
 
@@ -295,6 +292,10 @@ void Game::onAttach()
 		    new GameTools(&m_followCam, &m_playerHand, m_player, m_registry);
 		Client::get()->pushLayer(m_gameDebug);
 	}
+
+	m_inputQueue = new InputQueue(m_registry, m_player);
+	m_inputQueue->start(std::chrono::milliseconds(50), m_network);
+
 	LOG_INFO("MAIN") << "Game layer attached";
 }
 

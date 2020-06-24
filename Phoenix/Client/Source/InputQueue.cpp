@@ -26,12 +26,9 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Client/InputMap.hpp>
 #include <Client/InputQueue.hpp>
 
 #include <Common/Position.hpp>
-
-#include <chrono>
 
 using namespace phx::client;
 using namespace phx;
@@ -58,11 +55,11 @@ InputQueue::~InputQueue()
 
 void InputQueue::run(std::chrono::milliseconds dt, client::Network* network)
 {
-	m_running = true;
 	using std::chrono::system_clock;
 	system_clock::time_point next = system_clock::now();
 	while (m_running)
 	{
+		m_sequence++;
 		InputState state = getCurrentState();
 		m_queue.push(state);
 		network->sendState(state);
@@ -74,11 +71,15 @@ void InputQueue::run(std::chrono::milliseconds dt, client::Network* network)
 void InputQueue::start(std::chrono::milliseconds dt, client::Network* network)
 {
 	m_running           = true;
-	std::thread thread1 = std::thread(&InputQueue::run, this);
+	std::thread thread1 = std::thread(&InputQueue::run, this, dt, network);
 	std::swap(m_thread, thread1);
 }
 
-void InputQueue::stop() { m_running = false; }
+void InputQueue::stop()
+{
+	m_running = false;
+	m_thread.join();
+}
 
 InputState InputQueue::getCurrentState()
 {
@@ -93,8 +94,6 @@ InputState InputQueue::getCurrentState()
 	    m_registry->get<Position>(m_player->getEntity()).rotation.x * 360000.0);
 	input.rotation.y = static_cast<unsigned int>(
 	    m_registry->get<Position>(m_player->getEntity()).rotation.y * 360000.0);
-	input.sequence = currentSequence() + 1;
+	input.sequence = m_sequence;
 	return input;
 }
-
-std::size_t InputQueue::currentSequence() { return m_queue.back().sequence; }

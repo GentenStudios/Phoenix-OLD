@@ -28,10 +28,10 @@
 
 #pragma once
 
+#include <Client/InputMap.hpp>
 #include <Client/Network.hpp>
 #include <Client/Player.hpp>
 
-#include <Common/Input.hpp>
 #include <Common/Util/BlockingQueue.hpp>
 
 namespace phx::client
@@ -71,13 +71,6 @@ namespace phx::client
 		 */
 		InputState getCurrentState();
 
-		/**
-		 * @brief Gets the current sequence number, this is the most recent
-		 * InputState that was queued
-		 * @return A numerical identifier for the sequence
-		 */
-		std::size_t currentSequence();
-
 		BlockingQueue<InputState> m_queue;
 
 	private:
@@ -86,6 +79,8 @@ namespace phx::client
 
 		Player*         m_player;
 		entt::registry* m_registry;
+
+		std::size_t m_sequence;
 
 		client::Input* m_forward;
 		client::Input* m_backward;
