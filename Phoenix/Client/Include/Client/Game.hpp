@@ -41,7 +41,6 @@
 #include <Common/CMS/ModManager.hpp>
 
 #include <deque>
-#include <enet/enet.h>
 
 namespace phx::client
 {
