@@ -33,12 +33,12 @@
 
 using namespace phx::voxels;
 
-Map::Map(std::string save, std::string name)
+Map::Map(std::string  save, std::string  name)
     : m_save(std::move(save)), m_mapName(std::move(name))
 {
 }
 
-Chunk Map::getChunk(phx::math::vec3 pos)
+Chunk Map::getChunk(const phx::math::vec3& pos)
 {
 	if (m_chunks.find(pos) != m_chunks.end())
 	{
@@ -116,7 +116,7 @@ void Map::setBlockAt(phx::math::vec3 position, BlockType* block)
 	save(chunkPosition);
 }
 
-void Map::save(phx::math::vec3 pos)
+void Map::save(const phx::math::vec3& pos)
 {
 	std::ofstream saveFile;
 	std::string   position = "." + std::to_string(int(pos.x)) + "_" +

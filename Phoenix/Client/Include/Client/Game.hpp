@@ -80,7 +80,7 @@ namespace phx::client
 		 * @param cout Needs to be depreciated, unused (but required by
 		 * terminal)
 		 */
-		void sendMessage(std::string input, std::ostringstream& cout);
+		void sendMessage(const std::string& input, std::ostringstream& cout);
 
 	private:
 		gfx::Window*       m_window;

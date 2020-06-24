@@ -94,6 +94,6 @@ namespace phx::client
 		bool                m_running;
 		phx::net::Host*     m_client;
 		std::ostringstream& m_chat;
-		std::thread*        m_thread = nullptr;
+		std::thread         m_thread;
 	};
 } // namespace phx::client::net

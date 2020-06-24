@@ -79,14 +79,14 @@ void Network::run()
 void Network::start()
 {
 	m_running = true;
-	m_thread  = new std::thread(&Network::run, this);
+    std::thread thread1 = std::thread(&Network::run, this);
+    std::swap(m_thread, thread1);
 }
 
 void Network::stop()
 {
 	m_running = false;
-	m_thread->join();
-	delete m_thread;
+	m_thread.join();
 }
 
 void Network::parseEvent(phx::net::Packet& packet)

@@ -50,11 +50,6 @@ namespace phx::server::net
 		std::unordered_map<entt::entity, InputState> states;
 	};
 
-	struct EventBundle
-	{
-		entt::entity* userRef;
-	};
-
 	struct MessageBundle
 	{
 		size_t      userID;
@@ -86,7 +81,6 @@ namespace phx::server::net
 
 		void kill() { m_running = false; };
 
-		void auth();
 		/**
 		 * @brief Actions taken when a user disconnects
 		 *

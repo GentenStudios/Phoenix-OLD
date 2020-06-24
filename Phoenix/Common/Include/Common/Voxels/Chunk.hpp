@@ -79,14 +79,14 @@ namespace phx::voxels
 	public:
 		Chunk() = delete;
 
-		explicit Chunk(math::vec3 chunkPos);
+		explicit Chunk(const math::vec3& chunkPos);
 		~Chunk()                  = default;
 		Chunk(const Chunk& other) = default;
 		Chunk& operator=(const Chunk& other) = default;
 		Chunk(Chunk&& other) noexcept        = default;
 		Chunk& operator=(Chunk&& other) noexcept = default;
 
-		Chunk(math::vec3 chunkPos, const std::string& save);
+		Chunk(const math::vec3& chunkPos, const std::string& save);
 
 		std::string save();
 

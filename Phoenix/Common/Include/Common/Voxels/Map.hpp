@@ -37,11 +37,11 @@ namespace phx::voxels
 	class Map
 	{
 	public:
-		Map(std::string save, std::string name);
+		Map(std::string  save, std::string  name);
 
-		Chunk getChunk(math::vec3 pos);
+		Chunk getChunk(const math::vec3& pos);
 		void  setBlockAt(math::vec3 pos, BlockType* block);
-		void  save(math::vec3 pos);
+		void  save(const math::vec3& pos);
 
 	private:
 		std::map<math::vec3, Chunk, math::Vector3Key> m_chunks;

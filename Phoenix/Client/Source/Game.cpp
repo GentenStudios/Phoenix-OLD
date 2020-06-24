@@ -460,7 +460,7 @@ void Game::tick(float dt)
 	                             m_camera->getProjection());
 }
 
-void Game::sendMessage(std::string input, std::ostringstream& cout)
+void Game::sendMessage(const std::string& input, std::ostringstream& cout)
 {
 	m_network->sendMessage(input);
 }

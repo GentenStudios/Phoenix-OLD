@@ -57,9 +57,10 @@ namespace phx::server
 	 * similar to how programs are called from the terminal.
 	 *
 	 */
-	typedef std::function<void(std::vector<std::string> args)> CommandFunction;
+	using CommandFunction = std::function<void(std::vector<std::string> args)>;
 
-	struct Command{
+	struct Command
+	{
 	    std::string command;
 	    std::string help;
 	    CommandFunction callback;

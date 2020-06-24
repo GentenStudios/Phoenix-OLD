@@ -8,7 +8,7 @@ authoritative as to what happens. For some background information on determinist
 [this article by GlenFelder (Gaffer On Games) is a good read](https://gafferongames.com/post/deterministic_lockstep/).
 We process three types of information during runtime. States are non-critical but time-sensitive pieces of information
 that get sent unreliably and are discarded when not received (such as positioning). Events are critical pieces of
-information that are sent via Enet's reliable packet system (Suck as when a block is broken). Messages are essentially
+information that are sent via Enet's reliable packet system (Such as when a block is broken). Messages are essentially
 events but we use a third channel on Enet since they are processed by an entirely separate system.
 NOTE: This system's V1 version is a WIP, some information here may describe a future state of the networking system not
 yet implemented.

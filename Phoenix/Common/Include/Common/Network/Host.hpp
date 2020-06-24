@@ -142,7 +142,7 @@ namespace phx::net
 		/**
 		 * @brief Connects to a provided address.
 		 * @param address The address to connect to.
-		 * @return A peer inside an std::optional incase the connection fails.
+		 * @return A peer inside an std::optional in case the connection fails.
 		 *
 		 * @paragraph Usage
 		 * You must call the Host::poll function once a connection request has
@@ -290,7 +290,7 @@ namespace phx::net
 		/**
 		 * @brief Gets a peer based on its ID.
 		 * @param id The ID of the Peer.
-		 * @return A pointer to the peer, or a nullptr if it doesnt exit.
+		 * @return A pointer to the peer, or a nullptr if it doesn't exit.
 		 */
 		Peer* getPeer(std::size_t id);
 

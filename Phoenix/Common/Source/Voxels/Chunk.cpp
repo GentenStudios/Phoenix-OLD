@@ -32,12 +32,12 @@
 
 using namespace phx::voxels;
 
-Chunk::Chunk(phx::math::vec3 chunkPos) : m_pos(chunkPos)
+Chunk::Chunk(const phx::math::vec3& chunkPos) : m_pos(chunkPos)
 {
 	m_blocks.reserve(CHUNK_WIDTH * CHUNK_HEIGHT * CHUNK_DEPTH);
 }
 
-Chunk::Chunk(phx::math::vec3 chunkPos, const std::string& save)
+Chunk::Chunk(const phx::math::vec3& chunkPos, const std::string& save)
     : m_pos(chunkPos)
 {
 	std::string_view search = save;

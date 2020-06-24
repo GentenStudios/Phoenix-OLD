@@ -90,8 +90,6 @@ void Iris::run()
 	}
 }
 
-void Iris::auth() {}
-
 void Iris::disconnect(std::size_t peerID)
 {
 	LOG_INFO("NETWORK") << peerID << " disconnected";
