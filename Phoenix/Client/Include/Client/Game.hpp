@@ -36,13 +36,11 @@
 #include <Client/Graphics/ShaderPipeline.hpp>
 #include <Client/Graphics/UI.hpp>
 #include <Client/Graphics/Window.hpp>
-#include <Client/Network.hpp>
-#include <Client/Player.hpp>
+#include <Client/InputQueue.hpp>
 
 #include <Common/CMS/ModManager.hpp>
 
 #include <deque>
-#include <enet/enet.h>
 
 namespace phx::client
 {
@@ -102,11 +100,12 @@ namespace phx::client
 		math::vec3  m_prevPos;
 		int         m_playerHand = 0;
 
-		client::Network* m_network;
+		client::Network*    m_network;
+		client::InputQueue* m_inputQueue;
 
 		// intermediary variables to prevent getting the pointer from the client
 		// singleton every tick.
-		audio::Audio* m_audio;
+		audio::Audio*    m_audio;
 		audio::Listener* m_listener;
 	};
 } // namespace phx::client

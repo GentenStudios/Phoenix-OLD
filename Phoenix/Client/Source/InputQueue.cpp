@@ -26,84 +26,74 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Client/InputMap.hpp>
 #include <Client/InputQueue.hpp>
 
-#include <chrono>
-#include <ctime>
-#include <thread>
+#include <Common/Position.hpp>
 
 using namespace phx::client;
 using namespace phx;
 
-InputQueue::InputQueue()
+InputQueue::InputQueue(entt::registry* registry, Player* player)
+    : m_player(player), m_registry(registry),
+
+      m_forward(InputMap::get()->getInput("core.move.forward")),
+      m_backward(InputMap::get()->getInput("core.move.backward")),
+      m_left(InputMap::get()->getInput("core.move.left")),
+      m_right(InputMap::get()->getInput("core.move.right")),
+      m_up(InputMap::get()->getInput("core.move.up")),
+      m_down(InputMap::get()->getInput("core.move.down"))
 {
-	m_forward  = InputMap::get()->getInput("core.move.forward");
-	m_backward = InputMap::get()->getInput("core.move.backward");
-	m_left     = InputMap::get()->getInput("core.move.left");
-	m_right    = InputMap::get()->getInput("core.move.right");
-	m_up       = InputMap::get()->getInput("core.move.up");
-	m_down     = InputMap::get()->getInput("core.move.down");
 }
 
-void InputQueue::run(float dt)
+InputQueue::~InputQueue()
 {
-	//    using std::chrono::system_clock;
-	//    std::time_t wait = system_clock::to_time_t (system_clock::now());
-	//    wait.tm_sec + dt;
-	//    std::this_thread::sleep_until (system_clock)
-	m_running = true;
+	if (m_running)
+	{
+		stop();
+	}
+}
+
+void InputQueue::run(std::chrono::milliseconds dt, client::Network* network)
+{
+	using std::chrono::system_clock;
+	system_clock::time_point next = system_clock::now();
 	while (m_running)
 	{
-		InputState input;
-		if (InputMap::get()->getState(m_forward))
-		{
-			input.forward = true;
-		}
-		if (InputMap::get()->getState(m_backward))
-		{
-			input.backward = true;
-		}
-		if (InputMap::get()->getState(m_left))
-		{
-			input.left = true;
-		}
-		if (InputMap::get()->getState(m_right))
-		{
-			input.right = true;
-		}
-		if (InputMap::get()->getState(m_up))
-		{
-			input.up = true;
-		}
-		if (InputMap::get()->getState(m_down))
-		{
-			input.down = true;
-		}
-		input.sequence = currentSequence() + 1;
-		m_queue.push_back(input);
+		m_sequence++;
+		InputState state = getCurrentState();
+		m_queue.push(state);
+		network->sendState(state);
+		next = next + dt;
+		std::this_thread::sleep_until(next);
 	}
 }
 
-void InputQueue::kill() { m_running = false; }
-
-InputState InputQueue::getState(std::size_t sequence)
+void InputQueue::start(std::chrono::milliseconds dt, client::Network* network)
 {
-	for (const auto& state : m_queue)
-	{
-		if (state.sequence == sequence)
-		{
-			return state;
-		}
-	}
+	m_running           = true;
+	std::thread thread1 = std::thread(&InputQueue::run, this, dt, network);
+	std::swap(m_thread, thread1);
 }
 
-void InputQueue::clearState(std::size_t sequence)
+void InputQueue::stop()
 {
-	while (m_queue.front().sequence <= sequence)
-	{
-		m_queue.pop_front();
-	}
+	m_running = false;
+	m_thread.join();
 }
 
-std::size_t InputQueue::currentSequence() { return m_queue.back().sequence; }
+InputState InputQueue::getCurrentState()
+{
+	InputState input;
+	input.forward    = InputMap::get()->getState(m_forward);
+	input.backward   = InputMap::get()->getState(m_backward);
+	input.left       = InputMap::get()->getState(m_left);
+	input.right      = InputMap::get()->getState(m_right);
+	input.up         = InputMap::get()->getState(m_up);
+	input.down       = InputMap::get()->getState(m_down);
+	input.rotation.x = static_cast<unsigned int>(
+	    m_registry->get<Position>(m_player->getEntity()).rotation.x * 360000.0);
+	input.rotation.y = static_cast<unsigned int>(
+	    m_registry->get<Position>(m_player->getEntity()).rotation.y * 360000.0);
+	input.sequence = m_sequence;
+	return input;
+}

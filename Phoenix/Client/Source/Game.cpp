@@ -256,7 +256,7 @@ void Game::onAttach()
 
 	if (!result.ok)
 	{
-		LOG_FATAL("MODDING") << "An error has occured.";
+		LOG_FATAL("MODDING") << "An error has occurred.";
 		exit(EXIT_FAILURE);
 	}
 
@@ -292,6 +292,10 @@ void Game::onAttach()
 		    new GameTools(&m_followCam, &m_playerHand, m_player, m_registry);
 		Client::get()->pushLayer(m_gameDebug);
 	}
+
+	m_inputQueue = new InputQueue(m_registry, m_player);
+	m_inputQueue->start(std::chrono::milliseconds(50), m_network);
+
 	LOG_INFO("MAIN") << "Game layer attached";
 }
 
@@ -407,32 +411,6 @@ void Game::tick(float dt)
 	lightdir.x = std::cos(time);
 
 	m_camera->tick(dt);
-
-	static std::size_t sequence;
-	sequence++;
-
-	// Build input state
-	// @todo move this to inputQueue.cpp
-	{
-		InputState inputState;
-		inputState.sequence = sequence;
-		inputState.forward  = m_window->isKeyDown(events::Keys::KEY_W);
-		inputState.backward = m_window->isKeyDown(events::Keys::KEY_S);
-		inputState.left     = m_window->isKeyDown(events::Keys::KEY_A);
-		inputState.right    = m_window->isKeyDown(events::Keys::KEY_D);
-		inputState.up       = m_window->isKeyDown(events::Keys::KEY_SPACE);
-		inputState.down     = m_window->isKeyDown(events::Keys::KEY_LEFT_SHIFT);
-
-		/// conversion from rad to 1/1000 of degrees
-		inputState.rotation.x = static_cast<unsigned int>(
-		    m_registry->get<Position>(m_player->getEntity()).rotation.x *
-		    360000.0);
-		inputState.rotation.y = static_cast<unsigned int>(
-		    m_registry->get<Position>(m_player->getEntity()).rotation.y *
-		    360000.0);
-
-		m_network->sendState(inputState);
-	}
 
 	const Position& position = m_registry->get<Position>(m_player->getEntity());
 

@@ -28,48 +28,59 @@
 
 #pragma once
 
-#include <Common/Input.hpp>
-#include <list>
+#include <Client/InputMap.hpp>
+#include <Client/Network.hpp>
+#include <Client/Player.hpp>
+
+#include <Common/Util/BlockingQueue.hpp>
 
 namespace phx::client
 {
 	class InputQueue
 	{
 	public:
-		InputQueue();
+		InputQueue(entt::registry* registry, Player* player);
+		~InputQueue();
 
 		/**
 		 * @brief Thread to capture and queue input states
-		 * @param dt How frequently in seconds a state should be captured
+		 * @param dt How frequently in seconds a state should be captured in
+		 * milliseconds
+		 * @param network Pointer to network to send states to
 		 */
-		void run(float dt);
+	private:
+		void run(std::chrono::milliseconds dt, client::Network* network);
+
+	public:
+		/**
+		 * @brief Starts a new thread to capture and queue input states
+		 * @param dt How frequently in seconds a state should be captured in
+		 * milliseconds
+		 * @param network Pointer to network to send states to
+		 */
+		void start(std::chrono::milliseconds dt, client::Network* network);
 
 		/**
 		 * @brief Stops the current thread
 		 */
-		void kill();
+		void stop();
 
 		/**
-		 * @brief Gets a state for processing
-		 * @param sequence The sequence number for the desired state
+		 * @brief Gets the current state of the input
 		 * @return The input state
 		 */
-		InputState getState(std::size_t sequence);
-		/**
-		 * @brief Clears all states equal to or older than the supplied sequence
-		 * @param sequence The sequence number to clear through
-		 */
-		void clearState(std::size_t sequence);
-		/**
-		 * @brief Gets the current sequence number, this is the most recent
-		 * InputState that was queued
-		 * @return A numerical identifier for the sequence
-		 */
-		std::size_t currentSequence();
+		InputState getCurrentState();
+
+		BlockingQueue<InputState> m_queue;
 
 	private:
-		std::list<InputState> m_queue;
-		bool                  m_running;
+		bool        m_running;
+		std::thread m_thread;
+
+		Player*         m_player;
+		entt::registry* m_registry;
+
+		std::size_t m_sequence;
 
 		client::Input* m_forward;
 		client::Input* m_backward;
