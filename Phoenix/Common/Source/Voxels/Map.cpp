@@ -33,8 +33,8 @@
 
 using namespace phx::voxels;
 
-Map::Map(std::string  save, std::string  name)
-    : m_save(std::move(save)), m_mapName(std::move(name))
+Map::Map(const std::string& save, const std::string& name)
+    : m_save(save), m_mapName(name)
 {
 }
 
