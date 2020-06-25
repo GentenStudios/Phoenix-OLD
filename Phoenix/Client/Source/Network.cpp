@@ -94,7 +94,28 @@ void Network::parseEvent(phx::net::Packet& packet)
 	std::cout << "Event received";
 }
 
-void Network::parseState(phx::net::Packet& packet) {}
+void Network::parseState(phx::net::Packet& packet)
+{
+	static size_t currentSequence;
+
+	auto data = packet.getData();
+
+	phx::Serializer ser(Serializer::Mode::READ);
+	ser.setBuffer(reinterpret_cast<std::byte*>(&data), packet.getSize());
+
+	size_t sequence;
+	ser&   sequence;
+	if (sequence < currentSequence && sequence > 10)
+	{
+		return;
+	}
+	currentSequence = sequence;
+
+	Position input;
+	ser &    input.position.x, input.position.y, input.position.z;
+
+	stateQueue.push(std::pair(input, sequence));
+}
 
 void Network::parseMessage(phx::net::Packet& packet)
 {

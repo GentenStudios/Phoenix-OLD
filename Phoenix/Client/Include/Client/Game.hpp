@@ -81,6 +81,8 @@ namespace phx::client
 		void sendMessage(const std::string& input, std::ostringstream& cout);
 
 	private:
+		void confirmState(const Position& position);
+
 		gfx::Window*       m_window;
 		gfx::FPSCamera*    m_camera = nullptr;
 		entt::registry*    m_registry;

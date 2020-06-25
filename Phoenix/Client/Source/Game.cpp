@@ -413,6 +413,7 @@ void Game::tick(float dt)
 	m_camera->tick(dt);
 
 	const Position& position = m_registry->get<Position>(m_player->getEntity());
+	confirmState(position);
 
 	if (m_followCam)
 	{
@@ -441,4 +442,39 @@ void Game::tick(float dt)
 void Game::sendMessage(const std::string& input, std::ostringstream& cout)
 {
 	m_network->sendMessage(input);
+}
+
+void Game::confirmState(const Position& position)
+{
+	static std::list<InputState> states;
+
+	size_t i = m_inputQueue->m_queue.size();
+	for (size_t j = 0; j <= i; j++)
+	{
+		states.push_back(m_inputQueue->m_queue.pop());
+	}
+
+	if (m_network->stateQueue.empty())
+	{
+		return;
+	}
+	auto confirmation = m_network->stateQueue.pop();
+
+	// Discard any inputStates older than the confirmationState
+	while (!states.empty() && states.front().sequence < confirmation.second)
+	{
+		states.pop_front();
+	}
+
+	auto      entity = m_registry->create();
+	Position& pos    = m_registry->emplace<Position>(
+        entity, confirmation.first.rotation, confirmation.first.position);
+	for (const auto& inputState : states)
+	{
+		phx::ActorSystem::tick(m_registry, entity, 1 / 20, inputState);
+	}
+
+	LOG_INFO("POS") << "Sequence:" << confirmation.second
+	                << "prediction:" << position.position
+	                << "confirmation:" << pos.position;
 }

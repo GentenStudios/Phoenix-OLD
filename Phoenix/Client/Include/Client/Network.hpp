@@ -30,6 +30,7 @@
 
 #include <Common/Input.hpp>
 #include <Common/Network/Host.hpp>
+#include <Common/Position.hpp>
 #include <Common/Util/BlockingQueue.hpp>
 #include <thread>
 
@@ -89,6 +90,8 @@ namespace phx::client
 		 * @param data The message packet data
 		 */
 		void sendMessage(std::string message);
+
+		phx::BlockingQueue<std::pair<Position, size_t>> stateQueue;
 
 	private:
 		bool                m_running;
