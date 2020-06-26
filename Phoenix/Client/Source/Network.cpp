@@ -112,7 +112,7 @@ void Network::parseState(phx::net::Packet& packet)
 	currentSequence = sequence;
 
 	Position input;
-	ser &    input.position.x, input.position.y, input.position.z;
+	ser& input.position.x& input.position.y& input.position.z;
 
 	stateQueue.push(std::pair(input, sequence));
 }
@@ -136,10 +136,21 @@ void Network::sendState(InputState inputState)
 {
 	Serializer ser(Serializer::Mode::WRITE);
 	ser&       inputState;
-	auto       state = ser.getBuffer();
+	LOG_DEBUG("POS") << "Send state: " << inputState.sequence
+	                 << " Input: " << inputState.up << inputState.down;
 
 	phx::net::Packet packet =
 	    phx::net::Packet(ser.getBuffer(), phx::net::PacketFlags::UNRELIABLE);
+
+	InputState input;
+	auto       data = packet.getData();
+
+	phx::Serializer ser2(Serializer::Mode::READ);
+	ser2.setBuffer(reinterpret_cast<std::byte*>(&data), packet.getSize());
+	ser2& input;
+	LOG_DEBUG("POS") << "Sent state: " << input.sequence
+	                 << " Input: " << input.up << input.down;
+
 	m_client->broadcast(packet, 1);
 }
 

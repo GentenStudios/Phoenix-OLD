@@ -175,9 +175,11 @@ namespace phx
 
 		template <typename T>
 		void pop(std::basic_string<T>& data);
-	
-	private:		
+
+	public:
 		Mode m_mode;
+
+	private:
 		data::Data m_buffer;
 	};
 } // namespace phx::data
