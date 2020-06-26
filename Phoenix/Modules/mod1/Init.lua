@@ -1,4 +1,4 @@
-print ("Load mod 1")
+core.log_info("Load mod 1")
 
 function hello (args)
     if args[1] == "there" then
