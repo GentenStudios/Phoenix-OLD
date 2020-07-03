@@ -33,8 +33,22 @@
  * @copyright Copyright (c) 2019-2020 Genten Studios
  */
 
-namespace phx{
-    struct Hand{
-        voxels::BlockType* hand;
-    };
-}
+#include <Common/Input.hpp>
+#include <Common/Voxels/Block.hpp>
+#include <entt/entt.hpp>
+
+namespace phx
+{
+	struct Hand
+	{
+		voxels::BlockType* hand;
+	};
+
+	class ActorSystem
+	{
+	public:
+		static entt::entity registerActor(entt::registry* registry);
+		static void         tick(entt::registry* registry, entt::entity entity,
+		                         const float dt, InputState input);
+	};
+} // namespace phx

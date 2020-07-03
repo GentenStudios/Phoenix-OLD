@@ -29,11 +29,14 @@
 #include <Client/Client.hpp>
 #include <Client/Game.hpp>
 
-#include <Common/Actor.hpp>
 #include <Common/CMS/ModManager.hpp>
+#include <Common/Serialization/Serializer.hpp>
+#include <Common/Voxels/BlockRegistry.hpp>
+
+#include <Common/Actor.hpp>
 #include <Common/Commander.hpp>
 #include <Common/Position.hpp>
-#include <Common/Voxels/BlockRegistry.hpp>
+#include <Common/Logger.hpp>
 
 #include <cmath>
 #include <tuple>
@@ -41,11 +44,18 @@
 using namespace phx::client;
 using namespace phx;
 
-static Commander kirk;
+///@todo This needs refactored to play nicely
+/**
+* This exists so we can call the message function from the chat client,
+* we definitely need to just clean that up so it all plays nicely. If
+* a second instance of the game is created, this entire system will break
+* (but so will a few others . . . )
+*/
+static Game* myGame = nullptr;
 
 static void rawEcho(const std::string& input, std::ostringstream& cout)
 {
-	kirk.callback(input, cout);
+	myGame->sendMessage(input, cout);
 }
 
 Game::Game(gfx::Window* window, entt::registry* registry)
@@ -59,7 +69,7 @@ Game::Game(gfx::Window* window, entt::registry* registry)
 	fileStream.open("Saves/" + save + "/Mods.txt");
 	if (!fileStream.is_open())
 	{
-		std::cout << "Error opening save file";
+		LOG_FATAL("CMS") << "Error opening save file";
 		exit(EXIT_FAILURE);
 	}
 
@@ -72,6 +82,10 @@ Game::Game(gfx::Window* window, entt::registry* registry)
 	m_modManager = new cms::ModManager(toLoad, {"Modules"});
 
 	voxels::BlockRegistry::get()->registerAPI(m_modManager);
+
+	m_modManager->registerFunction(
+	    "core.command.register",
+	    [](std::string command, std::string help, sol::function f) {});
 
 	m_modManager->registerFunction("core.print", [=](const std::string& text) {
 		m_chat->cout << text << "\n";
@@ -156,7 +170,7 @@ Game::Game(gfx::Window* window, entt::registry* registry)
 			float x = source["position"]["x"];
 			float y = source["position"]["y"];
 			float z = source["position"]["z"];
-			
+
 			audioSource.setPos({x, y, z});
 		}
 
@@ -230,18 +244,22 @@ Game::Game(gfx::Window* window, entt::registry* registry)
 
 		Client::get()->getAudioPool()->queue(audioSource);
 	});
+
+	myGame = this;
 }
 
 Game::~Game() { delete m_chat; }
 
 void Game::onAttach()
 {
-	/// @todo Replace this with logger
-	printf("%s", "Attaching game layer\n");
 	m_chat = new ui::ChatWindow("Chat Window", 5,
 	                            "Type /help for a command list and help.");
 
+	/// @TODO replace with network callback
 	m_chat->registerCallback(rawEcho);
+
+	m_network = new client::Network(m_chat->cout);
+	m_network->start();
 
 	m_player = new Player(m_registry);
 	m_player->registerAPI(m_modManager);
@@ -251,11 +269,11 @@ void Game::onAttach()
 
 	if (!result.ok)
 	{
-		LOG_FATAL("MODDING") << "An error has occured.";
+		LOG_FATAL("MODDING") << "An error has occurred.";
 		exit(EXIT_FAILURE);
 	}
 
-	printf("%s", "Registering world\n");
+	LOG_INFO("MAIN") << "Registering world";
 	const std::string save = "save1";
 	m_world = new voxels::ChunkView(3, voxels::Map(save, "map1"));
 	m_player->setWorld(m_world);
@@ -266,7 +284,7 @@ void Game::onAttach()
 	    m_player->getEntity(),
 	    voxels::BlockRegistry::get()->getFromRegistryID(0));
 
-	printf("%s", "Prepare rendering\n");
+	LOG_INFO("MAIN") << "Prepare rendering";
 	m_renderPipeline.prepare("Assets/SimpleWorld.vert",
 	                         "Assets/SimpleWorld.frag",
 	                         gfx::ChunkRenderer::getRequiredShaderLayout());
@@ -276,7 +294,7 @@ void Game::onAttach()
 	const math::mat4 model;
 	m_renderPipeline.setMatrix("u_model", model);
 
-	printf("%s", "Register GUI\n");
+	LOG_INFO("MAIN") << "Register GUI";
 	m_crosshair  = new Crosshair(m_window);
 	m_escapeMenu = new EscapeMenu(m_window);
 	Client::get()->pushLayer(m_crosshair);
@@ -287,14 +305,20 @@ void Game::onAttach()
 		    new GameTools(&m_followCam, &m_playerHand, m_player, m_registry);
 		Client::get()->pushLayer(m_gameDebug);
 	}
-	printf("%s", "Game layer attached");
+
+	m_inputQueue = new InputQueue(m_registry, m_player);
+	m_inputQueue->start(std::chrono::milliseconds(50), m_network);
+
+	LOG_INFO("MAIN") << "Game layer attached";
 }
 
 void Game::onDetach()
 {
+	m_network->stop();
 	delete m_world;
 	delete m_player;
 	delete m_camera;
+	delete m_network;
 }
 
 void Game::onEvent(events::Event& e)
@@ -402,7 +426,7 @@ void Game::tick(float dt)
 	m_camera->tick(dt);
 
 	const Position& position = m_registry->get<Position>(m_player->getEntity());
-	
+
 	if (m_followCam)
 	{
 		m_prevPos = position.position;
@@ -425,4 +449,9 @@ void Game::tick(float dt)
 	m_world->render();
 	m_player->renderSelectionBox(m_camera->calculateViewMatrix(),
 	                             m_camera->getProjection());
+}
+
+void Game::sendMessage(const std::string& input, std::ostringstream& cout)
+{
+	m_network->sendMessage(input);
 }

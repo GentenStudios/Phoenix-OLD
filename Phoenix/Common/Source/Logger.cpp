@@ -183,8 +183,9 @@ Logger::Logger(const LoggerConfig& config)
 	m_file.open(config.logFile);
 	if (!m_file.is_open())
 	{
-		printf("Uh Oh! We couldn't open the log file, guess we won't have any "
-		       "file logging for today. :(\n");
+		Log message = {LogVerbosity::INFO, "", 0, "LOGGING"};
+		message << "A log file was not specified, logging only to console.";
+		log(message);
 	}
 }
 

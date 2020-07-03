@@ -119,11 +119,13 @@ void Client::onEvent(events::Event e)
 void Client::run()
 {
 	Settings::get()->load("settings.txt");
-	Logger::initialize({});
+    LoggerConfig config;
+    config.verbosity = LogVerbosity::DEBUG;
+    Logger::initialize(config);
 
 	audio::Audio::initialize();
 	m_audio = new audio::Audio();
-	
+
 	SplashScreen* splashScreen = new SplashScreen();
 	m_layerStack.pushLayer(splashScreen);
 

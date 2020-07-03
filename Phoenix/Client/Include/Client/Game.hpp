@@ -28,17 +28,19 @@
 
 #pragma once
 
+#include <Client/Crosshair.hpp>
+#include <Client/EscapeMenu.hpp>
 #include <Client/GameTools.hpp>
 #include <Client/Graphics/Camera.hpp>
 #include <Client/Graphics/Layer.hpp>
 #include <Client/Graphics/ShaderPipeline.hpp>
 #include <Client/Graphics/UI.hpp>
 #include <Client/Graphics/Window.hpp>
-#include <Client/Player.hpp>
-#include <Client/EscapeMenu.hpp>
-#include <Client/Crosshair.hpp>
+#include <Client/InputQueue.hpp>
 
 #include <Common/CMS/ModManager.hpp>
+
+#include <deque>
 
 namespace phx::client
 {
@@ -69,11 +71,20 @@ namespace phx::client
 		void onEvent(events::Event& e) override;
 		void tick(float dt) override;
 
+		/** @brief Sends a message packet to the server for the commander to
+		 * interpret.
+		 *
+		 * @param input The message sent to the server
+		 * @param cout Needs to be depreciated, unused (but required by
+		 * terminal)
+		 */
+		void sendMessage(const std::string& input, std::ostringstream& cout);
+
 	private:
 		gfx::Window*       m_window;
 		gfx::FPSCamera*    m_camera = nullptr;
-        entt::registry*    m_registry;
-        Player*            m_player;
+		entt::registry*    m_registry;
+		Player*            m_player;
 		voxels::ChunkView* m_world = nullptr;
 
 		gfx::ShaderPipeline m_renderPipeline;
@@ -81,17 +92,20 @@ namespace phx::client
 		ui::ChatWindow* m_chat = nullptr;
 
 		cms::ModManager* m_modManager;
-		
-		Crosshair* m_crosshair = nullptr;
+
+		Crosshair*  m_crosshair  = nullptr;
 		EscapeMenu* m_escapeMenu = nullptr;
-		GameTools* m_gameDebug = nullptr;
-		bool       m_followCam = true;
-		math::vec3 m_prevPos;
-		int        m_playerHand = 0;
+		GameTools*  m_gameDebug  = nullptr;
+		bool        m_followCam  = true;
+		math::vec3  m_prevPos;
+		int         m_playerHand = 0;
+
+		client::Network*    m_network;
+		client::InputQueue* m_inputQueue;
 
 		// intermediary variables to prevent getting the pointer from the client
 		// singleton every tick.
-		audio::Audio* m_audio;
+		audio::Audio*    m_audio;
 		audio::Listener* m_listener;
 	};
 } // namespace phx::client
