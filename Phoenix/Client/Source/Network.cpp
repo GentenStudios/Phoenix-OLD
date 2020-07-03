@@ -136,8 +136,6 @@ void Network::sendState(InputState inputState)
 {
 	Serializer ser(Serializer::Mode::WRITE);
 	ser&       inputState;
-	LOG_DEBUG("POS") << "Send state: " << inputState.sequence
-	                 << " Input: " << inputState.up << inputState.down;
 
 	phx::net::Packet packet =
 	    phx::net::Packet(ser.getBuffer(), phx::net::PacketFlags::UNRELIABLE);

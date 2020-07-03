@@ -504,21 +504,18 @@ void Game::confirmState(Position position)
 	if (diff.x > precision || diff.x < -precision)
 	{
 		position.position.x = pos.position.x;
-		LOG_WARNING("POS") << "RESET X " << diff.x;
 		reset = true;
 	}
 
 	if (diff.y > precision || diff.y < -precision)
 	{
 		position.position.y = pos.position.y;
-		LOG_WARNING("POS") << "RESET Y " << diff.y;
 		reset = true;
 	}
 
 	if (diff.z > precision || diff.z < -precision)
 	{
 		position.position.z = pos.position.z;
-		LOG_WARNING("POS") << "RESET Z " << diff.z;
 		reset = true;
 	}
 
