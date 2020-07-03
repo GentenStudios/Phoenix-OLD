@@ -92,32 +92,6 @@ namespace phx::gfx
 		explicit FPSCamera(Window* window, entt::registry* registry);
 
 		/**
-		 * @brief Gets the position of the camera.
-		 * @return The 3-component world-space position.
-		 *
-		 * This camera return is NOT compatible with the voxel world. The
-		 * coordinate system used by the camera and the system used by the
-		 * voxel world are different, because of the way block coordinates
-		 * have been setup.
-		 */
-		math::vec3 getPosition() const;
-
-		/**
-		 * @brief Gets the direction the camera is facing.
-		 * @return The 3-component vector representing direction.
-		 *
-		 * The direction is always the direction the player is looking, this
-		 * can be used with the Ray object to find what the player is
-		 * actually looking at within the actual world, whether it be voxels
-		 * or something else. Because this is not representative of
-		 * position, and direction cannot be skewed by the world coordinate
-		 * system, this data is compatible with every other layer requiring
-		 * and supporting direction, of course when asking for a 3
-		 * dimensional vector.
-		 */
-		math::vec3 getDirection() const;
-
-		/**
 		 * @brief Sets the camera perspective projection.
 		 * @param projection The actual projection to set the camera to.
 		 *

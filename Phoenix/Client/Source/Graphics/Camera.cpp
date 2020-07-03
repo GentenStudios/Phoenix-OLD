@@ -30,8 +30,6 @@
 
 #include <Common/Position.hpp>
 
-const float MOVE_SPEED = 0.01f;
-
 using namespace phx;
 using namespace gfx;
 
