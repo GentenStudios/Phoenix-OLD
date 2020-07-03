@@ -72,7 +72,7 @@ void Network::run()
 {
 	while (m_running)
 	{
-		m_client->poll();
+		m_client->poll(50_ms, 100);
 	}
 }
 

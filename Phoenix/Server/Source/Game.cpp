@@ -55,7 +55,7 @@ void Game::run()
 		// Process everybody's input first
 		if (m_iris->stateQueue.empty())
 		{
-			sleep(25); // This just keeps the CPU from spinning
+			sleep(1); // This just keeps the CPU from spinning
 			continue;
 		}
 		net::StateBundle m_currentState = m_iris->stateQueue.pop();
@@ -65,7 +65,7 @@ void Game::run()
 			ActorSystem::tick(m_registry,
 			                  m_registry->get<Player>(state.first).actor, dt,
 			                  state.second);
-			std::cout << state.second.up << state.second.down;
+			std::cout << "Sequence:" << state.second.sequence;
 			//@todo remove this debug statement before merging to develop
 			std::cout << m_registry
 			                 ->get<Position>(

@@ -86,7 +86,7 @@ void Iris::run()
 	m_running = true;
 	while (m_running)
 	{
-		m_server->poll();
+		m_server->poll(50_ms, 100);
 	}
 }
 
