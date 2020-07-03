@@ -33,8 +33,9 @@
 using namespace phx::client;
 using namespace phx;
 
-InputQueue::InputQueue(entt::registry* registry, Player* player)
-    : m_player(player), m_registry(registry),
+InputQueue::InputQueue(entt::registry* registry, Player* player,
+                       gfx::FPSCamera* camera)
+    : m_player(player), m_registry(registry), m_camera(camera),
 
       m_forward(InputMap::get()->getInput("core.move.forward")),
       m_backward(InputMap::get()->getInput("core.move.backward")),
@@ -84,12 +85,15 @@ void InputQueue::stop()
 InputState InputQueue::getCurrentState()
 {
 	InputState input;
-	input.forward    = InputMap::get()->getState(m_forward);
-	input.backward   = InputMap::get()->getState(m_backward);
-	input.left       = InputMap::get()->getState(m_left);
-	input.right      = InputMap::get()->getState(m_right);
-	input.up         = InputMap::get()->getState(m_up);
-	input.down       = InputMap::get()->getState(m_down);
+	if (m_camera->isEnabled())
+	{
+		input.forward  = InputMap::get()->getState(m_forward);
+		input.backward = InputMap::get()->getState(m_backward);
+		input.left     = InputMap::get()->getState(m_left);
+		input.right    = InputMap::get()->getState(m_right);
+		input.up       = InputMap::get()->getState(m_up);
+		input.down     = InputMap::get()->getState(m_down);
+	}
 	input.rotation.x = static_cast<unsigned int>(
 	    m_registry->get<Position>(m_player->getEntity()).rotation.x * 360000.0);
 	input.rotation.y = static_cast<unsigned int>(

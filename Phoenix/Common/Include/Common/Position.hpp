@@ -48,5 +48,16 @@ namespace phx
 			                   std::sin(rotation.y),
 			                   std::cos(rotation.y) * std::cos(rotation.x)};
 		};
+
+		math::vec3 getRight()
+		{
+			return math::vec3 {std::sin(rotation.x - math::PIDIV2), 0.f,
+			                   std::cos(rotation.x - math::PIDIV2)};
+		};
+
+		math::vec3 getForward()
+		{
+			return math::vec3 {std::sin(rotation.x), 0.f, std::cos(rotation.x)};
+		};
 	};
 } // namespace phx

@@ -38,6 +38,7 @@
 #include <Common/Position.hpp>
 #include <Common/Logger.hpp>
 
+#include <Common/Movement.hpp>
 #include <cmath>
 #include <tuple>
 
@@ -293,7 +294,7 @@ void Game::onAttach()
 		Client::get()->pushLayer(m_gameDebug);
 	}
 
-	m_inputQueue = new InputQueue(m_registry, m_player);
+	m_inputQueue = new InputQueue(m_registry, m_player, m_camera);
 	m_inputQueue->start(std::chrono::milliseconds(50), m_network);
 
 	LOG_INFO("MAIN") << "Game layer attached";
@@ -469,12 +470,15 @@ void Game::confirmState(const Position& position)
 	auto      entity = m_registry->create();
 	Position& pos    = m_registry->emplace<Position>(
         entity, confirmation.first.rotation, confirmation.first.position);
+	m_registry->emplace<Movement>(
+	    entity, m_registry->get<Movement>(m_player->getEntity()).moveSpeed);
 	for (const auto& inputState : states)
 	{
-		phx::ActorSystem::tick(m_registry, entity, 1 / 20, inputState);
+		phx::ActorSystem::tick(m_registry, entity, 1.f / 20.f, inputState);
 	}
 
 	LOG_INFO("POS") << "Sequence:" << confirmation.second
 	                << "prediction:" << position.position
 	                << "confirmation:" << pos.position;
+	m_registry->destroy(entity);
 }

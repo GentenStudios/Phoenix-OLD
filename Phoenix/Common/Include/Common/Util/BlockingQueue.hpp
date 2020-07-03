@@ -47,6 +47,13 @@ namespace phx
 		};
 	} // namespace
 
+	/**
+	 * @brief A thread safe queue
+	 *
+	 * @tparam T The type of object stored in the queue
+	 * @tparam Validator
+	 * @tparam Container
+	 */
 	template <typename T, typename Validator = IsValid<T>,
 	          typename Container = std::queue<T>>
 	class BlockingQueue : public Container
@@ -67,6 +74,11 @@ namespace phx
 			Container::c.clear();
 		}
 
+		/**
+		 * @brief checks if the queue is empty
+		 * @return true if empty
+		 * @return false if not empty
+		 */
 		bool empty() const
 		{
 			std::lock_guard<std::mutex> lock(m_mutex);
@@ -78,6 +90,11 @@ namespace phx
 			return res;
 		}
 
+		/**
+		 * @brief Gets the size of the queue
+		 *
+		 * @return How many elements are in the queue
+		 */
 		size_t size() const
 		{
 			std::lock_guard<std::mutex> lock(m_mutex);
@@ -89,6 +106,11 @@ namespace phx
 			return res;
 		}
 
+		/**
+		 * @brief Removes an element from the end of the queue.
+		 *
+		 * @return the removed element
+		 */
 		T pop()
 		{
 			std::unique_lock<std::mutex> lock_cond(m_mutex);
@@ -130,6 +152,11 @@ namespace phx
 			return true;
 		}
 
+		/**
+		 * @brief pushes an element to the front of the queue
+		 *
+		 * @param value The element to be pushed to the queue
+		 */
 		void push(const T& value)
 		{
 			std::lock_guard<std::mutex> lock(m_mutex);

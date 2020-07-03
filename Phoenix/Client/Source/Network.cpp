@@ -101,7 +101,7 @@ void Network::parseState(phx::net::Packet& packet)
 	auto data = packet.getData();
 
 	phx::Serializer ser(Serializer::Mode::READ);
-	ser.setBuffer(reinterpret_cast<std::byte*>(&data), packet.getSize());
+	ser.setBuffer(data.data(), packet.getSize());
 
 	size_t sequence;
 	ser&   sequence;
@@ -141,15 +141,6 @@ void Network::sendState(InputState inputState)
 
 	phx::net::Packet packet =
 	    phx::net::Packet(ser.getBuffer(), phx::net::PacketFlags::UNRELIABLE);
-
-	InputState input;
-	auto       data = packet.getData();
-
-	phx::Serializer ser2(Serializer::Mode::READ);
-	ser2.setBuffer(reinterpret_cast<std::byte*>(&data), packet.getSize());
-	ser2& input;
-	LOG_DEBUG("POS") << "Sent state: " << input.sequence
-	                 << " Input: " << input.up << input.down;
 
 	m_client->broadcast(packet, 1);
 }

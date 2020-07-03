@@ -52,11 +52,8 @@ void ActorSystem::tick(entt::registry* registry, entt::entity entity,
 	const auto moveSpeed =
 	    static_cast<float>(registry->get<Movement>(entity).moveSpeed);
 
-	math::vec3       direction = pos.getDirection();
-	const math::vec3 right     = {std::sin(direction.x - math::PIDIV2), 0.f,
-                              std::cos(direction.x - math::PIDIV2)};
-	const math::vec3 forward   = {std::sin(direction.x), 0.f,
-                                std::cos(direction.x)};
+	const math::vec3 right   = pos.getRight();
+	const math::vec3 forward = pos.getForward();
 
 	if (input.forward)
 	{
