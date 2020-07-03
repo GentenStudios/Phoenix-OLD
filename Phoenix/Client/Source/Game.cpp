@@ -112,6 +112,19 @@ Game::Game(gfx::Window* window, entt::registry* registry)
 	InputMap::get()->registerAPI(m_modManager);
 	CommandBook::get()->registerAPI(m_modManager);
 
+	m_modManager->registerFunction("core.log_warning", [](std::string message) {
+		LOG_WARNING("MODULE") << message;
+	});
+	m_modManager->registerFunction("core.log_fatal", [](std::string message) {
+		LOG_FATAL("MODULE") << message;
+	});
+	m_modManager->registerFunction("core.log_info", [](std::string message) {
+		LOG_INFO("MODULE") << message;
+	});
+	m_modManager->registerFunction("core.log_debug", [](std::string message) {
+		LOG_DEBUG("MODULE") << message;
+	});
+
 	m_modManager->registerFunction(
 	    "audio.loadMP3",
 	    [=](const std::string& uniqueName, const std::string& filePath) {
