@@ -31,6 +31,8 @@
 #include <Server/Commander.hpp>
 #include <Server/Iris.hpp>
 
+#include <Common/Voxels/Map.hpp>
+
 #include <entt/entt.hpp>
 
 namespace phx::server
@@ -46,7 +48,8 @@ namespace phx::server
 		 * if this is true
 		 * @param iris Pointer to the nextworking system
 		 */
-		Game(entt::registry* registry, bool* running, net::Iris* iris);
+		Game(entt::registry* registry, bool* running, net::Iris* iris,
+		     const std::string& save);
 
 		/** @brief Loads all API's that the game utilizes into a CMS ModManager
 		 *
@@ -72,5 +75,7 @@ namespace phx::server
 		net::Iris* m_iris;
 		/// @brief A commander object to process commands
 		Commander* m_commander;
+		/// @brief The map the players exist on
+		voxels::Map m_map;
 	};
 } // namespace phx::server

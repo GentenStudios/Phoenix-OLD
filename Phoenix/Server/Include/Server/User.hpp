@@ -34,14 +34,10 @@
 
 namespace phx::server
 {
-	struct User
-	{
-		std::string userName;
-		ENetPeer*   peer;
-	};
 
 	struct Player
 	{
 		entt::entity actor;
+		std::size_t  id;
 	};
 } // namespace phx::server

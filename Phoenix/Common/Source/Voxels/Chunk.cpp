@@ -99,3 +99,33 @@ void Chunk::setBlockAt(phx::math::vec3 position, BlockType* newBlock)
 		m_blocks[getVectorIndex(position)] = newBlock;
 	}
 }
+
+phx::Serializer& Chunk::operator&(phx::Serializer& this_)
+{
+	if (this_.m_mode == Serializer::Mode::WRITE)
+	{
+		this_& m_pos.x;
+		this_& m_pos.y;
+		this_& m_pos.z;
+		for (BlockType* block : m_blocks)
+		{
+			size_t id = block->getRegistryID();
+			this_& id;
+		}
+		return this_;
+	}
+	else
+	{
+		m_blocks.clear();
+		this_& m_pos.x;
+		this_& m_pos.y;
+		this_& m_pos.z;
+		for (int i = 0; i < CHUNK_DEPTH * CHUNK_WIDTH * CHUNK_HEIGHT; i++)
+		{
+			size_t id;
+			this_& id;
+			m_blocks.push_back(BlockRegistry::get()->getFromRegistryID(id));
+		}
+		return this_;
+	}
+}

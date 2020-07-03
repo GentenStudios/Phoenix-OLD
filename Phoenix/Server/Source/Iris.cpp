@@ -35,8 +35,6 @@
 #include <Common/Position.hpp>
 #include <Common/Serialization/Serializer.hpp>
 
-#include <cstring> //For std::memcpy on non-mac machines
-
 using namespace phx;
 using namespace phx::net;
 using namespace phx::server::net;
@@ -53,8 +51,8 @@ Iris::Iris(entt::registry* registry) : m_registry(registry)
 		    << "Client connected from: " << peer.getAddress().getIP();
 		{
 			auto entity = m_registry->create();
-			m_registry->emplace<Player>(entity,
-			                            ActorSystem::registerActor(m_registry));
+			m_registry->emplace<Player>(
+			    entity, ActorSystem::registerActor(m_registry), peer.getID());
 			m_users.emplace(peer.getID(), entity);
 		}
 	});
@@ -72,6 +70,9 @@ Iris::Iris(entt::registry* registry) : m_registry(registry)
 		    case 2:
 			    parseMessage(peer.getID(), packet);
 			    break;
+		    default:
+			    LOG_WARNING("NETWORK")
+			        << "Received packet on channel " << channelID;
 		    }
 	    });
 
@@ -93,6 +94,7 @@ void Iris::run()
 void Iris::disconnect(std::size_t peerID)
 {
 	LOG_INFO("NETWORK") << peerID << " disconnected";
+	m_registry->destroy(m_users.at(peerID));
 }
 
 void Iris::parseEvent(std::size_t userID, Packet& packet)
@@ -110,8 +112,6 @@ void Iris::parseEvent(std::size_t userID, Packet& packet)
 
 void Iris::parseState(std::size_t userID, phx::net::Packet& packet)
 {
-	const float dt = 1.f / 20.f;
-
 	InputState input;
 
 	auto data = packet.getData();
@@ -154,7 +154,6 @@ void Iris::parseState(std::size_t userID, phx::net::Packet& packet)
 	}
 
 	{
-		// printf("insert existing %lu \n", input.sequence);
 		for (auto it = currentBundles.begin(); it != currentBundles.end(); ++it)
 		{
 			StateBundle& bundle = *it;
@@ -236,4 +235,13 @@ void Iris::sendMessage(std::size_t userID, std::string message)
 	Packet     packet = Packet(ser.getBuffer(), PacketFlags::RELIABLE);
 	Peer*      peer   = m_server->getPeer(userID);
 	peer->send(packet, 2);
+}
+
+void Iris::sendData(std::size_t userID, voxels::Chunk data)
+{
+	Serializer ser(Serializer::Mode::WRITE);
+	ser&       data;
+	Packet     packet = Packet(ser.getBuffer(), PacketFlags::RELIABLE);
+	Peer*      peer   = m_server->getPeer(userID);
+	peer->send(packet, 3);
 }

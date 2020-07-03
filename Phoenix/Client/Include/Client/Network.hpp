@@ -32,6 +32,7 @@
 #include <Common/Network/Host.hpp>
 #include <Common/Position.hpp>
 #include <Common/Util/BlockingQueue.hpp>
+#include <Common/Voxels/Chunk.hpp>
 #include <thread>
 
 namespace phx::client
@@ -74,6 +75,8 @@ namespace phx::client
 		 */
 		void parseMessage(phx::net::Packet& packet);
 
+		void parseData(phx::net::Packet& packet);
+
 	public:
 		/**
 		 * @brief Sends a state packet to a client
@@ -92,9 +95,10 @@ namespace phx::client
 		void sendMessage(std::string message);
 
 		phx::BlockingQueue<std::pair<Position, size_t>> stateQueue;
+		phx::BlockingQueue<voxels::Chunk>               chunkQueue;
 
 	private:
-		bool                m_running;
+		bool                m_running = false;
 		phx::net::Host*     m_client;
 		std::ostringstream& m_chat;
 		std::thread         m_thread;

@@ -30,13 +30,16 @@
 #include <Server/User.hpp>
 
 #include <Common/Actor.hpp>
+#include <Common/Position.hpp>
 #include <thread>
 
 using namespace phx;
 using namespace phx::server;
 
-Game::Game(entt::registry* registry, bool* running, net::Iris* iris)
-    : m_registry(registry), m_running(running), m_iris(iris)
+Game::Game(entt::registry* registry, bool* running, net::Iris* iris,
+           const std::string& save)
+    : m_registry(registry), m_running(running), m_iris(iris),
+      m_map(voxels::Map(save, "map1"))
 {
 	m_commander = new Commander(m_iris);
 }
@@ -50,7 +53,7 @@ void Game::run()
 {
 	while (m_running)
 	{
-		// Process everybody's input first
+		// Wait for a new input bundle from the network
 		if (m_iris->stateQueue.empty())
 		{
 			std::this_thread::sleep_for(
@@ -59,11 +62,33 @@ void Game::run()
 		}
 		net::StateBundle m_currentState = m_iris->stateQueue.pop();
 
+		// Process everybody's input first
 		for (const auto& state : m_currentState.states)
 		{
-			ActorSystem::tick(m_registry,
-			                  m_registry->get<Player>(state.first).actor, dt,
-			                  state.second);
+			auto       entity = m_registry->get<Player>(state.first).actor;
+			math::vec3 oldPos = m_registry->get<Position>(entity).position;
+			ActorSystem::tick(m_registry, entity, dt, state.second);
+			math::vec3 newPos = m_registry->get<Position>(entity).position;
+			if (oldPos / voxels::Chunk::CHUNK_WIDTH !=
+			    newPos / voxels::Chunk::CHUNK_WIDTH)
+			{
+				// Send new chunks
+				/// @TODO We only need to send the chunks the player doesn't
+				/// already have
+				const int view = 5;
+				for (int x = 0; x < view; x++)
+				{
+					for (int y = 0; y < view; y++)
+					{
+						for (int z = 0; z < view; z++)
+						{
+							m_iris->sendData(
+							    m_registry->get<Player>(state.first).id,
+							    m_map.getChunk(math::vec3 {x, y, z}));
+						}
+					}
+				}
+			}
 		}
 		// Process events second
 
@@ -76,6 +101,7 @@ void Game::run()
 			m_iris->messageQueue.pop();
 		}
 
+		// Dispatch confirmation states
 		m_iris->sendState(m_registry, m_currentState.sequence);
 	}
 }
