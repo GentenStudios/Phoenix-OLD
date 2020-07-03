@@ -52,25 +52,22 @@ void ActorSystem::tick(entt::registry* registry, entt::entity entity,
 	const auto moveSpeed =
 	    static_cast<float>(registry->get<Movement>(entity).moveSpeed);
 
-	const math::vec3 right   = pos.getRight();
-	const math::vec3 forward = pos.getForward();
-
 	if (input.forward)
 	{
-		pos.position += forward * dt * moveSpeed;
+		pos.position += pos.getForward() * dt * moveSpeed;
 	}
 	else if (input.backward)
 	{
-		pos.position -= forward * dt * moveSpeed;
+		pos.position -= pos.getForward() * dt * moveSpeed;
 	}
 
 	if (input.left)
 	{
-		pos.position -= right * dt * moveSpeed;
+		pos.position -= pos.getRight() * dt * moveSpeed;
 	}
 	else if (input.right)
 	{
-		pos.position += right * dt * moveSpeed;
+		pos.position += pos.getRight() * dt * moveSpeed;
 	}
 
 	if (input.up)
