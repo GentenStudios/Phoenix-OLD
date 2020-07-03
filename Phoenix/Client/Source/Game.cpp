@@ -424,12 +424,12 @@ void Game::tick(float dt)
 	lightdir.y = std::sin(time);
 	lightdir.x = std::cos(time);
 
-	m_camera->tick(dt);
-	ActorSystem::tick(m_registry, m_player->getEntity(), dt,
-	                  m_inputQueue->getCurrentState());
-
 	const Position& position = m_registry->get<Position>(m_player->getEntity());
 
+	m_camera->tick(dt);
+	InputState state = m_inputQueue->getCurrentState();
+
+	ActorSystem::tick(m_registry, m_player->getEntity(), dt, state);
 	confirmState(position);
 
 	if (m_followCam)
@@ -438,7 +438,7 @@ void Game::tick(float dt)
 	}
 
 	m_listener->setPosition(position.position);
-	m_listener->setVelocity({ 0, 0, 0 });
+	m_listener->setVelocity({0, 0, 0});
 
 	m_world->tick(m_prevPos);
 

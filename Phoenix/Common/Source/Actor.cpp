@@ -27,6 +27,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <Common/Actor.hpp>
+#include <Common/Logger.hpp>
 
 #include <Common/Movement.hpp>
 #include <Common/Position.hpp>

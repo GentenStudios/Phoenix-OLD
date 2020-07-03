@@ -99,9 +99,9 @@ InputState InputQueue::getCurrentState()
 		input.up       = InputMap::get()->getState(m_up);
 		input.down     = InputMap::get()->getState(m_down);
 	}
-	input.rotation.x = static_cast<unsigned int>(
+	input.rotation.x = static_cast<int>(
 	    m_registry->get<Position>(m_player->getEntity()).rotation.x * 360000.0);
-	input.rotation.y = static_cast<unsigned int>(
+	input.rotation.y = static_cast<int>(
 	    m_registry->get<Position>(m_player->getEntity()).rotation.y * 360000.0);
 	input.sequence = m_sequence;
 	return input;
