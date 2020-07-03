@@ -412,8 +412,11 @@ void Game::tick(float dt)
 	lightdir.x = std::cos(time);
 
 	m_camera->tick(dt);
+	ActorSystem::tick(m_registry, m_player->getEntity(), dt,
+	                  m_inputQueue->getCurrentState());
 
 	const Position& position = m_registry->get<Position>(m_player->getEntity());
+
 	confirmState(position);
 
 	if (m_followCam)

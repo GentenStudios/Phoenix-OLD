@@ -215,11 +215,7 @@ namespace phx::gfx
 		Window* m_window;
 
 		math::mat4 m_projection;
-
-		math::vec3 m_rotation;
-		math::vec3 m_position;
 		math::vec3 m_up;
-		math::vec3 m_direction;
 
 		math::vec2 m_windowCentre;
 
@@ -230,14 +226,6 @@ namespace phx::gfx
 
 		entt::registry* m_registry;
 		entt::entity    m_actor;
-
-		/// @todo Relocate player movement to player instead of camera
-		client::Input* m_forward;
-		client::Input* m_backward;
-		client::Input* m_left;
-		client::Input* m_right;
-		client::Input* m_fly;
-		client::Input* m_down;
 	};
 } // namespace phx::gfx
 
