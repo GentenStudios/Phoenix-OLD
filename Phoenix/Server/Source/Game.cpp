@@ -30,8 +30,6 @@
 #include <Server/User.hpp>
 
 #include <Common/Actor.hpp>
-#include <Common/Movement.hpp>
-#include <Common/Position.hpp>
 #include <thread>
 
 using namespace phx;
@@ -55,7 +53,8 @@ void Game::run()
 		// Process everybody's input first
 		if (m_iris->stateQueue.empty())
 		{
-			sleep(1); // This just keeps the CPU from spinning
+			std::this_thread::sleep_for(
+			    1_ms); // This just keeps the CPU from spinning
 			continue;
 		}
 		net::StateBundle m_currentState = m_iris->stateQueue.pop();

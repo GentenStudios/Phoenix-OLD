@@ -64,7 +64,7 @@ math::mat4 FPSCamera::getProjection() const { return m_projection; }
 
 math::mat4 FPSCamera::calculateViewMatrix() const
 {
-	Position&        pos    = m_registry->get<Position>(m_actor);
+	const Position&  pos    = m_registry->get<Position>(m_actor);
 	const math::vec3 centre = pos.position + pos.getDirection();
 	return math::mat4::lookAt(pos.position, centre, m_up);
 }

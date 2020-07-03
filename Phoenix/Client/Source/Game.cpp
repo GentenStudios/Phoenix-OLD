@@ -493,10 +493,6 @@ void Game::confirmState(Position position)
 		phx::ActorSystem::tick(m_registry, entity, 1.f / 20.f, inputState);
 	}
 
-	LOG_INFO("POS") << "Sequence:" << confirmation.second
-	                << "prediction:" << position.position
-	                << "confirmation:" << pos.position;
-
 	math::vec3 diff = position.position - pos.position;
 
 	const float precision = .25f;

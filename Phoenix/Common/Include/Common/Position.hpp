@@ -54,20 +54,20 @@ namespace phx
 		 * and supporting direction, of course when asking for a 3
 		 * dimensional vector.
 		 */
-		math::vec3 getDirection()
+		math::vec3 getDirection() const
 		{
 			return math::vec3 {std::cos(rotation.y) * std::sin(rotation.x),
 			                   std::sin(rotation.y),
 			                   std::cos(rotation.y) * std::cos(rotation.x)};
 		};
 
-		math::vec3 getRight()
+		math::vec3 getRight() const
 		{
 			return math::vec3 {std::sin(rotation.x - math::PIDIV2), 0.f,
 			                   std::cos(rotation.x - math::PIDIV2)};
 		};
 
-		math::vec3 getForward()
+		math::vec3 getForward() const
 		{
 			return math::vec3 {std::sin(rotation.x), 0.f, std::cos(rotation.x)};
 		};
