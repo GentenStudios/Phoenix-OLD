@@ -98,6 +98,20 @@ void Server::run()
 	voxels::BlockRegistry::get()->registerAPI(m_modManager);
 	Settings::get()->registerAPI(m_modManager);
 	m_game->registerAPI(m_modManager);
+
+	m_modManager->registerFunction("core.log_warning", [](std::string message) {
+		LOG_WARNING("MODULE") << message;
+	});
+	m_modManager->registerFunction("core.log_fatal", [](std::string message) {
+		LOG_FATAL("MODULE") << message;
+	});
+	m_modManager->registerFunction("core.log_info", [](std::string message) {
+		LOG_INFO("MODULE") << message;
+	});
+	m_modManager->registerFunction("core.log_debug", [](std::string message) {
+		LOG_DEBUG("MODULE") << message;
+	});
+
 	registerUnusedAPI(m_modManager);
 
 	float progress = 0.f;
