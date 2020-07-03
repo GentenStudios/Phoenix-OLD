@@ -463,14 +463,17 @@ void Game::sendMessage(const std::string& input, std::ostringstream& cout)
 
 void Game::confirmState(const Position& position)
 {
+	// This is an internal log of the recent input states sent to the server
 	static std::list<InputState> states;
 
+	// We can't iterate through a queue so we drain the queue to this list
 	size_t i = m_inputQueue->m_queue.size();
 	for (size_t j = 0; j <= i; j++)
 	{
 		states.push_back(m_inputQueue->m_queue.pop());
 	}
 
+	// If there are no confirmation states ready from the network, we are done
 	if (m_network->stateQueue.empty())
 	{
 		return;
@@ -483,6 +486,9 @@ void Game::confirmState(const Position& position)
 		states.pop_front();
 	}
 
+	// Create a temporary position entity located at the confirmation position
+	// and run all the states sent to the network since that sequence against
+	// it.
 	auto      entity = m_registry->create();
 	Position& pos    = m_registry->emplace<Position>(
         entity, confirmation.first.rotation, confirmation.first.position);
@@ -493,8 +499,11 @@ void Game::confirmState(const Position& position)
 		phx::ActorSystem::tick(m_registry, entity, 1.f / 20.f, inputState);
 	}
 
+	// Compare the temporary position object with the current player position.
 	math::vec3 diff = position.position - pos.position;
 
+	// If the temporary position object based on the confirmation is too far off
+	// from our current position, update our current position.
 	const float precision = .25f;
 	if (diff.x > precision || diff.x < -precision || diff.y > precision ||
 	    diff.y < -precision || diff.z > precision || diff.z < -precision)
