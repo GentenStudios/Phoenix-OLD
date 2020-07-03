@@ -134,6 +134,9 @@ namespace phx::server::net
 		/**
 		 * @brief Sends a message packet to a client
 		 *
+		 * @note Const ref's are not used here due to the nature of the
+		 * serializer
+		 *
 		 * @param userRef The user to sent the message to
 		 * @param data The message packet data
 		 */
