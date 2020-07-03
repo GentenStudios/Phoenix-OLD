@@ -81,7 +81,17 @@ namespace phx::client
 		void sendMessage(const std::string& input, std::ostringstream& cout);
 
 	private:
-		void confirmState(Position position);
+		/**
+		 * @brief This confirms that the prediction on the client was accurate
+		 * to what the server decided to accept and send back in a confirmation.
+		 *
+		 * @param position The current player position to confirm
+		 *
+		 * @note This is a rough implementation, ideally it doesn't live in the
+		 * main game class forever but it is easier to work on it with access to
+		 * the values it needs.
+		 */
+		void confirmState(const Position& position);
 
 		gfx::Window*       m_window;
 		gfx::FPSCamera*    m_camera = nullptr;

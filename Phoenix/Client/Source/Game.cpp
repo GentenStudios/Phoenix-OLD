@@ -461,7 +461,7 @@ void Game::sendMessage(const std::string& input, std::ostringstream& cout)
 	m_network->sendMessage(input);
 }
 
-void Game::confirmState(Position position)
+void Game::confirmState(const Position& position)
 {
 	static std::list<InputState> states;
 
@@ -496,29 +496,11 @@ void Game::confirmState(Position position)
 	math::vec3 diff = position.position - pos.position;
 
 	const float precision = .25f;
-	bool        reset     = false;
-	if (diff.x > precision || diff.x < -precision)
-	{
-		position.position.x = pos.position.x;
-		reset = true;
-	}
-
-	if (diff.y > precision || diff.y < -precision)
-	{
-		position.position.y = pos.position.y;
-		reset = true;
-	}
-
-	if (diff.z > precision || diff.z < -precision)
-	{
-		position.position.z = pos.position.z;
-		reset = true;
-	}
-
-	if (reset)
+	if (diff.x > precision || diff.x < -precision || diff.y > precision ||
+	    diff.y < -precision || diff.z > precision || diff.z < -precision)
 	{
 		m_registry->get<Position>(m_player->getEntity()).position =
-		    position.position;
+		    pos.position;
 	}
 
 	m_registry->destroy(entity);
