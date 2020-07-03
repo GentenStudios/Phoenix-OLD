@@ -44,6 +44,8 @@
 
 #include <entt/entt.hpp>
 
+#include <atomic>
+
 namespace phx::gfx
 {
 	/**
