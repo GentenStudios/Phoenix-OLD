@@ -33,7 +33,8 @@
 
 using namespace phx::client;
 
-Network::Network(std::ostringstream& chat) : m_chat(chat)
+Network::Network(std::ostringstream& chat, phx::net::Address address)
+    : m_chat(chat)
 {
 	m_client = new phx::net::Host();
 
@@ -62,7 +63,6 @@ Network::Network(std::ostringstream& chat) : m_chat(chat)
 		std::cout << "Server disconnected";
 	});
 
-	phx::net::Address address = phx::net::Address("127.0.0.1", 7777);
 	m_client->connect(address, 3);
 	m_client->poll(5000_ms);
 }
@@ -149,6 +149,7 @@ void Network::parseData(phx::net::Packet& packet)
 	ser& chunk;
 
 	chunkQueue.push(chunk);
+	LOG_DEBUG("NET") << "CHUNK RECEIVED";
 }
 
 void Network::sendState(InputState inputState)

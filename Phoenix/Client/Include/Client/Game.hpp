@@ -62,7 +62,8 @@ namespace phx::client
 	class Game : public gfx::Layer
 	{
 	public:
-		explicit Game(gfx::Window* window, entt::registry* registry);
+		explicit Game(gfx::Window* window, entt::registry* registry,
+		              bool networked = true);
 		~Game() override;
 
 		void onAttach() override;
@@ -112,8 +113,8 @@ namespace phx::client
 		math::vec3  m_prevPos;
 		int         m_playerHand = 0;
 
-		client::Network*    m_network;
-		client::InputQueue* m_inputQueue;
+		client::Network*    m_network    = nullptr;
+		client::InputQueue* m_inputQueue = nullptr;
 
 		// intermediary variables to prevent getting the pointer from the client
 		// singleton every tick.

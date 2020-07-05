@@ -36,8 +36,8 @@
 using namespace phx::voxels;
 using namespace phx;
 
-ChunkView::ChunkView(int viewDistance, Map&& map)
-    : m_viewDistance(viewDistance), m_map(std::move(map))
+ChunkView::ChunkView(int viewDistance, Map* map)
+    : m_viewDistance(viewDistance), m_map(map)
 {
 	// calculates the maximum visible chunks.
 	const int viewLength       = (viewDistance * 2) + 1;
@@ -47,27 +47,105 @@ ChunkView::ChunkView(int viewDistance, Map&& map)
 	m_renderer->buildTextureArray();
 }
 
-ChunkView::~ChunkView() { delete m_renderer; }
+ChunkView::ChunkView(int viewDistance, client::Network* network)
+    : m_viewDistance(viewDistance), m_network(network)
+{
+	// calculates the maximum visible chunks.
+	const int viewLength       = (viewDistance * 2) + 1;
+	const int maxVisibleChunks = viewLength * viewLength * viewLength;
+
+	m_renderer = new gfx::ChunkRenderer(maxVisibleChunks);
+	m_renderer->buildTextureArray();
+}
+
+ChunkView::~ChunkView()
+{
+	delete m_renderer;
+	delete m_map;
+}
 
 void ChunkView::tick(math::vec3 playerPos)
 {
-	// this block converts the raw camera/player position into voxel-world
-	// positions.
+	// When networked, we only tick if we have new chunks from the network
+	if (m_network != nullptr)
+	{
+		if (m_network->chunkQueue.empty())
+		{
+			return;
+		}
+	}
+
+	// this converts the raw camera/player position into voxel-world positions.
 	playerPos = playerPos / 2.f;
 	playerPos += 0.5f;
 
+	// Use alternate tick function if we are connected to a server
+	if (m_network != nullptr)
+	{
+		tickNet(playerPos);
+	}
+	else if (m_map != nullptr)
+	{
+		tickLocal(playerPos);
+	}
+	else
+	{
+		LOG_FATAL("ChunkView.cpp")
+		    << "Attempted to tick while neither network or map exist";
+		exit(EXIT_FAILURE);
+	}
+}
+
+void ChunkView::tickNet(math::vec3 playerPos)
+{
+	// TODO discard all out of view chunks
+
+	// If we don't already have a chunk, insert it
+	size_t size = m_network->chunkQueue.size();
+	for (size_t i = 0; i < size; i++)
+	{
+		Chunk chunk = Chunk(math::vec3 {0, 0, 0});
+		if (!m_network->chunkQueue.try_pop(chunk))
+		{
+			LOG_WARNING("CHUNK_VIEW")
+			    << "Attempted to pop from empty chunk queue";
+			return;
+		}
+		math::vec3 chunkToCheck = chunk.getChunkPos();
+
+		chunkToCheck = chunkToCheck * static_cast<float>(Chunk::CHUNK_WIDTH);
+
+		auto result = std::find_if(m_activeChunks.begin(), m_activeChunks.end(),
+		                           [chunkToCheck](const Chunk& o) -> bool {
+			                           return o.getChunkPos() == chunkToCheck;
+		                           });
+
+		if (result == m_activeChunks.end())
+		{
+			m_activeChunks.emplace_back(chunk);
+
+			gfx::ChunkMesher mesher(chunkToCheck,
+			                        m_activeChunks.back().getBlocks(),
+			                        m_renderer->getTextureTable());
+
+			mesher.mesh();
+
+			m_renderer->submitChunk(mesher.getMesh(), chunkToCheck);
+		}
+	}
+}
+
+void ChunkView::tickLocal(math::vec3 playerPos)
+{
 	const int posX = static_cast<int>(playerPos.x) / Chunk::CHUNK_WIDTH;
 	const int posY = static_cast<int>(playerPos.y) / Chunk::CHUNK_HEIGHT;
 	const int posZ = static_cast<int>(playerPos.z) / Chunk::CHUNK_DEPTH;
 
-	// Get diameter to generate for.
-	const int chunkViewDistance = m_viewDistance;
-
-	for (int x = -chunkViewDistance; x <= chunkViewDistance; x++)
+	for (int x = -m_viewDistance; x <= m_viewDistance; x++)
 	{
-		for (int y = -chunkViewDistance; y <= chunkViewDistance; y++)
+		for (int y = -m_viewDistance; y <= m_viewDistance; y++)
 		{
-			for (int z = -chunkViewDistance; z <= chunkViewDistance; z++)
+			for (int z = -m_viewDistance; z <= m_viewDistance; z++)
 			{
 				math::vec3 chunkToCheck = {static_cast<float>(x + posX),
 				                           static_cast<float>(y + posY),
@@ -84,7 +162,7 @@ void ChunkView::tick(math::vec3 playerPos)
 
 				if (result == m_activeChunks.end())
 				{
-					m_activeChunks.emplace_back(m_map.getChunk(chunkToCheck));
+					m_activeChunks.emplace_back(m_map->getChunk(chunkToCheck));
 
 					gfx::ChunkMesher mesher(chunkToCheck,
 					                        m_activeChunks.back().getBlocks(),
@@ -155,7 +233,17 @@ BlockType* ChunkView::getBlockAt(math::vec3 position) const
 
 void ChunkView::setBlockAt(math::vec3 position, BlockType* block)
 {
-	m_map.setBlockAt(position, block);
+	if (m_network != nullptr)
+	{
+		// TODO add block manipulation over network
+		LOG_WARNING("ChunkView.cpp")
+		    << "Block manipulation when networked, not currently supported";
+		return;
+	}
+	else
+	{
+		m_map->setBlockAt(position, block);
+	}
 
 	int posX = static_cast<int>(position.x / Chunk::CHUNK_WIDTH);
 	int posY = static_cast<int>(position.y / Chunk::CHUNK_HEIGHT);
