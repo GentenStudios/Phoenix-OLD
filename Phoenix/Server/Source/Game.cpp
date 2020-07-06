@@ -30,7 +30,8 @@
 #include <Server/User.hpp>
 
 #include <Common/Actor.hpp>
-#include <Common/Position.hpp>
+#include <Common/PlayerView.hpp>
+
 #include <thread>
 
 using namespace phx;
@@ -65,34 +66,24 @@ void Game::run()
 		// Process everybody's input first
 		for (const auto& state : m_currentState.states)
 		{
-			auto       entity = m_registry->get<Player>(state.first).actor;
-			math::vec3 oldPos = m_registry->get<Position>(entity).position;
-			ActorSystem::tick(m_registry, entity, dt, state.second);
-			math::vec3 newPos = m_registry->get<Position>(entity).position;
-			LOG_DEBUG("POS") << "OLD CHUNK:" << oldPos << "NEW CHUNK" << newPos;
+			auto       player = m_registry->get<Player>(state.first);
+			math::vec3 pos = m_registry->get<Position>(player.actor).position;
+			const math::vec3i oldPos(
+			    static_cast<int>(pos.x) / voxels::Chunk::CHUNK_WIDTH,
+			    static_cast<int>(pos.y) / voxels::Chunk::CHUNK_HEIGHT,
+			    static_cast<int>(pos.z) / voxels::Chunk::CHUNK_DEPTH);
+			ActorSystem::tick(m_registry, player.actor, dt, state.second);
+			pos = m_registry->get<Position>(player.actor).position;
+			const math::vec3i newPos(
+			    static_cast<int>(pos.x) / voxels::Chunk::CHUNK_WIDTH,
+			    static_cast<int>(pos.y) / voxels::Chunk::CHUNK_HEIGHT,
+			    static_cast<int>(pos.z) / voxels::Chunk::CHUNK_DEPTH);
 			if (!(oldPos == newPos))
 			{
-				// Send new chunks
-				/// @TODO We only need to send the chunks the player doesn't
-				/// already have
-				LOG_DEBUG("POS") << "NEW CHUNK";
-				const int view = 3;
-				for (int x = -view; x < view; x++)
+				for (const auto& chunk :
+				     PlayerView::update(m_registry, player.actor, &m_map))
 				{
-					for (int y = -view; y < view; y++)
-					{
-						for (int z = -view; z < view; z++)
-						{
-							m_iris->sendData(
-							    m_registry->get<Player>(state.first).id,
-							    m_map.getChunk(math::vec3 {
-							        x + (newPos.x / voxels::Chunk::CHUNK_WIDTH),
-							        y + (newPos.y /
-							             voxels::Chunk::CHUNK_HEIGHT),
-							        z + (newPos.z /
-							             voxels::Chunk::CHUNK_DEPTH)}));
-						}
-					}
+					m_iris->sendData(player.id, chunk);
 				}
 			}
 		}

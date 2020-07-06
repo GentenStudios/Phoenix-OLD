@@ -6,11 +6,11 @@ add_subdirectory(Network)
 
 set(currentDir ${CMAKE_CURRENT_LIST_DIR})
 set(Headers
-	${mathHeaders}
-	${voxelHeaders}
-	${cmsHeaders}
-	${serializationHeaders}
-	${networkHeaders}
+        ${mathHeaders}
+        ${voxelHeaders}
+        ${cmsHeaders}
+        ${serializationHeaders}
+        ${networkHeaders}
 
         ${currentDir}/CoreIntrinsics.hpp
         ${currentDir}/EnumTools.hpp
@@ -23,6 +23,7 @@ set(Headers
         ${currentDir}/Position.hpp
         ${currentDir}/Movement.hpp
         ${currentDir}/Input.hpp
+        ${currentDir}/PlayerView.hpp
 
         PARENT_SCOPE
         )

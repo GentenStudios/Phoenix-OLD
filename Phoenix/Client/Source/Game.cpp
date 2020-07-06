@@ -37,8 +37,8 @@
 #include <Common/Commander.hpp>
 #include <Common/Position.hpp>
 #include <Common/Logger.hpp>
-
 #include <Common/Movement.hpp>
+
 #include <cmath>
 #include <tuple>
 

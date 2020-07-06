@@ -53,9 +53,10 @@ Network::Network(std::ostringstream& chat, phx::net::Address address)
 			break;
 		case 3:
 			parseData(packet);
+			break;
 		default:
 			LOG_WARNING("NETWORK")
-			    << "Received Packet on Channel " << channelID;
+			    << "Received Unexpected Packet on Channel " << channelID;
 		}
 	});
 
@@ -140,7 +141,6 @@ void Network::parseMessage(phx::net::Packet& packet)
 
 void Network::parseData(phx::net::Packet& packet)
 {
-	LOG_DEBUG("NET") << "RECEIVE CHUNK";
 	voxels::Chunk chunk(math::vec3 {0, 0, 0});
 
 	auto data = packet.getData();
@@ -150,7 +150,6 @@ void Network::parseData(phx::net::Packet& packet)
 	ser& chunk;
 
 	chunkQueue.push(chunk);
-	LOG_DEBUG("NET") << "CHUNK RECEIVED";
 }
 
 void Network::sendState(InputState inputState)
