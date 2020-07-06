@@ -42,7 +42,7 @@ namespace phx
 		bool        right {};
 		bool        up {};
 		bool        down {};
-		math::vec2i rotation {}; // in 1/1000 degres
+		math::vec3i rotation {}; // in 1/1000 degrees
 		std::size_t sequence {};
 		Serializer& operator&(Serializer& this_) override;
 	};

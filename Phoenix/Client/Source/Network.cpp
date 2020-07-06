@@ -96,8 +96,6 @@ void Network::parseEvent(phx::net::Packet& packet)
 
 void Network::parseState(phx::net::Packet& packet)
 {
-	static size_t currentSequence;
-
 	auto data = packet.getData();
 
 	phx::Serializer ser(Serializer::Mode::READ);
@@ -105,11 +103,11 @@ void Network::parseState(phx::net::Packet& packet)
 
 	size_t sequence;
 	ser&   sequence;
-	if (sequence < currentSequence && sequence > 10)
+	if (sequence < m_currentSequence && sequence > 10)
 	{
 		return;
 	}
-	currentSequence = sequence;
+	m_currentSequence = sequence;
 
 	Position input;
 	ser& input.position.x& input.position.y& input.position.z;

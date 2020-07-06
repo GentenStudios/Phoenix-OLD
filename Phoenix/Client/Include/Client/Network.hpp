@@ -98,5 +98,6 @@ namespace phx::client
 		phx::net::Host*     m_client;
 		std::ostringstream& m_chat;
 		std::thread         m_thread;
+		size_t              m_currentSequence;
 	};
 } // namespace phx::client::net
