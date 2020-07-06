@@ -33,8 +33,7 @@
 using namespace phx;
 using namespace gfx;
 
-FPSCamera::FPSCamera(Window* window, entt::registry* registry) :
-m_registry(registry)
+FPSCamera::FPSCamera(Window* window, entt::registry* registry) : m_registry(registry), m_enabled(true)
 {
 	m_window = window;
 	m_window->setCursorState(CursorState::DISABLED);

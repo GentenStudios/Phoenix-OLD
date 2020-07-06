@@ -194,7 +194,7 @@ namespace phx::gfx
 		math::vec2 m_windowCentre;
 
 		// Also used by InputQueue to determine if camera is focused or not
-		std::atomic<bool> m_enabled = true;
+		std::atomic<bool> m_enabled;
 
 		Setting* m_settingSensitivity;
 
