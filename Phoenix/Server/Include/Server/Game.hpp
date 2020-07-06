@@ -46,7 +46,7 @@ namespace phx::server
 		 * @param registry The shared EnTT registry
 		 * @param running Pointer to a boolean, the threaded function only runs
 		 * if this is true
-		 * @param iris Pointer to the nextworking system
+		 * @param iris Pointer to the networking system
 		 */
 		Game(entt::registry* registry, bool* running, net::Iris* iris,
 		     const std::string& save);

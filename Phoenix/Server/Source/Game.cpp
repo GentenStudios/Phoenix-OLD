@@ -56,8 +56,8 @@ void Game::run()
 		// Wait for a new input bundle from the network
 		if (m_iris->stateQueue.empty())
 		{
-			std::this_thread::sleep_for(
-			    1_ms); // This just keeps the CPU from spinning
+			// This just keeps the CPU from spinning
+			std::this_thread::sleep_for(1_ms);
 			continue;
 		}
 		net::StateBundle m_currentState = m_iris->stateQueue.pop();
@@ -69,22 +69,28 @@ void Game::run()
 			math::vec3 oldPos = m_registry->get<Position>(entity).position;
 			ActorSystem::tick(m_registry, entity, dt, state.second);
 			math::vec3 newPos = m_registry->get<Position>(entity).position;
-			if (oldPos / voxels::Chunk::CHUNK_WIDTH !=
-			    newPos / voxels::Chunk::CHUNK_WIDTH)
+			LOG_DEBUG("POS") << "OLD CHUNK:" << oldPos << "NEW CHUNK" << newPos;
+			if (!(oldPos == newPos))
 			{
 				// Send new chunks
 				/// @TODO We only need to send the chunks the player doesn't
 				/// already have
-				const int view = 5;
-				for (int x = 0; x < view; x++)
+				LOG_DEBUG("POS") << "NEW CHUNK";
+				const int view = 3;
+				for (int x = -view; x < view; x++)
 				{
-					for (int y = 0; y < view; y++)
+					for (int y = -view; y < view; y++)
 					{
-						for (int z = 0; z < view; z++)
+						for (int z = -view; z < view; z++)
 						{
 							m_iris->sendData(
 							    m_registry->get<Player>(state.first).id,
-							    m_map.getChunk(math::vec3 {x, y, z}));
+							    m_map.getChunk(math::vec3 {
+							        x + (newPos.x / voxels::Chunk::CHUNK_WIDTH),
+							        y + (newPos.y /
+							             voxels::Chunk::CHUNK_HEIGHT),
+							        z + (newPos.z /
+							             voxels::Chunk::CHUNK_DEPTH)}));
 						}
 					}
 				}

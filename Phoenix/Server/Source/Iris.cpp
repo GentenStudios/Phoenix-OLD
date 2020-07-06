@@ -44,7 +44,7 @@ static const std::size_t MAX_USERS = 32;
 
 Iris::Iris(entt::registry* registry) : m_registry(registry)
 {
-	m_server = new phx::net::Host(phx::net::Address(7777), MAX_USERS, 3);
+	m_server = new phx::net::Host(phx::net::Address(7777), MAX_USERS, 4);
 
 	m_server->onConnect([this](Peer& peer, enet_uint32) {
 		LOG_INFO("NETWORK")
@@ -239,6 +239,7 @@ void Iris::sendMessage(std::size_t userID, std::string message)
 
 void Iris::sendData(std::size_t userID, voxels::Chunk data)
 {
+	LOG_DEBUG("NET") << "SEND CHUNK " << data.getChunkPos();
 	Serializer ser(Serializer::Mode::WRITE);
 	ser&       data;
 	Packet     packet = Packet(ser.getBuffer(), PacketFlags::RELIABLE);

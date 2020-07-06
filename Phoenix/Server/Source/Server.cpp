@@ -67,7 +67,10 @@ void Server::run()
 {
 	std::cout << "Hello, Server!" << std::endl;
 
-	Logger::get()->initialize({});
+	LoggerConfig config;
+	config.verbosity = LogVerbosity::DEBUG;
+	Logger::initialize(config);
+
 	Settings::get()->load("config.txt");
 
 	// Initialize the Modules //

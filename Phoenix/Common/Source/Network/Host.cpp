@@ -217,7 +217,7 @@ Peer& Host::getPeer(ENetPeer& peer)
 	{
 		return m_peers.at(std::size_t(peer.data));
 	}
-	std::cout << "peer not found";
+	LOG_WARNING("NETCODE") << "peer not found";
 }
 
 Peer& Host::createPeer(ENetPeer& peer)

@@ -63,7 +63,7 @@ Network::Network(std::ostringstream& chat, phx::net::Address address)
 		std::cout << "Server disconnected";
 	});
 
-	m_client->connect(address, 3);
+	m_client->connect(address, 4);
 	m_client->poll(5000_ms);
 }
 
@@ -140,6 +140,7 @@ void Network::parseMessage(phx::net::Packet& packet)
 
 void Network::parseData(phx::net::Packet& packet)
 {
+	LOG_DEBUG("NET") << "RECEIVE CHUNK";
 	voxels::Chunk chunk(math::vec3 {0, 0, 0});
 
 	auto data = packet.getData();
