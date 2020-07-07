@@ -34,16 +34,27 @@
 
 namespace phx
 {
-	struct InputState : public phx::ISerializable
+	struct InputState : ISerializable
 	{
-		bool        forward{};
-		bool        backward{};
-		bool        left{};
-		bool        right{};
-		bool        up{};
-		bool        down{};
-		math::vec2u rotation{}; // in 1/1000 degres
-		std::size_t sequence{};
-		Serializer& operator&(Serializer& this_) override;
+		InputState()          = default;
+		virtual ~InputState() = default;
+
+		InputState(const InputState& other) = default;
+		InputState& operator=(const InputState& other) = default;
+		InputState(InputState&& other)                 = default;
+		InputState& operator=(InputState&& other) = default;
+
+		bool forward  = false;
+		bool backward = false;
+		bool left     = false;
+		bool right    = false;
+		bool up       = false;
+		bool down     = false;
+
+		math::vec2u rotation; // in 1/1000 degrees
+
+		std::size_t sequence = 0;
+
+		Serializer& operator&(Serializer& serializer) override;
 	};
 } // namespace phx
