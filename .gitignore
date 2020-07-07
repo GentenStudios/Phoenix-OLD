@@ -4,4 +4,7 @@ out/
 .vs/
 .vscode/
 
+# this is a Visual Studio file when you use it directly with CMake.
+CMakeSettings.json 
+
 Documentation/Build/
