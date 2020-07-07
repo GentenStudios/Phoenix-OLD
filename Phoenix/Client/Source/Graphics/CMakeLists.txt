@@ -10,6 +10,7 @@ set(graphicsSources
 	${currentDir}/Window.cpp
 	${currentDir}/LayerStack.cpp
 	${currentDir}/Camera.cpp
+	${currentDir}/TexturePacker.cpp
 
 	${currentDir}/ShaderPipeline.cpp
 

@@ -96,7 +96,9 @@ namespace phx::gfx
 	 * mainGameLoop()
 	 * {
 	 *     // individually activate since we have another shader that could be
-	 * active. pipeline.activate(); pipeline.setMatrix(myViewMatrix);
+	 *     // active.
+	 *     pipeline.activate();
+	 *	   pipeline.setMatrix(myViewMatrix);
 	 *     pipeline.setMatrix(myProjectionMatrix);
 	 *     world.render();
 	 *

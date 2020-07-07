@@ -16,6 +16,7 @@ set(graphicsHeaders
 
 	${currentDir}/ShaderPipeline.hpp
 	${currentDir}/Camera.hpp
+	${currentDir}/TexturePacker.hpp
 
 	${currentDir}/ChunkMesher.hpp
 	${currentDir}/ChunkRenderer.hpp
