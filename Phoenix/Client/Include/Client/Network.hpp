@@ -80,7 +80,7 @@ namespace phx::client
 		 * @param userRef The user to sent the state to
 		 * @param data The state packet data
 		 */
-		void sendState(InputState inputState);
+		void sendState(phx::InputState inputState);
 
 		/**
 		 * @brief Sends a message packet to a client

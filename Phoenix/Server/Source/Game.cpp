@@ -37,7 +37,7 @@
 using namespace phx;
 using namespace phx::server;
 
-Game::Game(entt::registry* registry, bool* running, net::Iris* iris)
+Game::Game(entt::registry* registry, bool* running, phx::server::net::Iris* iris)
     : m_registry(registry), m_running(running), m_iris(iris)
 {
 	m_commander = new Commander(m_iris);

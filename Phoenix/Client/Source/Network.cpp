@@ -111,7 +111,7 @@ void Network::parseMessage(phx::net::Packet& packet)
 	m_chat << "\n";
 }
 
-void Network::sendState(InputState inputState)
+void Network::sendState(phx::InputState inputState)
 {
 	Serializer ser(Serializer::Mode::WRITE);
 	ser&       inputState;
