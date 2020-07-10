@@ -29,15 +29,11 @@
 #include <Client/Graphics/Camera.hpp>
 
 #include <Common/Position.hpp>
-#include <Common/Movement.hpp>
-
-const float MOVE_SPEED = 0.01f;
 
 using namespace phx;
 using namespace gfx;
 
-FPSCamera::FPSCamera(Window* window, entt::registry* registry) :
-m_registry(registry)
+FPSCamera::FPSCamera(Window* window, entt::registry* registry) : m_registry(registry), m_enabled(true)
 {
 	m_window = window;
 	m_window->setCursorState(CursorState::DISABLED);
@@ -56,24 +52,7 @@ m_registry(registry)
 	    Settings::get()->add("Sensitivity", "camera:sensitivity", 50);
 	m_settingSensitivity->setMax(100);
 	m_settingSensitivity->setMin(1);
-
-	m_forward = client::InputMap::get()->registerInput(
-	    "core.move.forward", "Move Forward", events::Keys::KEY_W);
-	m_backward = client::InputMap::get()->registerInput(
-	    "core.move.backward", "Move Backward", events::Keys::KEY_S);
-	m_left = client::InputMap::get()->registerInput(
-	    "core.move.left", "Strafe Left", events::Keys::KEY_A);
-	m_right = client::InputMap::get()->registerInput(
-	    "core.move.right", "Strafe Right", events::Keys::KEY_D);
-	m_fly  = client::InputMap::get()->registerInput("core.move.up", "Fly Up",
-                                                   events::Keys::KEY_SPACE);
-	m_down = client::InputMap::get()->registerInput(
-	    "core.move.down", "Fly Down", events::Keys::KEY_LEFT_SHIFT);
 }
-
-math::vec3 FPSCamera::getPosition() const { return m_position; }
-
-math::vec3 FPSCamera::getDirection() const { return m_direction; }
 
 void FPSCamera::setProjection(const math::mat4& projection)
 {
@@ -84,8 +63,9 @@ math::mat4 FPSCamera::getProjection() const { return m_projection; }
 
 math::mat4 FPSCamera::calculateViewMatrix() const
 {
-	const math::vec3 centre = m_position + m_direction;
-	return math::mat4::lookAt(m_position, centre, m_up);
+	const Position&  pos    = m_registry->get<Position>(m_actor);
+	const math::vec3 centre = pos.position + pos.getDirection();
+	return math::mat4::lookAt(pos.position, centre, m_up);
 }
 
 void FPSCamera::tick(float dt)
@@ -102,61 +82,19 @@ void FPSCamera::tick(float dt)
 
 	m_window->setCursorPosition(m_windowCentre);
 
-	const float sensitivity = static_cast<float>(m_settingSensitivity->value()) / 50;
+	const float sensitivity =
+	    static_cast<float>(m_settingSensitivity->value()) / 50.f;
 
-	m_rotation = m_registry->get<Position>(m_actor).rotation;
-	m_position = m_registry->get<Position>(m_actor).position;
+	Position& pos = m_registry->get<Position>(m_actor);
 
 	/// @todo Fix this up since we're having an issue where we turn more/less
 	/// due to higher/lower frames.
-	m_rotation.x += sensitivity * dt * (m_windowCentre.x - mousePos.x);
-	m_rotation.y += sensitivity * dt * (m_windowCentre.y - mousePos.y);
+	pos.rotation.x += sensitivity * dt * (m_windowCentre.x - mousePos.x);
+	pos.rotation.y += sensitivity * dt * (m_windowCentre.y - mousePos.y);
 
-	m_rotation.y = math::clamp(m_rotation.y, -math::PIDIV2, math::PIDIV2);
+	pos.rotation.y = math::clamp(pos.rotation.y, -math::PIDIV2, math::PIDIV2);
 
-	m_direction.x = std::cos(m_rotation.y) * std::sin(m_rotation.x);
-	m_direction.y = std::sin(m_rotation.y);
-	m_direction.z = std::cos(m_rotation.y) * std::cos(m_rotation.x);
-
-	const math::vec3 right   = {std::sin(m_rotation.x - math::PIDIV2), 0.f,
-                              std::cos(m_rotation.x - math::PIDIV2)};
-	const math::vec3 forward = {std::sin(m_rotation.x), 0.f,
-	                            std::cos(m_rotation.x)};
-
-	m_up = math::vec3::cross(right, m_direction);
-
-	const float moveSpeed =
-	    static_cast<float>(m_registry->get<Movement>(m_actor).moveSpeed);
-
-	if (m_window->isKeyDown(m_forward->key))
-	{
-		m_position += forward * dt * moveSpeed;
-	}
-	else if (m_window->isKeyDown(m_backward->key))
-	{
-		m_position -= forward * dt * moveSpeed;
-	}
-
-	if (m_window->isKeyDown(m_left->key))
-	{
-		m_position -= right * dt * moveSpeed;
-	}
-	else if (m_window->isKeyDown(m_right->key))
-	{
-		m_position += right * dt * moveSpeed;
-	}
-
-	if (m_window->isKeyDown(m_fly->key))
-	{
-		m_position.y += dt * moveSpeed;
-	}
-	else if (m_window->isKeyDown(m_down->key))
-	{
-		m_position.y -= dt * moveSpeed;
-	}
-
-	m_registry->get<Position>(m_actor).position = m_position;
-	m_registry->get<Position>(m_actor).rotation = m_rotation;
+	m_up = math::vec3::cross(pos.getRight(), pos.getDirection());
 }
 
 void FPSCamera::enable(bool enabled)

@@ -30,6 +30,7 @@
 
 #include <Common/Input.hpp>
 #include <Common/Network/Host.hpp>
+#include <Common/Position.hpp>
 #include <Common/Util/BlockingQueue.hpp>
 #include <thread>
 
@@ -90,10 +91,13 @@ namespace phx::client
 		 */
 		void sendMessage(std::string message);
 
+		phx::BlockingQueue<std::pair<Position, size_t>> stateQueue;
+
 	private:
 		bool                m_running;
 		phx::net::Host*     m_client;
 		std::ostringstream& m_chat;
 		std::thread         m_thread;
+		size_t              m_currentSequence;
 	};
 } // namespace phx::client::net
