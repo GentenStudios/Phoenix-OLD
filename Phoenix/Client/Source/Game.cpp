@@ -486,14 +486,11 @@ void Game::sendMessage(const std::string& input, std::ostringstream& cout)
 
 void Game::confirmState(const Position& position)
 {
-	// This is an internal log of the recent input states sent to the server
-	static std::list<InputState> states;
-
 	// We can't iterate through a queue so we drain the queue to this list
-	size_t i = m_inputQueue->m_queue.size();
-	for (size_t j = 0; j <= i; j++)
+	std::size_t i = m_inputQueue->m_queue.size();
+	for (std::size_t j = 0; j <= i; j++)
 	{
-		states.push_back(m_inputQueue->m_queue.pop());
+		m_states.push_back(m_inputQueue->m_queue.pop());
 	}
 
 	// If there are no confirmation states ready from the network, we are done
@@ -504,9 +501,9 @@ void Game::confirmState(const Position& position)
 	auto confirmation = m_network->stateQueue.pop();
 
 	// Discard any inputStates older than the confirmationState
-	while (!states.empty() && states.front().sequence < confirmation.second)
+	while (!m_states.empty() && m_states.front().sequence < confirmation.second)
 	{
-		states.pop_front();
+		m_states.pop_front();
 	}
 
 	// Create a temporary position entity located at the confirmation position
@@ -517,7 +514,7 @@ void Game::confirmState(const Position& position)
         entity, confirmation.first.rotation, confirmation.first.position);
 	m_registry->emplace<Movement>(
 	    entity, m_registry->get<Movement>(m_player->getEntity()).moveSpeed);
-	for (const auto& inputState : states)
+	for (const auto& inputState : m_states)
 	{
 		phx::ActorSystem::tick(m_registry, entity, 1.f / 20.f, inputState);
 	}

@@ -83,7 +83,7 @@ void FPSCamera::tick(float dt)
 	m_window->setCursorPosition(m_windowCentre);
 
 	const float sensitivity =
-	    static_cast<float>(m_settingSensitivity->value()) / 50;
+	    static_cast<float>(m_settingSensitivity->value()) / 50.f;
 
 	Position& pos = m_registry->get<Position>(m_actor);
 
