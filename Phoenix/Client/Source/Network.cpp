@@ -150,7 +150,7 @@ void Network::parseData(phx::net::Packet& packet)
 	chunkQueue.push(chunk);
 }
 
-void Network::sendState(InputState inputState)
+void Network::sendState(phx::InputState inputState)
 {
 	Serializer ser(Serializer::Mode::WRITE);
 	ser&       inputState;
