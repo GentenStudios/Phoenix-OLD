@@ -114,6 +114,8 @@ namespace phx::client
 
 		client::Network*    m_network;
 		client::InputQueue* m_inputQueue;
+		// This is an internal log of the recent input states sent to the server
+		std::list<InputState> m_states;
 
 		// intermediary variables to prevent getting the pointer from the client
 		// singleton every tick.
