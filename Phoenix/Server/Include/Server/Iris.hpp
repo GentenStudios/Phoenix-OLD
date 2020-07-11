@@ -57,6 +57,16 @@ namespace phx::server::net
 		std::string message;
 	};
 
+	struct Event
+	{
+		enum Type
+		{
+			CONNECT
+		};
+		entt::entity player;
+		Type         type;
+	};
+
 	class Iris
 	{
 	public:
@@ -145,6 +155,10 @@ namespace phx::server::net
 
 		void sendData(std::size_t userID, voxels::Chunk data);
 
+		/**
+		 * @brief The Queue of events to process
+		 */
+		BlockingQueue<Event> eventQueue;
 		/**
 		 * @brief The Queue of bundled states received
 		 */

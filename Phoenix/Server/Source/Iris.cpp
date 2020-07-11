@@ -54,6 +54,7 @@ Iris::Iris(entt::registry* registry) : m_registry(registry)
 			m_registry->emplace<Player>(
 			    entity, ActorSystem::registerActor(m_registry), peer.getID());
 			m_users.emplace(peer.getID(), entity);
+			eventQueue.push({entity, Event::CONNECT});
 		}
 	});
 

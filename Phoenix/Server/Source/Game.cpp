@@ -87,10 +87,32 @@ void Game::run()
 				}
 			}
 		}
+
 		// Process events second
+		size_t size = m_iris->eventQueue.size();
+		for (size_t i = 0; i < size; i++)
+		{
+			net::Event event = m_iris->eventQueue.pop();
+			;
+			switch (event.type)
+			{
+			case net::Event::Type::CONNECT:
+			{
+				auto entity = m_registry->get<Player>(event.player);
+				for (const auto& chunk :
+				     PlayerView::update(m_registry, entity.actor, &m_map))
+				{
+					m_iris->sendData(entity.id, chunk);
+				}
+				break;
+			}
+			default:
+				LOG_WARNING("GAME") << "Event received with unknown type";
+			}
+		}
 
 		// Process messages last
-		size_t size = m_iris->messageQueue.size();
+		size = m_iris->messageQueue.size();
 		for (size_t i = 0; i < size; i++)
 		{
 			net::MessageBundle message = m_iris->messageQueue.front();
