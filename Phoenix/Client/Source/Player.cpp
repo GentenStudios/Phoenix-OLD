@@ -34,10 +34,6 @@
 
 using namespace phx;
 
-Player::Player(entt::registry* registry) : m_registry(registry)
-{
-	m_entity = ActorSystem::registerActor(registry);
-}
 
 void Player::registerAPI(cms::ModManager* manager)
 {

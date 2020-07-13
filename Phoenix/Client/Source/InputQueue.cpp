@@ -33,7 +33,7 @@
 using namespace phx::client;
 using namespace phx;
 
-InputQueue::InputQueue(entt::registry* registry, Player* player,
+InputQueue::InputQueue(entt::registry* registry, entt::entity player,
                        gfx::FPSCamera* camera)
     : m_player(player), m_registry(registry), m_camera(camera),
       m_forward(client::InputMap::get()->registerInput(
@@ -100,9 +100,9 @@ InputState InputQueue::getCurrentState()
 		input.down     = InputMap::get()->getState(m_down);
 	}
 	input.rotation.x = static_cast<int>(
-	    m_registry->get<Position>(m_player->getEntity()).rotation.x * 360000.0);
+	    m_registry->get<Position>(m_player).rotation.x * 360000.0);
 	input.rotation.y = static_cast<int>(
-	    m_registry->get<Position>(m_player->getEntity()).rotation.y * 360000.0);
+	    m_registry->get<Position>(m_player).rotation.y * 360000.0);
 	input.sequence = m_sequence;
 	return input;
 }

@@ -273,8 +273,7 @@ void Game::onAttach()
 		m_network->start();
 	}
 
-	m_player = new Player(m_registry);
-	m_player->registerAPI(m_modManager);
+	m_player = ActorSystem::registerActor(m_registry);
 
 	float progress = 0.f;
 	auto  result   = m_modManager->load(&progress);
@@ -295,14 +294,13 @@ void Game::onAttach()
 	{
 		m_map = new voxels::Map(save, "map1");
 	}
-	m_world = new voxels::ChunkView(3, m_registry, m_player->getEntity());
-	m_registry->emplace<PlayerView>(m_player->getEntity(), m_map);
+	m_world = new voxels::ChunkView(3, m_registry, m_player);
+	m_registry->emplace<PlayerView>(m_player, m_map);
 	m_camera = new gfx::FPSCamera(m_window, m_registry);
-	m_camera->setActor(m_player->getEntity());
+	m_camera->setActor(m_player);
 
 	m_registry->emplace<Hand>(
-	    m_player->getEntity(),
-	    voxels::BlockRegistry::get()->getFromRegistryID(0));
+	    m_player, voxels::BlockRegistry::get()->getFromRegistryID(0));
 
 	LOG_INFO("MAIN") << "Prepare rendering";
 	m_renderPipeline.prepare("Assets/SimpleWorld.vert",
@@ -321,8 +319,7 @@ void Game::onAttach()
 
 	if (Client::get()->isDebugLayerActive())
 	{
-		m_gameDebug =
-		    new GameTools(&m_followCam, &m_playerHand, m_player, m_registry);
+		m_gameDebug = new GameTools(&m_followCam, m_registry, m_player);
 		Client::get()->pushLayer(m_gameDebug);
 	}
 
@@ -340,7 +337,6 @@ void Game::onDetach()
 	delete m_world;
 	delete m_inputQueue;
 	delete m_network;
-	delete m_player;
 	delete m_camera;
 }
 
@@ -371,13 +367,13 @@ void Game::onEvent(events::Event& e)
 			break;
 		case events::Keys::KEY_E:
 			m_playerHand++;
-			m_registry->get<Hand>(m_player->getEntity()).hand =
+			m_registry->get<Hand>(m_player).hand =
 			    voxels::BlockRegistry::get()->getFromRegistryID(m_playerHand);
 			e.handled = true;
 			break;
 		case events::Keys::KEY_R:
 			m_playerHand--;
-			m_registry->get<Hand>(m_player->getEntity()).hand =
+			m_registry->get<Hand>(m_player).hand =
 			    voxels::BlockRegistry::get()->getFromRegistryID(m_playerHand);
 			e.handled = true;
 			break;
@@ -385,8 +381,8 @@ void Game::onEvent(events::Event& e)
 			if (Client::get()->isDebugLayerActive())
 				if (m_gameDebug == nullptr)
 				{
-					m_gameDebug = new GameTools(&m_followCam, &m_playerHand,
-					                            m_player, m_registry);
+					m_gameDebug =
+					    new GameTools(&m_followCam, m_registry, m_player);
 					Client::get()->pushLayer(m_gameDebug);
 				}
 				else
@@ -411,12 +407,12 @@ void Game::onEvent(events::Event& e)
 		switch (e.mouse.button)
 		{
 		case events::MouseButtons::LEFT:
-			ActorSystem::action1(m_registry, m_player->getEntity());
+			ActorSystem::action1(m_registry, m_player);
 			e.handled = true;
 			break;
 
 		case events::MouseButtons::RIGHT:
-			ActorSystem::action2(m_registry, m_player->getEntity());
+			ActorSystem::action2(m_registry, m_player);
 			e.handled = true;
 			break;
 
@@ -446,12 +442,12 @@ void Game::tick(float dt)
 	lightdir.y = std::sin(time);
 	lightdir.x = std::cos(time);
 
-	const Position& position = m_registry->get<Position>(m_player->getEntity());
+	const Position& position = m_registry->get<Position>(m_player);
 
 	m_camera->tick(dt);
 	InputState state = m_inputQueue->getCurrentState();
 
-	ActorSystem::tick(m_registry, m_player->getEntity(), dt, state);
+	ActorSystem::tick(m_registry, m_player, dt, state);
 	if (m_network != nullptr)
 	{
 		confirmState(position);
@@ -515,7 +511,7 @@ void Game::confirmState(const Position& position)
 	Position& pos    = m_registry->emplace<Position>(
         entity, confirmation.first.rotation, confirmation.first.position);
 	m_registry->emplace<Movement>(
-	    entity, m_registry->get<Movement>(m_player->getEntity()).moveSpeed);
+	    entity, m_registry->get<Movement>(m_player).moveSpeed);
 	for (const auto& inputState : m_states)
 	{
 		phx::ActorSystem::tick(m_registry, entity, 1.f / 20.f, inputState);
@@ -530,8 +526,7 @@ void Game::confirmState(const Position& position)
 	if (diff.x > precision || diff.x < -precision || diff.y > precision ||
 	    diff.y < -precision || diff.z > precision || diff.z < -precision)
 	{
-		m_registry->get<Position>(m_player->getEntity()).position =
-		    pos.position;
+		m_registry->get<Position>(m_player).position = pos.position;
 	}
 
 	m_registry->destroy(entity);

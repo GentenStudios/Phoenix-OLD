@@ -51,13 +51,8 @@ namespace phx
 	class Player
 	{
 	public:
-		// temporary until a proper management system is put in place.
-		explicit Player(entt::registry* registry);
 
 		void registerAPI(cms::ModManager* manager);
-
-		/// @brief Gets the entity for the player used in ECS
-		entt::entity getEntity() { return m_entity; }
 
 	private:
 		entt::registry*    m_registry;

@@ -40,7 +40,7 @@ namespace phx::client
 	class InputQueue
 	{
 	public:
-		InputQueue(entt::registry* registry, Player* player,
+		InputQueue(entt::registry* registry, entt::entity player,
 		           gfx::FPSCamera* camera);
 		~InputQueue();
 
@@ -79,7 +79,7 @@ namespace phx::client
 		bool        m_running;
 		std::thread m_thread;
 
-		Player*         m_player;
+		entt::entity    m_player;
 		gfx::FPSCamera* m_camera;
 		entt::registry* m_registry;
 
