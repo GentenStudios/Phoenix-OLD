@@ -72,11 +72,9 @@ std::vector<voxels::Chunk*> PlayerView::update(entt::registry* registry,
 				}
 				if (!hasChunk)
 				{
-					LOG_DEBUG("MAP") << "GET CHUNK " << chunkToCheck;
 					voxels::Chunk* chunk = view.map->getChunk(chunkToCheck);
 					if (chunk != nullptr)
 					{
-						LOG_DEBUG("MAP") << "CHUNK GOOD";
 						view.chunks.emplace_back(chunkToCheck);
 						newChunks.emplace_back(
 						    view.map->getChunk(chunkToCheck));

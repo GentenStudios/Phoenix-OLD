@@ -153,7 +153,7 @@ namespace phx::server::net
 		 */
 		void sendMessage(std::size_t userID, std::string message);
 
-		void sendData(std::size_t userID, voxels::Chunk data);
+		void sendData(std::size_t userID, voxels::Chunk* data);
 
 		/**
 		 * @brief The Queue of events to process

@@ -63,7 +63,7 @@ namespace phx::client
 	{
 	public:
 		explicit Game(gfx::Window* window, entt::registry* registry,
-		              bool networked = false);
+		              bool networked = true);
 		~Game() override;
 
 		void onAttach() override;

@@ -27,6 +27,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <Common/Logger.hpp>
+#include <Common/Voxels/BlockRegistry.hpp>
 #include <Common/Voxels/Map.hpp>
 
 #include <iostream>
@@ -50,7 +51,6 @@ Chunk* Map::getChunk(const phx::math::vec3& pos)
 
 	if (m_queue != nullptr)
 	{
-		LOG_WARNING("MAP") << "WE THINGS WE ARE NETWORKED";
 		if (m_queue->empty())
 		{
 			return nullptr;
@@ -142,8 +142,14 @@ std::pair<phx::math::vec3, phx::math::vec3> Map::getBlockPos(
 
 BlockType* Map::getBlockAt(math::vec3 position)
 {
-	const auto& pos = getBlockPos(position);
-	return getChunk(pos.first)->getBlockAt(pos.second);
+	const auto& pos   = getBlockPos(position);
+	Chunk*      chunk = getChunk(pos.first);
+	if (chunk == nullptr)
+	{
+		return BlockRegistry::get()->getFromRegistryID(
+		    BlockRegistry::OUT_OF_BOUNDS_BLOCK);
+	}
+	return chunk->getBlockAt(pos.second);
 }
 
 void Map::setBlockAt(phx::math::vec3 position, BlockType* block)
