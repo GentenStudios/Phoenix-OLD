@@ -35,6 +35,7 @@
 
 #include <Common/Input.hpp>
 #include <Common/Voxels/Block.hpp>
+
 #include <entt/entt.hpp>
 
 namespace phx
@@ -47,8 +48,15 @@ namespace phx
 	class ActorSystem
 	{
 	public:
+		// TODO this should be unique to each actor
+		static constexpr float m_reach = 32.f;
+
+		static math::Ray    getTarget(entt::registry* registry,
+		                              entt::entity    entity);
 		static entt::entity registerActor(entt::registry* registry);
 		static void         tick(entt::registry* registry, entt::entity entity,
-		                         const float dt, InputState input);
+		                         float dt, const InputState& input);
+		static bool action1(entt::registry* registry, entt::entity entity);
+		static bool action2(entt::registry* registry, entt::entity entity);
 	};
 } // namespace phx

@@ -30,16 +30,10 @@
 
 using namespace phx;
 
-std::vector<voxels::Chunk> PlayerView::update(entt::registry* registry,
-                                              entt::entity    entity,
-                                              voxels::Map*    map)
+std::vector<voxels::Chunk*> PlayerView::update(entt::registry* registry,
+                                               entt::entity    entity)
 {
-	std::vector<voxels::Chunk> newChunks;
-
-	if (!registry->has<PlayerView>(entity))
-	{
-		registry->emplace<PlayerView>(entity);
-	}
+	std::vector<voxels::Chunk*> newChunks;
 
 	PlayerView& view = registry->get<PlayerView>(entity);
 
@@ -75,11 +69,16 @@ std::vector<voxels::Chunk> PlayerView::update(entt::registry* registry,
 				}
 				if (!hasChunk)
 				{
-					view.chunks.emplace_back(chunkToCheck);
-					newChunks.emplace_back(map->getChunk(chunkToCheck));
+					voxels::Chunk* chunk = view.map->getChunk(chunkToCheck);
+					if (chunk != nullptr)
+					{
+						view.chunks.emplace_back(chunkToCheck);
+						newChunks.emplace_back(
+						    view.map->getChunk(chunkToCheck));
+					}
 				}
 			}
 		}
 	}
 	return newChunks;
-};
+}

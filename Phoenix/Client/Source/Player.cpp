@@ -28,16 +28,11 @@
 
 #include <Client/Player.hpp>
 
-#include <Common/Commander.hpp>
-#include <Common/Voxels/BlockRegistry.hpp>
-
 #include <Common/Actor.hpp>
 #include <Common/Movement.hpp>
-#include <Common/Position.hpp>
+#include <Common/PlayerView.hpp>
 
 using namespace phx;
-
-static const float RAY_INCREMENT = 0.5f;
 
 Player::Player(entt::registry* registry) : m_registry(registry)
 {
@@ -45,13 +40,6 @@ Player::Player(entt::registry* registry) : m_registry(registry)
 	m_registry->emplace<Position>(m_entity, math::vec3 {0, 0, 0},
 	                              math::vec3 {0, 0, 0});
 	m_registry->emplace<Movement>(m_entity, DEFAULT_MOVE_SPEED);
-
-	CommandBook::get()->add(
-	    "tp", "Teleports player to supplied coordinates \n /tp <x> <y> <z>",
-	    "all", [this](const std::vector<std::string>& args) {
-		    m_registry->get<Position>(m_entity).position = {
-		        std::stoi(args[0]), std::stoi(args[1]), std::stoi(args[2])};
-	    });
 
 	glGenVertexArrays(1, &m_vao);
 	glGenBuffers(1, &m_vbo);
@@ -86,105 +74,14 @@ void Player::registerAPI(cms::ModManager* manager)
 	    });
 }
 
-void Player::setWorld(voxels::ChunkView* world) { m_world = world; }
-
-math::Ray Player::getTarget() const
-{
-	math::vec3 pos = (m_registry->get<Position>(m_entity).position / 2.f) + .5f;
-
-	math::Ray ray(pos, rotToDir(m_registry->get<Position>(m_entity).rotation));
-
-	while (ray.getLength() < m_reach)
-	{
-		pos.floor();
-
-		if (m_world->getBlockAt(pos)->category == voxels::BlockCategory::SOLID)
-		{
-			return ray;
-		}
-
-		pos = ray.advance(RAY_INCREMENT);
-	}
-
-	return ray;
-}
-
-bool Player::action1()
-{
-	math::vec3 pos = (m_registry->get<Position>(m_entity).position / 2.f) + .5f;
-
-	math::Ray ray(pos, rotToDir(m_registry->get<Position>(m_entity).rotation));
-
-	while (ray.getLength() < m_reach)
-	{
-		pos.floor();
-
-		const auto currentBlock = m_world->getBlockAt(pos);
-		if (currentBlock->category == voxels::BlockCategory::SOLID)
-		{
-			m_world->setBlockAt(
-			    pos, voxels::BlockRegistry::get()->getFromID("core.air"));
-
-			if (currentBlock->onBreak)
-			{
-				currentBlock->onBreak(pos.x, pos.y, pos.z);
-			}
-
-			return true;
-		}
-
-		pos = ray.advance(RAY_INCREMENT);
-	}
-
-	return false;
-}
-
-bool Player::action2()
-{
-	math::vec3 pos = (m_registry->get<Position>(m_entity).position / 2.f) + .5f;
-
-	math::Ray ray(pos, rotToDir(m_registry->get<Position>(m_entity).rotation));
-
-	while (ray.getLength() < m_reach)
-	{
-		pos.floor();
-
-		const auto currentBlock = m_world->getBlockAt(pos);
-		if (currentBlock->category == voxels::BlockCategory::SOLID)
-		{
-			math::vec3 back = ray.backtrace(RAY_INCREMENT);
-			back.floor();
-
-			m_world->setBlockAt(back, m_registry->get<Hand>(getEntity()).hand);
-
-			if (m_registry->get<Hand>(getEntity()).hand->onPlace)
-			{
-				m_registry->get<Hand>(getEntity())
-				    .hand->onPlace(back.x, back.y, back.z);
-			}
-
-			return true;
-		}
-
-		pos = ray.advance(RAY_INCREMENT);
-	}
-
-	return false;
-}
-
-math::vec3 Player::rotToDir(math::vec3 m_rotation)
-{
-	return {std::cos(m_rotation.y) * std::sin(m_rotation.x),
-	        std::sin(m_rotation.y),
-	        std::cos(m_rotation.y) * std::cos(m_rotation.x)};
-}
-
 void Player::renderSelectionBox(const math::mat4 view, const math::mat4 proj)
 {
-	auto pos = getTarget().getCurrentPosition();
+	auto pos =
+	    ActorSystem::getTarget(m_registry, m_entity).getCurrentPosition();
 	pos.floor();
-	// do not waste cpu time if we aren't targetting a solid block
-	if (m_world->getBlockAt(pos)->category != voxels::BlockCategory::SOLID)
+	// do not waste cpu time if we aren't targeting a solid block
+	if (m_registry->get<PlayerView>(m_entity).map->getBlockAt(pos)->category !=
+	    voxels::BlockCategory::SOLID)
 		return;
 
 	// voxel position to camera position

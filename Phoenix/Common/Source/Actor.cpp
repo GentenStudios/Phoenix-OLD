@@ -27,10 +27,11 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <Common/Actor.hpp>
-#include <Common/Logger.hpp>
 
 #include <Common/Movement.hpp>
+#include <Common/PlayerView.hpp>
 #include <Common/Position.hpp>
+#include <Common/Voxels/BlockRegistry.hpp>
 
 using namespace phx;
 
@@ -43,7 +44,7 @@ entt::entity ActorSystem::registerActor(entt::registry* registry)
 	return entity;
 }
 void ActorSystem::tick(entt::registry* registry, entt::entity entity,
-                       const float dt, InputState input)
+                       const float dt, const InputState& input)
 {
 	auto& pos = registry->get<Position>(entity);
 
@@ -79,4 +80,93 @@ void ActorSystem::tick(entt::registry* registry, entt::entity entity,
 	{
 		pos.position.y -= dt * moveSpeed;
 	}
+}
+
+static const float RAY_INCREMENT = 0.5f;
+
+math::Ray ActorSystem::getTarget(entt::registry* registry, entt::entity entity)
+{
+	math::vec3   pos = (registry->get<Position>(entity).position / 2.f) + .5f;
+	voxels::Map* map = registry->get<PlayerView>(entity).map;
+
+	math::Ray ray(pos, registry->get<Position>(entity).getDirection());
+
+	while (ray.getLength() < m_reach)
+	{
+		pos.floor();
+
+		if (map->getBlockAt(pos)->category == voxels::BlockCategory::SOLID)
+		{
+			return ray;
+		}
+
+		pos = ray.advance(RAY_INCREMENT);
+	}
+
+	return ray;
+}
+
+bool ActorSystem::action1(entt::registry* registry, entt::entity entity)
+{
+	math::vec3   pos = (registry->get<Position>(entity).position / 2.f) + .5f;
+	voxels::Map* map = registry->get<voxels::Map*>(entity);
+
+	math::Ray ray(pos, registry->get<Position>(entity).getDirection());
+
+	while (ray.getLength() < m_reach)
+	{
+		pos.floor();
+
+		const auto currentBlock = map->getBlockAt(pos);
+		if (currentBlock->category == voxels::BlockCategory::SOLID)
+		{
+			map->setBlockAt(
+			    pos, voxels::BlockRegistry::get()->getFromID("core.air"));
+
+			if (currentBlock->onBreak)
+			{
+				currentBlock->onBreak(pos.x, pos.y, pos.z);
+			}
+
+			return true;
+		}
+
+		pos = ray.advance(RAY_INCREMENT);
+	}
+
+	return false;
+}
+
+bool ActorSystem::action2(entt::registry* registry, entt::entity entity)
+{
+	math::vec3   pos = (registry->get<Position>(entity).position / 2.f) + .5f;
+	voxels::Map* map = registry->get<voxels::Map*>(entity);
+
+	math::Ray ray(pos, registry->get<Position>(entity).getDirection());
+
+	while (ray.getLength() < m_reach)
+	{
+		pos.floor();
+
+		const auto currentBlock = map->getBlockAt(pos);
+		if (currentBlock->category == voxels::BlockCategory::SOLID)
+		{
+			math::vec3 back = ray.backtrace(RAY_INCREMENT);
+			back.floor();
+
+			map->setBlockAt(back, registry->get<Hand>(entity).hand);
+
+			if (registry->get<Hand>(entity).hand->onPlace)
+			{
+				registry->get<Hand>(entity).hand->onPlace(back.x, back.y,
+				                                          back.z);
+			}
+
+			return true;
+		}
+
+		pos = ray.advance(RAY_INCREMENT);
+	}
+
+	return false;
 }

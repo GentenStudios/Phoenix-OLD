@@ -39,10 +39,12 @@ namespace phx
 {
 	struct PlayerView
 	{
-		std::vector<math::vec3> chunks;
+		PlayerView(voxels::Map* map) : map(map) {};
 
-		static std::vector<voxels::Chunk> update(entt::registry* registry,
-		                                         entt::entity    entity,
-		                                         voxels::Map*    map);
+		std::vector<math::vec3> chunks;
+		voxels::Map*            map;
+
+		static std::vector<voxels::Chunk*> update(entt::registry* registry,
+		                                          entt::entity    entity);
 	};
 } // namespace phx

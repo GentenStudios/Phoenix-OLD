@@ -28,8 +28,9 @@
 
 #pragma once
 
-#include <Common/Math/Math.hpp>
+#include <Common/Util/BlockingQueue.hpp>
 #include <Common/Voxels/Chunk.hpp>
+
 #include <map>
 
 namespace phx::voxels
@@ -38,14 +39,19 @@ namespace phx::voxels
 	{
 	public:
 		Map(const std::string& save, const std::string& name);
+		Map(BlockingQueue<Chunk>* queue);
 
-		Chunk getChunk(const math::vec3& pos);
-		void  setBlockAt(math::vec3 pos, BlockType* block);
-		void  save(const math::vec3& pos);
+		Chunk* getChunk(const math::vec3& pos);
+		static std::pair<math::vec3, math::vec3> getBlockPos(
+		    math::vec3 position);
+		BlockType* getBlockAt(math::vec3 position);
+		void       setBlockAt(math::vec3 pos, BlockType* block);
+		void       save(const math::vec3& pos);
 
 	private:
 		std::map<math::vec3, Chunk, math::Vector3Key> m_chunks;
 		std::string                                   m_save;
 		std::string                                   m_mapName;
+		BlockingQueue<Chunk>*                         m_queue = nullptr;
 	};
 } // namespace phx::voxels

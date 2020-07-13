@@ -41,8 +41,9 @@ namespace phx
 		math::vec3 rotation;
 		/// @brief The cardinal position of the entity
 		math::vec3 position;
+
 		/**
-		 * @brief Gets the direction the camera is facing.
+		 * @brief Gets the direction the object is facing.
 		 * @return The 3-component vector representing direction.
 		 *
 		 * The direction is always the direction the player is looking, this

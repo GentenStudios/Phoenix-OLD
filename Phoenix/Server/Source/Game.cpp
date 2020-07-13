@@ -99,6 +99,7 @@ void Game::run()
 			case net::Event::Type::CONNECT:
 			{
 				auto entity = m_registry->get<Player>(event.player);
+				m_registry->emplace<voxels::Map*>(entity.actor, &m_map);
 				for (const auto& chunk :
 				     PlayerView::update(m_registry, entity.actor, &m_map))
 				{

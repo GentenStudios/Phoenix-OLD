@@ -63,7 +63,7 @@ namespace phx::client
 	{
 	public:
 		explicit Game(gfx::Window* window, entt::registry* registry,
-		              bool networked = true);
+		              bool networked = false);
 		~Game() override;
 
 		void onAttach() override;
@@ -99,6 +99,7 @@ namespace phx::client
 		entt::registry*    m_registry;
 		Player*            m_player;
 		voxels::ChunkView* m_world = nullptr;
+		voxels::Map*       m_map   = nullptr;
 
 		gfx::ShaderPipeline m_renderPipeline;
 

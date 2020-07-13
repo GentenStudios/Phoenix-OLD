@@ -41,7 +41,6 @@
 #include <Common/CMS/ModManager.hpp>
 
 #include <glad/glad.h>
-#include <entt/entt.hpp>
 
 namespace phx
 {
@@ -60,25 +59,13 @@ namespace phx
 
 		void registerAPI(cms::ModManager* manager);
 
-		void setWorld(voxels::ChunkView* world);
-		
-		math::Ray getTarget() const;
-
-		bool action1();
-		bool action2();
-
 		/// @brief Gets the entity for the player used in ECS
 		entt::entity getEntity() { return m_entity; }
-
-		/// @brief Gets the direction something is facing based on its rotation
-		static math::vec3 rotToDir(math::vec3 m_rotation);
 
 		/// @brief Render the selection box around the pointed block
 		void renderSelectionBox(const math::mat4 view, const math::mat4 proj);
 
 	private:
-		const float        m_reach = 32.f;
-		voxels::ChunkView* m_world;
 		entt::registry*    m_registry;
 		entt::entity       m_entity;
 

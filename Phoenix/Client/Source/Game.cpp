@@ -39,6 +39,7 @@
 #include <Common/Logger.hpp>
 #include <Common/Movement.hpp>
 
+#include <Common/PlayerView.hpp>
 #include <cmath>
 #include <tuple>
 
@@ -288,13 +289,14 @@ void Game::onAttach()
 	const std::string save = "save1";
 	if (m_network != nullptr)
 	{
-		m_world = new voxels::ChunkView(3, m_network);
+		m_map = new voxels::Map(&m_network->chunkQueue);
 	}
 	else
 	{
-		m_world = new voxels::ChunkView(3, new voxels::Map(save, "map1"));
+		m_map = new voxels::Map(save, "map1");
 	}
-	m_player->setWorld(m_world);
+	m_world = new voxels::ChunkView(3, m_registry, m_player->getEntity());
+	m_registry->emplace<PlayerView>(m_player->getEntity(), m_map);
 	m_camera = new gfx::FPSCamera(m_window, m_registry);
 	m_camera->setActor(m_player->getEntity());
 
@@ -409,12 +411,12 @@ void Game::onEvent(events::Event& e)
 		switch (e.mouse.button)
 		{
 		case events::MouseButtons::LEFT:
-			m_player->action1();
+			ActorSystem::action1(m_registry, m_player->getEntity());
 			e.handled = true;
 			break;
 
 		case events::MouseButtons::RIGHT:
-			m_player->action2();
+			ActorSystem::action2(m_registry, m_player->getEntity());
 			e.handled = true;
 			break;
 
@@ -463,7 +465,7 @@ void Game::tick(float dt)
 	m_listener->setPosition(position.position);
 	m_listener->setVelocity({0, 0, 0});
 
-	m_world->tick(m_prevPos);
+	m_world->tick();
 
 	m_chat->draw();
 
