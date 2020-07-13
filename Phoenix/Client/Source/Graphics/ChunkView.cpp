@@ -67,7 +67,7 @@ void ChunkView::render() { m_renderer->render(); }
 
 BlockType* ChunkView::getBlockAt(math::vec3 position) const
 {
-	m_registry->get<PlayerView>(m_entity).map->getBlockAt(position);
+	return m_registry->get<PlayerView>(m_entity).map->getBlockAt(position);
 }
 
 void ChunkView::setBlockAt(math::vec3 position, BlockType* block)

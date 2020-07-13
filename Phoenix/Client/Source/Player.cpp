@@ -36,10 +36,7 @@ using namespace phx;
 
 Player::Player(entt::registry* registry) : m_registry(registry)
 {
-	m_entity = m_registry->create();
-	m_registry->emplace<Position>(m_entity, math::vec3 {0, 0, 0},
-	                              math::vec3 {0, 0, 0});
-	m_registry->emplace<Movement>(m_entity, DEFAULT_MOVE_SPEED);
+	m_entity = ActorSystem::registerActor(registry);
 
 	glGenVertexArrays(1, &m_vao);
 	glGenBuffers(1, &m_vbo);

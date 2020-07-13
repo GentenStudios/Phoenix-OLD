@@ -50,6 +50,7 @@ Chunk* Map::getChunk(const phx::math::vec3& pos)
 
 	if (m_queue != nullptr)
 	{
+		LOG_WARNING("MAP") << "WE THINGS WE ARE NETWORKED";
 		if (m_queue->empty())
 		{
 			return nullptr;
@@ -66,7 +67,14 @@ Chunk* Map::getChunk(const phx::math::vec3& pos)
 			}
 			m_chunks.emplace(chunk.getChunkPos(), chunk);
 		}
-		return &m_chunks.at(pos);
+		if (m_chunks.find(pos) != m_chunks.end())
+		{
+			return &m_chunks.at(pos);
+		}
+		else
+		{
+			return nullptr;
+		}
 	}
 
 	// Chunk isn't in memory and we aren't networked, so lets create one

@@ -26,6 +26,7 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+#include <Common/Logger.hpp>
 #include <Common/PlayerView.hpp>
 
 using namespace phx;
@@ -58,7 +59,9 @@ std::vector<voxels::Chunk*> PlayerView::update(entt::registry* registry,
 				math::vec3 chunkToCheck = {static_cast<float>(x + posX),
 				                           static_cast<float>(y + posY),
 				                           static_cast<float>(z + posZ)};
-				bool       hasChunk     = false;
+				chunkToCheck            = chunkToCheck *
+				               static_cast<float>(voxels::Chunk::CHUNK_WIDTH);
+				bool hasChunk = false;
 				for (const auto chunk : view.chunks)
 				{
 					if (chunk == chunkToCheck)
@@ -69,9 +72,11 @@ std::vector<voxels::Chunk*> PlayerView::update(entt::registry* registry,
 				}
 				if (!hasChunk)
 				{
+					LOG_DEBUG("MAP") << "GET CHUNK " << chunkToCheck;
 					voxels::Chunk* chunk = view.map->getChunk(chunkToCheck);
 					if (chunk != nullptr)
 					{
+						LOG_DEBUG("MAP") << "CHUNK GOOD";
 						view.chunks.emplace_back(chunkToCheck);
 						newChunks.emplace_back(
 						    view.map->getChunk(chunkToCheck));
