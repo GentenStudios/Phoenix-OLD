@@ -31,7 +31,6 @@
 #include <Client/Graphics/Camera.hpp>
 #include <Client/InputMap.hpp>
 #include <Client/Network.hpp>
-#include <Client/Player.hpp>
 
 #include <Common/Util/BlockingQueue.hpp>
 
