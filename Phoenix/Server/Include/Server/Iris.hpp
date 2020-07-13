@@ -59,7 +59,7 @@ namespace phx::server::net
 
 	struct Event
 	{
-		enum Type
+		enum class Type
 		{
 			CONNECT
 		};
@@ -170,7 +170,7 @@ namespace phx::server::net
 		BlockingQueue<MessageBundle> messageQueue;
 
 	private:
-		bool                                          m_running = false;
+		bool                                          m_running;
 		phx::net::Host*                               m_server;
 		entt::registry*                               m_registry;
 		std::unordered_map<std::size_t, entt::entity> m_users;
