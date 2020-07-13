@@ -477,8 +477,8 @@ void Game::tick(float dt)
 	m_renderPipeline.setFloat("u_Brightness", 0.6f);
 
 	m_world->render();
-	m_player->renderSelectionBox(m_camera->calculateViewMatrix(),
-	                             m_camera->getProjection());
+	m_world->renderSelectionBox(m_camera->calculateViewMatrix(),
+	                            m_camera->getProjection());
 }
 
 void Game::sendMessage(const std::string& input, std::ostringstream& cout)

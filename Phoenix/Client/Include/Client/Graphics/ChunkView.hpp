@@ -29,9 +29,12 @@
 #pragma once
 
 #include <Client/Graphics/ChunkRenderer.hpp>
+#include <Client/Graphics/ShaderPipeline.hpp>
 #include <Common/Voxels/Map.hpp>
 
 #include <entt/entt.hpp>
+
+#include <glad/glad.h>
 
 namespace phx::voxels
 {
@@ -114,12 +117,19 @@ namespace phx::voxels
 		 */
 		void setBlockAt(math::vec3 position, BlockType* block);
 
+		/// @brief Render the selection box around the pointed block
+		void renderSelectionBox(const math::mat4 view, const math::mat4 proj);
+
 	private:
 		int m_viewDistance = 1; // 1 chunk
 
 		gfx::ChunkRenderer* m_renderer;
 		entt::registry*     m_registry;
 		entt::entity        m_entity;
+
+		GLuint              m_vao;
+		GLuint              m_vbo;
+		gfx::ShaderPipeline m_pipeline;
 	};
 } // namespace phx::voxels
 

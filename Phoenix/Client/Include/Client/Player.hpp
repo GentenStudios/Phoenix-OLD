@@ -36,11 +36,8 @@
 #pragma once
 
 #include <Client/Graphics/ChunkView.hpp>
-#include <Client/Graphics/ShaderPipeline.hpp>
 
 #include <Common/CMS/ModManager.hpp>
-
-#include <glad/glad.h>
 
 namespace phx
 {
@@ -62,15 +59,8 @@ namespace phx
 		/// @brief Gets the entity for the player used in ECS
 		entt::entity getEntity() { return m_entity; }
 
-		/// @brief Render the selection box around the pointed block
-		void renderSelectionBox(const math::mat4 view, const math::mat4 proj);
-
 	private:
 		entt::registry*    m_registry;
 		entt::entity       m_entity;
-
-		GLuint              m_vao;
-		GLuint              m_vbo;
-		gfx::ShaderPipeline m_pipeline;
 	};
 } // namespace phx
