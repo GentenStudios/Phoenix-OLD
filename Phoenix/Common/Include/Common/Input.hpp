@@ -51,7 +51,7 @@ namespace phx
 		bool up       = false;
 		bool down     = false;
 
-		math::vec2u rotation; // in 1/1000 degrees
+		math::vec3i rotation; // in 1/1000 degrees
 
 		std::size_t sequence = 0;
 
