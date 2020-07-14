@@ -26,25 +26,59 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Client/Client.hpp>
+#pragma once
 
-#include <Common/Logger.hpp>
+#include <Common/Voxels/Chunk.hpp>
 
-#include <Common/Save.hpp>
+#include <nlohmann/json.hpp>
 
-using namespace phx;
+#include <string>
+#include <unordered_map>
+#include <vector>
 
-#undef main
-int main(int argc, char** argv)
+namespace phx
 {
-	//client::Client::get()->run();
+	class Dimension
+	{
+	};
 
-	Logger::initialize({});
+	struct SaveConfig
+	{
+		// name of save.
+		std::string name;
 
-	phx::SaveConfig config;
-	config.name = "epic gamer world";
-	config.mods = {"mod1", "mod2"};
-	phx::Save::createSave(config);
-	
-	return 0;
-}
+		// mod list, passed as CLI arguments.
+		std::vector<std::string> mods;
+
+		// save specific settings, etc...
+		nlohmann::json settings;
+	};
+
+	class Save
+	{
+	public:
+		Save(const std::string& save);
+		~Save();
+
+		static Save createSave(const SaveConfig& config);
+
+		const std::string& getName() const;
+
+		/// @todo Implement Dimension system.
+		/// keeping these empty methods so we know what we need, I'll work on
+		/// this fairly soon with worldgen probably. - beeper.
+		//Dimension* createDimension(const std::string& name);
+		//Dimension* getDimension(const std::string& name);
+		//void       setDefaultDimension(Dimension* dimension);
+		//Dimension* getDefaultDimension();
+		//const std::vector<std::string>& getDimensions() const;
+
+		void save();
+
+	private:
+		SaveConfig m_data;
+
+		//Dimension* m_defaultDimension;
+		//std::unordered_map<std::string, Dimension> m_loadedDimensions;
+	};
+} // namespace phx

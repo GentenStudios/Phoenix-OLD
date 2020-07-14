@@ -15,6 +15,7 @@ set(Sources
 	${currentDir}/Logger.cpp
 	${currentDir}/Commander.cpp
 	${currentDir}/Input.cpp
+	${currentDir}/Save.cpp
 
 	PARENT_SCOPE
 )

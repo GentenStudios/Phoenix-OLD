@@ -12,17 +12,18 @@ set(Headers
 	${serializationHeaders}
 	${networkHeaders}
 
-        ${currentDir}/CoreIntrinsics.hpp
-        ${currentDir}/EnumTools.hpp
-        ${currentDir}/Singleton.hpp
-        ${currentDir}/FileIO.hpp
-        ${currentDir}/Logger.hpp
-
-        ${currentDir}/Settings.hpp
-        ${currentDir}/Commander.hpp
-        ${currentDir}/Position.hpp
-        ${currentDir}/Movement.hpp
-        ${currentDir}/Input.hpp
-
-        PARENT_SCOPE
-        )
+	${currentDir}/CoreIntrinsics.hpp
+	${currentDir}/EnumTools.hpp
+	${currentDir}/Singleton.hpp
+	${currentDir}/FileIO.hpp
+	${currentDir}/Logger.hpp
+	
+	${currentDir}/Settings.hpp
+	${currentDir}/Commander.hpp
+	${currentDir}/Position.hpp
+	${currentDir}/Movement.hpp
+	${currentDir}/Input.hpp
+	${currentDir}/Save.hpp
+	
+	PARENT_SCOPE
+)

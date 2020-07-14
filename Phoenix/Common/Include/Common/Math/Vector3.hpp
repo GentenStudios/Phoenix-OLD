@@ -331,7 +331,7 @@ namespace phx::math
 	struct Vector3Hasher
 	{
 		template <typename T>
-		size_t operator()(const detail::Vector3<T>& k) const
+		std::size_t operator()(const detail::Vector3<T>& k) const
 		{
 			return std::hash<T>()(k.x) ^ std::hash<T>()(k.y) ^
 			       std::hash<T>()(k.z);
