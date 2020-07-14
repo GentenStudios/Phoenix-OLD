@@ -33,15 +33,21 @@
 using namespace phx::client;
 using namespace phx;
 
-InputQueue::InputQueue(entt::registry* registry, Player* player)
-    : m_player(player), m_registry(registry),
-
-      m_forward(InputMap::get()->getInput("core.move.forward")),
-      m_backward(InputMap::get()->getInput("core.move.backward")),
-      m_left(InputMap::get()->getInput("core.move.left")),
-      m_right(InputMap::get()->getInput("core.move.right")),
-      m_up(InputMap::get()->getInput("core.move.up")),
-      m_down(InputMap::get()->getInput("core.move.down"))
+InputQueue::InputQueue(entt::registry* registry, Player* player,
+                       gfx::FPSCamera* camera)
+    : m_player(player), m_registry(registry), m_camera(camera),
+      m_forward(client::InputMap::get()->registerInput(
+          "core.move.forward", "Move Forward", events::Keys::KEY_W)),
+      m_backward(client::InputMap::get()->registerInput(
+          "core.move.backward", "Move Backward", events::Keys::KEY_S)),
+      m_left(client::InputMap::get()->registerInput(
+          "core.move.left", "Strafe Left", events::Keys::KEY_A)),
+      m_right(client::InputMap::get()->registerInput(
+          "core.move.right", "Strafe Right", events::Keys::KEY_D)),
+      m_up(client::InputMap::get()->registerInput("core.move.up", "Fly Up",
+                                                  events::Keys::KEY_SPACE)),
+      m_down(client::InputMap::get()->registerInput(
+          "core.move.down", "Fly Down", events::Keys::KEY_LEFT_SHIFT))
 {
 }
 
@@ -84,15 +90,18 @@ void InputQueue::stop()
 InputState InputQueue::getCurrentState()
 {
 	InputState input;
-	input.forward    = InputMap::get()->getState(m_forward);
-	input.backward   = InputMap::get()->getState(m_backward);
-	input.left       = InputMap::get()->getState(m_left);
-	input.right      = InputMap::get()->getState(m_right);
-	input.up         = InputMap::get()->getState(m_up);
-	input.down       = InputMap::get()->getState(m_down);
-	input.rotation.x = static_cast<unsigned int>(
+	if (m_camera->isEnabled())
+	{
+		input.forward  = InputMap::get()->getState(m_forward);
+		input.backward = InputMap::get()->getState(m_backward);
+		input.left     = InputMap::get()->getState(m_left);
+		input.right    = InputMap::get()->getState(m_right);
+		input.up       = InputMap::get()->getState(m_up);
+		input.down     = InputMap::get()->getState(m_down);
+	}
+	input.rotation.x = static_cast<int>(
 	    m_registry->get<Position>(m_player->getEntity()).rotation.x * 360000.0);
-	input.rotation.y = static_cast<unsigned int>(
+	input.rotation.y = static_cast<int>(
 	    m_registry->get<Position>(m_player->getEntity()).rotation.y * 360000.0);
 	input.sequence = m_sequence;
 	return input;

@@ -27,6 +27,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <Common/Actor.hpp>
+#include <Common/Logger.hpp>
 
 #include <Common/Movement.hpp>
 #include <Common/Position.hpp>
@@ -46,34 +47,28 @@ void ActorSystem::tick(entt::registry* registry, entt::entity entity,
 {
 	auto& pos = registry->get<Position>(entity);
 
-    /// conversion from 1/1000 of degres to rad
+	/// conversion from 1/1000 of degrees to rad
 	pos.rotation.x = static_cast<float>(input.rotation.x) / 360000.0;
 	pos.rotation.y = static_cast<float>(input.rotation.y) / 360000.0;
 	const auto moveSpeed =
 	    static_cast<float>(registry->get<Movement>(entity).moveSpeed);
 
-	math::vec3       direction = pos.getDirection();
-	const math::vec3 right     = {std::sin(direction.x - math::PIDIV2), 0.f,
-                              std::cos(direction.x - math::PIDIV2)};
-	const math::vec3 forward   = {std::sin(direction.x), 0.f,
-                                std::cos(direction.x)};
-
 	if (input.forward)
 	{
-		pos.position += forward * dt * moveSpeed;
+		pos.position += pos.getForward() * dt * moveSpeed;
 	}
 	else if (input.backward)
 	{
-		pos.position -= forward * dt * moveSpeed;
+		pos.position -= pos.getForward() * dt * moveSpeed;
 	}
 
 	if (input.left)
 	{
-		pos.position -= right * dt * moveSpeed;
+		pos.position -= pos.getRight() * dt * moveSpeed;
 	}
 	else if (input.right)
 	{
-		pos.position += right * dt * moveSpeed;
+		pos.position += pos.getRight() * dt * moveSpeed;
 	}
 
 	if (input.up)
