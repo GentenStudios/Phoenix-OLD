@@ -39,10 +39,10 @@ namespace phx
 		InputState()          = default;
 		virtual ~InputState() = default;
 
-		InputState(const InputState& other) = default;
+		InputState(const InputState& other)            = default;
 		InputState& operator=(const InputState& other) = default;
 		InputState(InputState&& other)                 = default;
-		InputState& operator=(InputState&& other) = default;
+		InputState& operator=(InputState&& other)      = default;
 
 		bool forward  = false;
 		bool backward = false;
@@ -51,7 +51,7 @@ namespace phx
 		bool up       = false;
 		bool down     = false;
 
-		math::vec2u rotation; // in 1/1000 degrees
+		math::vec3i rotation; // in 1/1000 degrees
 
 		std::size_t sequence = 0;
 

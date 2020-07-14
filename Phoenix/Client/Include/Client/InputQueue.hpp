@@ -28,6 +28,7 @@
 
 #pragma once
 
+#include <Client/Graphics/Camera.hpp>
 #include <Client/InputMap.hpp>
 #include <Client/Network.hpp>
 #include <Client/Player.hpp>
@@ -39,7 +40,8 @@ namespace phx::client
 	class InputQueue
 	{
 	public:
-		InputQueue(entt::registry* registry, Player* player);
+		InputQueue(entt::registry* registry, Player* player,
+		           gfx::FPSCamera* camera);
 		~InputQueue();
 
 		/**
@@ -78,6 +80,7 @@ namespace phx::client
 		std::thread m_thread;
 
 		Player*         m_player;
+		gfx::FPSCamera* m_camera;
 		entt::registry* m_registry;
 
 		std::size_t m_sequence;

@@ -72,7 +72,7 @@ void Network::run()
 {
 	while (m_running)
 	{
-		m_client->poll();
+		m_client->poll(50_ms, 100);
 	}
 }
 
@@ -94,7 +94,26 @@ void Network::parseEvent(phx::net::Packet& packet)
 	std::cout << "Event received";
 }
 
-void Network::parseState(phx::net::Packet& packet) {}
+void Network::parseState(phx::net::Packet& packet)
+{
+	auto data = packet.getData();
+
+	phx::Serializer ser(Serializer::Mode::READ);
+	ser.setBuffer(data.data(), packet.getSize());
+
+	size_t sequence;
+	ser&   sequence;
+	if (sequence < m_currentSequence && sequence > 10)
+	{
+		return;
+	}
+	m_currentSequence = sequence;
+
+	Position input;
+	ser& input.position.x& input.position.y& input.position.z;
+
+	stateQueue.push(std::pair(input, sequence));
+}
 
 void Network::parseMessage(phx::net::Packet& packet)
 {
@@ -111,14 +130,14 @@ void Network::parseMessage(phx::net::Packet& packet)
 	m_chat << "\n";
 }
 
-void Network::sendState(InputState inputState)
+void Network::sendState(phx::InputState inputState)
 {
 	Serializer ser(Serializer::Mode::WRITE);
 	ser&       inputState;
-	auto       state = ser.getBuffer();
 
 	phx::net::Packet packet =
 	    phx::net::Packet(ser.getBuffer(), phx::net::PacketFlags::UNRELIABLE);
+
 	m_client->broadcast(packet, 1);
 }
 

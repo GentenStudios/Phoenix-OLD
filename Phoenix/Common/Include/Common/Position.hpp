@@ -41,12 +41,35 @@ namespace phx
 		math::vec3 rotation;
 		/// @brief The cardinal position of the entity
 		math::vec3 position;
-
-		math::vec3 getDirection()
+		/**
+		 * @brief Gets the direction the camera is facing.
+		 * @return The 3-component vector representing direction.
+		 *
+		 * The direction is always the direction the player is looking, this
+		 * can be used with the Ray object to find what the player is
+		 * actually looking at within the actual world, whether it be voxels
+		 * or something else. Because this is not representative of
+		 * position, and direction cannot be skewed by the world coordinate
+		 * system, this data is compatible with every other layer requiring
+		 * and supporting direction, of course when asking for a 3
+		 * dimensional vector.
+		 */
+		math::vec3 getDirection() const
 		{
 			return math::vec3 {std::cos(rotation.y) * std::sin(rotation.x),
 			                   std::sin(rotation.y),
 			                   std::cos(rotation.y) * std::cos(rotation.x)};
+		};
+
+		math::vec3 getRight() const
+		{
+			return math::vec3 {std::sin(rotation.x - math::PIDIV2), 0.f,
+			                   std::cos(rotation.x - math::PIDIV2)};
+		};
+
+		math::vec3 getForward() const
+		{
+			return math::vec3 {std::sin(rotation.x), 0.f, std::cos(rotation.x)};
 		};
 	};
 } // namespace phx

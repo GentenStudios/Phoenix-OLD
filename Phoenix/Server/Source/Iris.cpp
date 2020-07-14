@@ -86,7 +86,7 @@ void Iris::run()
 	m_running = true;
 	while (m_running)
 	{
-		m_server->poll();
+		m_server->poll(50_ms, 100);
 	}
 }
 
@@ -117,7 +117,7 @@ void Iris::parseState(std::size_t userID, phx::net::Packet& packet)
 	auto data = packet.getData();
 
 	phx::Serializer ser(Serializer::Mode::READ);
-	ser.setBuffer(reinterpret_cast<std::byte*>(&data), packet.getSize());
+	ser.setBuffer(data.data(), packet.getSize());
 	ser& input;
 
 	// If the queue is empty we need to add a new bundle

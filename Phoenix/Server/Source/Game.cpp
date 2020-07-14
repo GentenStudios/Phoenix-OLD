@@ -30,14 +30,12 @@
 #include <Server/User.hpp>
 
 #include <Common/Actor.hpp>
-#include <Common/Movement.hpp>
-#include <Common/Position.hpp>
 #include <thread>
 
 using namespace phx;
 using namespace phx::server;
 
-Game::Game(entt::registry* registry, bool* running, net::Iris* iris)
+Game::Game(entt::registry* registry, bool* running, phx::server::net::Iris* iris)
     : m_registry(registry), m_running(running), m_iris(iris)
 {
 	m_commander = new Commander(m_iris);
@@ -53,6 +51,12 @@ void Game::run()
 	while (m_running)
 	{
 		// Process everybody's input first
+		if (m_iris->stateQueue.empty())
+		{
+			std::this_thread::sleep_for(
+			    1_ms); // This just keeps the CPU from spinning
+			continue;
+		}
 		net::StateBundle m_currentState = m_iris->stateQueue.pop();
 
 		for (const auto& state : m_currentState.states)
@@ -60,13 +64,6 @@ void Game::run()
 			ActorSystem::tick(m_registry,
 			                  m_registry->get<Player>(state.first).actor, dt,
 			                  state.second);
-
-			// @todo remove this debug statement before merging to develop
-			//			std::cout << m_registry
-			//			                 ->get<Position>(
-			//			                     m_registry->get<Player>(state.first).actor)
-			//			                 .position
-			//			          << "\n";
 		}
 		// Process events second
 

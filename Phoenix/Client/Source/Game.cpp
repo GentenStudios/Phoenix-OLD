@@ -38,6 +38,7 @@
 #include <Common/Position.hpp>
 #include <Common/Logger.hpp>
 
+#include <Common/Movement.hpp>
 #include <cmath>
 #include <tuple>
 
@@ -306,7 +307,7 @@ void Game::onAttach()
 		Client::get()->pushLayer(m_gameDebug);
 	}
 
-	m_inputQueue = new InputQueue(m_registry, m_player);
+	m_inputQueue = new InputQueue(m_registry, m_player, m_camera);
 	m_inputQueue->start(std::chrono::milliseconds(50), m_network);
 
 	LOG_INFO("MAIN") << "Game layer attached";
@@ -423,9 +424,13 @@ void Game::tick(float dt)
 	lightdir.y = std::sin(time);
 	lightdir.x = std::cos(time);
 
-	m_camera->tick(dt);
-
 	const Position& position = m_registry->get<Position>(m_player->getEntity());
+
+	m_camera->tick(dt);
+	InputState state = m_inputQueue->getCurrentState();
+
+	ActorSystem::tick(m_registry, m_player->getEntity(), dt, state);
+	confirmState(position);
 
 	if (m_followCam)
 	{
@@ -433,7 +438,7 @@ void Game::tick(float dt)
 	}
 
 	m_listener->setPosition(position.position);
-	m_listener->setVelocity({ 0, 0, 0 });
+	m_listener->setVelocity({0, 0, 0});
 
 	m_world->tick(m_prevPos);
 
@@ -454,4 +459,55 @@ void Game::tick(float dt)
 void Game::sendMessage(const std::string& input, std::ostringstream& cout)
 {
 	m_network->sendMessage(input);
+}
+
+void Game::confirmState(const Position& position)
+{
+	// We can't iterate through a queue so we drain the queue to this list
+	std::size_t i = m_inputQueue->m_queue.size();
+	for (std::size_t j = 0; j <= i; j++)
+	{
+		m_states.push_back(m_inputQueue->m_queue.pop());
+	}
+
+	// If there are no confirmation states ready from the network, we are done
+	if (m_network->stateQueue.empty())
+	{
+		return;
+	}
+	auto confirmation = m_network->stateQueue.pop();
+
+	// Discard any inputStates older than the confirmationState
+	while (!m_states.empty() && m_states.front().sequence < confirmation.second)
+	{
+		m_states.pop_front();
+	}
+
+	// Create a temporary position entity located at the confirmation position
+	// and run all the states sent to the network since that sequence against
+	// it.
+	auto      entity = m_registry->create();
+	Position& pos    = m_registry->emplace<Position>(
+        entity, confirmation.first.rotation, confirmation.first.position);
+	m_registry->emplace<Movement>(
+	    entity, m_registry->get<Movement>(m_player->getEntity()).moveSpeed);
+	for (const auto& inputState : m_states)
+	{
+		phx::ActorSystem::tick(m_registry, entity, 1.f / 20.f, inputState);
+	}
+
+	// Compare the temporary position object with the current player position.
+	math::vec3 diff = position.position - pos.position;
+
+	// If the temporary position object based on the confirmation is too far off
+	// from our current position, update our current position.
+	const float precision = .25f;
+	if (diff.x > precision || diff.x < -precision || diff.y > precision ||
+	    diff.y < -precision || diff.z > precision || diff.z < -precision)
+	{
+		m_registry->get<Position>(m_player->getEntity()).position =
+		    pos.position;
+	}
+
+	m_registry->destroy(entity);
 }
