@@ -33,7 +33,7 @@
 
 using namespace phx::client;
 
-Network::Network(std::ostringstream& chat, phx::net::Address address)
+Network::Network(std::ostringstream& chat, const phx::net::Address& address)
     : m_chat(chat)
 {
 	m_client = new phx::net::Host();

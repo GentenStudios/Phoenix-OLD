@@ -40,7 +40,7 @@ namespace phx::client
 	class Network
 	{
 	public:
-		Network(std::ostringstream& chat, phx::net::Address address);
+		Network(std::ostringstream& chat, const phx::net::Address& address);
 		~Network();
 
 	private:
