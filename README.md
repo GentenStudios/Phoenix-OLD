@@ -13,7 +13,7 @@ More information on this project and its mission can be found [here](https://doc
 - CMake (Version >= 3.0)
 - A C++17 compatible compiler. The following have been tested
   - Visual Studio 2017 & 2019 (MSVC >= 19.14)
-  - Clang (>= 9)
+  - Clang (>= 7)
   - GCC (>= 8)
 - OpenGL (Version >= 3.3)
 
