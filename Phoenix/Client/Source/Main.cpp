@@ -28,23 +28,12 @@
 
 #include <Client/Client.hpp>
 
-#include <Common/Logger.hpp>
-
-#include <Common/Save.hpp>
-
 using namespace phx;
 
 #undef main
 int main(int argc, char** argv)
 {
-	//client::Client::get()->run();
-
-	Logger::initialize({});
-
-	phx::SaveConfig config;
-	config.name = "epic gamer world";
-	config.mods = {"mod1", "mod2"};
-	phx::Save::createSave(config);
+	client::Client::get()->run();
 	
 	return 0;
 }
