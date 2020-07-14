@@ -39,10 +39,10 @@ namespace phx
 		InputState()          = default;
 		virtual ~InputState() = default;
 
-		InputState(const InputState& other) = default;
+		InputState(const InputState& other)            = default;
 		InputState& operator=(const InputState& other) = default;
 		InputState(InputState&& other)                 = default;
-		InputState& operator=(InputState&& other) = default;
+		InputState& operator=(InputState&& other)      = default;
 
 		bool forward  = false;
 		bool backward = false;
