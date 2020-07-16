@@ -39,11 +39,8 @@ Save::Save(const std::string& save)
 {
 	namespace fs = std::filesystem;
 
-	auto path = fs::current_path();
-	path /= "Saves";
-	path /= save;
-
 	// check if the save exists
+	auto path = fs::current_path() / "Saves" / save;
 	if (!fs::exists(path))
 	{
 		LOG_FATAL("SAVES") << "Save could not be located, quitting.";
@@ -85,10 +82,7 @@ Save Save::createSave(const SaveConfig& config)
 {
 	namespace fs = std::filesystem;
 
-	auto path = fs::current_path();
-	path /= "Saves";
-	path /= config.name;
-
+	auto path = fs::current_path() / "Saves" / config.name;
 	if (fs::exists(path))
 	{
 		LOG_WARNING("SAVES") << "Save already exists, loading existing save.";
@@ -111,3 +105,5 @@ Save Save::createSave(const SaveConfig& config)
 
 	return Save(config.name);
 }
+
+const std::string& Save::getName() const { return m_data.name; }

@@ -38,10 +38,18 @@
 
 namespace phx
 {
+	// temporary class until map is updated.
 	class Dimension
 	{
 	};
 
+	/**
+	 * @brief Configuration for a Save.
+	 *
+	 * All these values are read through a JSON file in the save directory. If
+	 * the JSON file does not exist and/or the save itself doesn't exist, then a
+	 * save will be needed to be made.
+	 */
 	struct SaveConfig
 	{
 		// name of save.
@@ -54,14 +62,40 @@ namespace phx
 		nlohmann::json settings;
 	};
 
+	/**
+	 * @brief A class to handle data within a save.
+	 *
+	 * Saves will be directories inside the Save/ folder. The saves will contain
+	 * a JSON file containing settings for a specific save (not much currently,
+	 * but it will definitely be useful down the line).
+	 */
 	class Save
 	{
 	public:
+		/**
+		 * @brief Loads a save, quits if not found.
+		 * @param save The save to load.
+		 */
 		Save(const std::string& save);
+
+		/**
+		 * @brief Saves everything to be saved and closes the save.
+		 */
 		~Save();
 
+		/**
+		 * @brief Creates a new save if one does not exist.
+		 * @param config The configuration for the new save.
+		 * @return The new save.
+		 *
+		 * If the save already exists it will return that save.
+		 */
 		static Save createSave(const SaveConfig& config);
 
+		/**
+		 * @brief Gets the name of the save.
+		 * @return The name of the save.
+		 */
 		const std::string& getName() const;
 
 		/// @todo Implement Dimension system.
@@ -73,6 +107,9 @@ namespace phx
 		//Dimension* getDefaultDimension();
 		//const std::vector<std::string>& getDimensions() const;
 
+		/**
+		 * @brief Saves everything to be saved in the Save.
+		 */
 		void save();
 
 	private:
