@@ -165,7 +165,7 @@ namespace phx::voxels
 			                      static_cast<std::size_t>(pos.z));
 		}
 
-		Serializer& operator&(Serializer& this_) override;
+		Serializer& operator&(Serializer& ser) override;
 
 	private:
 		/// @brief The position of the chunk in relation to the map.

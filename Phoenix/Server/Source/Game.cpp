@@ -108,6 +108,7 @@ void Game::run()
 			}
 			default:
 				LOG_WARNING("GAME") << "Event received with unknown type";
+				break;
 			}
 		}
 

@@ -90,9 +90,7 @@ void ChunkView::tick(math::vec3 playerPos)
 	}
 	else
 	{
-		LOG_FATAL("ChunkView.cpp")
-		    << "Attempted to tick while neither network or map exist";
-		exit(EXIT_FAILURE);
+		assert(m_network != nullptr || m_map != nullptr)
 	}
 }
 
@@ -104,7 +102,7 @@ void ChunkView::tickNet(math::vec3 playerPos)
 	size_t size = m_network->chunkQueue.size();
 	for (size_t i = 0; i < size; i++)
 	{
-		Chunk chunk = Chunk(math::vec3 {0, 0, 0});
+		Chunk chunk = Chunk(math::vec3 {});
 		if (!m_network->chunkQueue.try_pop(chunk))
 		{
 			LOG_WARNING("CHUNK_VIEW")
