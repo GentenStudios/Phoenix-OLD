@@ -93,7 +93,7 @@ void Game::run()
 		for (size_t i = 0; i < size; i++)
 		{
 			net::Event event = m_iris->eventQueue.pop();
-			;
+
 			switch (event.type)
 			{
 			case net::Event::Type::CONNECT:
@@ -107,7 +107,7 @@ void Game::run()
 				break;
 			}
 			default:
-				LOG_WARNING("GAME") << "Event received with unknown type";
+				LOG_WARNING("GAME") << "Invalid network event received";
 				break;
 			}
 		}
