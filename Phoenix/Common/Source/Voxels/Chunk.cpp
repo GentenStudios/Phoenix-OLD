@@ -104,9 +104,7 @@ phx::Serializer& Chunk::operator&(phx::Serializer& ser)
 {
 	if (ser.m_mode == Serializer::Mode::WRITE)
 	{
-		ser& m_pos.x;
-		ser& m_pos.y;
-		ser& m_pos.z;
+		ser& m_pos.x & m_pos.y & m_pos.z;
 		for (BlockType* block : m_blocks)
 		{
 			size_t id = block->getRegistryID();
@@ -117,9 +115,7 @@ phx::Serializer& Chunk::operator&(phx::Serializer& ser)
 	else
 	{
 		m_blocks.clear();
-		ser& m_pos.x;
-		ser& m_pos.y;
-		ser& m_pos.z;
+		ser& m_pos.x & m_pos.y & m_pos.z;
 		for (int i = 0; i < CHUNK_DEPTH * CHUNK_WIDTH * CHUNK_HEIGHT; i++)
 		{
 			size_t id;

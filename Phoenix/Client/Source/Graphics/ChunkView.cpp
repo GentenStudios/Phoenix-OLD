@@ -76,22 +76,14 @@ void ChunkView::tick(math::vec3 playerPos)
 	}
 
 	// this converts the raw camera/player position into voxel-world positions.
-	playerPos = playerPos / 2.f;
-	playerPos += 0.5f;
+	playerPos = (playerPos / 2.f) + 0.5f;
 
 	// Use alternate tick function if we are connected to a server
 	if (m_network != nullptr)
 	{
 		tickNet(playerPos);
 	}
-	else if (m_map != nullptr)
-	{
-		tickLocal(playerPos);
-	}
-	else
-	{
-		assert(m_network != nullptr || m_map != nullptr)
-	}
+	tickLocal(playerPos);
 }
 
 void ChunkView::tickNet(math::vec3 playerPos)
@@ -99,8 +91,8 @@ void ChunkView::tickNet(math::vec3 playerPos)
 	// TODO discard all out of view chunks
 
 	// If we don't already have a chunk, insert it
-	size_t size = m_network->chunkQueue.size();
-	for (size_t i = 0; i < size; i++)
+	std::size_t size = m_network->chunkQueue.size();
+	for (std::size_t i = 0; i < size; i++)
 	{
 		Chunk chunk = Chunk(math::vec3 {});
 		if (!m_network->chunkQueue.try_pop(chunk))

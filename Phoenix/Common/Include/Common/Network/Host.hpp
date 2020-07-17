@@ -315,7 +315,7 @@ namespace phx::net
 	private:
 		void handleEvent(ENetEvent& event);
 
-		Peer& getPeer(ENetPeer& peer);
+		Peer* getPeer(ENetPeer& peer);
 		Peer& createPeer(ENetPeer& peer);
 		void  removePeer(ENetPeer& peer);
 
