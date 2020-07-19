@@ -6,7 +6,6 @@ set(Sources
         ${graphicsSources}
         ${audioSources}
 
-        ${currentDir}/Player.cpp
         ${currentDir}/InputQueue.cpp
 
         ${currentDir}/Client.cpp
