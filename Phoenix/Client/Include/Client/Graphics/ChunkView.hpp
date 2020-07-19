@@ -32,6 +32,8 @@
 
 #include <Common/Voxels/Map.hpp>
 
+#include <Client/Network.hpp>
+#include <Common/Util/BlockingQueue.hpp>
 #include <vector>
 
 namespace phx::voxels
@@ -74,7 +76,13 @@ namespace phx::voxels
 		 * @param viewDistance The view distance in every direction.
 		 * @param map The map the ChunkView loads from
 		 */
-		ChunkView(int viewDistance, Map&& map);
+		ChunkView(int viewDistance, Map* map);
+		/**
+		 * @brief Constructs the ChunkView.
+		 * @param viewDistance The view distance in every direction.
+		 * @param map The map the ChunkView loads from
+		 */
+		ChunkView(int viewDistance, client::Network* network);
 		~ChunkView();
 
 		/**
@@ -93,6 +101,11 @@ namespace phx::voxels
 		 */
 		void tick(math::vec3 playerPos);
 
+	private:
+		void tickNet(math::vec3 playerPos);
+		void tickLocal(math::vec3 playerPos);
+
+	public:
 		/**
 		 * @brief Renders active chunks.
 		 */
@@ -118,7 +131,8 @@ namespace phx::voxels
 
 		std::vector<Chunk>  m_activeChunks;
 		gfx::ChunkRenderer* m_renderer;
-		Map                 m_map;
+		Map*                m_map     = nullptr;
+		client::Network*    m_network = nullptr;
 	};
 } // namespace phx::voxels
 

@@ -35,8 +35,6 @@
 #include <Common/Position.hpp>
 #include <Common/Serialization/Serializer.hpp>
 
-#include <cstring> //For std::memcpy on non-mac machines
-
 using namespace phx;
 using namespace phx::net;
 using namespace phx::server::net;
@@ -44,18 +42,19 @@ using namespace phx::server::net;
 /// @todo Replace this with the config system
 static const std::size_t MAX_USERS = 32;
 
-Iris::Iris(entt::registry* registry) : m_registry(registry)
+Iris::Iris(entt::registry* registry) : m_registry(registry), m_running(false)
 {
-	m_server = new phx::net::Host(phx::net::Address(7777), MAX_USERS, 3);
+	m_server = new phx::net::Host(phx::net::Address(7777), MAX_USERS, 4);
 
 	m_server->onConnect([this](Peer& peer, enet_uint32) {
 		LOG_INFO("NETWORK")
 		    << "Client connected from: " << peer.getAddress().getIP();
 		{
 			auto entity = m_registry->create();
-			m_registry->emplace<Player>(entity,
-			                            ActorSystem::registerActor(m_registry));
+			m_registry->emplace<Player>(
+			    entity, ActorSystem::registerActor(m_registry), peer.getID());
 			m_users.emplace(peer.getID(), entity);
+			eventQueue.push({entity, Event::Type::CONNECT});
 		}
 	});
 
@@ -72,6 +71,9 @@ Iris::Iris(entt::registry* registry) : m_registry(registry)
 		    case 2:
 			    parseMessage(peer.getID(), packet);
 			    break;
+		    default:
+			    LOG_WARNING("NETWORK")
+			        << "Received packet on channel " << channelID;
 		    }
 	    });
 
@@ -93,6 +95,7 @@ void Iris::run()
 void Iris::disconnect(std::size_t peerID)
 {
 	LOG_INFO("NETWORK") << peerID << " disconnected";
+	m_registry->destroy(m_users.at(peerID));
 }
 
 void Iris::parseEvent(std::size_t userID, Packet& packet)
@@ -110,8 +113,6 @@ void Iris::parseEvent(std::size_t userID, Packet& packet)
 
 void Iris::parseState(std::size_t userID, phx::net::Packet& packet)
 {
-	const float dt = 1.f / 20.f;
-
 	InputState input;
 
 	auto data = packet.getData();
@@ -154,7 +155,6 @@ void Iris::parseState(std::size_t userID, phx::net::Packet& packet)
 	}
 
 	{
-		// printf("insert existing %lu \n", input.sequence);
 		for (auto it = currentBundles.begin(); it != currentBundles.end(); ++it)
 		{
 			StateBundle& bundle = *it;
@@ -236,4 +236,14 @@ void Iris::sendMessage(std::size_t userID, std::string message)
 	Packet     packet = Packet(ser.getBuffer(), PacketFlags::RELIABLE);
 	Peer*      peer   = m_server->getPeer(userID);
 	peer->send(packet, 2);
+}
+
+void Iris::sendData(std::size_t userID, voxels::Chunk data)
+{
+	LOG_DEBUG("NET") << "SEND CHUNK " << data.getChunkPos();
+	Serializer ser(Serializer::Mode::WRITE);
+	ser&       data;
+	Packet     packet = Packet(ser.getBuffer(), PacketFlags::RELIABLE);
+	Peer*      peer   = m_server->getPeer(userID);
+	peer->send(packet, 3);
 }

@@ -37,8 +37,8 @@
 #include <Common/Commander.hpp>
 #include <Common/Position.hpp>
 #include <Common/Logger.hpp>
-
 #include <Common/Movement.hpp>
+
 #include <cmath>
 #include <tuple>
 
@@ -59,10 +59,24 @@ static void rawEcho(const std::string& input, std::ostringstream& cout)
 	myGame->sendMessage(input, cout);
 }
 
-Game::Game(gfx::Window* window, entt::registry* registry)
+Game::Game(gfx::Window* window, entt::registry* registry, bool networked)
     : Layer("Game"), m_window(window), m_registry(registry)
 {
+	m_chat = new ui::ChatWindow("Chat Window", 5,
+	                            "Type /help for a command list and help.");
+
+	/// @TODO replace with network callback
+	m_chat->registerCallback(rawEcho);
+
+	if (networked)
+	{
+		m_network = new client::Network(m_chat->cout,
+		                                phx::net::Address("127.0.0.1", 7777));
+	}
+	// else TODO enable this else when we get mod list from network
+	//{
 	const std::string save = "save1";
+	//}
 
 	std::fstream             fileStream;
 	std::vector<std::string> toLoad;
@@ -253,14 +267,10 @@ Game::~Game() { delete m_chat; }
 
 void Game::onAttach()
 {
-	m_chat = new ui::ChatWindow("Chat Window", 5,
-	                            "Type /help for a command list and help.");
-
-	/// @TODO replace with network callback
-	m_chat->registerCallback(rawEcho);
-
-	m_network = new client::Network(m_chat->cout);
-	m_network->start();
+	if (m_network != nullptr)
+	{
+		m_network->start();
+	}
 
 	m_player = new Player(m_registry);
 	m_player->registerAPI(m_modManager);
@@ -276,7 +286,14 @@ void Game::onAttach()
 
 	LOG_INFO("MAIN") << "Registering world";
 	const std::string save = "save1";
-	m_world = new voxels::ChunkView(3, voxels::Map(save, "map1"));
+	if (m_network != nullptr)
+	{
+		m_world = new voxels::ChunkView(3, m_network);
+	}
+	else
+	{
+		m_world = new voxels::ChunkView(3, new voxels::Map(save, "map1"));
+	}
 	m_player->setWorld(m_world);
 	m_camera = new gfx::FPSCamera(m_window, m_registry);
 	m_camera->setActor(m_player->getEntity());
@@ -308,18 +325,21 @@ void Game::onAttach()
 	}
 
 	m_inputQueue = new InputQueue(m_registry, m_player, m_camera);
-	m_inputQueue->start(std::chrono::milliseconds(50), m_network);
+	if (m_network != nullptr)
+	{
+		m_inputQueue->start(std::chrono::milliseconds(50), m_network);
+	}
 
 	LOG_INFO("MAIN") << "Game layer attached";
 }
 
 void Game::onDetach()
 {
-	m_network->stop();
 	delete m_world;
+	delete m_inputQueue;
+	delete m_network;
 	delete m_player;
 	delete m_camera;
-	delete m_network;
 }
 
 void Game::onEvent(events::Event& e)
@@ -430,7 +450,10 @@ void Game::tick(float dt)
 	InputState state = m_inputQueue->getCurrentState();
 
 	ActorSystem::tick(m_registry, m_player->getEntity(), dt, state);
-	confirmState(position);
+	if (m_network != nullptr)
+	{
+		confirmState(position);
+	}
 
 	if (m_followCam)
 	{

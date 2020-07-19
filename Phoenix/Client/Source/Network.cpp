@@ -29,10 +29,12 @@
 #include <Client/Network.hpp>
 
 #include <Common/Logger.hpp>
+#include <Common/Voxels/Chunk.hpp>
 
 using namespace phx::client;
 
-Network::Network(std::ostringstream& chat) : m_chat(chat)
+Network::Network(std::ostringstream& chat, const phx::net::Address& address)
+    : m_chat(chat)
 {
 	m_client = new phx::net::Host();
 
@@ -49,6 +51,12 @@ Network::Network(std::ostringstream& chat) : m_chat(chat)
 		case 2:
 			parseMessage(packet);
 			break;
+		case 3:
+			parseData(packet);
+			break;
+		default:
+			LOG_WARNING("NETWORK")
+			    << "Received Unexpected Packet on Channel " << channelID;
 		}
 	});
 
@@ -56,8 +64,7 @@ Network::Network(std::ostringstream& chat) : m_chat(chat)
 		std::cout << "Server disconnected";
 	});
 
-	phx::net::Address address = phx::net::Address("127.0.0.1", 7777);
-	m_client->connect(address, 3);
+	m_client->connect(address, 4);
 	m_client->poll(5000_ms);
 }
 
@@ -128,6 +135,19 @@ void Network::parseMessage(phx::net::Packet& packet)
 	LOG_INFO("Messenger") << input;
 	m_chat << input;
 	m_chat << "\n";
+}
+
+void Network::parseData(phx::net::Packet& packet)
+{
+	voxels::Chunk chunk(math::vec3 {0, 0, 0});
+
+	auto data = packet.getData();
+
+	phx::Serializer ser(Serializer::Mode::READ);
+	ser.setBuffer(reinterpret_cast<std::byte*>(data.data()), data.size());
+	ser& chunk;
+
+	chunkQueue.push(chunk);
 }
 
 void Network::sendState(phx::InputState inputState)

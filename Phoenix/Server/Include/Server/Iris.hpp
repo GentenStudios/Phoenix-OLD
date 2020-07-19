@@ -36,6 +36,7 @@
 #include <Common/Input.hpp>
 #include <Common/Network/Host.hpp>
 #include <Common/Util/BlockingQueue.hpp>
+#include <Common/Voxels/Chunk.hpp>
 
 #include <enet/enet.h>
 #include <entt/entt.hpp>
@@ -56,6 +57,16 @@ namespace phx::server::net
 		std::string message;
 	};
 
+	struct Event
+	{
+		enum class Type
+		{
+			CONNECT
+		};
+		entt::entity player;
+		Type         type;
+	};
+
 	class Iris
 	{
 	public:
@@ -66,7 +77,7 @@ namespace phx::server::net
 		 * @param running Pointer to a boolean, the threaded function only runs
 		 * if this is true
 		 */
-		Iris(entt::registry* registry);
+		explicit Iris(entt::registry* registry);
 
 		/**
 		 * @brief Cleans up any internal only objects
@@ -142,6 +153,12 @@ namespace phx::server::net
 		 */
 		void sendMessage(std::size_t userID, std::string message);
 
+		void sendData(std::size_t userID, voxels::Chunk data);
+
+		/**
+		 * @brief The Queue of events to process
+		 */
+		BlockingQueue<Event> eventQueue;
 		/**
 		 * @brief The Queue of bundled states received
 		 */

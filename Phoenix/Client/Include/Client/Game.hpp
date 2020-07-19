@@ -62,7 +62,8 @@ namespace phx::client
 	class Game : public gfx::Layer
 	{
 	public:
-		explicit Game(gfx::Window* window, entt::registry* registry);
+		explicit Game(gfx::Window* window, entt::registry* registry,
+		              bool networked = true);
 		~Game() override;
 
 		void onAttach() override;
@@ -112,8 +113,8 @@ namespace phx::client
 		math::vec3  m_prevPos;
 		int         m_playerHand = 0;
 
-		client::Network*    m_network;
-		client::InputQueue* m_inputQueue;
+		client::Network*    m_network    = nullptr;
+		client::InputQueue* m_inputQueue = nullptr;
 		// This is an internal log of the recent input states sent to the server
 		std::list<InputState> m_states;
 
