@@ -42,7 +42,7 @@ using namespace phx::server::net;
 /// @todo Replace this with the config system
 static const std::size_t MAX_USERS = 32;
 
-Iris::Iris(entt::registry* registry) : m_registry(registry)
+Iris::Iris(entt::registry* registry) : m_registry(registry), m_running(false)
 {
 	m_server = new phx::net::Host(phx::net::Address(7777), MAX_USERS, 4);
 
@@ -54,7 +54,7 @@ Iris::Iris(entt::registry* registry) : m_registry(registry)
 			m_registry->emplace<Player>(
 			    entity, ActorSystem::registerActor(m_registry), peer.getID());
 			m_users.emplace(peer.getID(), entity);
-			eventQueue.push({entity, Event::CONNECT});
+			eventQueue.push({entity, Event::Type::CONNECT});
 		}
 	});
 

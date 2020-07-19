@@ -35,8 +35,8 @@ add_subdirectory (json)
 set_target_properties(SDL2main SDL2-static uninstall
 	Glad ImGui
 	lua liblua
-	enet aob build_version native-tools
-	OpenAL common ex-common
+	enet aob build_version
+	OpenAL common
 	PROPERTIES FOLDER Dependencies)
 
 # utility thing to make phoenix cmake tidier

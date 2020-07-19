@@ -78,6 +78,7 @@ void Game::run()
 			    static_cast<int>(pos.x) / voxels::Chunk::CHUNK_WIDTH,
 			    static_cast<int>(pos.y) / voxels::Chunk::CHUNK_HEIGHT,
 			    static_cast<int>(pos.z) / voxels::Chunk::CHUNK_DEPTH);
+			// TODO this needs fixed in the math lib
 			if (!(oldPos == newPos))
 			{
 				for (const auto& chunk :
@@ -107,7 +108,8 @@ void Game::run()
 				break;
 			}
 			default:
-				LOG_WARNING("GAME") << "Event received with unknown type";
+				LOG_WARNING("GAME") << "Invalid network event received";
+				break;
 			}
 		}
 

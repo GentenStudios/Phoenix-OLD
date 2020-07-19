@@ -46,6 +46,7 @@ std::vector<voxels::Chunk*> PlayerView::update(entt::registry* registry,
 	    static_cast<int>(playerPos.y) / voxels::Chunk::CHUNK_HEIGHT;
 	const int posZ = static_cast<int>(playerPos.z) / voxels::Chunk::CHUNK_DEPTH;
 
+	// TODO move this to a config or add as a parameter
 	const int viewDistance = 3;
 
 	// TODO remove chunks that are out of view

@@ -68,7 +68,7 @@ Window::Window(const std::string& title, int width, int height)
 	if (m_window == nullptr)
 	{
 		SDL_Quit();
-		std::cout << "[ERROR] Couldn't create window, need OpenGL >= 3.3"
+		std::cout << "[ERROR1] Couldn't create window, need OpenGL >= 3.3"
 		          << std::endl;
 		exit(EXIT_FAILURE);
 	}
@@ -81,7 +81,7 @@ Window::Window(const std::string& title, int width, int height)
 
 	if (!gladLoadGLLoader(static_cast<GLADloadproc>(SDL_GL_GetProcAddress)))
 	{
-		std::cout << "[ERROR] Couldn't create window, need OpenGL >= 3.3"
+		std::cout << "[ERROR2] Couldn't create window, need OpenGL >= 3.3"
 		          << std::endl;
 		exit(EXIT_FAILURE);
 	}
