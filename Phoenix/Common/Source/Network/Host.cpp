@@ -191,7 +191,7 @@ void Host::handleEvent(ENetEvent& event)
 	case ENET_EVENT_TYPE_RECEIVE:
 		if (m_receiveCallback)
 		{
-			m_receiveCallback(getPeer(*peer), Packet(*event.packet, true),
+			m_receiveCallback(*getPeer(*peer), Packet(*event.packet, true),
 			                  event.channelID);
 		}
 
@@ -211,13 +211,14 @@ void Host::handleEvent(ENetEvent& event)
 	}
 }
 
-Peer& Host::getPeer(ENetPeer& peer)
+Peer* Host::getPeer(ENetPeer& peer)
 {
 	if (m_peers.find(std::size_t(peer.data)) != m_peers.end())
 	{
-		return m_peers.at(std::size_t(peer.data));
+		return &m_peers.at(std::size_t(peer.data));
 	}
-	std::cout << "peer not found";
+	LOG_WARNING("NETCODE") << "Peer not found.";
+	return nullptr;
 }
 
 Peer& Host::createPeer(ENetPeer& peer)

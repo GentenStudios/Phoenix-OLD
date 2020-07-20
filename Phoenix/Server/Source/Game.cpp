@@ -30,13 +30,17 @@
 #include <Server/User.hpp>
 
 #include <Common/Actor.hpp>
+#include <Common/PlayerView.hpp>
+
 #include <thread>
 
 using namespace phx;
 using namespace phx::server;
 
-Game::Game(entt::registry* registry, bool* running, phx::server::net::Iris* iris)
-    : m_registry(registry), m_running(running), m_iris(iris)
+Game::Game(entt::registry* registry, bool* running, phx::server::net::Iris* iris,
+           const std::string& save)
+    : m_registry(registry), m_running(running), m_iris(iris),
+      m_map(voxels::Map(save, "map1"))
 {
 	m_commander = new Commander(m_iris);
 }
@@ -50,25 +54,67 @@ void Game::run()
 {
 	while (m_running)
 	{
-		// Process everybody's input first
+		// Wait for a new input bundle from the network
 		if (m_iris->stateQueue.empty())
 		{
-			std::this_thread::sleep_for(
-			    1_ms); // This just keeps the CPU from spinning
+			// This just keeps the CPU from spinning
+			std::this_thread::sleep_for(1_ms);
 			continue;
 		}
 		net::StateBundle m_currentState = m_iris->stateQueue.pop();
 
+		// Process everybody's input first
 		for (const auto& state : m_currentState.states)
 		{
-			ActorSystem::tick(m_registry,
-			                  m_registry->get<Player>(state.first).actor, dt,
-			                  state.second);
+			auto       player = m_registry->get<Player>(state.first);
+			math::vec3 pos = m_registry->get<Position>(player.actor).position;
+			const math::vec3i oldPos(
+			    static_cast<int>(pos.x) / voxels::Chunk::CHUNK_WIDTH,
+			    static_cast<int>(pos.y) / voxels::Chunk::CHUNK_HEIGHT,
+			    static_cast<int>(pos.z) / voxels::Chunk::CHUNK_DEPTH);
+			ActorSystem::tick(m_registry, player.actor, dt, state.second);
+			pos = m_registry->get<Position>(player.actor).position;
+			const math::vec3i newPos(
+			    static_cast<int>(pos.x) / voxels::Chunk::CHUNK_WIDTH,
+			    static_cast<int>(pos.y) / voxels::Chunk::CHUNK_HEIGHT,
+			    static_cast<int>(pos.z) / voxels::Chunk::CHUNK_DEPTH);
+			// TODO this needs fixed in the math lib
+			if (!(oldPos == newPos))
+			{
+				for (const auto& chunk :
+				     PlayerView::update(m_registry, player.actor, &m_map))
+				{
+					m_iris->sendData(player.id, chunk);
+				}
+			}
 		}
+
 		// Process events second
+		size_t size = m_iris->eventQueue.size();
+		for (size_t i = 0; i < size; i++)
+		{
+			net::Event event = m_iris->eventQueue.pop();
+
+			switch (event.type)
+			{
+			case net::Event::Type::CONNECT:
+			{
+				auto entity = m_registry->get<Player>(event.player);
+				for (const auto& chunk :
+				     PlayerView::update(m_registry, entity.actor, &m_map))
+				{
+					m_iris->sendData(entity.id, chunk);
+				}
+				break;
+			}
+			default:
+				LOG_WARNING("GAME") << "Invalid network event received";
+				break;
+			}
+		}
 
 		// Process messages last
-		size_t size = m_iris->messageQueue.size();
+		size = m_iris->messageQueue.size();
 		for (size_t i = 0; i < size; i++)
 		{
 			net::MessageBundle message = m_iris->messageQueue.front();
@@ -76,6 +122,7 @@ void Game::run()
 			m_iris->messageQueue.pop();
 		}
 
+		// Dispatch confirmation states
 		m_iris->sendState(m_registry, m_currentState.sequence);
 	}
 }

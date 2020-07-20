@@ -32,6 +32,7 @@
 #include <Common/Math/Math.hpp>
 #include <Common/Voxels/Block.hpp>
 
+#include <Common/Serialization/Serializer.hpp>
 #include <vector>
 
 namespace phx::voxels
@@ -74,7 +75,7 @@ namespace phx::voxels
 	 * //renderer->dropChunk(chunk.getChunkPos());
 	 * @endcode
 	 */
-	class Chunk
+	class Chunk : public phx::ISerializable
 	{
 	public:
 		Chunk() = delete;
@@ -164,10 +165,11 @@ namespace phx::voxels
 			                      static_cast<std::size_t>(pos.z));
 		}
 
+		Serializer& operator&(Serializer& ser) override;
+
 	private:
 		/// @brief The position of the chunk in relation to the map.
 		math::vec3              m_pos;
 		std::vector<BlockType*> m_blocks;
 	};
 } // namespace phx::voxels
-

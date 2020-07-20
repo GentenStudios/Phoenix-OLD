@@ -16,6 +16,7 @@ set(Sources
 	${currentDir}/Commander.cpp
 	${currentDir}/Input.cpp
 	${currentDir}/Save.cpp
+	${currentDir}/PlayerView.cpp
 
 	PARENT_SCOPE
 )

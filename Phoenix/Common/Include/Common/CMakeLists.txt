@@ -17,13 +17,14 @@ set(Headers
 	${currentDir}/Singleton.hpp
 	${currentDir}/FileIO.hpp
 	${currentDir}/Logger.hpp
-	
+
 	${currentDir}/Settings.hpp
 	${currentDir}/Commander.hpp
 	${currentDir}/Position.hpp
 	${currentDir}/Movement.hpp
 	${currentDir}/Input.hpp
 	${currentDir}/Save.hpp
-	
+	${currentDir}/PlayerView.hpp
+
 	PARENT_SCOPE
 )

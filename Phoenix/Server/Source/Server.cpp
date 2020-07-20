@@ -43,7 +43,7 @@ using namespace phx;
 Server::Server(std::string save) : m_save(std::move(save))
 {
 	m_iris = new server::net::Iris(&m_registry);
-	m_game = new Game(&m_registry, &m_running, m_iris);
+	m_game = new Game(&m_registry, &m_running, m_iris, m_save);
 }
 
 void registerUnusedAPI(cms::ModManager* manager)
@@ -67,7 +67,10 @@ void Server::run()
 {
 	std::cout << "Hello, Server!" << std::endl;
 
-	Logger::get()->initialize({});
+	LoggerConfig config;
+	config.verbosity = LogVerbosity::DEBUG;
+	Logger::initialize(config);
+
 	Settings::get()->load("config.txt");
 
 	// Initialize the Modules //

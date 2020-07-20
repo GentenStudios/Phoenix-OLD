@@ -28,16 +28,21 @@
 
 #pragma once
 
-#include <enet/enet.h>
+#include <Common/Position.hpp>
+#include <Common/Voxels/Map.hpp>
+
 #include <entt/entt.hpp>
-#include <string>
 
-namespace phx::server
+#include <vector>
+
+namespace phx
 {
-
-	struct Player
+	struct PlayerView
 	{
-		entt::entity actor;
-		std::size_t  id;
+		std::vector<math::vec3> chunks;
+
+		static std::vector<voxels::Chunk> update(entt::registry* registry,
+		                                         entt::entity    entity,
+		                                         voxels::Map*    map);
 	};
-} // namespace phx::server
+} // namespace phx
