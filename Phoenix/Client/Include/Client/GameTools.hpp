@@ -45,24 +45,23 @@ namespace phx::client
 	 */
 	class GameTools : public gfx::Overlay
 	{
-    public:
+	public:
 		GameTools(bool* followCam, entt::registry* registry,
 		          entt::entity player);
 		~GameTools() override = default;
 
 		void onAttach() override;
-        void onDetach() override;
-        void onEvent(events::Event& e) override;
-        void tick(float dt) override;
+		void onDetach() override;
+		void onEvent(events::Event& e) override;
+		void tick(float dt) override;
 
-    private:
-        entt::registry* m_registry;
+	private:
+		entt::registry* m_registry;
 
-        bool*    m_followCam = nullptr;
-        int      m_currentSensitivity = 1;
-        Setting* m_sensitivity = nullptr;
+		bool*    m_followCam          = nullptr;
+		int      m_currentSensitivity = 1;
+		Setting* m_sensitivity        = nullptr;
 
 		entt::entity m_player;
 	};
 } // namespace phx::client
-

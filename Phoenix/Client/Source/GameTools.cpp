@@ -78,4 +78,3 @@ void GameTools::tick(float dt)
 	}
 	ImGui::End();
 }
-

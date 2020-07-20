@@ -39,7 +39,7 @@ namespace phx
 {
 	struct PlayerView
 	{
-		PlayerView(voxels::Map* map) : map(map) {};
+		PlayerView(voxels::Map* map) : map(map) {}
 
 		std::vector<math::vec3> chunks;
 		voxels::Map*            map;
