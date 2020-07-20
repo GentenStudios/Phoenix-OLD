@@ -109,11 +109,27 @@ namespace phx
 
 		/**
 		 * @brief Saves everything to be saved in the Save.
+		 * @param name The name of the save.
+		 *
+		 * If the name is empty, it will overwrite/save to the existing save.
+		 * Otherwise you will be able to "rename" the save, like a "save as".
+		 *
+		 * If renamed, the old save must be manually deleted.
 		 */
-		void save();
+		void toFile(const std::string& name = "");
 
 	private:
 		SaveConfig m_data;
+
+		/**
+		 * @brief Tells the saving operations whether settings have changed.
+		 *
+		 * If the settings have changed, then the JSON settings file will be
+		 * updated, otherwise it won't be - it'll save a bit of time during
+		 * saving, especially since there are a lot of chunks, etc... to spend
+		 * time on instead.
+		 */
+		bool m_settingsChanged = false;
 
 		//Dimension* m_defaultDimension;
 		//std::unordered_map<std::string, Dimension> m_loadedDimensions;

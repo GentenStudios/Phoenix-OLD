@@ -180,7 +180,7 @@ Logger::Logger(const LoggerConfig& config)
 		m_worker.swap(thread);
 	}
 
-	m_file.open(config.logFile);
+	m_file.open(config.logFile, std::ios_base::app);
 	if (!m_file.is_open())
 	{
 		Log message = {LogVerbosity::INFO, "", 0, "LOGGING"};
@@ -201,6 +201,8 @@ Logger::~Logger()
 		if (m_worker.joinable())
 			m_worker.join();
 	}
+
+	m_file.close();
 }
 
 void Logger::loggerInternal(const Log& log)

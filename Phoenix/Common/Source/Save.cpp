@@ -107,3 +107,58 @@ Save Save::createSave(const SaveConfig& config)
 }
 
 const std::string& Save::getName() const { return m_data.name; }
+
+void Save::toFile(const std::string& name)
+{
+	namespace fs = std::filesystem;
+
+	// if the name is not empty or the name of the current save, choose to make
+	// a new save.
+	if (!name.empty() && name != m_data.name)
+	{
+		m_data.name = name;
+		
+		const auto path = fs::current_path() / "Saves" / name;
+
+		// save already exists, overwrite json.
+		if (fs::exists(path))
+		{
+			LOG_WARNING("SAVES")
+			    << "Save already exists, save will be overwritten.";
+
+			/// @todo implement system to potentially move the existing save to another folder as a backup.
+			// empty the folder of the existing save.
+			fs::remove_all(path);
+
+			nlohmann::json saveSettings;
+			saveSettings["name"] = name;
+			saveSettings["mods"] = m_data.mods;
+			saveSettings += m_data.settings;
+			
+			std::ofstream json(path / (name + ".json"));
+			json << std::setw(4) << saveSettings;
+			json.close();
+		}
+	}
+	else
+	{
+		// the save hasn't been renamed, and the settings have changed, now
+		// update file, otherwise there's no point.
+		if (m_settingsChanged)
+		{
+			nlohmann::json saveSettings;
+			saveSettings["name"] = name;
+			saveSettings["mods"] = m_data.mods;
+			saveSettings += m_data.settings;
+
+			const auto path = fs::current_path() / "Saves" / m_data.name;
+			std::ofstream writeSettings(path);
+			writeSettings << std::setw(4) << saveSettings;
+			writeSettings.close();
+		}
+	}
+	
+	// we've already altered all the JSON's and paths, now save all dimensions
+	// (etc...). dimensions will need a function like this where the
+	// save/dimension name is "changeable".
+}
