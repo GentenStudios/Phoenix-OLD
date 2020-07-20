@@ -28,12 +28,19 @@
 
 #include <Client/Client.hpp>
 
+#include <Common/Save.hpp>
+
 using namespace phx;
 
 #undef main
 int main(int argc, char** argv)
 {
-	client::Client::get()->run();
+	//client::Client::get()->run();
+
+	auto save = phx::Save::createSave({"bob", {}, {{"shrek", "pizza"}}});
+
+	save.toFile();
+	save.toFile("bob2");
 	
 	return 0;
 }
