@@ -66,15 +66,9 @@ Save::Save(const std::string& save)
 		exit(EXIT_FAILURE);
 	}
 
-	m_data.mods = saveSettings["mods"].get<std::vector<std::string>>();
-	m_data.name = saveSettings["name"].get<std::string>();
+	m_data.mods     = saveSettings["mods"].get<std::vector<std::string>>();
+	m_data.name     = saveSettings["name"].get<std::string>();
 	m_data.settings = saveSettings["settings"].get<nlohmann::json>();
-
-	LOG_INFO("SAVES") << "The save: " << m_data.name << " requires the mods: ";
-	for (const std::string& mod : m_data.mods)
-	{
-		LOG_INFO("SAVES") << mod;
-	}
 }
 
 Save::~Save()
