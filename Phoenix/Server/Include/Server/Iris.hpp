@@ -153,7 +153,17 @@ namespace phx::server::net
 		 */
 		void sendMessage(std::size_t userID, std::string message);
 
-		void sendData(std::size_t userID, voxels::Chunk data);
+		/**
+		 * @brief Sends a chunk to a client
+		 *
+		 * @note This is designed to send large game data in the future, but
+		 * needs expanded upon before we can do that. This is why its named
+		 * sendData();
+		 *
+		 * @param userID The user the data is being sent to
+		 * @param data The data to send (Currently, this is just a pointer to a chunk)
+		 */
+		void sendData(std::size_t userID, voxels::Chunk* data);
 
 		/**
 		 * @brief The Queue of events to process

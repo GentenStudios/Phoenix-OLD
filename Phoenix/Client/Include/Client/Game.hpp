@@ -32,6 +32,7 @@
 #include <Client/EscapeMenu.hpp>
 #include <Client/GameTools.hpp>
 #include <Client/Graphics/Camera.hpp>
+#include <Client/Graphics/ChunkView.hpp>
 #include <Client/Graphics/Layer.hpp>
 #include <Client/Graphics/ShaderPipeline.hpp>
 #include <Client/Graphics/UI.hpp>
@@ -94,11 +95,13 @@ namespace phx::client
 		 */
 		void confirmState(const Position& position);
 
+		entt::registry* m_registry;
+		entt::entity    m_player;
+
 		gfx::Window*       m_window;
 		gfx::FPSCamera*    m_camera = nullptr;
-		entt::registry*    m_registry;
-		Player*            m_player;
-		voxels::ChunkView* m_world = nullptr;
+		voxels::ChunkView* m_world  = nullptr;
+		voxels::Map*       m_map    = nullptr;
 
 		gfx::ShaderPipeline m_renderPipeline;
 

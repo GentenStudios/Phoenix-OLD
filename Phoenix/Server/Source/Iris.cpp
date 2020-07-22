@@ -231,6 +231,7 @@ void Iris::sendState(entt::registry* registry, std::size_t sequence)
 
 void Iris::sendMessage(std::size_t userID, std::string message)
 {
+	// TODO clean this up so the serializer can take a const ref to data
 	Serializer ser(Serializer::Mode::WRITE);
 	ser&       message;
 	Packet     packet = Packet(ser.getBuffer(), PacketFlags::RELIABLE);
@@ -238,11 +239,10 @@ void Iris::sendMessage(std::size_t userID, std::string message)
 	peer->send(packet, 2);
 }
 
-void Iris::sendData(std::size_t userID, voxels::Chunk data)
+void Iris::sendData(std::size_t userID, voxels::Chunk* data)
 {
-	LOG_DEBUG("NET") << "SEND CHUNK " << data.getChunkPos();
 	Serializer ser(Serializer::Mode::WRITE);
-	ser&       data;
+	ser&*      data;
 	Packet     packet = Packet(ser.getBuffer(), PacketFlags::RELIABLE);
 	Peer*      peer   = m_server->getPeer(userID);
 	peer->send(packet, 3);

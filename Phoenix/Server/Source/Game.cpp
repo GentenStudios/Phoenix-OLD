@@ -82,7 +82,7 @@ void Game::run()
 			if (!(oldPos == newPos))
 			{
 				for (const auto& chunk :
-				     PlayerView::update(m_registry, player.actor, &m_map))
+				     PlayerView::update(m_registry, player.actor))
 				{
 					m_iris->sendData(player.id, chunk);
 				}
@@ -94,14 +94,14 @@ void Game::run()
 		for (size_t i = 0; i < size; i++)
 		{
 			net::Event event = m_iris->eventQueue.pop();
-
 			switch (event.type)
 			{
 			case net::Event::Type::CONNECT:
 			{
 				auto entity = m_registry->get<Player>(event.player);
+				m_registry->emplace<PlayerView>(entity.actor, &m_map);
 				for (const auto& chunk :
-				     PlayerView::update(m_registry, entity.actor, &m_map))
+				     PlayerView::update(m_registry, entity.actor))
 				{
 					m_iris->sendData(entity.id, chunk);
 				}

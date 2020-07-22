@@ -26,20 +26,15 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+#include <Common/Logger.hpp>
 #include <Common/PlayerView.hpp>
 
 using namespace phx;
 
-std::vector<voxels::Chunk> PlayerView::update(entt::registry* registry,
-                                              entt::entity    entity,
-                                              voxels::Map*    map)
+std::vector<voxels::Chunk*> PlayerView::update(entt::registry* registry,
+                                               entt::entity    entity)
 {
-	std::vector<voxels::Chunk> newChunks;
-
-	if (!registry->has<PlayerView>(entity))
-	{
-		registry->emplace<PlayerView>(entity);
-	}
+	std::vector<voxels::Chunk*> newChunks;
 
 	PlayerView& view = registry->get<PlayerView>(entity);
 
@@ -65,7 +60,9 @@ std::vector<voxels::Chunk> PlayerView::update(entt::registry* registry,
 				math::vec3 chunkToCheck = {static_cast<float>(x + posX),
 				                           static_cast<float>(y + posY),
 				                           static_cast<float>(z + posZ)};
-				bool       hasChunk     = false;
+				chunkToCheck            = chunkToCheck *
+				               static_cast<float>(voxels::Chunk::CHUNK_WIDTH);
+				bool hasChunk = false;
 				for (const auto chunk : view.chunks)
 				{
 					if (chunk == chunkToCheck)
@@ -76,11 +73,16 @@ std::vector<voxels::Chunk> PlayerView::update(entt::registry* registry,
 				}
 				if (!hasChunk)
 				{
-					view.chunks.emplace_back(chunkToCheck);
-					newChunks.emplace_back(map->getChunk(chunkToCheck));
+					voxels::Chunk* chunk = view.map->getChunk(chunkToCheck);
+					if (chunk != nullptr)
+					{
+						view.chunks.emplace_back(chunkToCheck);
+						newChunks.emplace_back(
+						    view.map->getChunk(chunkToCheck));
+					}
 				}
 			}
 		}
 	}
 	return newChunks;
-};
+}

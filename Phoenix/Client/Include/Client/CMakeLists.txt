@@ -8,7 +8,6 @@ set(Headers
         ${graphicsHeaders}
         ${audioHeaders}
 
-        ${currentDir}/Player.hpp
         ${currentDir}/InputQueue.hpp
 
         ${currentDir}/Client.hpp

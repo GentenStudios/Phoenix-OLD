@@ -29,12 +29,12 @@
 #pragma once
 
 #include <Client/Graphics/ChunkRenderer.hpp>
-
+#include <Client/Graphics/ShaderPipeline.hpp>
 #include <Common/Voxels/Map.hpp>
 
-#include <Client/Network.hpp>
-#include <Common/Util/BlockingQueue.hpp>
-#include <vector>
+#include <entt/entt.hpp>
+
+#include <glad/glad.h>
 
 namespace phx::voxels
 {
@@ -76,13 +76,8 @@ namespace phx::voxels
 		 * @param viewDistance The view distance in every direction.
 		 * @param map The map the ChunkView loads from
 		 */
-		ChunkView(int viewDistance, Map* map);
-		/**
-		 * @brief Constructs the ChunkView.
-		 * @param viewDistance The view distance in every direction.
-		 * @param map The map the ChunkView loads from
-		 */
-		ChunkView(int viewDistance, client::Network* network);
+		ChunkView(int viewDistance, entt::registry* registry,
+		          entt::entity entity);
 		~ChunkView();
 
 		/**
@@ -99,11 +94,7 @@ namespace phx::voxels
 		 * @todo Create classes to solve said issue, decide on whether to
 		 * rely on explicit or implicit conversion of coordinate systems.
 		 */
-		void tick(math::vec3 playerPos);
-
-	private:
-		void tickNet(math::vec3 playerPos);
-		void tickLocal(math::vec3 playerPos);
+		void tick();
 
 	public:
 		/**
@@ -126,13 +117,19 @@ namespace phx::voxels
 		 */
 		void setBlockAt(math::vec3 position, BlockType* block);
 
+		/// @brief Render the selection box around the pointed block
+		void renderSelectionBox(const math::mat4 view, const math::mat4 proj);
+
 	private:
 		int m_viewDistance = 1; // 1 chunk
 
-		std::vector<Chunk>  m_activeChunks;
 		gfx::ChunkRenderer* m_renderer;
-		Map*                m_map     = nullptr;
-		client::Network*    m_network = nullptr;
+		entt::registry*     m_registry;
+		entt::entity        m_entity;
+
+		GLuint              m_vao;
+		GLuint              m_vbo;
+		gfx::ShaderPipeline m_pipeline;
 	};
 } // namespace phx::voxels
 

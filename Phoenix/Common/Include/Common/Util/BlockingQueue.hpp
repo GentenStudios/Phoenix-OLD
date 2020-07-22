@@ -37,15 +37,15 @@
 
 namespace phx
 {
-	namespace
+	// namespace
+	//{
+	template <typename T>
+	class IsValid
 	{
-		template <typename T>
-		class IsValid
-		{
-		public:
-			bool operator()(const T&) { return true; }
-		};
-	} // namespace
+	public:
+		bool operator()(const T&) { return true; }
+	};
+	//} // namespace
 
 	/**
 	 * @brief A thread safe queue
