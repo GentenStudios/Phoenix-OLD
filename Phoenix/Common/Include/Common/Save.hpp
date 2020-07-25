@@ -73,24 +73,17 @@ namespace phx
 	{
 	public:
 		/**
-		 * @brief Loads a save, quits if not found.
+		 * @brief Loads a save, creates one if the parameters are provided.
 		 * @param save The save to load.
+		 * @param mods The mods to use if creating a save.
+		 * @param settings The settings to use if creating a save.
 		 */
-		Save(const std::string& save);
+		Save(const std::string& save, const std::vector<std::string>& mods = {}, const nlohmann::json& settings = {});
 
 		/**
 		 * @brief Saves everything to be saved and closes the save.
 		 */
 		~Save();
-
-		/**
-		 * @brief Creates a new save if one does not exist.
-		 * @param config The configuration for the new save.
-		 * @return The new save.
-		 *
-		 * If the save already exists it will return that save.
-		 */
-		static Save createSave(const SaveConfig& config);
 
 		/**
 		 * @brief Gets the name of the save.
@@ -119,7 +112,7 @@ namespace phx
 		void toFile(const std::string& name = "");
 
 	private:
-		SaveConfig m_data;
+		SaveConfig m_config;
 
 		/**
 		 * @brief Tells the saving operations whether settings have changed.

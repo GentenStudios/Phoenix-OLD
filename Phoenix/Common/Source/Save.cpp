@@ -35,40 +35,65 @@
 
 using namespace phx;
 
-Save::Save(const std::string& save)
+Save::Save(const std::string& save, const std::vector<std::string>& mods,
+     const nlohmann::json& settings)
 {
 	namespace fs = std::filesystem;
 
-	// check if the save exists
 	auto path = fs::current_path() / "Saves" / save;
 	if (!fs::exists(path))
 	{
-		LOG_FATAL("SAVES") << "Save could not be located, quitting.";
-		exit(EXIT_FAILURE);
-	}
+		LOG_INFO("SAVES") << "Save doesn't exist, creating.";
+		
+		// save doesn't already exist, lets make it.
+		fs::create_directory(path);
 
-	// save exists, lets load what we need.
-	std::ifstream json(path.append(save + ".json"));
-	if (!json.is_open())
+		// we make a new json thing so we don't double the size of the config
+		// struct.
+		nlohmann::json saveSettings;
+
+		saveSettings["name"]     = save;
+		saveSettings["mods"]     = mods;
+		saveSettings["settings"] = settings;
+
+		std::ofstream json(path / (save + ".json"));
+		json << std::setw(4) << saveSettings;
+		json.close();
+
+		m_config.name = save;
+		m_config.mods = mods;
+		m_config.settings = settings;
+	}
+	else
 	{
-		LOG_FATAL("SAVES") << "The save: " << save
-		                   << " does not have a valid configuration, quitting.";
-		exit(EXIT_FAILURE);
-	}
+		LOG_INFO("SAVES") << "Loading existing save.";
+		
+		// save exists, lets load what we need.
+		std::ifstream json(path.append(save + ".json"));
+		if (!json.is_open())
+		{
+			LOG_FATAL("SAVES")
+			    << "The save: " << save
+			    << " does not have a valid configuration, quitting.";
+			exit(EXIT_FAILURE);
+		}
 
-	nlohmann::json saveSettings;
-	
-	json >> saveSettings;
-	if (!saveSettings["mods"].is_array())
-	{
-		LOG_FATAL("SAVES") << "The save: " << save
-		                   << " does not have a valid configuration, quitting.";
-		exit(EXIT_FAILURE);
-	}
+		nlohmann::json saveSettings;
 
-	m_data.mods     = saveSettings["mods"].get<std::vector<std::string>>();
-	m_data.name     = saveSettings["name"].get<std::string>();
-	m_data.settings = saveSettings["settings"].get<nlohmann::json>();
+		json >> saveSettings;
+		json.close();
+		if (!saveSettings["mods"].is_array())
+		{
+			LOG_FATAL("SAVES")
+			    << "The save: " << save
+			    << " does not have a valid configuration, quitting.";
+			exit(EXIT_FAILURE);
+		}
+
+		m_config.mods     = saveSettings["mods"].get<std::vector<std::string>>();
+		m_config.name     = saveSettings["name"].get<std::string>();
+		m_config.settings = saveSettings["settings"].get<nlohmann::json>();
+	}
 }
 
 Save::~Save()
@@ -77,36 +102,7 @@ Save::~Save()
 	toFile();
 }
 
-Save Save::createSave(const SaveConfig& config)
-{
-	namespace fs = std::filesystem;
-
-	const auto path = fs::current_path() / "Saves" / config.name;
-	if (fs::exists(path))
-	{
-		LOG_WARNING("SAVES") << "Save already exists, loading existing save.";
-		return Save(config.name);
-	}
-
-	// save doesn't already exist, lets make it.
-	fs::create_directory(path);
-
-	// we make a new json thing so we don't double the size of the config
-	// struct.
-	nlohmann::json saveSettings;
-
-	saveSettings["name"] = config.name;
-	saveSettings["mods"] = config.mods;
-	saveSettings["settings"] = config.settings;
-
-	std::ofstream json(path / (config.name + ".json"));
-	json << std::setw(4) << saveSettings;
-	json.close();
-
-	return Save(config.name);
-}
-
-const std::string& Save::getName() const { return m_data.name; }
+const std::string& Save::getName() const { return m_config.name; }
 
 void Save::toFile(const std::string& name)
 {
@@ -114,9 +110,9 @@ void Save::toFile(const std::string& name)
 
 	// if the name is not empty or the name of the current save, choose to make
 	// a new save.
-	if (!name.empty() && name != m_data.name)
+	if (!name.empty() && name != m_config.name)
 	{
-		m_data.name = name;
+		m_config.name = name;
 
 		const auto path = fs::current_path() / "Saves" / name;
 
@@ -129,13 +125,17 @@ void Save::toFile(const std::string& name)
 
 			/// @todo implement system to potentially backup the existing save
 			// empty the folder of the existing save.
-			fs::remove_all(path);
 
+			for (auto& p : fs::directory_iterator(path))
+			{
+				fs::remove(p);
+			}
+			
 			// write new json file.
 			nlohmann::json saveSettings;
 			saveSettings["name"] = name;
-			saveSettings["mods"] = m_data.mods;
-			saveSettings["settings"] = m_data.settings;
+			saveSettings["mods"] = m_config.mods;
+			saveSettings["settings"] = m_config.settings;
 
 			std::ofstream json(path / (name + ".json"));
 			json << std::setw(4) << saveSettings;
@@ -148,11 +148,11 @@ void Save::toFile(const std::string& name)
 
 			// write new json file.
 			nlohmann::json saveSettings;
-			saveSettings["name"]     = m_data.name;
-			saveSettings["mods"]     = m_data.mods;
-			saveSettings["settings"] = m_data.settings;
+			saveSettings["name"]     = m_config.name;
+			saveSettings["mods"]     = m_config.mods;
+			saveSettings["settings"] = m_config.settings;
 
-			std::ofstream json(path / (m_data.name + ".json"));
+			std::ofstream json(path / (m_config.name + ".json"));
 			json << std::setw(4) << saveSettings;
 			json.close();
 		}
@@ -162,7 +162,7 @@ void Save::toFile(const std::string& name)
 		// the save hasn't been renamed, and the settings have changed, now
 		// update file, otherwise there's no point.
 
-		const auto path = fs::current_path() / "Saves" / m_data.name;
+		const auto path = fs::current_path() / "Saves" / m_config.name;
 
 		// this exists as a error check to prevent an exception being thrown when opening the json file.
 		if (!fs::exists(path))
@@ -181,8 +181,8 @@ void Save::toFile(const std::string& name)
 		{
 			nlohmann::json saveSettings;
 			saveSettings["name"] = name;
-			saveSettings["mods"] = m_data.mods;
-			saveSettings["settings"] = m_data.settings;
+			saveSettings["mods"] = m_config.mods;
+			saveSettings["settings"] = m_config.settings;
 
 			std::ofstream writeSettings(path);
 			writeSettings << std::setw(4) << saveSettings;
