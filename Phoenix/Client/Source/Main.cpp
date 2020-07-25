@@ -28,11 +28,20 @@
 
 #include <Client/Client.hpp>
 
+#include <Common/Save.hpp>
+
 using namespace phx;
 
 #undef main
 int main(int argc, char** argv)
 {
-	client::Client::get()->run();	
+	//client::Client::get()->run();
+
+	auto saves = Save::listAllSaves();
+	for (auto& save : saves)
+	{
+		std::cout << save << std::endl;
+	}
+
 	return 0;
 }

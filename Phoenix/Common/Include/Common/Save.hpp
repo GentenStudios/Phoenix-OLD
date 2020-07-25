@@ -85,6 +85,8 @@ namespace phx
 		 */
 		~Save();
 
+		static std::vector<std::string> listAllSaves();
+
 		/**
 		 * @brief Gets the name of the save.
 		 * @return The name of the save.

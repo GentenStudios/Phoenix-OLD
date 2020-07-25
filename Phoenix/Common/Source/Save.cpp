@@ -102,6 +102,41 @@ Save::~Save()
 	toFile();
 }
 
+std::vector<std::string> Save::listAllSaves()
+{
+	namespace fs = std::filesystem;
+
+	std::vector<std::string> saves;
+	
+	auto path = fs::current_path() / "Saves";
+	for (auto& p : fs::directory_iterator(path))
+	{
+		if (p.is_directory())
+		{
+			// we only check if the folder has a json (would mean it's a save)
+			// but we don't validate the json or anything since there's no real
+			// point.
+			
+			// probably not very optimised but no real point optimising this
+			// until it's a problem
+			auto jsonLocation = p.path() / p.path().filename().concat(".json");
+			
+			std::ifstream input(jsonLocation);
+			if (!input.is_open())
+			{
+				// doesn't exist.
+				continue;
+			}
+
+			// i know this is ugly as fuck but if u know a better way tell me,
+			// std::filesystem is cool but it really lacks some QoL features.
+			saves.emplace_back(jsonLocation.parent_path().filename().string());
+		}
+	}
+
+	return saves;
+}
+
 const std::string& Save::getName() const { return m_config.name; }
 
 void Save::toFile(const std::string& name)
@@ -124,8 +159,8 @@ void Save::toFile(const std::string& name)
 			       "proceeding by overwriting folder contents.";
 
 			/// @todo implement system to potentially backup the existing save
-			// empty the folder of the existing save.
 
+			// empty the folder of the existing save.
 			for (auto& p : fs::directory_iterator(path))
 			{
 				fs::remove(p);
