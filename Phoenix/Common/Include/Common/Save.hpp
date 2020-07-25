@@ -93,6 +93,18 @@ namespace phx
 		 */
 		const std::string& getName() const;
 
+		/**
+		 * @brief Gets the list of mods that will be used.
+		 * @return The list of mods that will be used.
+		 */
+		const std::vector<std::string>& getModList() const;
+
+		/**
+		 * @brief Gets the settings for that specific save.
+		 * @return The settings specifically for the save.
+		 */
+		const nlohmann::json& getSettings() const;
+
 		/// @todo Implement Dimension system.
 		/// keeping these empty methods so we know what we need, I'll work on
 		/// this fairly soon with worldgen probably. - beeper.

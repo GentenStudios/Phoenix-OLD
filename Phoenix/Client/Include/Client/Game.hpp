@@ -39,8 +39,7 @@
 #include <Client/InputQueue.hpp>
 
 #include <Common/CMS/ModManager.hpp>
-
-#include <deque>
+#include <Common/Save.hpp>
 
 namespace phx::client
 {
@@ -122,5 +121,7 @@ namespace phx::client
 		// singleton every tick.
 		audio::Audio*    m_audio;
 		audio::Listener* m_listener;
+
+		Save* m_save = nullptr;
 	};
 } // namespace phx::client

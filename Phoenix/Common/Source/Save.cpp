@@ -139,6 +139,13 @@ std::vector<std::string> Save::listAllSaves()
 
 const std::string& Save::getName() const { return m_config.name; }
 
+const std::vector<std::string>& Save::getModList() const
+{
+	return m_config.mods;
+}
+
+const nlohmann::json& Save::getSettings() const { return m_config.settings; }
+
 void Save::toFile(const std::string& name)
 {
 	namespace fs = std::filesystem;

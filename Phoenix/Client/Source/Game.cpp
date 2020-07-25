@@ -81,20 +81,27 @@ Game::Game(gfx::Window* window, entt::registry* registry, bool networked)
 	std::fstream             fileStream;
 	std::vector<std::string> toLoad;
 
-	fileStream.open("Saves/" + save + "/Mods.txt");
-	if (!fileStream.is_open())
-	{
-		LOG_FATAL("CMS") << "Error opening save file";
-		exit(EXIT_FAILURE);
-	}
+	auto saveToUse = "save1234";
+	auto existingSaves = Save::listAllSaves();
 
-	std::string input;
-	while (std::getline(fileStream, input))
+	if (std::find(existingSaves.begin(), existingSaves.end(), saveToUse) == existingSaves.end())
 	{
-		toLoad.push_back(input);
-	}
+		// gotta create a save, so we gotta give it a mod list too.
 
-	m_modManager = new cms::ModManager(toLoad, {"Modules"});
+		// we should use a mod list command line argument, but in the meantime
+		// lets hard code it.
+
+		std::vector<std::string> mods = {"mod1", "mod2", "mod3"};
+
+		m_save = new Save(saveToUse, mods);
+	}
+	else
+	{
+		// it exists so lets load it.
+		m_save = new Save(saveToUse);
+	}
+	
+	m_modManager = new cms::ModManager(m_save->getModList(), {"Modules"});
 
 	voxels::BlockRegistry::get()->registerAPI(m_modManager);
 
