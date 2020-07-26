@@ -125,6 +125,7 @@ void Client::run()
 
 	audio::Audio::initialize();
 	m_audio = new audio::Audio();
+	m_audioPool = new audio::SourcePool();
 
 	SplashScreen* splashScreen = new SplashScreen();
 	m_layerStack.pushLayer(splashScreen);
@@ -142,11 +143,14 @@ void Client::run()
 		if (!m_layerStack.empty())
 			m_layerStack.tick(dt);
 
-		m_audioPool.tick();
+		m_audioPool->tick();
 
 		m_window.endFrame();
 	}
 
+	delete m_audioPool;
+	delete m_audio;
+	
 	audio::Audio::teardown();
 
 	Settings::get()->save("settings.txt");

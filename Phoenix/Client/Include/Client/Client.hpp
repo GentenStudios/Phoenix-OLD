@@ -52,7 +52,7 @@ namespace phx::client
 		bool isDebugLayerActive() const { return m_debugOverlayActive; }
 
 		audio::Audio*      getAudioHandler() { return m_audio; }
-		audio::SourcePool* getAudioPool() { return &m_audioPool; }
+		audio::SourcePool* getAudioPool() { return m_audioPool; }
 
 		void onEvent(events::Event e) override;
 		void run();
@@ -61,7 +61,7 @@ namespace phx::client
 	    entt::registry  m_registry;
 
 		audio::Audio* m_audio;
-		audio::SourcePool m_audioPool;
+		audio::SourcePool* m_audioPool;
 		
 		gfx::Window     m_window;
 		gfx::LayerStack m_layerStack;
