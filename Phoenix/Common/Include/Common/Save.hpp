@@ -44,25 +44,6 @@ namespace phx
 	};
 
 	/**
-	 * @brief Configuration for a Save.
-	 *
-	 * All these values are read through a JSON file in the save directory. If
-	 * the JSON file does not exist and/or the save itself doesn't exist, then a
-	 * save will be needed to be made.
-	 */
-	struct SaveConfig
-	{
-		// name of save.
-		std::string name;
-
-		// mod list, passed as CLI arguments.
-		std::vector<std::string> mods;
-
-		// save specific settings, etc...
-		nlohmann::json settings;
-	};
-
-	/**
 	 * @brief A class to handle data within a save.
 	 *
 	 * Saves will be directories inside the Save/ folder. The saves will contain
@@ -78,7 +59,8 @@ namespace phx
 		 * @param mods The mods to use if creating a save.
 		 * @param settings The settings to use if creating a save.
 		 */
-		Save(const std::string& save, const std::vector<std::string>& mods = {}, const nlohmann::json& settings = {});
+		Save(const std::string& save, const std::vector<std::string>& mods = {},
+		     const nlohmann::json& settings = {});
 
 		/**
 		 * @brief Saves everything to be saved and closes the save.
@@ -108,11 +90,11 @@ namespace phx
 		/// @todo Implement Dimension system.
 		/// keeping these empty methods so we know what we need, I'll work on
 		/// this fairly soon with worldgen probably. - beeper.
-		//Dimension* createDimension(const std::string& name);
-		//Dimension* getDimension(const std::string& name);
-		//void       setDefaultDimension(Dimension* dimension);
-		//Dimension* getDefaultDimension();
-		//const std::vector<std::string>& getDimensions() const;
+		// Dimension* createDimension(const std::string& name);
+		// Dimension* getDimension(const std::string& name);
+		// void       setDefaultDimension(Dimension* dimension);
+		// Dimension* getDefaultDimension();
+		// const std::vector<std::string>& getDimensions() const;
 
 		/**
 		 * @brief Saves everything to be saved in the Save.
@@ -126,7 +108,9 @@ namespace phx
 		void toFile(const std::string& name = "");
 
 	private:
-		SaveConfig m_config;
+		std::string              m_name;
+		std::vector<std::string> m_mods;
+		nlohmann::json           m_settings;
 
 		/**
 		 * @brief Tells the saving operations whether settings have changed.
@@ -138,7 +122,7 @@ namespace phx
 		 */
 		bool m_settingsChanged = false;
 
-		//Dimension* m_defaultDimension;
-		//std::unordered_map<std::string, Dimension> m_loadedDimensions;
+		// Dimension* m_defaultDimension;
+		// std::unordered_map<std::string, Dimension> m_loadedDimensions;
 	};
 } // namespace phx
