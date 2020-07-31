@@ -36,6 +36,7 @@
 #pragma once
 
 #include <Client/Graphics/ChunkRenderer.hpp>
+#include <Client/Voxels/BlockRegistry.hpp>
 
 #include <Common/Math/Math.hpp>
 #include <Common/Voxels/Block.hpp>
@@ -91,8 +92,8 @@ namespace phx::gfx
 		 * @param texTable The texture table values created by the renderer.
 		 */
 		ChunkMesher(math::vec3 pos, std::vector<voxels::BlockType*>& blocks,
-		            const ChunkRenderer::AssociativeTextureTable& texTable)
-		    : m_pos(pos), m_blockRef(blocks), m_texTable(texTable)
+		            const ChunkRenderer::AssociativeTextureTable& texTable, client::BlockRegistry* blockRegistry)
+		    : m_pos(pos), m_blockRef(blocks), m_texTable(texTable), m_blockRegistry(blockRegistry)
 		{
 		}
 		~ChunkMesher() = default;
@@ -118,6 +119,8 @@ namespace phx::gfx
 		std::vector<float>                            m_mesh;
 		std::vector<voxels::BlockType*>               m_blockRef;
 		const ChunkRenderer::AssociativeTextureTable& m_texTable;
+
+		client::BlockRegistry* m_blockRegistry;
 	};
 } // namespace phx::gfx
 

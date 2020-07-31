@@ -31,7 +31,6 @@
 
 #include <Common/CMS/ModManager.hpp>
 #include <Common/Serialization/Serializer.hpp>
-#include <Common/Voxels/BlockRegistry.hpp>
 
 #include <Common/Actor.hpp>
 #include <Common/Commander.hpp>
@@ -104,7 +103,7 @@ Game::Game(gfx::Window* window, entt::registry* registry, bool networked)
 	
 	m_modManager = new cms::ModManager(m_save->getModList(), {"Modules"});
 
-	voxels::BlockRegistry::get()->registerAPI(m_modManager);
+	m_blockRegistry.registerAPI(m_modManager);
 
 	m_modManager->registerFunction(
 	    "core.command.register",
@@ -280,6 +279,7 @@ void Game::onAttach()
 		m_network->start();
 	}
 
+	ActorSystem::setBlockReferrer(&m_blockRegistry.referrer);
 	m_player = ActorSystem::registerActor(m_registry);
 
 	float progress = 0.f;
@@ -295,19 +295,20 @@ void Game::onAttach()
 	const std::string save = "save1";
 	if (m_network != nullptr)
 	{
-		m_map = new voxels::Map(&m_network->chunkQueue);
+		m_map = new voxels::Map(&m_network->chunkQueue, &m_blockRegistry.referrer);
 	}
 	else
 	{
-		m_map = new voxels::Map(save, "map1");
+		m_map = new voxels::Map(save, "map1", &m_blockRegistry.referrer);
 	}
-	m_world = new voxels::ChunkView(3, m_registry, m_player);
+	
+	m_world = new voxels::ChunkView(3, m_registry, m_player, &m_blockRegistry);
 	m_registry->emplace<PlayerView>(m_player, m_map);
 	m_camera = new gfx::FPSCamera(m_window, m_registry);
 	m_camera->setActor(m_player);
 
 	m_registry->emplace<Hand>(
-	    m_player, voxels::BlockRegistry::get()->getFromRegistryID(0));
+	    m_player, m_blockRegistry.referrer.blocks.get(0));
 
 	LOG_INFO("MAIN") << "Prepare rendering";
 	m_renderPipeline.prepare("Assets/SimpleWorld.vert",
@@ -375,13 +376,13 @@ void Game::onEvent(events::Event& e)
 		case events::Keys::KEY_E:
 			m_playerHand++;
 			m_registry->get<Hand>(m_player).hand =
-			    voxels::BlockRegistry::get()->getFromRegistryID(m_playerHand);
+			    m_blockRegistry.referrer.blocks.get(m_playerHand);
 			e.handled = true;
 			break;
 		case events::Keys::KEY_R:
 			m_playerHand--;
 			m_registry->get<Hand>(m_player).hand =
-			    voxels::BlockRegistry::get()->getFromRegistryID(m_playerHand);
+			    m_blockRegistry.referrer.blocks.get(m_playerHand);
 			e.handled = true;
 			break;
 		case events::Keys::KEY_P:

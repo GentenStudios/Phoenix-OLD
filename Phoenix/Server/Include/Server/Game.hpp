@@ -30,6 +30,7 @@
 
 #include <Server/Commander.hpp>
 #include <Server/Iris.hpp>
+#include <Server/Voxels/BlockRegistry.hpp>
 
 #include <Common/Voxels/Map.hpp>
 
@@ -48,7 +49,7 @@ namespace phx::server
 		 * if this is true
 		 * @param iris Pointer to the networking system
 		 */
-		Game(entt::registry* registry, bool* running, net::Iris* iris,
+		Game(BlockRegistry* blockReg, entt::registry* registry, net::Iris* iris,
 		     const std::string& save);
 
 		/** @brief Loads all API's that the game utilizes into a CMS ModManager
@@ -62,13 +63,20 @@ namespace phx::server
 		 */
 		void run();
 
+		/**
+		 * @brief Kills the main game loop.
+		 */
+		void kill();
+
 		/// @brief Just a temporary static storage for the DT
 		/// @TODO Move this to a config file
 		static constexpr float dt = 1.f / 20.f;
 
 	private:
 		/// @brief The main loop runs while this is true
-		bool* m_running;
+		bool m_running;
+		/// @brief The block registry to use.
+		BlockRegistry* m_blockRegistry;
 		/// @breif An EnTT registry to store various data in
 		entt::registry* m_registry;
 		/// @brief The networking object to get data from

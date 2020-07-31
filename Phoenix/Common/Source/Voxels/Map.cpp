@@ -27,7 +27,6 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <Common/Logger.hpp>
-#include <Common/Voxels/BlockRegistry.hpp>
 #include <Common/Voxels/Map.hpp>
 
 #include <iostream>
@@ -35,12 +34,17 @@
 
 using namespace phx::voxels;
 
-Map::Map(const std::string& save, const std::string& name)
-    : m_save(save), m_mapName(name)
+Map::Map(const std::string& save, const std::string& name, BlockReferrer* referrer)
+    : m_referrer(referrer), m_save(save), m_mapName(name)
 {
 }
 
-Map::Map(phx::BlockingQueue<Chunk>* queue) : m_queue(queue) {}
+Map::Map(
+    phx::BlockingQueue<std::pair<math::vec3, std::vector<std::byte>>>* queue,
+    BlockReferrer*                                                     referrer)
+    : m_referrer(referrer), m_queue(queue)
+{
+}
 
 Chunk* Map::getChunk(const phx::math::vec3& pos)
 {
@@ -55,47 +59,84 @@ Chunk* Map::getChunk(const phx::math::vec3& pos)
 		{
 			return nullptr;
 		}
-		size_t size = m_queue->size();
-		for (size_t i = 0; i < size; i++)
+		
+		std::size_t size = m_queue->size();
+		for (std::size_t i = 0; i < size; i++)
 		{
-			Chunk chunk = Chunk(math::vec3 {0, 0, 0});
-			if (!m_queue->try_pop(chunk))
+			std::pair<math::vec3, std::vector<std::byte>> data;
+			if (!m_queue->try_pop(data))
 			{
 				LOG_WARNING("CHUNK_VIEW")
 				    << "Attempted to pop from empty chunk queue";
 				return nullptr;
 			}
+
+			// we have data.
+			Chunk chunk(data.first, m_referrer);
+			Serializer ser(Serializer::Mode::READ);
+			ser.setBuffer(data.second);
+			ser& chunk;
+			
 			m_chunks.emplace(chunk.getChunkPos(), chunk);
 		}
+
 		if (m_chunks.find(pos) != m_chunks.end())
 		{
 			return &m_chunks.at(pos);
 		}
-		else
-		{
-			return nullptr;
-		}
+
+		return nullptr;
 	}
 
 	// Chunk isn't in memory and we aren't networked, so lets create one
 	std::ifstream saveFile;
-	std::string   position = "." + std::to_string(int(pos.x)) + "_" +
-	                       std::to_string(int(pos.y)) + "_" +
-	                       std::to_string(int(pos.z));
+	std::string position = "." + std::to_string(static_cast<int>(pos.x)) + "_" +
+	                       std::to_string(static_cast<int>(pos.y)) + "_" +
+	                       std::to_string(static_cast<int>(pos.z));
 	saveFile.open("Saves/" + m_save + "/" + m_mapName + position + ".save");
 
 	if (saveFile)
 	{
 		std::string saveString;
 		std::getline(saveFile, saveString);
-		auto win = m_chunks.emplace(pos, Chunk(pos, saveString));
+
+		Chunk chunk(pos, m_referrer);
+		Chunk::BlockList& blocks = chunk.getBlocks();
+
+		std::string_view search = saveString;
+		std::size_t      strPos = 0;
+		std::size_t      i      = 0;
+		while ((strPos = search.find_first_of(';')) != std::string_view::npos)
+		{
+			std::string result;
+			result = search.substr(0, strPos);
+			blocks[i] = m_referrer->blocks.get(*m_referrer->referrer.get(result));
+			search.remove_prefix(strPos + 1);
+		}
+
+		m_chunks.emplace(pos, std::move(chunk));
 	}
 	else
 	{
-		auto win = m_chunks.emplace(pos, Chunk(pos));
-		m_chunks.at(pos).autoTestFill();
+		// save doesn't exist, generate it.
+		Chunk chunk(pos, m_referrer);
+
+		BlockType* block = nullptr;
+		if (chunk.getChunkPos().y >= 0)
+		{
+			block =
+			    m_referrer->blocks.get(*m_referrer->referrer.get("core:air"));
+		}
+		else
+		{
+			block =
+			    m_referrer->blocks.get(*m_referrer->referrer.get("core:grass"));
+		}
+
+		m_chunks.emplace(pos, std::move(chunk));
 		save(pos);
 	}
+	
 	return &m_chunks.at(pos);
 }
 
@@ -146,9 +187,9 @@ BlockType* Map::getBlockAt(math::vec3 position)
 	Chunk*      chunk = getChunk(pos.first);
 	if (chunk == nullptr)
 	{
-		return BlockRegistry::get()->getFromRegistryID(
-		    BlockRegistry::OUT_OF_BOUNDS_BLOCK);
+		return m_referrer->blocks.get(BlockType::OUT_OF_BOUNDS_BLOCK);
 	}
+
 	return chunk->getBlockAt(pos.second);
 }
 
@@ -178,7 +219,15 @@ void Map::save(const phx::math::vec3& pos)
 	                       std::to_string(int(pos.y)) + "_" +
 	                       std::to_string(int(pos.z));
 	saveFile.open("Saves/" + m_save + "/" + m_mapName + position + ".save");
-	saveFile << m_chunks.at(pos).save();
+
+	std::string saveString;
+	auto&       blocks = m_chunks.at(pos).getBlocks();
+	for (auto* block : blocks)
+	{
+		saveString += block->id + ";";
+	}
+
+	saveFile << saveString;
 
 	saveFile.close();
 }

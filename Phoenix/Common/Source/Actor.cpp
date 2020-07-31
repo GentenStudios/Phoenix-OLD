@@ -31,9 +31,15 @@
 #include <Common/Movement.hpp>
 #include <Common/PlayerView.hpp>
 #include <Common/Position.hpp>
-#include <Common/Voxels/BlockRegistry.hpp>
 
 using namespace phx;
+
+voxels::BlockReferrer* ActorSystem::m_blockReferrer = nullptr;
+
+void ActorSystem::setBlockReferrer(voxels::BlockReferrer* referrer)
+{
+	m_blockReferrer = referrer;
+}
 
 entt::entity ActorSystem::registerActor(entt::registry* registry)
 {
@@ -117,11 +123,11 @@ bool ActorSystem::action1(entt::registry* registry, entt::entity entity)
 	{
 		pos.floor();
 
-		const auto currentBlock = map->getBlockAt(pos);
+		const auto* currentBlock = map->getBlockAt(pos);
 		if (currentBlock->category == voxels::BlockCategory::SOLID)
 		{
 			map->setBlockAt(
-			    pos, voxels::BlockRegistry::get()->getFromID("core.air"));
+			    pos, m_blockReferrer->blocks.get(voxels::BlockType::AIR_BLOCK));
 
 			if (currentBlock->onBreak)
 			{

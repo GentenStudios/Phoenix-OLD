@@ -139,15 +139,15 @@ void Network::parseMessage(phx::net::Packet& packet)
 
 void Network::parseData(phx::net::Packet& packet)
 {
-	voxels::Chunk chunk(math::vec3 {0, 0, 0});
-
 	auto data = packet.getData();
 
+	math::vec3 pos;
+	
 	phx::Serializer ser(Serializer::Mode::READ);
-	ser.setBuffer(reinterpret_cast<std::byte*>(data.data()), data.size());
-	ser& chunk;
+	ser.setBuffer(reinterpret_cast<std::byte*>(data.data()), sizeof(float) * 3);
+	ser& pos.x& pos.y& pos.z;
 
-	chunkQueue.push(chunk);
+	chunkQueue.push({pos, data});
 }
 
 void Network::sendState(phx::InputState inputState)

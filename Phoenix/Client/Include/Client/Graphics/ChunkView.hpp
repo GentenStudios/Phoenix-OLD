@@ -30,6 +30,8 @@
 
 #include <Client/Graphics/ChunkRenderer.hpp>
 #include <Client/Graphics/ShaderPipeline.hpp>
+#include <Client/Voxels/BlockRegistry.hpp>
+
 #include <Common/Voxels/Map.hpp>
 
 #include <entt/entt.hpp>
@@ -74,10 +76,9 @@ namespace phx::voxels
 		/**
 		 * @brief Constructs the ChunkView.
 		 * @param viewDistance The view distance in every direction.
-		 * @param map The map the ChunkView loads from
 		 */
 		ChunkView(int viewDistance, entt::registry* registry,
-		          entt::entity entity);
+		          entt::entity entity, client::BlockRegistry* blockRegistry);
 		~ChunkView();
 
 		/**
@@ -96,7 +97,6 @@ namespace phx::voxels
 		 */
 		void tick();
 
-	public:
 		/**
 		 * @brief Renders active chunks.
 		 */
@@ -123,6 +123,8 @@ namespace phx::voxels
 	private:
 		int m_viewDistance = 1; // 1 chunk
 
+		client::BlockRegistry* m_blockRegistry;
+		
 		gfx::ChunkRenderer* m_renderer;
 		entt::registry*     m_registry;
 		entt::entity        m_entity;

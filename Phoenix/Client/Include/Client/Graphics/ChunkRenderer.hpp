@@ -36,6 +36,7 @@
 #pragma once
 
 #include <Client/Graphics/ShaderPipeline.hpp>
+#include <Client/Voxels/BlockRegistry.hpp>
 
 #include <unordered_map>
 #include <vector>
@@ -77,7 +78,7 @@ namespace phx::gfx
 	 *
 	 * @paragraph Usage
 	 * @code
-	 * ChunkRenderer* renderer = new ChunkRenderer(2); // view distance of 3.
+	 * ChunkRenderer* renderer = new ChunkRenderer(2, blockRegistry);
 	 * renderer->buildTextureArray(); // make sure all blocks are loaded in
 	 * before this.
 	 *
@@ -113,7 +114,7 @@ namespace phx::gfx
 		 * it will become used as I (beeperdeeper089) continue to improve
 		 * this functionality.
 		 */
-		explicit ChunkRenderer(std::size_t visibleChunks);
+		explicit ChunkRenderer(std::size_t visibleChunks, client::BlockRegistry* blockRegistry);
 		~ChunkRenderer();
 
 		/**
@@ -189,6 +190,8 @@ namespace phx::gfx
 		void render();
 
 	private:
+		client::BlockRegistry* m_blockRegistry;
+		
 		std::unordered_map<math::vec3, ChunkRenderData, math::Vector3Hasher,
 		                   math::Vector3KeyComparator>
 		             m_buffers;
@@ -203,4 +206,3 @@ namespace phx::gfx
 		AssociativeTextureTable m_textureTable;
 	};
 } // namespace phx::gfx
-

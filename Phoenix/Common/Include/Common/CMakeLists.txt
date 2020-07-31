@@ -17,6 +17,7 @@ set(Headers
 	${currentDir}/Singleton.hpp
 	${currentDir}/FileIO.hpp
 	${currentDir}/Logger.hpp
+	${currentDir}/Registry.hpp
 
 	${currentDir}/Settings.hpp
 	${currentDir}/Commander.hpp

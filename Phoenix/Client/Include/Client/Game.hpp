@@ -38,6 +38,7 @@
 #include <Client/Graphics/UI.hpp>
 #include <Client/Graphics/Window.hpp>
 #include <Client/InputQueue.hpp>
+#include <Client/Voxels/BlockRegistry.hpp>
 
 #include <Common/CMS/ModManager.hpp>
 #include <Common/Save.hpp>
@@ -93,6 +94,9 @@ namespace phx::client
 		 * the values it needs.
 		 */
 		void confirmState(const Position& position);
+
+	private:
+		BlockRegistry m_blockRegistry;
 
 		entt::registry* m_registry;
 		entt::entity    m_player;
