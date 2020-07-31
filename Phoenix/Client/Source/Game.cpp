@@ -393,6 +393,7 @@ void Game::onEvent(events::Event& e)
 			// e.handled = true;
 			break;
 		case events::Keys::KEY_F:
+			LOG_INFO("INPUT") << "Flying mode is now " << (!m_camera->fly());
 			m_camera->setFly(!m_camera->fly());
 			break;
 		default:

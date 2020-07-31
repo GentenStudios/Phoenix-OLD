@@ -223,20 +223,9 @@ namespace phx::gfx
 		entt::registry* m_registry;
 		entt::entity    m_actor;
 
-<<<<<<< HEAD
 		voxels::ChunkView* m_world;
 
 		bool m_fly = true;
-=======
-		/// @todo Relocate player movement to player instead of camera
-		client::Input* m_forward;
-		client::Input* m_backward;
-		client::Input* m_left;
-		client::Input* m_right;
-		client::Input* m_fly;
-		client::Input* m_down;
-		voxels::ChunkView* m_world;
->>>>>>> 7c7b5f2d7bedaffa4bd06c29fc255c47ec5b36a7
 	};
 } // namespace phx::gfx
 
