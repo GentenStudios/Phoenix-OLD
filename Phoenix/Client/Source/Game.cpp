@@ -29,49 +29,71 @@
 #include <Client/Client.hpp>
 #include <Client/Game.hpp>
 
-#include <Common/Actor.hpp>
 #include <Common/CMS/ModManager.hpp>
+#include <Common/Serialization/Serializer.hpp>
+#include <Common/Voxels/BlockRegistry.hpp>
+#include <Common/Voxels/Chunk.hpp>
+
+#include <Common/Actor.hpp>
 #include <Common/Commander.hpp>
 #include <Common/Position.hpp>
-#include <Common/Voxels/BlockRegistry.hpp>
+#include <Common/Logger.hpp>
+#include <Common/Movement.hpp>
 
+#include <Common/PlayerView.hpp>
 #include <cmath>
 #include <tuple>
 
 using namespace phx::client;
 using namespace phx;
 
-static Commander kirk;
+///@todo This needs refactored to play nicely
+/**
+* This exists so we can call the message function from the chat client,
+* we definitely need to just clean that up so it all plays nicely. If
+* a second instance of the game is created, this entire system will break
+* (but so will a few others . . . )
+*/
+static Game* myGame = nullptr;
 
 static void rawEcho(const std::string& input, std::ostringstream& cout)
 {
-	kirk.callback(input, cout);
+	myGame->sendMessage(input, cout);
 }
 
-Game::Game(gfx::Window* window, entt::registry* registry)
+Game::Game(gfx::Window* window, entt::registry* registry, bool networked)
     : Layer("Game"), m_window(window), m_registry(registry)
 {
-	const std::string save = "save1";
+	m_chat = new ui::ChatWindow("Chat Window", 5,
+	                            "Type /help for a command list and help.");
 
-	std::fstream             fileStream;
-	std::vector<std::string> toLoad;
+	/// @TODO replace with network callback
+	m_chat->registerCallback(rawEcho);
 
-	fileStream.open("Saves/" + save + "/Mods.txt");
-	if (!fileStream.is_open())
+	if (networked)
 	{
-		std::cout << "Error opening save file";
-		exit(EXIT_FAILURE);
+		m_network = new client::Network(m_chat->cout,
+		                                phx::net::Address("127.0.0.1", 7777));
 	}
+	// else TODO enable this else when we get mod list from network
+	//{
+	auto saveToUse = "save1";
+	//}
 
-	std::string input;
-	while (std::getline(fileStream, input))
-	{
-		toLoad.push_back(input);
-	}
-
-	m_modManager = new cms::ModManager(toLoad, {"Modules"});
+	// use this as a placeholder until we have command line arguments.
+	// even if the list is empty, it can create/load a save as required.
+	// listing mods but loading an existing save will NOT load more mods, you
+	// must manually edit the JSON to load an another mod after initialization.
+	std::vector<std::string> commandLineModList = {"mod1", "mod2", "mod3"};
+	m_save = new Save(saveToUse, commandLineModList);
+	
+	m_modManager = new cms::ModManager(m_save->getModList(), {"Modules"});
 
 	voxels::BlockRegistry::get()->registerAPI(m_modManager);
+
+	m_modManager->registerFunction(
+	    "core.command.register",
+	    [](std::string command, std::string help, sol::function f) {});
 
 	m_modManager->registerFunction("core.print", [=](const std::string& text) {
 		m_chat->cout << text << "\n";
@@ -97,6 +119,19 @@ Game::Game(gfx::Window* window, entt::registry* registry)
 	Settings::get()->registerAPI(m_modManager);
 	InputMap::get()->registerAPI(m_modManager);
 	CommandBook::get()->registerAPI(m_modManager);
+
+	m_modManager->registerFunction("core.log_warning", [](std::string message) {
+		LOG_WARNING("MODULE") << message;
+	});
+	m_modManager->registerFunction("core.log_fatal", [](std::string message) {
+		LOG_FATAL("MODULE") << message;
+	});
+	m_modManager->registerFunction("core.log_info", [](std::string message) {
+		LOG_INFO("MODULE") << message;
+	});
+	m_modManager->registerFunction("core.log_debug", [](std::string message) {
+		LOG_DEBUG("MODULE") << message;
+	});
 
 	m_modManager->registerFunction(
 	    "audio.loadMP3",
@@ -143,7 +178,7 @@ Game::Game(gfx::Window* window, entt::registry* registry)
 			float x = source["position"]["x"];
 			float y = source["position"]["y"];
 			float z = source["position"]["z"];
-			
+
 			audioSource.setPos({x, y, z});
 		}
 
@@ -217,43 +252,52 @@ Game::Game(gfx::Window* window, entt::registry* registry)
 
 		Client::get()->getAudioPool()->queue(audioSource);
 	});
+
+	myGame = this;
 }
 
 Game::~Game() { delete m_chat; }
 
 void Game::onAttach()
 {
-	/// @todo Replace this with logger
-	printf("%s", "Attaching game layer\n");
-	m_chat = new ui::ChatWindow("Chat Window", 5,
-	                            "Type /help for a command list and help.");
+	if (m_network != nullptr)
+	{
+		m_network->start();
+	}
 
-	m_chat->registerCallback(rawEcho);
-
-	m_player = new Player(m_registry);
-	m_player->registerAPI(m_modManager);
+	m_player = ActorSystem::registerActor(m_registry);
+	Position& position = m_registry->get<Position>(m_player);
+	position.position.y = phx::voxels::Chunk::CHUNK_HEIGHT + 4;  ///< Temp fix to put the player on top of the world
 
 	float progress = 0.f;
 	auto  result   = m_modManager->load(&progress);
 
 	if (!result.ok)
 	{
-		LOG_FATAL("MODDING") << "An error has occured.";
+		LOG_FATAL("MODDING") << "An error has occurred.";
 		exit(EXIT_FAILURE);
 	}
 
-	printf("%s", "Registering world\n");
+	LOG_INFO("MAIN") << "Registering world";
 	const std::string save = "save1";
-	m_world = new voxels::ChunkView(3, voxels::Map(save, "map1"));
-	m_player->setWorld(m_world);
+	if (m_network != nullptr)
+	{
+		m_map = new voxels::Map(&m_network->chunkQueue);
+	}
+	else
+	{
+		m_map = new voxels::Map(save, "map1");
+	}
+	m_world = new voxels::ChunkView(3, m_registry, m_player);
+	m_registry->emplace<PlayerView>(m_player, m_map);
 	m_camera = new gfx::FPSCamera(m_window, m_registry);
-	m_camera->setActor(m_player->getEntity());
+	m_camera->setActor(m_player);
+	m_camera->setWorld(m_world);
 
 	m_registry->emplace<Hand>(
-	    m_player->getEntity(),
-	    voxels::BlockRegistry::get()->getFromRegistryID(0));
+	    m_player, voxels::BlockRegistry::get()->getFromRegistryID(0));
 
-	printf("%s", "Prepare rendering\n");
+	LOG_INFO("MAIN") << "Prepare rendering";
 	m_renderPipeline.prepare("Assets/SimpleWorld.vert",
 	                         "Assets/SimpleWorld.frag",
 	                         gfx::ChunkRenderer::getRequiredShaderLayout());
@@ -263,24 +307,31 @@ void Game::onAttach()
 	const math::mat4 model;
 	m_renderPipeline.setMatrix("u_model", model);
 
-	printf("%s", "Register GUI\n");
+	LOG_INFO("MAIN") << "Register GUI";
 	m_crosshair  = new Crosshair(m_window);
 	m_escapeMenu = new EscapeMenu(m_window);
 	Client::get()->pushLayer(m_crosshair);
 
 	if (Client::get()->isDebugLayerActive())
 	{
-		m_gameDebug =
-		    new GameTools(&m_followCam, &m_playerHand, m_player, m_registry);
+		m_gameDebug = new GameTools(&m_followCam, m_registry, m_player);
 		Client::get()->pushLayer(m_gameDebug);
 	}
-	printf("%s", "Game layer attached");
+
+	m_inputQueue = new InputQueue(m_registry, m_player, m_camera);
+	if (m_network != nullptr)
+	{
+		m_inputQueue->start(std::chrono::milliseconds(50), m_network);
+	}
+
+	LOG_INFO("MAIN") << "Game layer attached";
 }
 
 void Game::onDetach()
 {
 	delete m_world;
-	delete m_player;
+	delete m_inputQueue;
+	delete m_network;
 	delete m_camera;
 }
 
@@ -311,13 +362,13 @@ void Game::onEvent(events::Event& e)
 			break;
 		case events::Keys::KEY_E:
 			m_playerHand++;
-			m_registry->get<Hand>(m_player->getEntity()).hand =
+			m_registry->get<Hand>(m_player).hand =
 			    voxels::BlockRegistry::get()->getFromRegistryID(m_playerHand);
 			e.handled = true;
 			break;
 		case events::Keys::KEY_R:
 			m_playerHand--;
-			m_registry->get<Hand>(m_player->getEntity()).hand =
+			m_registry->get<Hand>(m_player).hand =
 			    voxels::BlockRegistry::get()->getFromRegistryID(m_playerHand);
 			e.handled = true;
 			break;
@@ -325,8 +376,8 @@ void Game::onEvent(events::Event& e)
 			if (Client::get()->isDebugLayerActive())
 				if (m_gameDebug == nullptr)
 				{
-					m_gameDebug = new GameTools(&m_followCam, &m_playerHand,
-					                            m_player, m_registry);
+					m_gameDebug =
+					    new GameTools(&m_followCam, m_registry, m_player);
 					Client::get()->pushLayer(m_gameDebug);
 				}
 				else
@@ -341,6 +392,9 @@ void Game::onEvent(events::Event& e)
 			// stack to enable debug overlays.
 			// e.handled = true;
 			break;
+		case events::Keys::KEY_F:
+			m_camera->setFly(!m_camera->fly());
+			break;
 		default:
 			break;
 		}
@@ -351,12 +405,12 @@ void Game::onEvent(events::Event& e)
 		switch (e.mouse.button)
 		{
 		case events::MouseButtons::LEFT:
-			m_player->action1();
+			ActorSystem::action1(m_registry, m_player);
 			e.handled = true;
 			break;
 
 		case events::MouseButtons::RIGHT:
-			m_player->action2();
+			ActorSystem::action2(m_registry, m_player);
 			e.handled = true;
 			break;
 
@@ -386,19 +440,26 @@ void Game::tick(float dt)
 	lightdir.y = std::sin(time);
 	lightdir.x = std::cos(time);
 
-	m_camera->tick(dt);
+	const Position& position = m_registry->get<Position>(m_player);
 
-	const Position& position = m_registry->get<Position>(m_player->getEntity());
-	
+	m_camera->tick(dt);
+	InputState state = m_inputQueue->getCurrentState();
+
+	ActorSystem::tick(m_registry, m_player, dt, state);
+	if (m_network != nullptr)
+	{
+		confirmState(position);
+	}
+
 	if (m_followCam)
 	{
 		m_prevPos = position.position;
 	}
 
 	m_listener->setPosition(position.position);
-	m_listener->setVelocity({ 0, 0, 0 });
+	m_listener->setVelocity({0, 0, 0});
 
-	m_world->tick(m_prevPos);
+	m_world->tick();
 
 	m_chat->draw();
 
@@ -410,6 +471,61 @@ void Game::tick(float dt)
 	m_renderPipeline.setFloat("u_Brightness", 0.6f);
 
 	m_world->render();
-	m_player->renderSelectionBox(m_camera->calculateViewMatrix(),
-	                             m_camera->getProjection());
+	m_world->renderSelectionBox(m_camera->calculateViewMatrix(),
+	                            m_camera->getProjection());
+}
+
+void Game::sendMessage(const std::string& input, std::ostringstream& cout)
+{
+	m_network->sendMessage(input);
+}
+
+void Game::confirmState(const Position& position)
+{
+	// We can't iterate through a queue so we drain the queue to this list
+	std::size_t i = m_inputQueue->m_queue.size();
+	for (std::size_t j = 0; j <= i; j++)
+	{
+		m_states.push_back(m_inputQueue->m_queue.pop());
+	}
+
+	// If there are no confirmation states ready from the network, we are done
+	if (m_network->stateQueue.empty())
+	{
+		return;
+	}
+	auto confirmation = m_network->stateQueue.pop();
+
+	// Discard any inputStates older than the confirmationState
+	while (!m_states.empty() && m_states.front().sequence < confirmation.second)
+	{
+		m_states.pop_front();
+	}
+
+	// Create a temporary position entity located at the confirmation position
+	// and run all the states sent to the network since that sequence against
+	// it.
+	auto      entity = m_registry->create();
+	Position& pos    = m_registry->emplace<Position>(
+        entity, confirmation.first.rotation, confirmation.first.position);
+	m_registry->emplace<Movement>(
+	    entity, m_registry->get<Movement>(m_player).moveSpeed);
+	for (const auto& inputState : m_states)
+	{
+		phx::ActorSystem::tick(m_registry, entity, 1.f / 20.f, inputState);
+	}
+
+	// Compare the temporary position object with the current player position.
+	math::vec3 diff = position.position - pos.position;
+
+	// If the temporary position object based on the confirmation is too far off
+	// from our current position, update our current position.
+	const float precision = .25f;
+	if (diff.x > precision || diff.x < -precision || diff.y > precision ||
+	    diff.y < -precision || diff.z > precision || diff.z < -precision)
+	{
+		m_registry->get<Position>(m_player).position = pos.position;
+	}
+
+	m_registry->destroy(entity);
 }

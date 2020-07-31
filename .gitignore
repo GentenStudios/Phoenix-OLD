@@ -3,4 +3,6 @@ Build/
 .vs/
 .vscode/
 
+CMakeSettings.json
+
 Documentation/Build/

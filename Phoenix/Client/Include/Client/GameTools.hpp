@@ -30,38 +30,38 @@
 
 #include <Client/Events/Event.hpp>
 #include <Client/Graphics/Layer.hpp>
-#include <Client/Player.hpp>
 
 #include <Common/Settings.hpp>
 
+#include <entt/entt.hpp>
+
 namespace phx::client
 {
-    /**
-     * @brief The Debug Tool for the Game.
-     *
-     * @see Layer
-     * @see LayerStack
-     */
-    class GameTools : public gfx::Overlay
-    {
-    public:
-        GameTools(bool* followCam, int* playerHand, Player* player, entt::registry* registry);
-        ~GameTools() override = default;
+	/**
+	 * @brief The Debug Tool for the Game.
+	 *
+	 * @see Layer
+	 * @see LayerStack
+	 */
+	class GameTools : public gfx::Overlay
+	{
+	public:
+		GameTools(bool* followCam, entt::registry* registry,
+		          entt::entity player);
+		~GameTools() override = default;
 
-        void onAttach() override;
-        void onDetach() override;
-        void onEvent(events::Event& e) override;
-        void tick(float dt) override;
+		void onAttach() override;
+		void onDetach() override;
+		void onEvent(events::Event& e) override;
+		void tick(float dt) override;
 
-    private:
-        entt::registry* m_registry;
+	private:
+		entt::registry* m_registry;
 
-        bool*    m_followCam = nullptr;
-        int      m_currentSensitivity = 1;
-        Setting* m_sensitivity = nullptr;
-        int*     m_playerHand  = nullptr;
+		bool*    m_followCam          = nullptr;
+		int      m_currentSensitivity = 1;
+		Setting* m_sensitivity        = nullptr;
 
-        Player* m_player;
-    };
+		entt::entity m_player;
+	};
 } // namespace phx::client
-

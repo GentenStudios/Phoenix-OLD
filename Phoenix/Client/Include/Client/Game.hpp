@@ -28,17 +28,19 @@
 
 #pragma once
 
+#include <Client/Crosshair.hpp>
+#include <Client/EscapeMenu.hpp>
 #include <Client/GameTools.hpp>
 #include <Client/Graphics/Camera.hpp>
+#include <Client/Graphics/ChunkView.hpp>
 #include <Client/Graphics/Layer.hpp>
 #include <Client/Graphics/ShaderPipeline.hpp>
 #include <Client/Graphics/UI.hpp>
 #include <Client/Graphics/Window.hpp>
-#include <Client/Player.hpp>
-#include <Client/EscapeMenu.hpp>
-#include <Client/Crosshair.hpp>
+#include <Client/InputQueue.hpp>
 
 #include <Common/CMS/ModManager.hpp>
+#include <Common/Save.hpp>
 
 namespace phx::client
 {
@@ -60,7 +62,8 @@ namespace phx::client
 	class Game : public gfx::Layer
 	{
 	public:
-		explicit Game(gfx::Window* window, entt::registry* registry);
+		explicit Game(gfx::Window* window, entt::registry* registry,
+		              bool networked = true);
 		~Game() override;
 
 		void onAttach() override;
@@ -69,29 +72,59 @@ namespace phx::client
 		void onEvent(events::Event& e) override;
 		void tick(float dt) override;
 
+		/** @brief Sends a message packet to the server for the commander to
+		 * interpret.
+		 *
+		 * @param input The message sent to the server
+		 * @param cout Needs to be depreciated, unused (but required by
+		 * terminal)
+		 */
+		void sendMessage(const std::string& input, std::ostringstream& cout);
+
 	private:
+		/**
+		 * @brief This confirms that the prediction on the client was accurate
+		 * to what the server decided to accept and send back in a confirmation.
+		 *
+		 * @param position The current player position to confirm
+		 *
+		 * @note This is a rough implementation, ideally it doesn't live in the
+		 * main game class forever but it is easier to work on it with access to
+		 * the values it needs.
+		 */
+		void confirmState(const Position& position);
+
+		entt::registry* m_registry;
+		entt::entity    m_player;
+
 		gfx::Window*       m_window;
 		gfx::FPSCamera*    m_camera = nullptr;
-        entt::registry*    m_registry;
-        Player*            m_player;
-		voxels::ChunkView* m_world = nullptr;
+		voxels::ChunkView* m_world  = nullptr;
+		voxels::Map*       m_map    = nullptr;
 
 		gfx::ShaderPipeline m_renderPipeline;
 
 		ui::ChatWindow* m_chat = nullptr;
 
 		cms::ModManager* m_modManager;
-		
-		Crosshair* m_crosshair = nullptr;
+
+		Crosshair*  m_crosshair  = nullptr;
 		EscapeMenu* m_escapeMenu = nullptr;
-		GameTools* m_gameDebug = nullptr;
-		bool       m_followCam = true;
-		math::vec3 m_prevPos;
-		int        m_playerHand = 0;
+		GameTools*  m_gameDebug  = nullptr;
+		bool        m_followCam  = true;
+		math::vec3  m_prevPos;
+		int         m_playerHand = 0;
+
+		client::Network*    m_network    = nullptr;
+		client::InputQueue* m_inputQueue = nullptr;
+		// This is an internal log of the recent input states sent to the server
+		std::list<InputState> m_states;
 
 		// intermediary variables to prevent getting the pointer from the client
 		// singleton every tick.
-		audio::Audio* m_audio;
+		audio::Audio*    m_audio;
 		audio::Listener* m_listener;
+
+		Save* m_save = nullptr;
 	};
 } // namespace phx::client

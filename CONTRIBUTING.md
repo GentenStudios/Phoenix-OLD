@@ -131,7 +131,7 @@ Multiline comments should use the /* */ method of commenting, where the /* and *
 When documenting classes, methods and similar we follow the Doxygen Javadoc syntax. For example, this convention should be followed:
 ```cpp
 /**
- * @brief This class is for documentation reasons. 
+ * @brief This class is for documentation reasons.
  */
 class FooBar {
 public:

@@ -38,11 +38,14 @@
 #include <Client/Graphics/Window.hpp>
 
 #include <Client/InputMap.hpp>
+#include <Client/Graphics/ChunkView.hpp>
 
 #include <Common/Math/Math.hpp>
 #include <Common/Settings.hpp>
 
 #include <entt/entt.hpp>
+
+#include <atomic>
 
 namespace phx::gfx
 {
@@ -88,32 +91,6 @@ namespace phx::gfx
 		 * know of, however this is fine for the most part.
 		 */
 		explicit FPSCamera(Window* window, entt::registry* registry);
-
-		/**
-		 * @brief Gets the position of the camera.
-		 * @return The 3-component world-space position.
-		 *
-		 * This camera return is NOT compatible with the voxel world. The
-		 * coordinate system used by the camera and the system used by the
-		 * voxel world are different, because of the way block coordinates
-		 * have been setup.
-		 */
-		math::vec3 getPosition() const;
-
-		/**
-		 * @brief Gets the direction the camera is facing.
-		 * @return The 3-component vector representing direction.
-		 *
-		 * The direction is always the direction the player is looking, this
-		 * can be used with the Ray object to find what the player is
-		 * actually looking at within the actual world, whether it be voxels
-		 * or something else. Because this is not representative of
-		 * position, and direction cannot be skewed by the world coordinate
-		 * system, this data is compatible with every other layer requiring
-		 * and supporting direction, of course when asking for a 3
-		 * dimensional vector.
-		 */
-		math::vec3 getDirection() const;
 
 		/**
 		 * @brief Sets the camera perspective projection.
@@ -209,32 +186,46 @@ namespace phx::gfx
 		 */
 		void setActor(entt::entity actor);
 
+		/**
+		 * @brief Sets the world for the camera.
+		 * @param world 
+		 */
+		void setWorld(voxels::ChunkView* world);
+
+		/**
+		 * @brief Set the Flying mode
+		 * 
+		 * @param value default to true
+		 */
+		void setFly(bool value);
+
+		/**
+		 * @brief Return true if the camera is in flying mode
+		 * 
+		 * @return true 
+		 * @return false 
+		 */
+		bool fly() const;
+
 	private:
 		Window* m_window;
 
 		math::mat4 m_projection;
-
-		math::vec3 m_rotation;
-		math::vec3 m_position;
 		math::vec3 m_up;
-		math::vec3 m_direction;
 
 		math::vec2 m_windowCentre;
 
-		bool m_enabled = true;
+		// Also used by InputQueue to determine if camera is focused or not
+		std::atomic<bool> m_enabled;
 
 		Setting* m_settingSensitivity;
 
 		entt::registry* m_registry;
 		entt::entity    m_actor;
 
-		/// @todo Relocate player movement to player instead of camera
-		client::Input* m_forward;
-		client::Input* m_backward;
-		client::Input* m_left;
-		client::Input* m_right;
-		client::Input* m_fly;
-		client::Input* m_down;
+		voxels::ChunkView* m_world;
+
+		bool m_fly = true;
 	};
 } // namespace phx::gfx
 

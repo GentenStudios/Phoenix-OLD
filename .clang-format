@@ -8,10 +8,10 @@ AlignEscapedNewlines: Left
 AlignOperands:   true
 AlignTrailingComments: true
 AllowAllParametersOfDeclarationOnNextLine: true
-AllowShortBlocksOnASingleLine: false
+AllowShortBlocksOnASingleLine: Never
 AllowShortCaseLabelsOnASingleLine: false
 AllowShortFunctionsOnASingleLine: All
-AllowShortIfStatementsOnASingleLine: false
+AllowShortIfStatementsOnASingleLine: Never
 AllowShortLoopsOnASingleLine: false
 AlwaysBreakAfterDefinitionReturnType: None
 AlwaysBreakAfterReturnType: None
@@ -21,7 +21,7 @@ BinPackArguments: true
 BinPackParameters: true
 BraceWrapping:   
   AfterClass:      false
-  AfterControlStatement: true
+  AfterControlStatement: 'true'
   AfterEnum:       true
   AfterFunction:   true
   AfterNamespace:  true
@@ -106,7 +106,7 @@ SpacesInCStyleCastParentheses: false
 SpacesInParentheses: false
 SpacesInSquareBrackets: false
 
-Standard:       Cpp11
+Standard: c++17
 StatementMacros: 
   - Q_UNUSED
   - QT_REQUIRE_VERSION

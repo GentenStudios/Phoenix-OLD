@@ -28,18 +28,53 @@
 
 #pragma once
 
+#include <Server/Game.hpp>
+#include <Server/Iris.hpp>
+
+#include <Server/User.hpp>
+
+#include <Common/CMS/ModManager.hpp>
+
+#include <entt/entt.hpp>
+#include <enet/enet.h>
+
+#include <array>
+#include <string>
+
 namespace phx::server
 {
 	class Server
 	{
 	public:
-		Server()  = default;
-		~Server() = default;
+		/**
+		 * @brief Core object for the server
+		 *
+		 * @param save The save we are loading
+		 */
+		Server(std::string save);
+		~Server();
 
+		/// @brief Main loop for the server
 		void run();
 
 	private:
-	    bool m_running;
+		/// @brief central boolean to control if the game is running or not
+		bool m_running = true;
+
+		/// @breif An EnTT registry to store various data in
+		entt::registry m_registry;
+
+		/// @brief The networking object, this listens for incoming data
+		net::Iris* m_iris;
+		/** @brief @brief The server side game object, this handles all of the
+		 * core game logic.
+		 */
+		Game* m_game;
+
+		/// @brief The mod manager providing LUA API functionality
+		cms::ModManager* m_modManager;
+
+		/// The name of the save we are running
+		std::string m_save;
 	};
 } // namespace phx::server
-

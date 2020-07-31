@@ -26,99 +26,153 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+#include <Common/Logger.hpp>
+#include <Common/Voxels/BlockRegistry.hpp>
 #include <Common/Voxels/Map.hpp>
-#include <fstream>
+
 #include <iostream>
 #include <utility>
 
 using namespace phx::voxels;
-using namespace phx;
 
-Map::Map(std::string save, std::string name)
-    : m_save(std::move(save)), m_mapName(std::move(name))
+Map::Map(const std::string& save, const std::string& name)
+    : m_save(save), m_mapName(name)
 {
 }
 
-Chunk Map::getChunk(math::vec3 pos)
+Map::Map(phx::BlockingQueue<Chunk>* queue) : m_queue(queue) {}
+
+Chunk* Map::getChunk(const phx::math::vec3& pos)
 {
 	if (m_chunks.find(pos) != m_chunks.end())
 	{
-		return m_chunks.at(pos);
+		return &m_chunks.at(pos);
 	}
-	else
-	{
-		std::ifstream saveFile;
-		std::string   position = "." + std::to_string(int(pos.x)) + "_" +
-		                       std::to_string(int(pos.y)) + "_" +
-		                       std::to_string(int(pos.z));
-		saveFile.open("Saves/" + m_save + "/" + m_mapName + position + ".save");
 
-		if (saveFile)
+	if (m_queue != nullptr)
+	{
+		if (m_queue->empty())
 		{
-			std::string saveString;
-			std::getline(saveFile, saveString);
-			auto win = m_chunks.emplace(pos, Chunk(pos, saveString));
+			return nullptr;
+		}
+		size_t size = m_queue->size();
+		for (size_t i = 0; i < size; i++)
+		{
+			Chunk chunk = Chunk(math::vec3 {0, 0, 0});
+			if (!m_queue->try_pop(chunk))
+			{
+				LOG_WARNING("CHUNK_VIEW")
+				    << "Attempted to pop from empty chunk queue";
+				return nullptr;
+			}
+			m_chunks.emplace(chunk.getChunkPos(), chunk);
+		}
+		if (m_chunks.find(pos) != m_chunks.end())
+		{
+			return &m_chunks.at(pos);
 		}
 		else
 		{
-			auto win = m_chunks.emplace(pos, Chunk(pos));
-			m_chunks.at(pos).autoTestFill();
-			save(pos);
+			return nullptr;
 		}
-		return m_chunks.at(pos);
 	}
+
+	// Chunk isn't in memory and we aren't networked, so lets create one
+	std::ifstream saveFile;
+	std::string   position = "." + std::to_string(int(pos.x)) + "_" +
+	                       std::to_string(int(pos.y)) + "_" +
+	                       std::to_string(int(pos.z));
+	saveFile.open("Saves/" + m_save + "/" + m_mapName + position + ".save");
+
+	if (saveFile)
+	{
+		std::string saveString;
+		std::getline(saveFile, saveString);
+		auto win = m_chunks.emplace(pos, Chunk(pos, saveString));
+	}
+	else
+	{
+		auto win = m_chunks.emplace(pos, Chunk(pos));
+		m_chunks.at(pos).autoTestFill();
+		save(pos);
+	}
+	return &m_chunks.at(pos);
+}
+
+std::pair<phx::math::vec3, phx::math::vec3> Map::getBlockPos(
+    phx::math::vec3 position)
+{
+	// This mess converts position types between world and inner chunk
+	// positioning
+	int posX = static_cast<int>(position.x / voxels::Chunk::CHUNK_WIDTH);
+	int posY = static_cast<int>(position.y / voxels::Chunk::CHUNK_HEIGHT);
+	int posZ = static_cast<int>(position.z / voxels::Chunk::CHUNK_DEPTH);
+
+	position.x = static_cast<float>(static_cast<int>(position.x) %
+	                                voxels::Chunk::CHUNK_WIDTH);
+	if (position.x < 0)
+	{
+		posX -= 1;
+		position.x += voxels::Chunk::CHUNK_WIDTH;
+	}
+
+	position.y = static_cast<float>(static_cast<int>(position.y) %
+	                                voxels::Chunk::CHUNK_HEIGHT);
+	if (position.y < 0)
+	{
+		posY -= 1;
+		position.y += voxels::Chunk::CHUNK_HEIGHT;
+	}
+
+	position.z = static_cast<float>(static_cast<int>(position.z) %
+	                                voxels::Chunk::CHUNK_DEPTH);
+	if (position.z < 0)
+	{
+		posZ -= 1;
+		position.z += voxels::Chunk::CHUNK_DEPTH;
+	}
+
+	const math::vec3 chunkPosition =
+	    math::vec3(static_cast<float>(posX * voxels::Chunk::CHUNK_WIDTH),
+	               static_cast<float>(posY * voxels::Chunk::CHUNK_HEIGHT),
+	               static_cast<float>(posZ * voxels::Chunk::CHUNK_DEPTH));
+
+	return {chunkPosition, position};
+}
+
+BlockType* Map::getBlockAt(phx::math::vec3 position)
+{
+	const auto& pos   = getBlockPos(position);
+	Chunk*      chunk = getChunk(pos.first);
+	if (chunk == nullptr)
+	{
+		return BlockRegistry::get()->getFromRegistryID(
+		    BlockRegistry::OUT_OF_BOUNDS_BLOCK);
+	}
+	return chunk->getBlockAt(pos.second);
 }
 
 void Map::setBlockAt(phx::math::vec3 position, BlockType* block)
 {
-	int posX = static_cast<int>(position.x / Chunk::CHUNK_WIDTH);
-	int posY = static_cast<int>(position.y / Chunk::CHUNK_HEIGHT);
-	int posZ = static_cast<int>(position.z / Chunk::CHUNK_DEPTH);
+	const auto& pos   = getBlockPos(position);
+	Chunk*      chunk = getChunk(pos.first);
 
-	position.x =
-	    static_cast<float>(static_cast<int>(position.x) % Chunk::CHUNK_WIDTH);
-	if (position.x < 0)
+	chunk->setBlockAt(pos.second, block);
+
+	if (m_queue == nullptr)
 	{
-		posX -= 1;
-		position.x += Chunk::CHUNK_WIDTH;
+		save(pos.first);
 	}
-
-	position.y =
-	    static_cast<float>(static_cast<int>(position.y) % Chunk::CHUNK_HEIGHT);
-	if (position.y < 0)
-	{
-		posY -= 1;
-		position.y += Chunk::CHUNK_HEIGHT;
-	}
-
-	position.z =
-	    static_cast<float>(static_cast<int>(position.z) % Chunk::CHUNK_DEPTH);
-	if (position.z < 0)
-	{
-		posZ -= 1;
-		position.z += Chunk::CHUNK_DEPTH;
-	}
-
-	const math::vec3 chunkPosition =
-	    math::vec3(static_cast<float>(posX * Chunk::CHUNK_WIDTH),
-	               static_cast<float>(posY * Chunk::CHUNK_HEIGHT),
-	               static_cast<float>(posZ * Chunk::CHUNK_DEPTH));
-
-	m_chunks.at(chunkPosition)
-	    .setBlockAt(
-	        {
-	            // "INLINE" VECTOR 3 DECLARATION
-	            position.x, // x position IN the chunk, not overall
-	            position.y, // y position IN the chunk, not overall
-	            position.z  // z position IN the chunk, not overall
-	        },
-	        block);
-
-	save(chunkPosition);
 }
 
-void Map::save(phx::math::vec3 pos)
+void Map::save(const phx::math::vec3& pos)
 {
+	if (m_queue != nullptr)
+	{
+		LOG_WARNING("MAP") << "Attempted to save while networked";
+		return;
+	}
+
 	std::ofstream saveFile;
 	std::string   position = "." + std::to_string(int(pos.x)) + "_" +
 	                       std::to_string(int(pos.y)) + "_" +
@@ -128,4 +182,3 @@ void Map::save(phx::math::vec3 pos)
 
 	saveFile.close();
 }
-

@@ -26,64 +26,18 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-/**
- * @file Player.hpp
- * @brief Header file for the Player derivation of Actor.
- *
- * @copyright Copyright (c) 2019-2020 Genten Studios
- */
-
 #pragma once
 
-#include <Client/Graphics/ChunkView.hpp>
-#include <Client/Graphics/ShaderPipeline.hpp>
-
-#include <Common/CMS/ModManager.hpp>
-
-#include <glad/glad.h>
+#include <enet/enet.h>
 #include <entt/entt.hpp>
+#include <string>
 
-namespace phx
+namespace phx::server
 {
-	/**
-	 * @brief An object representing the player in a game
-	 *
-	 * Objects created by this class represent any player in the game, the
-	 * player can be controlled by a camera object.
-	 *
-	 */
-	class Player
+
+	struct Player
 	{
-	public:
-		// temporary until a proper management system is put in place.
-		explicit Player(entt::registry* registry);
-
-		void registerAPI(cms::ModManager* manager);
-
-		void setWorld(voxels::ChunkView* world);
-		
-		math::Ray getTarget() const;
-
-		bool action1();
-		bool action2();
-
-		/// @brief Gets the entity for the player used in ECS
-		entt::entity getEntity() { return m_entity; }
-
-		/// @brief Gets the direction something is facing based on its rotation
-		static math::vec3 rotToDir(math::vec3 m_rotation);
-
-		/// @brief Render the selection box around the pointed block
-		void renderSelectionBox(const math::mat4 view, const math::mat4 proj);
-
-	private:
-		const float        m_reach = 32.f;
-		voxels::ChunkView* m_world;
-		entt::registry*    m_registry;
-		entt::entity       m_entity;
-
-		GLuint              m_vao;
-		GLuint              m_vbo;
-		gfx::ShaderPipeline m_pipeline;
+		entt::entity actor;
+		std::size_t  id;
 	};
-} // namespace phx
+} // namespace phx::server

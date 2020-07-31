@@ -1,4 +1,4 @@
-print ("Load mod 1")
+core.log_info("Load mod 1")
 
 function hello (args)
     if args[1] == "there" then
@@ -9,7 +9,8 @@ function hello (args)
         print("with you, the force is not")
     end
 end
-core.command.register("Hello", "Master the arts of the Jedi you must", hello)
+
+--core.command.register("Hello", "Master the arts of the Jedi you must", hello)
 
 local dirtAudioRef = audio.loadMP3("core.dirt_place", "Modules/mod1/Assets/Audio/dirt_place.mp3");
 

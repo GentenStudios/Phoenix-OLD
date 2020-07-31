@@ -180,11 +180,12 @@ Logger::Logger(const LoggerConfig& config)
 		m_worker.swap(thread);
 	}
 
-	m_file.open(config.logFile);
+	m_file.open(config.logFile, std::ios_base::app);
 	if (!m_file.is_open())
 	{
-		printf("Uh Oh! We couldn't open the log file, guess we won't have any "
-		       "file logging for today. :(\n");
+		Log message = {LogVerbosity::INFO, "", 0, "LOGGING"};
+		message << "A log file was not specified, logging only to console.";
+		log(message);
 	}
 }
 
@@ -200,6 +201,8 @@ Logger::~Logger()
 		if (m_worker.joinable())
 			m_worker.join();
 	}
+
+	m_file.close();
 }
 
 void Logger::loggerInternal(const Log& log)

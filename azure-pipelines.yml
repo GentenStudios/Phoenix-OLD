@@ -19,16 +19,16 @@ jobs:
     vmImage: 'ubuntu-18.04'
   strategy:
     matrix:
-      Clang-6:
-        CC: clang
-        CXX: clang++
+      Clang-8:
+        CC: clang-8
+        CXX: clang++-8
         BuildType: Debug
         SelfHost: false
         CMakeArgs: ''
 
-      GCC-7:
-        CC: gcc-7
-        CXX: g++-7
+      GCC-8:
+        CC: gcc-8
+        CXX: g++-8
         BuildType: Debug
         SelfHost: false
         CMakeArgs: ''

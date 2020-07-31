@@ -214,4 +214,3 @@ Vector3<float> Matrix4x4::operator*(const Vec3& other)
 
 	return {x, y, z};
 }
-
