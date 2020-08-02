@@ -109,7 +109,7 @@ math::Ray ActorSystem::getTarget(entt::registry* registry, entt::entity entity)
 bool ActorSystem::action1(entt::registry* registry, entt::entity entity)
 {
 	math::vec3   pos = (registry->get<Position>(entity).position / 2.f) + .5f;
-	voxels::Map* map = registry->get<voxels::Map*>(entity);
+	voxels::Map* map = registry->get<PlayerView>(entity).map;
 
 	math::Ray ray(pos, registry->get<Position>(entity).getDirection());
 

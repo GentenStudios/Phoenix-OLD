@@ -61,7 +61,7 @@ static void rawEcho(const std::string& input, std::ostringstream& cout)
 }
 
 Game::Game(gfx::Window* window, entt::registry* registry, bool networked)
-    : Layer("Game"), m_window(window), m_registry(registry)
+    : Layer("Game"), m_registry(registry), m_window(window)
 {
 	m_chat = new ui::ChatWindow("Chat Window", 5,
 	                            "Type /help for a command list and help.");

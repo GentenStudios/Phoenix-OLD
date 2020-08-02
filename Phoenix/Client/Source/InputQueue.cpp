@@ -84,7 +84,9 @@ void InputQueue::start(std::chrono::milliseconds dt, client::Network* network)
 void InputQueue::stop()
 {
 	m_running = false;
-	m_thread.join();
+
+	if (m_thread.joinable())
+		m_thread.join();
 }
 
 InputState InputQueue::getCurrentState()
