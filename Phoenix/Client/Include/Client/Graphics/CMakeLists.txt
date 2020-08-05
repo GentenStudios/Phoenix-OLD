@@ -10,12 +10,11 @@ set(graphicsHeaders
 	${currentDir}/Window.hpp
 	${currentDir}/Layer.hpp
 	${currentDir}/LayerStack.hpp
-	${currentDir}/ImGuiHelpers.hpp
-	${currentDir}/ImGuiHelpers.inl
-	${currentDir}/UI.hpp
 
 	${currentDir}/ShaderPipeline.hpp
 	${currentDir}/Camera.hpp
+
+	${currentDir}/ChatBox.hpp
 
 	${currentDir}/ChunkMesher.hpp
 	${currentDir}/ChunkRenderer.hpp

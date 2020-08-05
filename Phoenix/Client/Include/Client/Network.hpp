@@ -30,6 +30,8 @@
 
 #include <Client/Voxels/BlockRegistry.hpp>
 
+#include <Client/Graphics/ChatBox.hpp>
+
 #include <Common/Input.hpp>
 #include <Common/Network/Host.hpp>
 #include <Common/Position.hpp>
@@ -43,7 +45,7 @@ namespace phx::client
 	class Network
 	{
 	public:
-		Network(std::ostringstream& chat, const phx::net::Address& address);
+		Network(const phx::net::Address& address, gfx::ChatBox* chat);
 		~Network();
 
 	private:
@@ -102,10 +104,10 @@ namespace phx::client
 		    chunkQueue;
 
 	private:
-		bool                m_running = false;
-		phx::net::Host*     m_client;
-		std::ostringstream& m_chat;
-		std::thread         m_thread;
-		size_t              m_currentSequence;
+		bool            m_running = false;
+		phx::net::Host* m_client;
+		gfx::ChatBox*   m_chat;
+		std::thread     m_thread;
+		std::size_t     m_currentSequence;
 	};
-} // namespace phx::client::net
+} // namespace phx::client

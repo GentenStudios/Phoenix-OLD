@@ -35,8 +35,8 @@
 #include <Client/Graphics/ChunkView.hpp>
 #include <Client/Graphics/Layer.hpp>
 #include <Client/Graphics/ShaderPipeline.hpp>
-#include <Client/Graphics/UI.hpp>
 #include <Client/Graphics/Window.hpp>
+#include <Client/Graphics/ChatBox.hpp>
 #include <Client/InputQueue.hpp>
 #include <Client/Voxels/BlockRegistry.hpp>
 
@@ -73,15 +73,6 @@ namespace phx::client
 		void onEvent(events::Event& e) override;
 		void tick(float dt) override;
 
-		/** @brief Sends a message packet to the server for the commander to
-		 * interpret.
-		 *
-		 * @param input The message sent to the server
-		 * @param cout Needs to be depreciated, unused (but required by
-		 * terminal)
-		 */
-		void sendMessage(const std::string& input, std::ostringstream& cout);
-
 	private:
 		/**
 		 * @brief This confirms that the prediction on the client was accurate
@@ -108,7 +99,7 @@ namespace phx::client
 
 		gfx::ShaderPipeline m_renderPipeline;
 
-		ui::ChatWindow* m_chat = nullptr;
+		gfx::ChatBox* m_chat = nullptr;
 
 		cms::ModManager* m_modManager;
 

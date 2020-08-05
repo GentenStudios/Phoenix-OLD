@@ -28,36 +28,53 @@
 
 #pragma once
 
-#include <Client/Graphics/ImGuiHelpers.hpp>
+#include <Client/Graphics/Window.hpp>
 
-#include <imgui.h>
+#include <deque>
+#include <string>
+#include <mutex>
+#include <functional>
 
-/// @brief Contains all UI elements specifically designed for Phoenix.
-namespace ui
+namespace phx::gfx
 {
-	// @brief A restyle of the standard BasicTerminal for Phoenix
-	class ChatWindow : public ImGui::BasicTerminal
+	class ChatBox
 	{
-		/// @privatesection
-	private:
-		/// @brief The current external focus event state.
-		bool m_renderFocus = false;
-
-		/// @protectedsection
-	protected:
-		/// @brief used when setting the unselected chat terminal transparency.
-		const float unselectedTransparency = 0.3f;
-
-		/// @publicsection
 	public:
-		using BasicTerminal::BasicTerminal;
+		ChatBox(Window* window);
+		~ChatBox();
 
-		/// @brief Sets the external focus event flag for the current
-		///   terminal / the chat window. Upon call, chat's input window will
-		///   get focus regardless of player in game state.
-		inline void focus() { m_renderFocus = true; };
+		void setDrawBox(bool drawBox);
+		bool shouldDrawBox();
 
-		void draw(bool* p_open = nullptr, ImGuiWindowFlags flags = ImGuiWindowFlags_None);
+		void draw();
+
+		void tick(float dt);
+
+		void setMessageCallback(
+		    const std::function<void(const std::string& message)>& callback);
+
+		void pushMessage(const std::string& message);
+
+	private:
+		struct InvisibleMessage
+		{
+			float time;
+			std::string message;
+		};
+		
+	private:
+		Window* m_window = nullptr;
+		
+		bool m_drawBox = false;
+		bool m_scroll = false;
+
+		char* m_input = nullptr;
+
+		std::mutex m_mutex;
+
+		std::function<void(const std::string& message)> m_callback;
+		
+		std::deque<std::string> m_history;
+		std::deque<InvisibleMessage> m_invisibleBuf;
 	};
-}; // namespace UI
-
+} // namespace phx::gfx

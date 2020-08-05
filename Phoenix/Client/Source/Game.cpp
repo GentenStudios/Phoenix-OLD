@@ -45,33 +45,18 @@
 using namespace phx::client;
 using namespace phx;
 
-///@todo This needs refactored to play nicely
-/**
-* This exists so we can call the message function from the chat client,
-* we definitely need to just clean that up so it all plays nicely. If
-* a second instance of the game is created, this entire system will break
-* (but so will a few others . . . )
-*/
-static Game* myGame = nullptr;
-
-static void rawEcho(const std::string& input, std::ostringstream& cout)
-{
-	myGame->sendMessage(input, cout);
-}
-
 Game::Game(gfx::Window* window, entt::registry* registry, bool networked)
-    : Layer("Game"), m_window(window), m_registry(registry)
+    : Layer("Game"), m_registry(registry), m_window(window)
 {
-	m_chat = new ui::ChatWindow("Chat Window", 5,
-	                            "Type /help for a command list and help.");
-
-	/// @TODO replace with network callback
-	m_chat->registerCallback(rawEcho);
+	m_chat = new gfx::ChatBox(m_window);
 
 	if (networked)
 	{
-		m_network = new client::Network(m_chat->cout,
-		                                phx::net::Address("127.0.0.1", 7777));
+		m_network = new client::Network(phx::net::Address("127.0.0.1", 7777), m_chat);
+		m_chat->setMessageCallback([this](const std::string& message)
+		{
+			m_network->sendMessage(message);
+		});
 	}
 	// else TODO enable this else when we get mod list from network
 	//{
@@ -110,7 +95,7 @@ Game::Game(gfx::Window* window, entt::registry* registry, bool networked)
 	    [](std::string command, std::string help, sol::function f) {});
 
 	m_modManager->registerFunction("core.print", [=](const std::string& text) {
-		m_chat->cout << text << "\n";
+		m_chat->pushMessage(text);
 	});
 
 	m_audio    = Client::get()->getAudioHandler();
@@ -266,8 +251,6 @@ Game::Game(gfx::Window* window, entt::registry* registry, bool networked)
 
 		Client::get()->getAudioPool()->queue(audioSource);
 	});
-
-	myGame = this;
 }
 
 Game::~Game() { delete m_chat; }
@@ -483,11 +466,6 @@ void Game::tick(float dt)
 	m_world->render();
 	m_world->renderSelectionBox(m_camera->calculateViewMatrix(),
 	                            m_camera->getProjection());
-}
-
-void Game::sendMessage(const std::string& input, std::ostringstream& cout)
-{
-	m_network->sendMessage(input);
 }
 
 void Game::confirmState(const Position& position)
