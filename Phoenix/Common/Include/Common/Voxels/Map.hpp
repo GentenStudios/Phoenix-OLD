@@ -29,6 +29,7 @@
 #pragma once
 
 #include <Common/Util/BlockingQueue.hpp>
+#include <Common/Voxels/BlockReferrer.hpp>
 #include <Common/Voxels/Chunk.hpp>
 
 #include <map>
@@ -38,20 +39,29 @@ namespace phx::voxels
 	class Map
 	{
 	public:
-		Map(const std::string& save, const std::string& name);
-		Map(BlockingQueue<Chunk>* queue);
+		Map(const std::string& save, const std::string& name,
+		    voxels::BlockReferrer* referrer);
+		Map(BlockingQueue<std::pair<math::vec3, std::vector<std::byte>>>* queue,
+		    voxels::BlockReferrer* referrer);
 
 		Chunk* getChunk(const math::vec3& pos);
 		static std::pair<math::vec3, math::vec3> getBlockPos(
 		    math::vec3 position);
 		BlockType* getBlockAt(math::vec3 position);
-		void       setBlockAt(math::vec3 pos, BlockType* block);
-		void       save(const math::vec3& pos);
+		void             setBlockAt(math::vec3 pos, BlockType* block);
+		void             save(const math::vec3& pos);
 
 	private:
-		std::map<math::vec3, Chunk, math::Vector3Key> m_chunks;
-		std::string                                   m_save;
-		std::string                                   m_mapName;
-		BlockingQueue<Chunk>*                         m_queue = nullptr;
+		std::unordered_map<math::vec3, Chunk, math::Vector3Hasher,
+		                   math::Vector3KeyComparator>
+		    m_chunks;
+
+		BlockReferrer* m_referrer;
+
+		std::string m_save;
+		std::string m_mapName;
+
+		BlockingQueue<std::pair<math::vec3, std::vector<std::byte>>>* m_queue =
+		    nullptr;
 	};
 } // namespace phx::voxels

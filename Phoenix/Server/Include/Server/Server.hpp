@@ -30,9 +30,8 @@
 
 #include <Server/Game.hpp>
 #include <Server/Iris.hpp>
-
 #include <Server/User.hpp>
-
+#include <Server/Voxels/BlockRegistry.hpp>
 #include <Common/CMS/ModManager.hpp>
 
 #include <entt/entt.hpp>
@@ -61,13 +60,18 @@ namespace phx::server
 		/// @brief central boolean to control if the game is running or not
 		bool m_running = true;
 
-		/// @breif An EnTT registry to store various data in
+		/// @brief The Server's block registry.
+		BlockRegistry m_blockRegistry;
+		
+		/// @brief An EnTT registry to store various data in
 		entt::registry m_registry;
 
 		/// @brief The networking object, this listens for incoming data
 		net::Iris* m_iris;
-		/** @brief @brief The server side game object, this handles all of the
-		 * core game logic.
+
+		/**
+		 * @brief The server side game object, this handles all of the core game
+		 * logic.
 		 */
 		Game* m_game;
 

@@ -1,12 +1,14 @@
+add_subdirectory(Audio)
 add_subdirectory(Events)
 add_subdirectory(Graphics)
-add_subdirectory(Audio)
+add_subdirectory(Voxels)
 
 set(currentDir ${CMAKE_CURRENT_LIST_DIR})
 set(Headers
+        ${audioHeaders}
         ${eventHeaders}
         ${graphicsHeaders}
-        ${audioHeaders}
+        ${voxelHeaders}
 
         ${currentDir}/InputQueue.hpp
 

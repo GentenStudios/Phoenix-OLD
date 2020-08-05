@@ -31,7 +31,6 @@
 
 #include <Common/CMS/ModManager.hpp>
 #include <Common/Serialization/Serializer.hpp>
-#include <Common/Voxels/BlockRegistry.hpp>
 
 #include <Common/Actor.hpp>
 #include <Common/Commander.hpp>
@@ -46,33 +45,18 @@
 using namespace phx::client;
 using namespace phx;
 
-///@todo This needs refactored to play nicely
-/**
-* This exists so we can call the message function from the chat client,
-* we definitely need to just clean that up so it all plays nicely. If
-* a second instance of the game is created, this entire system will break
-* (but so will a few others . . . )
-*/
-static Game* myGame = nullptr;
-
-static void rawEcho(const std::string& input, std::ostringstream& cout)
-{
-	myGame->sendMessage(input, cout);
-}
-
 Game::Game(gfx::Window* window, entt::registry* registry, bool networked)
     : Layer("Game"), m_registry(registry), m_window(window)
 {
-	m_chat = new ui::ChatWindow("Chat Window", 5,
-	                            "Type /help for a command list and help.");
-
-	/// @TODO replace with network callback
-	m_chat->registerCallback(rawEcho);
+	m_chat = new gfx::ChatBox(m_window);
 
 	if (networked)
 	{
-		m_network = new client::Network(m_chat->cout,
-		                                phx::net::Address("127.0.0.1", 7777));
+		m_network = new client::Network(phx::net::Address("127.0.0.1", 7777), m_chat);
+		m_chat->setMessageCallback([this](const std::string& message)
+		{
+			m_network->sendMessage(message);
+		});
 	}
 	// else TODO enable this else when we get mod list from network
 	//{
@@ -88,14 +72,14 @@ Game::Game(gfx::Window* window, entt::registry* registry, bool networked)
 	
 	m_modManager = new cms::ModManager(m_save->getModList(), {"Modules"});
 
-	voxels::BlockRegistry::get()->registerAPI(m_modManager);
+	m_blockRegistry.registerAPI(m_modManager);
 
 	m_modManager->registerFunction(
 	    "core.command.register",
 	    [](std::string command, std::string help, sol::function f) {});
 
 	m_modManager->registerFunction("core.print", [=](const std::string& text) {
-		m_chat->cout << text << "\n";
+		m_chat->pushMessage(text);
 	});
 
 	m_audio    = Client::get()->getAudioHandler();
@@ -251,8 +235,6 @@ Game::Game(gfx::Window* window, entt::registry* registry, bool networked)
 
 		Client::get()->getAudioPool()->queue(audioSource);
 	});
-
-	myGame = this;
 }
 
 Game::~Game() { delete m_chat; }
@@ -264,6 +246,7 @@ void Game::onAttach()
 		m_network->start();
 	}
 
+	ActorSystem::setBlockReferrer(&m_blockRegistry.referrer);
 	m_player = ActorSystem::registerActor(m_registry);
 
 	float progress = 0.f;
@@ -279,19 +262,20 @@ void Game::onAttach()
 	const std::string save = "save1";
 	if (m_network != nullptr)
 	{
-		m_map = new voxels::Map(&m_network->chunkQueue);
+		m_map = new voxels::Map(&m_network->chunkQueue, &m_blockRegistry.referrer);
 	}
 	else
 	{
-		m_map = new voxels::Map(save, "map1");
+		m_map = new voxels::Map(save, "map1", &m_blockRegistry.referrer);
 	}
-	m_world = new voxels::ChunkView(3, m_registry, m_player);
+	
+	m_world = new voxels::ChunkView(3, m_registry, m_player, &m_blockRegistry);
 	m_registry->emplace<PlayerView>(m_player, m_map);
 	m_camera = new gfx::FPSCamera(m_window, m_registry);
 	m_camera->setActor(m_player);
 
 	m_registry->emplace<Hand>(
-	    m_player, voxels::BlockRegistry::get()->getFromRegistryID(0));
+	    m_player, m_blockRegistry.referrer.blocks.get(0));
 
 	LOG_INFO("MAIN") << "Prepare rendering";
 	m_renderPipeline.prepare("Assets/SimpleWorld.vert",
@@ -359,13 +343,13 @@ void Game::onEvent(events::Event& e)
 		case events::Keys::KEY_E:
 			m_playerHand++;
 			m_registry->get<Hand>(m_player).hand =
-			    voxels::BlockRegistry::get()->getFromRegistryID(m_playerHand);
+			    m_blockRegistry.referrer.blocks.get(m_playerHand);
 			e.handled = true;
 			break;
 		case events::Keys::KEY_R:
 			m_playerHand--;
 			m_registry->get<Hand>(m_player).hand =
-			    voxels::BlockRegistry::get()->getFromRegistryID(m_playerHand);
+			    m_blockRegistry.referrer.blocks.get(m_playerHand);
 			e.handled = true;
 			break;
 		case events::Keys::KEY_P:
@@ -466,11 +450,6 @@ void Game::tick(float dt)
 	m_world->render();
 	m_world->renderSelectionBox(m_camera->calculateViewMatrix(),
 	                            m_camera->getProjection());
-}
-
-void Game::sendMessage(const std::string& input, std::ostringstream& cout)
-{
-	m_network->sendMessage(input);
 }
 
 void Game::confirmState(const Position& position)

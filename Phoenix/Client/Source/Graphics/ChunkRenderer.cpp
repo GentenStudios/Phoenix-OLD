@@ -29,13 +29,11 @@
 #include <Client/Graphics/ChunkRenderer.hpp>
 #include <Client/Graphics/OpenGLTools.hpp>
 
-#include <Common/Voxels/BlockRegistry.hpp>
-
 #define STB_IMAGE_IMPLEMENTATION
 #include <glad/glad.h>
 #include <stb_image.h>
 
-#include <iostream>
+#include <unordered_set>
 
 using namespace phx;
 using namespace gfx;
@@ -58,7 +56,7 @@ struct Vertex
 	// float pos_z;
 };
 
-ChunkRenderer::ChunkRenderer(const std::size_t visibleChunks)
+ChunkRenderer::ChunkRenderer(const std::size_t visibleChunks, phx::client::BlockRegistry* blockRegistry) : m_blockRegistry(blockRegistry)
 {
 	m_buffers.reserve(visibleChunks);
 }
@@ -89,11 +87,18 @@ void ChunkRenderer::buildTextureArray()
 	glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA8, 16, 16, 256, 0, GL_RGBA,
 	             GL_UNSIGNED_BYTE, nullptr);
 
-	std::vector<std::string> texturePaths =
-	    voxels::BlockRegistry::get()->getTextures()->getTextures();
+	// we use the unordered_set since it will automatically remove duplicates.
+	std::unordered_set<std::string> texturePaths;
+	for (auto& element : m_blockRegistry->textures)
+	{
+		for (auto& tex : element.second)
+		{
+			texturePaths.insert(tex);
+		}
+	}
 
 	std::size_t i = 0;
-	for (std::string& path : texturePaths)
+	for (const std::string& path : texturePaths)
 	{
 		int            width = -1, height = -1, nbChannels = -1;
 		unsigned char* image =
