@@ -57,7 +57,11 @@ namespace phx
 	class ISerializable
 	{
 	public:
-		virtual Serializer& operator&(Serializer& serializer) = 0;
+		// serialize.
+		virtual Serializer& operator>>(Serializer& serializer) const = 0;
+
+		// unserialize.
+		virtual Serializer& operator<<(Serializer& serializer) = 0;
 	};
 
 	/**
@@ -130,36 +134,44 @@ namespace phx
 		};
 
 	public:
-		explicit Serializer(Mode mode) : m_mode(mode) {}
+		Serializer() = default;
 
 		data::Data& getBuffer() { return m_buffer; }
 		void  setBuffer(std::byte* data, std::size_t dataLength);
 		void  setBuffer(const data::Data& data) { m_buffer = data; }
+		void  setBuffer(data::Data&& data) { m_buffer = std::move(data); }
 
-		Serializer& operator&(bool& value);
-		Serializer& operator&(char& value);
-		Serializer& operator&(unsigned char& value);
-		Serializer& operator&(float& value);
-		Serializer& operator&(double& value);
-
-#if __INT32_EQUAL_LONG__
-		Serializer& operator&(long& value);
-		Serializer& operator&(unsigned long& value);
-#endif
-		
-		Serializer& operator&(std::int16_t& value);
-		Serializer& operator&(std::int32_t& value);
-		Serializer& operator&(std::int64_t& value);
-		Serializer& operator&(std::uint16_t& value);
-		Serializer& operator&(std::uint32_t& value);
-		Serializer& operator&(std::uint64_t& value);
+		Serializer& operator<<(bool val);
+		Serializer& operator<<(char val);
+		Serializer& operator<<(unsigned char val);
+		Serializer& operator<<(float val);
+		Serializer& operator<<(double val);
+		Serializer& operator<<(std::int16_t val);
+		Serializer& operator<<(std::int32_t val);
+		Serializer& operator<<(std::int64_t val);
+		Serializer& operator<<(std::uint16_t val);
+		Serializer& operator<<(std::uint32_t val);
+		Serializer& operator<<(std::uint64_t val);
+		Serializer& operator<<(const ISerializable& val);
 
 		template <typename T>
-		Serializer& operator&(std::basic_string<T>& value);
+		Serializer& operator<<(const std::basic_string<T>& val);
 
-		Serializer& operator&(ISerializable& value);
+		Serializer& operator>>(bool& val);
+		Serializer& operator>>(char& val);
+		Serializer& operator>>(unsigned char& val);
+		Serializer& operator>>(float& val);
+		Serializer& operator>>(double& val);
+		Serializer& operator>>(std::int16_t& val);
+		Serializer& operator>>(std::int32_t& val);
+		Serializer& operator>>(std::int64_t& val);
+		Serializer& operator>>(std::uint16_t& val);
+		Serializer& operator>>(std::uint32_t& val);
+		Serializer& operator>>(std::uint64_t& val);
+		Serializer& operator>>(ISerializable& val);
 
-		static data::Data end(Serializer& serializer);
+		template <typename T>
+		Serializer& operator>>(std::basic_string<T>& val);
 		
 	private:
 		template <typename T>
@@ -167,8 +179,6 @@ namespace phx
 
 		template <typename T>
 		void push(const std::basic_string<T>& data);
-
-		void push(ISerializable& data);
 
 		template <typename T>
 		void pop(T& data);

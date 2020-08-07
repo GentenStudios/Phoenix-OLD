@@ -55,6 +55,7 @@ namespace phx
 
 		std::size_t sequence = 0;
 
-		Serializer& operator&(Serializer& serializer) override;
+		Serializer& operator>>(Serializer& serializer) const override;
+		Serializer& operator<<(Serializer& serializer) override;
 	};
 } // namespace phx
