@@ -35,8 +35,26 @@
 
 namespace phx::voxels
 {
+	/**
+	 * @brief Acts as a universal pairing between string and block.
+	 *
+	 * This class is a universal struct that can be passed around to act as a minimal set of data.
+	 *
+	 * Originally we had a BlockRegistry that was on the Client/Server but we
+	 * realised that things like the Server don't need to store data about
+	 * textures and the likes, so by only having this as a common piece between
+	 * the two, the Client and Server can store extra data that they actually
+	 * need and potentially reduce unnecessary memory usage.
+	 *
+	 * Each application implements their own BlockRegistry with a few more
+	 * pieces of data and lua registration methods.
+	 */
 	struct BlockReferrer
 	{
+		/**
+		 * @brief Automatically implements the Unknown, Out of Bounds and Air
+		 * blocks as necessary.
+		 */
 		BlockReferrer()
 		{
 			// this will be 0, which is equivalent to BlockType::UNKNOWN_BLOCK
@@ -78,7 +96,7 @@ namespace phx::voxels
 			    blocks.get(voxels::BlockType::UNKNOWN_BLOCK));
 		}
 
-		// referrer refers string to int, which in turn is used to get the
+		// referrer refers a string to int, which in turn is used to get the
 		// blocktype.
 		Registry<std::string, std::size_t> referrer;
 		Registry<std::size_t, BlockType>   blocks;

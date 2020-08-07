@@ -42,45 +42,22 @@
 
 namespace phx::server
 {
+	/**
+	 * @brief Acts as a register for block data throughout the server application.
+	 *
+	 * This holds a block referrer which handles default initialized blocks and
+	 * then provides an API registration for registering blocks from within Lua.
+	 *
+	 * This is smarter than the original implementation since it won't store
+	 * things like texture paths on the server, which is completely pointless.
+	 */
 	struct BlockRegistry
 	{
-		BlockRegistry()
-		{
-			// this will be 0, which is equivalent to BlockType::UNKNOWN_BLOCK
-			auto              uid = referrer.referrer.size();
-			voxels::BlockType unknown;
-			unknown.displayName = "Unknown Block";
-			unknown.id          = "core:unknown";
-			unknown.category    = voxels::BlockCategory::SOLID;
-			unknown.uniqueIdentifier = uid;
-			referrer.referrer.add(unknown.id, uid);
-			referrer.blocks.add(uid, unknown);
-
-			// this will be 1, which is equivalent to
-			// BlockType::OUT_OF_BOUNDS_BLOCK.
-			uid = referrer.referrer.size();
-			voxels::BlockType outOfBounds;
-			outOfBounds.displayName = "Out of Bounds";
-			outOfBounds.id          = "core:out_ouf_bounds";
-			outOfBounds.category    = voxels::BlockCategory::AIR;
-			outOfBounds.uniqueIdentifier = uid;
-			referrer.referrer.add(outOfBounds.id, uid);
-			referrer.blocks.add(uid, outOfBounds);
-
-			// this will be 2, which is equivalent to BlockType::AIR_BLOCK.
-			uid = referrer.referrer.size();
-			voxels::BlockType air;
-			air.displayName = "Air";
-			air.id          = "core:air";
-			air.category    = voxels::BlockCategory::AIR;
-			air.uniqueIdentifier = uid;
-			referrer.referrer.add(air.id, uid);
-			referrer.blocks.add(uid, air);
-		}
+		BlockRegistry() = default;
 		
 		voxels::BlockReferrer referrer;
 
-		inline void registerAPI(cms::ModManager* manager)
+		void registerAPI(cms::ModManager* manager)
 		{
 			manager->registerFunction(
 			    "voxel.block.register",

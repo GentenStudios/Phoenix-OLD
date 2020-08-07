@@ -38,6 +38,16 @@
 
 namespace phx::client
 {
+	/**
+	 * @brief Acts as a register for block data throughout the client application.
+	 *
+	 * This holds a block referrer which handles default initialized blocks and
+	 * then provides an API registration for registering blocks from within Lua.
+	 *
+	 * We implemented this instead of the original impl because something like
+	 * the server does not need to store things like texture paths - which is
+	 * quite essential on the client.
+	 */
 	struct BlockRegistry
 	{
 		voxels::BlockReferrer referrer;
