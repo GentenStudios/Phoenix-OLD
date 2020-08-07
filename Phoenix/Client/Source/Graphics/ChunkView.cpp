@@ -31,20 +31,18 @@
 
 #include <Common/Actor.hpp>
 #include <Common/PlayerView.hpp>
-#include <Common/Voxels/BlockRegistry.hpp>
 
 using namespace phx::voxels;
-using namespace phx;
 
 ChunkView::ChunkView(int viewDistance, entt::registry* registry,
-                     entt::entity entity)
-    : m_viewDistance(viewDistance), m_entity(entity), m_registry(registry)
+                     entt::entity entity, phx::client::BlockRegistry* blockRegistry)
+    : m_viewDistance(viewDistance), m_blockRegistry(blockRegistry), m_registry(registry), m_entity(entity)
 {
 	// calculates the maximum visible chunks.
 	const int viewLength       = (viewDistance * 2) + 1;
 	const int maxVisibleChunks = viewLength * viewLength * viewLength;
 
-	m_renderer = new gfx::ChunkRenderer(maxVisibleChunks);
+	m_renderer = new gfx::ChunkRenderer(maxVisibleChunks, m_blockRegistry);
 	m_renderer->buildTextureArray();
 
 	glGenVertexArrays(1, &m_vao);
@@ -66,7 +64,7 @@ void ChunkView::tick()
 	for (auto& chunk : PlayerView::update(m_registry, m_entity))
 	{
 		gfx::ChunkMesher mesher(chunk->getChunkPos(), chunk->getBlocks(),
-		                        m_renderer->getTextureTable());
+		                        m_renderer->getTextureTable(), m_blockRegistry);
 		mesher.mesh();
 		m_renderer->submitChunk(mesher.getMesh(), chunk->getChunkPos());
 	}
@@ -86,7 +84,7 @@ void ChunkView::setBlockAt(math::vec3 position, BlockType* block)
 
 	Chunk*           chunk = map->getChunk(Map::getBlockPos(position).first);
 	gfx::ChunkMesher mesher(chunk->getChunkPos(), chunk->getBlocks(),
-	                        m_renderer->getTextureTable());
+	                        m_renderer->getTextureTable(), m_blockRegistry);
 	mesher.mesh();
 	m_renderer->updateChunk(mesher.getMesh(), chunk->getChunkPos());
 }

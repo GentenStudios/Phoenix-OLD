@@ -28,11 +28,14 @@
 
 #pragma once
 
+#include <Client/Voxels/BlockRegistry.hpp>
+
 #include <Common/Input.hpp>
 #include <Common/Network/Host.hpp>
 #include <Common/Position.hpp>
 #include <Common/Util/BlockingQueue.hpp>
 #include <Common/Voxels/Chunk.hpp>
+
 #include <thread>
 
 namespace phx::client
@@ -95,7 +98,8 @@ namespace phx::client
 		void sendMessage(std::string message);
 
 		phx::BlockingQueue<std::pair<Position, size_t>> stateQueue;
-		phx::BlockingQueue<voxels::Chunk>               chunkQueue;
+		phx::BlockingQueue<std::pair<math::vec3, std::vector<std::byte>>>
+		    chunkQueue;
 
 	private:
 		bool                m_running = false;

@@ -82,6 +82,12 @@ namespace phx::voxels
 	class BlockType
 	{
 	public:
+		// the base BlockReferrer object implements this.
+		static constexpr std::size_t UNKNOWN_BLOCK = 0;
+		static constexpr std::size_t OUT_OF_BOUNDS_BLOCK = 1;
+		static constexpr std::size_t AIR_BLOCK = 2;
+		
+	public:
 		BlockType()  = default;
 		~BlockType() = default;
 
@@ -90,6 +96,10 @@ namespace phx::voxels
 
 		/// @brief The unique id of the block, in the format of "mod:block".
 		std::string id;
+
+		/// @brief The unique *identifier* for the block, this is an internal
+		/// variable.
+		std::size_t uniqueIdentifier = -1;
 
 		/// @brief The material state of the block.
 		BlockCategory category = BlockCategory::AIR;
@@ -106,35 +116,8 @@ namespace phx::voxels
 		/// @brief (temporary) a bitpacked color: rrrrggggbbbbaaaa (a letter = 1 bit)
 		unsigned color = 0b1111111111111111;
 
-		/**
-		 * @brief An array of texture paths used for rendering the block.
-		 *
-		 * The textures are in the order front, left, back, right, top,
-		 * bottom.
-		 */
-		std::array<std::string, 6> textures;
-
-		/**
-		 * @brief Sets all the textures to be the same thing.
-		 * @param tex Path to the texture to be used.
-		 */
-		void setAllTextures(const std::string& tex) { textures.fill(tex); }
-
-		/**
-		 * @brief Gets the Registry ID of the blockType.
-		 *
-		 * The registry ID is a runtime specific int that allows for faster.
-		 * access but is not preserved between runs.
-		 *
-		 * @return std::size_t the ID of the blockType.
-		 */
-		std::size_t getRegistryID() const { return m_registryID; }
-
+		/// @brief comparison operator.
 		bool operator==(const BlockType& rhs) const { return (id == rhs.id); }
-
-	private:
-		std::size_t m_registryID = -1;
-		friend class BlockRegistry;
 	};
 
 	/**

@@ -31,6 +31,8 @@
 #include <Common/CoreIntrinsics.hpp>
 #include <Common/Math/Math.hpp>
 #include <Common/Voxels/Block.hpp>
+#include <Common/Voxels/BlockReferrer.hpp>
+#include <Common/Registry.hpp>
 
 #include <Common/Serialization/Serializer.hpp>
 #include <vector>
@@ -75,28 +77,20 @@ namespace phx::voxels
 	 * //renderer->dropChunk(chunk.getChunkPos());
 	 * @endcode
 	 */
-	class Chunk : public phx::ISerializable
+	class Chunk : public ISerializable
 	{
+	public:
+		using BlockList = std::vector<BlockType*>;
+		
 	public:
 		Chunk() = delete;
 
-		explicit Chunk(const math::vec3& chunkPos);
+		Chunk(const math::vec3& chunkPos, BlockReferrer* referrer);
 		~Chunk()                  = default;
 		Chunk(const Chunk& other) = default;
 		Chunk& operator=(const Chunk& other) = default;
 		Chunk(Chunk&& other) noexcept        = default;
 		Chunk& operator=(Chunk&& other) noexcept = default;
-
-		Chunk(const math::vec3& chunkPos, const std::string& save);
-
-		std::string save();
-
-		/**
-		 * @brief Quick function to create solid chunks of grass.
-		 *
-		 * @todo Replace this with MapGen
-		 */
-		void autoTestFill();
 
 		/**
 		 * @brief Get the position of the chunk.
@@ -109,7 +103,7 @@ namespace phx::voxels
 		 * @return std::vector<BlockType*>& Vector of pointers to all the
 		 * blocks in the chunk.
 		 */
-		std::vector<BlockType*>& getBlocks();
+		BlockList& getBlocks();
 
 		/**
 		 * @brief Gets the Block at the supplied position.
@@ -168,8 +162,9 @@ namespace phx::voxels
 		Serializer& operator&(Serializer& ser) override;
 
 	private:
-		/// @brief The position of the chunk in relation to the map.
-		math::vec3              m_pos;
-		std::vector<BlockType*> m_blocks;
+		math::vec3 m_pos;
+		BlockList m_blocks;
+
+		BlockReferrer* m_referrer;
 	};
 } // namespace phx::voxels

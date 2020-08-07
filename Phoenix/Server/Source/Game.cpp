@@ -37,10 +37,10 @@
 using namespace phx;
 using namespace phx::server;
 
-Game::Game(entt::registry* registry, bool* running, phx::server::net::Iris* iris,
-           const std::string& save)
-    : m_registry(registry), m_running(running), m_iris(iris),
-      m_map(voxels::Map(save, "map1"))
+Game::Game(BlockRegistry* blockReg, entt::registry* registry,
+           phx::server::net::Iris* iris, const std::string& save)
+    : m_blockRegistry(blockReg), m_registry(registry), m_iris(iris),
+      m_map(voxels::Map(save, "map1", &blockReg->referrer))
 {
 	m_commander = new Commander(m_iris);
 }
@@ -52,6 +52,7 @@ void Game::registerAPI(cms::ModManager* manager)
 
 void Game::run()
 {
+	m_running = true;
 	while (m_running)
 	{
 		// Wait for a new input bundle from the network
@@ -126,3 +127,5 @@ void Game::run()
 		m_iris->sendState(m_registry, m_currentState.sequence);
 	}
 }
+
+void Game::kill() { m_running = false; }

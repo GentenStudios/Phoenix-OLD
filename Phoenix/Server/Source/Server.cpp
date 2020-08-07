@@ -28,7 +28,7 @@
 
 #include <Server/Server.hpp>
 
-#include <Common/Voxels/BlockRegistry.hpp>
+#include <Common/Voxels/BlockReferrer.hpp>
 
 #include <Common/Logger.hpp>
 #include <Common/Settings.hpp>
@@ -43,7 +43,7 @@ using namespace phx;
 Server::Server(std::string save) : m_save(std::move(save))
 {
 	m_iris = new server::net::Iris(&m_registry);
-	m_game = new Game(&m_registry, &m_running, m_iris, m_save);
+	m_game = new Game(&m_blockRegistry, &m_registry, m_iris, m_save);
 }
 
 void registerUnusedAPI(cms::ModManager* manager)
@@ -98,9 +98,10 @@ void Server::run()
 		std::cout << text << "\n";
 	});
 
-	voxels::BlockRegistry::get()->registerAPI(m_modManager);
+	m_blockRegistry.registerAPI(m_modManager);
 	Settings::get()->registerAPI(m_modManager);
 	m_game->registerAPI(m_modManager);
+	registerUnusedAPI(m_modManager);
 
 	m_modManager->registerFunction("core.log_warning", [](std::string message) {
 		LOG_WARNING("MODULE") << message;
@@ -114,8 +115,6 @@ void Server::run()
 	m_modManager->registerFunction("core.log_debug", [](std::string message) {
 		LOG_DEBUG("MODULE") << message;
 	});
-
-	registerUnusedAPI(m_modManager);
 
 	float progress = 0.f;
 	auto  result   = m_modManager->load(&progress);
