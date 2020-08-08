@@ -147,7 +147,7 @@ void Network::parseData(phx::net::Packet& packet)
 	chunkQueue.push({pos, data});
 }
 
-void Network::sendState(phx::InputState inputState)
+void Network::sendState(const phx::InputState& inputState)
 {
 	Serializer ser;
 	ser << inputState;
@@ -158,7 +158,7 @@ void Network::sendState(phx::InputState inputState)
 	m_client->broadcast(packet, 1);
 }
 
-void Network::sendMessage(std::string message)
+void Network::sendMessage(const std::string& message)
 {
 	Serializer ser;
 	ser << message;
