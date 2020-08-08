@@ -60,9 +60,9 @@ Save::Save(const std::string& save, const std::vector<std::string>& mods,
 		json << std::setw(4) << saveSettings;
 		json.close();
 
-		m_config.name = save;
-		m_config.mods = mods;
-		m_config.settings = settings;
+		m_name = save;
+		m_mods = mods;
+		m_settings = settings;
 	}
 	else
 	{
@@ -90,9 +90,9 @@ Save::Save(const std::string& save, const std::vector<std::string>& mods,
 			exit(EXIT_FAILURE);
 		}
 
-		m_config.mods     = saveSettings["mods"].get<std::vector<std::string>>();
-		m_config.name     = saveSettings["name"].get<std::string>();
-		m_config.settings = saveSettings["settings"].get<nlohmann::json>();
+		m_name     = saveSettings["name"].get<std::string>();
+		m_mods     = saveSettings["mods"].get<std::vector<std::string>>();
+		m_settings = saveSettings["settings"].get<nlohmann::json>();
 	}
 }
 
@@ -137,14 +137,14 @@ std::vector<std::string> Save::listAllSaves()
 	return saves;
 }
 
-const std::string& Save::getName() const { return m_config.name; }
+const std::string& Save::getName() const { return m_name; }
 
 const std::vector<std::string>& Save::getModList() const
 {
-	return m_config.mods;
+	return m_mods;
 }
 
-const nlohmann::json& Save::getSettings() const { return m_config.settings; }
+const nlohmann::json& Save::getSettings() const { return m_settings; }
 
 void Save::toFile(const std::string& name)
 {
@@ -152,9 +152,9 @@ void Save::toFile(const std::string& name)
 
 	// if the name is not empty or the name of the current save, choose to make
 	// a new save.
-	if (!name.empty() && name != m_config.name)
+	if (!name.empty() && name != m_name)
 	{
-		m_config.name = name;
+		m_name = name;
 
 		const auto path = fs::current_path() / "Saves" / name;
 
@@ -176,8 +176,8 @@ void Save::toFile(const std::string& name)
 			// write new json file.
 			nlohmann::json saveSettings;
 			saveSettings["name"] = name;
-			saveSettings["mods"] = m_config.mods;
-			saveSettings["settings"] = m_config.settings;
+			saveSettings["mods"] = m_mods;
+			saveSettings["settings"] = m_settings;
 
 			std::ofstream json(path / (name + ".json"));
 			json << std::setw(4) << saveSettings;
@@ -190,11 +190,11 @@ void Save::toFile(const std::string& name)
 
 			// write new json file.
 			nlohmann::json saveSettings;
-			saveSettings["name"]     = m_config.name;
-			saveSettings["mods"]     = m_config.mods;
-			saveSettings["settings"] = m_config.settings;
+			saveSettings["name"]     = m_name;
+			saveSettings["mods"]     = m_mods;
+			saveSettings["settings"] = m_settings;
 
-			std::ofstream json(path / (m_config.name + ".json"));
+			std::ofstream json(path / (m_name + ".json"));
 			json << std::setw(4) << saveSettings;
 			json.close();
 		}
@@ -204,7 +204,7 @@ void Save::toFile(const std::string& name)
 		// the save hasn't been renamed, and the settings have changed, now
 		// update file, otherwise there's no point.
 
-		const auto path = fs::current_path() / "Saves" / m_config.name;
+		const auto path = fs::current_path() / "Saves" / m_name;
 
 		// this exists as a error check to prevent an exception being thrown when opening the json file.
 		if (!fs::exists(path))
@@ -223,8 +223,8 @@ void Save::toFile(const std::string& name)
 		{
 			nlohmann::json saveSettings;
 			saveSettings["name"] = name;
-			saveSettings["mods"] = m_config.mods;
-			saveSettings["settings"] = m_config.settings;
+			saveSettings["mods"] = m_mods;
+			saveSettings["settings"] = m_settings;
 
 			std::ofstream writeSettings(path);
 			writeSettings << std::setw(4) << saveSettings;

@@ -26,6 +26,7 @@ set(Headers
 	${currentDir}/Input.hpp
 	${currentDir}/Save.hpp
 	${currentDir}/PlayerView.hpp
+	${currentDir}/Actor.hpp
 
 	PARENT_SCOPE
 )

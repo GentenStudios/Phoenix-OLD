@@ -60,31 +60,15 @@ Game::Game(gfx::Window* window, entt::registry* registry, bool networked)
 	}
 	// else TODO enable this else when we get mod list from network
 	//{
-	const std::string save = "save1";
+	auto saveToUse = "save1";
 	//}
 
-	std::fstream             fileStream;
-	std::vector<std::string> toLoad;
-
-	auto saveToUse = "save1234";
-	auto existingSaves = Save::listAllSaves();
-
-	if (std::find(existingSaves.begin(), existingSaves.end(), saveToUse) == existingSaves.end())
-	{
-		// gotta create a save, so we gotta give it a mod list too.
-
-		// we should use a mod list command line argument, but in the meantime
-		// lets hard code it.
-
-		std::vector<std::string> mods = {"mod1", "mod2", "mod3"};
-
-		m_save = new Save(saveToUse, mods);
-	}
-	else
-	{
-		// it exists so lets load it.
-		m_save = new Save(saveToUse);
-	}
+	// use this as a placeholder until we have command line arguments.
+	// even if the list is empty, it can create/load a save as required.
+	// listing mods but loading an existing save will NOT load more mods, you
+	// must manually edit the JSON to load an another mod after initialization.
+	std::vector<std::string> commandLineModList = {"mod1", "mod2", "mod3"};
+	m_save = new Save(saveToUse, commandLineModList);
 	
 	m_modManager = new cms::ModManager(m_save->getModList(), {"Modules"});
 
