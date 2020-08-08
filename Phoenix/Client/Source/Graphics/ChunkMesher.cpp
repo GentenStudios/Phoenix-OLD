@@ -171,8 +171,23 @@ void ChunkMesher::mesh()
 void ChunkMesher::addBlockFace(voxels::BlockType* block, BlockFace face,
                                float x, float y, float z)
 {
-	const std::size_t texLayer = m_texTable.at((*m_blockRegistry->textures.get(
-	    block->uniqueIdentifier))[static_cast<std::size_t>(face)]);
+	// we don't need to worry about nullptr being returned here since we have
+	// setup the unknown return val in the BlockRegistry constructor.
+	const auto* textures =
+	    m_blockRegistry->textures.get(block->uniqueIdentifier);
+
+	std::size_t texLayer = 0;
+	if (textures->size() != 6)
+	{
+		// we can ALWAYS guarantee 1 texture since core:unknown will have
+		// unknown.png registered. (the textures for core:unknown will be
+		// returned from the texture registry if a block's tex are not found.)
+		texLayer = m_texTable.at((*textures)[0]);
+	}
+	else
+	{
+		texLayer = m_texTable.at((*textures)[static_cast<std::size_t>(face)]);
+	}
 
 	math::vec3 normals;
 	switch (face)

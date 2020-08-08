@@ -30,17 +30,18 @@
 
 #include <Client/Graphics/Window.hpp>
 
+#include <Common/Util/BlockingQueue.hpp>
+
 #include <deque>
-#include <string>
-#include <mutex>
 #include <functional>
+#include <string>
 
 namespace phx::gfx
 {
 	class ChatBox
 	{
 	public:
-		ChatBox(Window* window);
+		ChatBox(Window* window, BlockingQueue<std::string>* messageQueue);
 		~ChatBox();
 
 		void setDrawBox(bool drawBox);
@@ -53,28 +54,25 @@ namespace phx::gfx
 		void setMessageCallback(
 		    const std::function<void(const std::string& message)>& callback);
 
-		void pushMessage(const std::string& message);
-
 	private:
 		struct InvisibleMessage
 		{
-			float time;
+			float       time;
 			std::string message;
 		};
-		
+
 	private:
 		Window* m_window = nullptr;
-		
+
 		bool m_drawBox = false;
-		bool m_scroll = false;
+		bool m_scroll  = false;
 
 		char* m_input = nullptr;
 
-		std::mutex m_mutex;
-
 		std::function<void(const std::string& message)> m_callback;
-		
-		std::deque<std::string> m_history;
+
+		BlockingQueue<std::string>*  m_messageQueue = nullptr;
+		std::deque<std::string>      m_history;
 		std::deque<InvisibleMessage> m_invisibleBuf;
 	};
 } // namespace phx::gfx
