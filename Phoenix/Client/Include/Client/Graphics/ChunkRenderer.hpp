@@ -139,7 +139,7 @@ namespace phx::gfx
 		void buildTextureArray();
 
 		/**
-		 * @brief Gets the table telling eveyrthing where each texture is in the
+		 * @brief Gets the table telling everything where each texture is in the
 		 * GPU-side array.
 		 * @return An associative table storing which textures are on which
 		 * layers within the texture array.

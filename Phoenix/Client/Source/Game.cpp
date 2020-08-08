@@ -48,11 +48,9 @@ using namespace phx;
 Game::Game(gfx::Window* window, entt::registry* registry, bool networked)
     : Layer("Game"), m_registry(registry), m_window(window)
 {
-	m_chat = new gfx::ChatBox(m_window);
-
 	if (networked)
 	{
-		m_network = new client::Network(phx::net::Address("127.0.0.1", 7777), m_chat);
+		m_network = new client::Network(phx::net::Address("127.0.0.1", 7777));
 		m_chat->setMessageCallback([this](const std::string& message)
 		{
 			m_network->sendMessage(message);
@@ -79,7 +77,7 @@ Game::Game(gfx::Window* window, entt::registry* registry, bool networked)
 	    [](std::string command, std::string help, sol::function f) {});
 
 	m_modManager->registerFunction("core.print", [=](const std::string& text) {
-		m_chat->pushMessage(text);
+		m_network->sendMessage(text);
 	});
 
 	m_audio    = Client::get()->getAudioHandler();
@@ -268,6 +266,15 @@ void Game::onAttach()
 	{
 		m_map = new voxels::Map(save, "map1", &m_blockRegistry.referrer);
 	}
+
+	if (m_network)
+	{
+		m_chat = new gfx::ChatBox(m_window, &m_network->messageQueue);
+	}
+	else
+	{
+		m_chat = new gfx::ChatBox(m_window, nullptr);
+	}
 	
 	m_world = new voxels::ChunkView(3, m_registry, m_player, &m_blockRegistry);
 	m_registry->emplace<PlayerView>(m_player, m_map);
@@ -336,6 +343,12 @@ void Game::onEvent(events::Event& e)
 			}
 			e.handled = true;
 			break;
+
+		case events::Keys::KEY_T:
+			m_chat->setDrawBox(!m_chat->shouldDrawBox());
+			e.handled = true;
+			break;
+
 		case events::Keys::KEY_Q:
 			m_window->close();
 			e.handled = true;

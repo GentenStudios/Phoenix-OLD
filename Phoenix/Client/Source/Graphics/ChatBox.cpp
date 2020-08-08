@@ -34,11 +34,14 @@
 
 using namespace phx::gfx;
 
+// the maximum input size in the ImGui widget.
 static constexpr std::size_t MAX_INPUT_LIMIT = 500;
 
-ChatBox::ChatBox(Window* window) : m_window(window)
+ChatBox::ChatBox(Window* window, phx::BlockingQueue<std::string>* messageQueue)
+    : m_window(window), m_messageQueue(messageQueue)
 {
 	m_input = new char[MAX_INPUT_LIMIT];
+	std::memset(m_input, 0, MAX_INPUT_LIMIT);
 }
 
 ChatBox::~ChatBox() { delete m_input; }
@@ -96,7 +99,8 @@ void ChatBox::draw()
 					{
 						m_callback(message);
 					}
-					
+
+					// reset the array to 0, otherwise ImGui will NOT clear it and the message will stay in the box even after pressing enter.
 					std::memset(m_input, 0, MAX_INPUT_LIMIT);
 
 					// auto scroll if you type a message, otherwise leave it.
@@ -139,15 +143,36 @@ void ChatBox::draw()
 
 void ChatBox::tick(float dt)
 {
+	static constexpr std::size_t MAX_CHAT_HISTORY = 30;
+	static constexpr std::size_t MAX_INVISIBLE_CHAT_HISTORY = 10;
+
+	if (m_messageQueue)
+	{
+		std::string message;
+		while (m_messageQueue->try_pop(message))
+		{
+			// don't emplace here since if it gets moved then we won't have
+			// anything to put in the main history.
+			m_invisibleBuf.push_back({0.f, message});
+
+			if (m_drawBox)
+			{
+				// emplace here since it's the end of the chain, moving is fine
+				// since an "empty" string is fine.
+				m_history.emplace_back(message);
+			}
+		}
+	}
+	
 	// limit history to 30, can be increased in the future.
-	while (m_history.size() > 30)
+	while (m_history.size() > MAX_CHAT_HISTORY)
 	{
 		m_history.pop_front();
 	}
 
 	// limit the invisible buffer to 10 (the text displayed when the chatbox is
 	// not open).
-	while (m_invisibleBuf.size() > 10)
+	while (m_invisibleBuf.size() > MAX_INVISIBLE_CHAT_HISTORY)
 	{
 		m_invisibleBuf.pop_front();
 	}
@@ -159,8 +184,10 @@ void ChatBox::tick(float dt)
 
 	while (!m_invisibleBuf.empty())
 	{
+		static constexpr float TIME_BEFORE_MESSAGE_REMOVED = 5.f;
+		
 		// keep messages for 5 seconds, otherwise discard them.
-		if (m_invisibleBuf.front().time >= 5.f)
+		if (m_invisibleBuf.front().time >= TIME_BEFORE_MESSAGE_REMOVED)
 		{
 			m_invisibleBuf.pop_front();
 		}
@@ -177,19 +204,4 @@ void ChatBox::setMessageCallback(
     const std::function<void(const std::string& message)>& callback)
 {
 	m_callback = callback;
-}
-
-void ChatBox::pushMessage(const std::string& message)
-{
-	std::lock_guard<std::mutex> lock(m_mutex);
-
-	m_history.push_back(message);
-
-	// no need to add to the invisible buffer if the chat is actually open.
-	if (!m_drawBox)
-	{
-		// 0 as time cos you add on delta time each frame and remove after 5
-		// seconds.
-		m_invisibleBuf.push_back({0, message});
-	}
 }

@@ -101,7 +101,7 @@ Chunk* Map::getChunk(const phx::math::vec3& pos)
 		std::getline(saveFile, saveString);
 
 		Chunk chunk(pos, m_referrer);
-		Chunk::BlockList& blocks = chunk.getBlocks();
+		auto& blocks = chunk.getBlocks();
 
 		std::string_view search = saveString;
 		std::size_t      strPos = 0;
@@ -110,11 +110,46 @@ Chunk* Map::getChunk(const phx::math::vec3& pos)
 		{
 			std::string result;
 			result = search.substr(0, strPos);
-			blocks[i] = m_referrer->blocks.get(*m_referrer->referrer.get(result));
+			blocks.push_back(m_referrer->blocks.get(*m_referrer->referrer.get(result)));
 			search.remove_prefix(strPos + 1);
 		}
 
-		m_chunks.emplace(pos, std::move(chunk));
+		if (blocks.size() != Chunk::CHUNK_WIDTH * Chunk::CHUNK_HEIGHT * Chunk::CHUNK_DEPTH)
+		{
+			LOG_WARNING("MAP") << "Existing save for chunk at: " << pos
+			                   << " is invalid, regenerating";
+
+			blocks.clear();
+			blocks.reserve(4096);
+			
+			BlockType* block = nullptr;
+			if (chunk.getChunkPos().y >= 0)
+			{
+				block = m_referrer->blocks.get(
+				    *m_referrer->referrer.get("core:air"));
+			}
+			else
+			{
+				block = m_referrer->blocks.get(
+				    *m_referrer->referrer.get("core:grass"));
+			}
+
+			for (std::size_t i = 0;
+			     i <
+			     Chunk::CHUNK_WIDTH * Chunk::CHUNK_HEIGHT * Chunk::CHUNK_DEPTH;
+			     ++i)
+			{
+				blocks.push_back(block);
+			}
+
+			m_chunks.emplace(pos, std::move(chunk));
+
+			save(pos);
+		}
+		else
+		{
+			m_chunks.emplace(pos, std::move(chunk));
+		}
 	}
 	else
 	{
@@ -133,6 +168,14 @@ Chunk* Map::getChunk(const phx::math::vec3& pos)
 			    m_referrer->blocks.get(*m_referrer->referrer.get("core:grass"));
 		}
 
+		auto& blockRef = chunk.getBlocks();
+		for (std::size_t i = 0;
+		     i < Chunk::CHUNK_WIDTH * Chunk::CHUNK_HEIGHT * Chunk::CHUNK_DEPTH;
+		     ++i)
+		{
+			blockRef.push_back(block);
+		}
+		
 		m_chunks.emplace(pos, std::move(chunk));
 		save(pos);
 	}
