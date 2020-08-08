@@ -46,7 +46,7 @@ Save::Save(const std::string& save, const std::vector<std::string>& mods,
 		LOG_INFO("SAVES") << "Save doesn't exist, creating.";
 		
 		// save doesn't already exist, lets make it.
-		fs::create_directory(path);
+		fs::create_directories(path);
 
 		// we make a new json thing so we don't double the size of the config
 		// struct.
