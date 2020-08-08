@@ -50,7 +50,9 @@ namespace phx::server
 		 * @param iris Pointer to the networking system
 		 */
 		Game(BlockRegistry* blockReg, entt::registry* registry, net::Iris* iris,
-		     const std::string& save);
+		     Save* save);
+
+		~Game();
 
 		/** @brief Loads all API's that the game utilizes into a CMS ModManager
 		 *
@@ -74,7 +76,7 @@ namespace phx::server
 
 	private:
 		/// @brief The main loop runs while this is true
-		bool m_running;
+		bool m_running = false;
 		/// @brief The block registry to use.
 		BlockRegistry* m_blockRegistry;
 		/// @breif An EnTT registry to store various data in

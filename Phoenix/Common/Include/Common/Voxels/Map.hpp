@@ -31,6 +31,7 @@
 #include <Common/Util/BlockingQueue.hpp>
 #include <Common/Voxels/BlockReferrer.hpp>
 #include <Common/Voxels/Chunk.hpp>
+#include <Common/Save.hpp>
 
 #include <map>
 
@@ -39,7 +40,7 @@ namespace phx::voxels
 	class Map
 	{
 	public:
-		Map(const std::string& save, const std::string& name,
+		Map(Save* save, const std::string& name,
 		    voxels::BlockReferrer* referrer);
 		Map(BlockingQueue<std::pair<math::vec3, std::vector<std::byte>>>* queue,
 		    voxels::BlockReferrer* referrer);
@@ -58,7 +59,7 @@ namespace phx::voxels
 
 		BlockReferrer* m_referrer;
 
-		std::string m_save;
+		Save* m_save = nullptr;
 		std::string m_mapName;
 
 		BlockingQueue<std::pair<math::vec3, std::vector<std::byte>>>* m_queue =
