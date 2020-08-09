@@ -106,6 +106,20 @@ namespace phx
 		return *this;
 	}
 
+#ifdef PHX_INT32_EQUAL_LONG
+	inline Serializer& Serializer::operator<<(long val)
+	{
+		push(val);
+		return *this;
+	}
+
+	inline Serializer& Serializer::operator<<(unsigned long val)
+	{
+		push(val);
+		return *this;
+	}
+#endif
+
 	template <typename T>
 	Serializer& Serializer::operator<<(const std::basic_string<T>& val)
 	{
@@ -185,6 +199,20 @@ namespace phx
 		return *this;
 	}
 
+#ifdef PHX_INT32_EQUAL_LONG
+	inline Serializer& Serializer::operator>>(long& val)
+	{
+		pop(val);
+		return *this;
+	}
+
+	inline Serializer& Serializer::operator>>(unsigned long& val)
+	{
+		pop(val);
+		return *this;
+	}
+#endif
+	
 	template <typename T>
 	Serializer& Serializer::operator>>(std::basic_string<T>& val)
 	{

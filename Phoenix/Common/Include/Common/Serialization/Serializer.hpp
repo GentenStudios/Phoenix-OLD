@@ -37,11 +37,9 @@
 #include <cstring>
 
 #if defined(__APPLE__)
-#	define __INT32_EQUAL_LONG__ 1
+#	define PHX_INT32_EQUAL_LONG
 #elif defined(_WIN32)
-#	define __INT32_EQUAL_LONG__ 1
-#else
-#	define __INT32_EQUAL_LONG__ 0
+#	define PHX_INT32_EQUAL_LONG
 #endif
 
 namespace phx
@@ -154,6 +152,12 @@ namespace phx
 		Serializer& operator<<(std::uint64_t val);
 		Serializer& operator<<(const ISerializable& val);
 
+// idk but mac seems to complain without this.
+#ifdef PHX_INT32_EQUAL_LONG
+		Serializer& operator<<(long value);
+		Serializer& operator<<(unsigned long value);
+#endif
+		
 		template <typename T>
 		Serializer& operator<<(const std::basic_string<T>& val);
 
@@ -170,6 +174,12 @@ namespace phx
 		Serializer& operator>>(std::uint64_t& val);
 		Serializer& operator>>(ISerializable& val);
 
+// idk but mac seems to complain without this.
+#ifdef PHX_INT32_EQUAL_LONG
+		Serializer& operator>>(long& value);
+		Serializer& operator>>(unsigned long& value);
+#endif
+		
 		template <typename T>
 		Serializer& operator>>(std::basic_string<T>& val);
 		
