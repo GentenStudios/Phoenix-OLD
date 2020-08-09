@@ -81,7 +81,7 @@ namespace phx
 		}
 		
 		Iterator      begin() { return m_registry.begin(); }
-		Iterator      end() { return m_registry.begin(); }
+		Iterator      end() { return m_registry.end(); }
 		ConstIterator begin() const { return m_registry.begin(); }
 		ConstIterator end() const { return m_registry.end(); }
 		std::size_t   size() const { return m_registry.size(); }

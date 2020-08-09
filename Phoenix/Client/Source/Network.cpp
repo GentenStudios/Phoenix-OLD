@@ -33,8 +33,7 @@
 
 using namespace phx::client;
 
-Network::Network(std::ostringstream& chat, const phx::net::Address& address)
-    : m_chat(chat)
+Network::Network(const phx::net::Address& address)
 {
 	m_client = new phx::net::Host();
 
@@ -132,9 +131,7 @@ void Network::parseMessage(phx::net::Packet& packet)
 	ser.setBuffer(reinterpret_cast<std::byte*>(data.data()), data.size());
 	ser& input;
 
-	LOG_INFO("Messenger") << input;
-	m_chat << input;
-	m_chat << "\n";
+	messageQueue.push(input);
 }
 
 void Network::parseData(phx::net::Packet& packet)
@@ -168,4 +165,6 @@ void Network::sendMessage(std::string message)
 	phx::net::Packet packet =
 	    phx::net::Packet(ser.getBuffer(), phx::net::PacketFlags::RELIABLE);
 	m_client->broadcast(packet, 2);
+
+	messageQueue.push(message);
 }

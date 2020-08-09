@@ -28,9 +28,9 @@
 
 #pragma once
 
-#include <Common/Voxels/BlockReferrer.hpp>
 #include <Common/CMS/ModManager.hpp>
 #include <Common/Registry.hpp>
+#include <Common/Voxels/BlockReferrer.hpp>
 
 #include <string>
 #include <unordered_map>
@@ -39,7 +39,8 @@
 namespace phx::client
 {
 	/**
-	 * @brief Acts as a register for block data throughout the client application.
+	 * @brief Acts as a register for block data throughout the client
+	 * application.
 	 *
 	 * This holds a block referrer which handles default initialized blocks and
 	 * then provides an API registration for registering blocks from within Lua.
@@ -50,6 +51,17 @@ namespace phx::client
 	 */
 	struct BlockRegistry
 	{
+		BlockRegistry()
+		{
+			// we need to add the textures for unknown blocks.
+			const std::size_t uid =
+			    referrer.blocks.get(voxels::BlockType::UNKNOWN_BLOCK)
+			        ->uniqueIdentifier;
+
+			textures.add(uid, {"Assets/unknown.png"});
+			textures.setUnknownReturnVal(textures.get(uid));
+		}
+
 		voxels::BlockReferrer referrer;
 
 		Registry<std::size_t, std::vector<std::string>> textures;
@@ -57,8 +69,7 @@ namespace phx::client
 		void registerAPI(cms::ModManager* manager)
 		{
 			manager->registerFunction(
-			    "voxel.block.register",
-			    [manager, this](sol::table luaBlock) {
+			    "voxel.block.register", [manager, this](sol::table luaBlock) {
 				    voxels::BlockType block;
 
 				    block.displayName = luaBlock["name"];
@@ -110,14 +121,14 @@ namespace phx::client
 						    // directory.
 						    tex = manager->getCurrentModPath() + tex;
 					    }
-				    	
+
 					    setTex = true;
 				    }
 
-				    std::size_t blockUID = referrer.referrer.size();
+				    std::size_t blockUID   = referrer.referrer.size();
 				    block.uniqueIdentifier = blockUID;
 
-			    	referrer.referrer.add(block.id, blockUID);
+				    referrer.referrer.add(block.id, blockUID);
 				    referrer.blocks.add(blockUID, block);
 				    if (setTex)
 				    {
