@@ -47,7 +47,7 @@ Game::Game(BlockRegistry* blockReg, entt::registry* registry,
 
 Game::~Game()
 {
-	if (m_running){kill();}
+    if (m_running){kill();}
     delete m_commander;
 }
 
