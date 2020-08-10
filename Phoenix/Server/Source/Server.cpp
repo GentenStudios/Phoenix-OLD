@@ -35,13 +35,18 @@
 
 #include <iostream>
 #include <thread>
-#include <utility>
 
 using namespace phx::server;
 using namespace phx;
 
-Server::Server(std::string save) : m_save(std::move(save))
+Server::Server(const std::string& save)
 {
+    // use this as a placeholder until we have command line arguments.
+    // even if the list is empty, it can create/load a save as required.
+    // listing mods but loading an existing save will NOT load more mods, you
+    // must manually edit the JSON to load an another mod after initialization.
+    std::vector<std::string> commandLineModList = {"mod1", "mod2", "mod3"};
+	m_save = new Save(save, commandLineModList);
 	m_iris = new server::net::Iris(&m_registry);
 	m_game = new Game(&m_blockRegistry, &m_registry, m_iris, m_save);
 }
@@ -75,24 +80,7 @@ void Server::run()
 
 	// Initialize the Modules //
 
-	std::fstream             fileStream;
-	std::vector<std::string> toLoad;
-
-	fileStream.open("Saves/" + m_save + "/Mods.txt");
-	if (!fileStream.is_open())
-	{
-		LOG_FATAL("CMS") << "Error opening save file: \"Saves/" + m_save +
-		                        "/Mods.txt\"";
-		exit(EXIT_FAILURE);
-	}
-
-	std::string modules;
-	while (std::getline(fileStream, modules))
-	{
-		toLoad.push_back(modules);
-	}
-
-	m_modManager = new cms::ModManager(toLoad, {"Modules"});
+	m_modManager = new cms::ModManager(m_save->getModList(), {"Modules"});
 
 	m_modManager->registerFunction("core.print", [=](const std::string& text) {
 		std::cout << text << "\n";
@@ -129,13 +117,12 @@ void Server::run()
 
 	// Fire up Threads //
 
-	m_running = true;
-
 	std::thread t_iris(&server::net::Iris::run, m_iris);
 	std::thread t_game(&Game::run, m_game);
 
 	// Enter Main Loop //
 
+    m_running = true;
 	std::string input;
 	while (m_running)
 	{
@@ -160,4 +147,5 @@ Server::~Server()
 	delete m_iris;
 	delete m_game;
 	delete m_modManager;
+	delete m_save;
 }

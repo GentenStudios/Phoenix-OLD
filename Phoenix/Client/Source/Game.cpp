@@ -257,14 +257,13 @@ void Game::onAttach()
 	}
 
 	LOG_INFO("MAIN") << "Registering world";
-	const std::string save = "save1";
 	if (m_network != nullptr)
 	{
 		m_map = new voxels::Map(&m_network->chunkQueue, &m_blockRegistry.referrer);
 	}
 	else
 	{
-		m_map = new voxels::Map(save, "map1", &m_blockRegistry.referrer);
+		m_map = new voxels::Map(m_save, "map1", &m_blockRegistry.referrer);
 	}
 
 	if (m_network)

@@ -34,9 +34,10 @@
 
 using namespace phx::voxels;
 
-Map::Map(const std::string& save, const std::string& name, BlockReferrer* referrer)
-    : m_referrer(referrer), m_save(save), m_mapName(name)
+Map::Map(Save* save, const std::string& name, BlockReferrer* referrer)
+    : m_referrer(referrer), m_mapName(name)
 {
+	m_save = save;
 }
 
 Map::Map(
@@ -93,7 +94,7 @@ Chunk* Map::getChunk(const phx::math::vec3& pos)
 	std::string position = "." + std::to_string(static_cast<int>(pos.x)) + "_" +
 	                       std::to_string(static_cast<int>(pos.y)) + "_" +
 	                       std::to_string(static_cast<int>(pos.z));
-	saveFile.open("Saves/" + m_save + "/" + m_mapName + position + ".save");
+	saveFile.open("Saves/" + m_save->getName() + "/" + m_mapName + position + ".save");
 
 	if (saveFile)
 	{
@@ -261,7 +262,7 @@ void Map::save(const phx::math::vec3& pos)
 	std::string   position = "." + std::to_string(int(pos.x)) + "_" +
 	                       std::to_string(int(pos.y)) + "_" +
 	                       std::to_string(int(pos.z));
-	saveFile.open("Saves/" + m_save + "/" + m_mapName + position + ".save");
+	saveFile.open("Saves/" + m_save->getName() + "/" + m_mapName + position + ".save");
 
 	std::string saveString;
 	auto&       blocks = m_chunks.at(pos).getBlocks();
