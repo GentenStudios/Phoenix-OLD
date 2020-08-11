@@ -104,11 +104,11 @@ void Network::parseState(phx::net::Packet& packet)
 {
 	auto data = packet.getData();
 
-	phx::Serializer ser(Serializer::Mode::READ);
+	phx::Serializer ser;
 	ser.setBuffer(data.data(), packet.getSize());
 
-	size_t sequence;
-	ser&   sequence;
+	std::size_t sequence;
+	ser >> sequence;
 	if (sequence < m_currentSequence && sequence > 10)
 	{
 		return;
@@ -116,7 +116,7 @@ void Network::parseState(phx::net::Packet& packet)
 	m_currentSequence = sequence;
 
 	Position input;
-	ser& input.position.x& input.position.y& input.position.z;
+	ser >> input.position.x >> input.position.y >> input.position.z;
 
 	stateQueue.push(std::pair(input, sequence));
 }
@@ -127,9 +127,9 @@ void Network::parseMessage(phx::net::Packet& packet)
 
 	auto data = packet.getData();
 
-	phx::Serializer ser(Serializer::Mode::READ);
+	phx::Serializer ser;
 	ser.setBuffer(reinterpret_cast<std::byte*>(data.data()), data.size());
-	ser& input;
+	ser >> input;
 
 	messageQueue.push(input);
 }
@@ -140,17 +140,17 @@ void Network::parseData(phx::net::Packet& packet)
 
 	math::vec3 pos;
 	
-	phx::Serializer ser(Serializer::Mode::READ);
+	phx::Serializer ser;
 	ser.setBuffer(reinterpret_cast<std::byte*>(data.data()), sizeof(float) * 3);
-	ser& pos.x& pos.y& pos.z;
+	ser >> pos.x >> pos.y >> pos.z;
 
 	chunkQueue.push({pos, data});
 }
 
-void Network::sendState(phx::InputState inputState)
+void Network::sendState(const phx::InputState& inputState)
 {
-	Serializer ser(Serializer::Mode::WRITE);
-	ser&       inputState;
+	Serializer ser;
+	ser << inputState;
 
 	phx::net::Packet packet =
 	    phx::net::Packet(ser.getBuffer(), phx::net::PacketFlags::UNRELIABLE);
@@ -158,10 +158,10 @@ void Network::sendState(phx::InputState inputState)
 	m_client->broadcast(packet, 1);
 }
 
-void Network::sendMessage(std::string message)
+void Network::sendMessage(const std::string& message)
 {
-	Serializer       ser(Serializer::Mode::WRITE);
-	ser&             message;
+	Serializer ser;
+	ser << message;
 	phx::net::Packet packet =
 	    phx::net::Packet(ser.getBuffer(), phx::net::PacketFlags::RELIABLE);
 	m_client->broadcast(packet, 2);

@@ -87,7 +87,7 @@ namespace phx::client
 		 * @param userRef The user to sent the state to
 		 * @param data The state packet data
 		 */
-		void sendState(phx::InputState inputState);
+		void sendState(const phx::InputState& inputState);
 
 		/**
 		 * @brief Sends a message packet to a client
@@ -95,7 +95,7 @@ namespace phx::client
 		 * @param userRef The user to sent the message to
 		 * @param data The message packet data
 		 */
-		void sendMessage(std::string message);
+		void sendMessage(const std::string& message);
 
 		phx::BlockingQueue<std::string> messageQueue;
 		phx::BlockingQueue<std::pair<Position, size_t>> stateQueue;

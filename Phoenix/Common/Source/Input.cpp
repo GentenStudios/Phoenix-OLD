@@ -28,7 +28,14 @@
 
 #include <Common/Input.hpp>
 
-phx::Serializer& phx::InputState::operator&(phx::Serializer& serializer)
+phx::Serializer& phx::InputState::operator>>(Serializer& serializer) const
 {
-    return serializer & forward & backward & left & right & up & down & rotation.x & rotation.y & sequence;
+	return serializer << forward << backward << left << right << up << down
+	                  << rotation.x << rotation.y << sequence;
+}
+
+phx::Serializer& phx::InputState::operator<<(Serializer& serializer)
+{
+	return serializer >> forward >> backward >> left >> right >> up >> down >>
+	       rotation.x >> rotation.y >> sequence;
 }

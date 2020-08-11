@@ -59,28 +59,29 @@ void Chunk::setBlockAt(phx::math::vec3 position, BlockType* newBlock)
 	}
 }
 
-phx::Serializer& Chunk::operator&(phx::Serializer& ser)
+phx::Serializer& Chunk::operator>>(Serializer& ser) const
 {
-	if (ser.m_mode == Serializer::Mode::WRITE)
+	ser << m_pos.x << m_pos.y << m_pos.z;
+	for (const BlockType* block : m_blocks)
 	{
-		ser& m_pos.x& m_pos.y& m_pos.z;
-		for (const BlockType* block : m_blocks)
-		{
-			std::size_t id = block->uniqueIdentifier;
-			ser&   id;
-		}
-		return ser;
+		ser << block->uniqueIdentifier;
 	}
 
+	return ser;
+}
+
+phx::Serializer& Chunk::operator<<(Serializer& ser)
+{
 	m_blocks.clear();
 	m_blocks.reserve(4096);
 
-	ser& m_pos.x& m_pos.y& m_pos.z;
+	ser >> m_pos.x >> m_pos.y >> m_pos.z;
 	for (int i = 0; i < CHUNK_DEPTH * CHUNK_WIDTH * CHUNK_HEIGHT; i++)
 	{
-		std::size_t id;
-		ser&   id;
+		std::size_t id = 0;
+		ser >> id;
 		m_blocks.push_back(m_referrer->blocks.get(id));
 	}
+
 	return ser;
 }

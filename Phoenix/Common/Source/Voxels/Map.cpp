@@ -74,9 +74,9 @@ Chunk* Map::getChunk(const phx::math::vec3& pos)
 
 			// we have data.
 			Chunk chunk(data.first, m_referrer);
-			Serializer ser(Serializer::Mode::READ);
+			Serializer ser;
 			ser.setBuffer(data.second);
-			ser& chunk;
+			ser << chunk;
 			
 			m_chunks.emplace(chunk.getChunkPos(), chunk);
 		}
