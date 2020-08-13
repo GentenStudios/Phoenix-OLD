@@ -76,6 +76,7 @@ ChunkRenderer::ChunkRenderer(voxels::Map*           map,
 	glGenVertexArrays(1, &m_selectionBoxVAO);
 	glBindVertexArray(m_selectionBoxVAO);
 	glGenBuffers(1, &m_selectionBoxVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, m_selectionBoxVBO);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
 	glEnableVertexAttribArray(0);
 
