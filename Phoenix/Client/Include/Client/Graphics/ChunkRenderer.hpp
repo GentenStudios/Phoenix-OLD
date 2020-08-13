@@ -29,14 +29,19 @@
 /**
  * @file ChunkRenderer.hpp
  * @brief The ChunkRenderer.
- * 
+ *
  * @copyright Copyright (c) 2019-20 Genten Studios
  */
 
 #pragma once
 
+#include <Client/Graphics/Camera.hpp>
 #include <Client/Graphics/ShaderPipeline.hpp>
 #include <Client/Voxels/BlockRegistry.hpp>
+
+#include <Common/Voxels/Map.hpp>
+
+#include <entt/entt.hpp>
 
 #include <unordered_map>
 #include <vector>
@@ -73,29 +78,22 @@ namespace phx::gfx
 	 * through the Lua subsystem. This can ensure that we can build the
 	 * texture array and have every texture already in there and not have to
 	 * deal with a broken texture array where some textures are missing.
-	 * Currently, we have a limitation of 256 textures that can be loaded at
-	 * any one time, since we're using OpenGL 3.3 which only guarantees 256.
 	 *
 	 * @paragraph Usage
 	 * @code
-	 * ChunkRenderer* renderer = new ChunkRenderer(2, blockRegistry);
-	 * renderer->buildTextureArray(); // make sure all blocks are loaded in
-	 * before this.
+	 * ChunkRenderer* renderer = new ChunkRenderer(map, blockRegistry,
+	 *                             entityRegistry, entity);
+	 * renderer->prep();
+	 * renderer->attachCamera();
 	 *
 	 * Chunk chunk = Chunk({0, 0, 0});
 	 *
-	 * ChunkMesher mesher({0, 0, 0}, chunk, renderer->getTextureTable());
-	 * mesher.mesh();
+	 * renderer->add(chunk);
+	 * //renderer->update(chunk);
+	 * //renderer->remove(chunk);
 	 *
-	 * renderer->submitChunk(mesher.getMesh(), { 0, 0, 0 });
-	 * //renderer->updateChunk(mesher.getMesh(), { 0, 0, 0 });
-	 * //renderer->dropChunk({ 0, 0, 0 });
-	 *
-	 * renderer->render():
+	 * renderer->tick():
 	 * @endcode
-	 *
-	 * @todo Find solution to the max texture limit. Not urgent but hopefully by
-	 * 0.3/4
 	 */
 	class ChunkRenderer
 	{
@@ -104,18 +102,23 @@ namespace phx::gfx
 		using AssociativeTextureTable =
 		    std::unordered_map<std::string, std::size_t>;
 
-		/**
-		 * @brief Constructs a chunk renderer which will accept a specific
-		 * amount of chunks.
-		 * @param visibleChunks The maximum view distance.
-		 *
-		 * The max view distance does not do anything yet, mainly because of
-		 * a redesign of renderer which ended up not requiring that, however
-		 * it will become used as I (beeperdeeper089) continue to improve
-		 * this functionality.
-		 */
-		explicit ChunkRenderer(std::size_t visibleChunks, client::BlockRegistry* blockRegistry);
+		ChunkRenderer(voxels::Map* map, client::BlockRegistry* blockRegistry,
+		              entt::registry* registry, entt::entity entity);
 		~ChunkRenderer();
+
+		void prep();
+		void attachCamera(FPSCamera* camera);
+
+		void add(voxels::Chunk* chunk);
+		void update(voxels::Chunk* chunk);
+		void remove(voxels::Chunk* chunk);
+
+		void clear();
+
+		// we don't need dt on here yet, but put it here for consistency.
+		void tick(float dt);
+
+		void renderSelectionBox();
 
 		/**
 		 * @brief Gets the shader vertex layout that this renderer requires.
@@ -124,85 +127,39 @@ namespace phx::gfx
 		static std::vector<ShaderLayout> getRequiredShaderLayout();
 
 		/**
-		 * @brief Builds a texture array for everything to use.
-		 *
-		 * This builds a texture array using all the textures registered in
-		 * the TextureRegistry, which comes from the BlockRegistry in this
-		 * context.
-		 *
-		 * This does have the caveat of being unable to be larger than 256
-		 * layers, aka 256 textures - a texture array is essentially a 3D
-		 * array where the Z-axis can just be layer that we are storing the
-		 * texture on. This ia a OpenGL thing so internal understanding is
-		 * not necessary unless modifying/improving this function.
-		 */
-		void buildTextureArray();
-
-		/**
-		 * @brief Gets the table telling eveyrthing where each texture is in the
-		 * GPU-side array.
-		 * @return An associative table storing which textures are on which
-		 * layers within the texture array.
+		 * @brief Gets the table of textures and how they are allocated on the
+		 * GPU.
+		 * @return The locations of the textures on the GPU.
 		 */
 		const AssociativeTextureTable& getTextureTable() const;
 
-		/**
-		 * @brief Uploads and prepares a chunk's Mesh for rendering.
-		 * @param mesh The meshed data to upload and render.
-		 * @param pos The position of the chunk that the mesh of for.
-		 *
-		 * This function does not check if a mesh for requested chunk exists
-		 * beforehand so keep track manually and make sure you're not
-		 * attempting to submit the same chunk multiple times. This is not
-		 * the fastest function, so if the chunk already exists, don't just
-		 * drop and submit again, try to update since that will be more
-		 * efficient in the long run.
-		 *
-		 * If the chunk has no vertices (all air), it will not create an
-		 * entry in the internal list, since there is no point, however, a
-		 * redundancy has been built into updateChunk just in case, to make
-		 * sure you don't have to check whether the chunk is air manually
-		 * and knowing whether it is submitted or not.
-		 */
-		void submitChunk(const std::vector<float>& mesh, math::vec3 pos);
-
-		/**
-		 * @brief Updates the new mesh for a previously submitted chunk.
-		 * @param mesh The mesh of the updated chunk.
-		 * @param pos The position of the chunk you're updating.
-		 *
-		 * This function has a redundancy that will automatically run
-		 * "submitChunk" if the chunk doesn't exist in the internal list.
-		 * This is more efficient for updating chunks since it won't
-		 * reallocate the GPU-side buffer if the mesh size is the same.
-		 */
-		void updateChunk(const std::vector<float>& mesh, math::vec3 pos);
-
-		/**
-		 * @brief Deletes the stated chunk from the GPU.
-		 * @param pos The position of the chunk to drop.
-		 */
-		void dropChunk(math::vec3 pos);
-
-		/**
-		 * @brief Renders the active chunks.
-		 */
-		void render();
-
 	private:
 		client::BlockRegistry* m_blockRegistry;
-		
+		voxels::Map*           m_map;
+
+		entt::registry* m_registry;
+		entt::entity    m_entity;
+
+		FPSCamera* m_camera = nullptr;
+
+		// keep another copy of chunk pointers so we can know which chunks need
+		// to be remeshed that are being rendered rn.
+		std::vector<voxels::Chunk*> m_chunks;
+
 		std::unordered_map<math::vec3, ChunkRenderData, math::Vector3Hasher,
 		                   math::Vector3KeyComparator>
-		             m_buffers;
-		unsigned int m_textureArray = 0;
+		    m_buffers;
+
+		unsigned int            m_textureArray = 0;
+		AssociativeTextureTable m_textureTable;
 
 		const int m_vertexAttributeLocation = 0;
 		const int m_uvAttributeLocation     = 1;
 		const int m_normalAttributeLocation = 2;
 		const int m_colorAttributeLocation  = 3;
-		// const int m_posAttributeLocation    = 4;
 
-		AssociativeTextureTable m_textureTable;
+		unsigned int   m_selectionBoxVAO = 0;
+		unsigned int   m_selectionBoxVBO = 0;
+		ShaderPipeline m_selectionBoxPipeline;
 	};
 } // namespace phx::gfx

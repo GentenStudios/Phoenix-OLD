@@ -128,6 +128,10 @@ namespace phx::voxels
 		/// @brief How deep a chunk is (z axis).
 		static constexpr int CHUNK_DEPTH = 16;
 
+		/// @brief The amount of blocks in a chunk.
+		static constexpr int CHUNK_MAX_BLOCKS =
+		    CHUNK_WIDTH * CHUNK_HEIGHT * CHUNK_DEPTH;
+
 		/**
 		 * @brief Get the Index based coordinates in a chunk.
 		 *

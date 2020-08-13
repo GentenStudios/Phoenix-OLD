@@ -102,7 +102,7 @@ Chunk* Map::getChunk(const phx::math::vec3& pos)
 
 		Chunk chunk(pos, m_referrer);
 		Chunk::BlockList& blocks = chunk.getBlocks();
-
+		
 		std::string_view search = saveString;
 		std::size_t      strPos = 0;
 		std::size_t      i      = 0;
@@ -110,8 +110,31 @@ Chunk* Map::getChunk(const phx::math::vec3& pos)
 		{
 			std::string result;
 			result = search.substr(0, strPos);
-			blocks[i] = m_referrer->blocks.get(*m_referrer->referrer.get(result));
+			blocks.push_back(m_referrer->blocks.get(*m_referrer->referrer.get(result)));
 			search.remove_prefix(strPos + 1);
+		}
+
+		// something went wrong if the amount of blocks is different.
+		if (blocks.size() != Chunk::CHUNK_MAX_BLOCKS)
+		{
+			blocks.clear();
+
+			BlockType* block = nullptr;
+			if (chunk.getChunkPos().y >= 0)
+			{
+				block = m_referrer->blocks.get(
+				    *m_referrer->referrer.get("core.air"));
+			}
+			else
+			{
+				block = m_referrer->blocks.get(
+				    *m_referrer->referrer.get("core.grass"));
+			}
+
+			for (int i = 0; i < Chunk::CHUNK_MAX_BLOCKS; ++i)
+			{
+				blocks.push_back(block);
+			}
 		}
 
 		m_chunks.emplace(pos, std::move(chunk));
@@ -125,12 +148,18 @@ Chunk* Map::getChunk(const phx::math::vec3& pos)
 		if (chunk.getChunkPos().y >= 0)
 		{
 			block =
-			    m_referrer->blocks.get(*m_referrer->referrer.get("core:air"));
+			    m_referrer->blocks.get(*m_referrer->referrer.get("core.air"));
 		}
 		else
 		{
 			block =
-			    m_referrer->blocks.get(*m_referrer->referrer.get("core:grass"));
+			    m_referrer->blocks.get(*m_referrer->referrer.get("core.grass"));
+		}
+
+		auto& blocks = chunk.getBlocks();
+		for (int i = 0; i < Chunk::CHUNK_MAX_BLOCKS; ++i)
+		{
+			blocks.push_back(block);
 		}
 
 		m_chunks.emplace(pos, std::move(chunk));

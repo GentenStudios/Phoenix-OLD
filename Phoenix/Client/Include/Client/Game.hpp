@@ -31,8 +31,9 @@
 #include <Client/Crosshair.hpp>
 #include <Client/EscapeMenu.hpp>
 #include <Client/GameTools.hpp>
+
 #include <Client/Graphics/Camera.hpp>
-#include <Client/Graphics/ChunkView.hpp>
+#include <Client/Graphics/ChunkRenderer.hpp>
 #include <Client/Graphics/Layer.hpp>
 #include <Client/Graphics/ShaderPipeline.hpp>
 #include <Client/Graphics/UI.hpp>
@@ -101,10 +102,10 @@ namespace phx::client
 		entt::registry* m_registry;
 		entt::entity    m_player;
 
-		gfx::Window*       m_window;
-		gfx::FPSCamera*    m_camera = nullptr;
-		voxels::ChunkView* m_world  = nullptr;
-		voxels::Map*       m_map    = nullptr;
+		gfx::Window*        m_window;
+		gfx::FPSCamera*     m_camera        = nullptr;
+		gfx::ChunkRenderer* m_worldRenderer = nullptr;
+		voxels::Map*        m_map           = nullptr;
 
 		gfx::ShaderPipeline m_renderPipeline;
 

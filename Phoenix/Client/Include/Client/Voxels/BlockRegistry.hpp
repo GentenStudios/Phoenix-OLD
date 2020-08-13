@@ -50,6 +50,13 @@ namespace phx::client
 	 */
 	struct BlockRegistry
 	{
+		BlockRegistry()
+		{
+			textures.add(voxels::BlockType::UNKNOWN_BLOCK, {"Assets/Unknown.png"});
+			textures.setUnknownReturnVal(
+			    textures.get(voxels::BlockType::UNKNOWN_BLOCK));
+		}
+
 		voxels::BlockReferrer referrer;
 
 		Registry<std::size_t, std::vector<std::string>> textures;
@@ -65,10 +72,10 @@ namespace phx::client
 				    block.id          = luaBlock["id"];
 
 				    const std::string category = luaBlock["category"];
-				    if (category == "Solid")
+				    if (category == "Air")
 				    {
 					    // put solid first since that's most likely.
-					    block.category = voxels::BlockCategory::SOLID;
+					    block.category = voxels::BlockCategory::AIR;
 				    }
 				    else if (category == "Liquid")
 				    {
@@ -76,8 +83,8 @@ namespace phx::client
 				    }
 				    else
 				    {
-					    // default to air if not liquid or solid.
-					    block.category = voxels::BlockCategory::AIR;
+					    // default to solid if not liquid or air.
+					    block.category = voxels::BlockCategory::SOLID;
 				    }
 
 				    sol::optional<sol::function> onPlace = luaBlock["onPlace"];

@@ -63,9 +63,3 @@ block.onBreak = function(x, y, z)
                     audio.play(source)
                 end
 voxel.block.register(block)
-
-air = {}
-air.name = "Air"
-air.id = "core.air"
-air.category = "Air"
-voxel.block.register(air)
