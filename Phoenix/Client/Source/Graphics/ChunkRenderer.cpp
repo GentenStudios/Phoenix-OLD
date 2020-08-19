@@ -322,6 +322,14 @@ void ChunkRenderer::clear()
 	}
 }
 
+void ChunkRenderer::onMapEvent(const voxels::MapEvent& mapEvent)
+{
+	if (mapEvent.type == voxels::MapEvent::CHUNK_UPDATE)
+	{
+		update(mapEvent.chunk);
+	}
+}
+
 void ChunkRenderer::tick(float dt)
 {
 	for (auto& chunk : PlayerView::update(m_registry, m_entity))

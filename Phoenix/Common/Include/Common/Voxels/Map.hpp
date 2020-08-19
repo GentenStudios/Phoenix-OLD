@@ -28,15 +28,35 @@
 
 #pragma once
 
+#include <Common/Save.hpp>
 #include <Common/Util/BlockingQueue.hpp>
 #include <Common/Voxels/BlockReferrer.hpp>
 #include <Common/Voxels/Chunk.hpp>
-#include <Common/Save.hpp>
 
-#include <map>
+#include <unordered_map>
 
 namespace phx::voxels
 {
+	struct MapEvent
+	{
+		// only one event for now, but to streamline things in the future if we
+		// don't need to update a whole chunk, this will become much more
+		// useful.
+		enum Event
+		{
+			CHUNK_UPDATE
+		};
+
+		Event      type;
+		voxels::Chunk* chunk;
+	};
+
+	class MapEventSubscriber
+	{
+	public:
+		virtual void onMapEvent(const MapEvent& mapEvent) = 0;
+	};
+
 	class Map
 	{
 	public:
@@ -49,9 +69,14 @@ namespace phx::voxels
 		static std::pair<math::vec3, math::vec3> getBlockPos(
 		    math::vec3 position);
 		BlockType* getBlockAt(math::vec3 position);
-		void             setBlockAt(math::vec3 pos, BlockType* block);
-		void             save(const math::vec3& pos);
+		void       setBlockAt(math::vec3 pos, BlockType* block);
+		void       save(const math::vec3& pos);
 
+		void registerEventSubscriber(MapEventSubscriber* subscriber);
+
+	private:
+		void dispatchToSubscriber(const MapEvent& mapEvent) const;
+		
 	private:
 		std::unordered_map<math::vec3, Chunk, math::Vector3Hasher,
 		                   math::Vector3KeyComparator>
@@ -59,10 +84,12 @@ namespace phx::voxels
 
 		BlockReferrer* m_referrer;
 
-		Save* m_save = nullptr;
+		Save*       m_save = nullptr;
 		std::string m_mapName;
 
 		BlockingQueue<std::pair<math::vec3, std::vector<std::byte>>>* m_queue =
 		    nullptr;
+
+		std::vector<MapEventSubscriber*> m_subscribers;
 	};
 } // namespace phx::voxels
