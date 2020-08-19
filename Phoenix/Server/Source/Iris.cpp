@@ -102,9 +102,9 @@ void Iris::parseEvent(std::size_t userID, Packet& packet)
 {
 	std::string data;
 
-	phx::Serializer ser(Serializer::Mode::READ);
+	phx::Serializer ser;
 	ser.setBuffer(packet.getData());
-	ser& data;
+	ser >> data;
 
 	printf("Event received");
 	printf("An Event packet containing %s was received from %lu\n",
@@ -117,9 +117,9 @@ void Iris::parseState(std::size_t userID, phx::net::Packet& packet)
 
 	auto data = packet.getData();
 
-	phx::Serializer ser(Serializer::Mode::READ);
+	phx::Serializer ser;
 	ser.setBuffer(data.data(), packet.getSize());
-	ser& input;
+	ser >> input;
 
 	// If the queue is empty we need to add a new bundle
 	if (currentBundles.empty())
@@ -193,9 +193,9 @@ void Iris::parseMessage(std::size_t userID, phx::net::Packet& packet)
 
 	auto data = packet.getData();
 
-	phx::Serializer ser(Serializer::Mode::READ);
+	phx::Serializer ser;
 	ser.setBuffer(reinterpret_cast<std::byte*>(data.data()), data.size());
-	ser& input;
+	ser >> input;
 
 	/// @TODO replace userID with userName
 	std::cout << userID << ": " << input << "\n";
@@ -218,32 +218,31 @@ void Iris::sendEvent(std::size_t userID, enet_uint8* data) {}
 void Iris::sendState(entt::registry* registry, std::size_t sequence)
 {
 	auto       view = registry->view<Position, Movement>();
-	Serializer ser(Serializer::Mode::WRITE);
-	ser&       sequence;
+	Serializer ser;
+	ser << sequence;
 	for (auto entity : view)
 	{
 		auto pos = view.get<Position>(entity);
-		ser& pos.position.x& pos.position.y& pos.position.z;
+		ser << pos.position.x << pos.position.y << pos.position.z;
 	}
 	Packet packet = Packet(ser.getBuffer(), PacketFlags::UNRELIABLE);
 	m_server->broadcast(packet, 1);
 }
 
-void Iris::sendMessage(std::size_t userID, std::string message)
+void Iris::sendMessage(std::size_t userID, const std::string& message)
 {
-	// TODO clean this up so the serializer can take a const ref to data
-	Serializer ser(Serializer::Mode::WRITE);
-	ser&       message;
-	Packet     packet = Packet(ser.getBuffer(), PacketFlags::RELIABLE);
-	Peer*      peer   = m_server->getPeer(userID);
+	Serializer ser;
+	ser << message;
+	Packet packet = Packet(ser.getBuffer(), PacketFlags::RELIABLE);
+	Peer*  peer   = m_server->getPeer(userID);
 	peer->send(packet, 2);
 }
 
 void Iris::sendData(std::size_t userID, voxels::Chunk* data)
 {
-	Serializer ser(Serializer::Mode::WRITE);
-	ser&*      data;
-	Packet     packet = Packet(ser.getBuffer(), PacketFlags::RELIABLE);
-	Peer*      peer   = m_server->getPeer(userID);
+	Serializer ser;
+	ser << *data;
+	Packet packet = Packet(ser.getBuffer(), PacketFlags::RELIABLE);
+	Peer*  peer   = m_server->getPeer(userID);
 	peer->send(packet, 3);
 }

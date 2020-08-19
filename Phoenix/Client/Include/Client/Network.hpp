@@ -43,7 +43,7 @@ namespace phx::client
 	class Network
 	{
 	public:
-		Network(std::ostringstream& chat, const phx::net::Address& address);
+		Network(const phx::net::Address& address);
 		~Network();
 
 	private:
@@ -87,7 +87,7 @@ namespace phx::client
 		 * @param userRef The user to sent the state to
 		 * @param data The state packet data
 		 */
-		void sendState(phx::InputState inputState);
+		void sendState(const phx::InputState& inputState);
 
 		/**
 		 * @brief Sends a message packet to a client
@@ -95,17 +95,17 @@ namespace phx::client
 		 * @param userRef The user to sent the message to
 		 * @param data The message packet data
 		 */
-		void sendMessage(std::string message);
+		void sendMessage(const std::string& message);
 
+		phx::BlockingQueue<std::string> messageQueue;
 		phx::BlockingQueue<std::pair<Position, size_t>> stateQueue;
 		phx::BlockingQueue<std::pair<math::vec3, std::vector<std::byte>>>
 		    chunkQueue;
 
 	private:
-		bool                m_running = false;
-		phx::net::Host*     m_client;
-		std::ostringstream& m_chat;
-		std::thread         m_thread;
-		size_t              m_currentSequence;
+		bool            m_running = false;
+		phx::net::Host* m_client;
+		std::thread     m_thread;
+		std::size_t     m_currentSequence;
 	};
-} // namespace phx::client::net
+} // namespace phx::client

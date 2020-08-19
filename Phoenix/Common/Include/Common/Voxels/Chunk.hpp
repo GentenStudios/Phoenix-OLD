@@ -163,7 +163,11 @@ namespace phx::voxels
 			                      static_cast<std::size_t>(pos.z));
 		}
 
-		Serializer& operator&(Serializer& ser) override;
+		// serialize.
+		Serializer& operator>>(Serializer& ser) const override;
+
+		// unserialize.
+		Serializer& operator<<(Serializer& ser) override;
 
 	private:
 		math::vec3 m_pos;

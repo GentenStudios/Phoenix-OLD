@@ -151,7 +151,7 @@ namespace phx::server::net
 		 * @param userRef The user to sent the message to
 		 * @param data The message packet data
 		 */
-		void sendMessage(std::size_t userID, std::string message);
+		void sendMessage(std::size_t userID, const std::string& message);
 
 		/**
 		 * @brief Sends a chunk to a client

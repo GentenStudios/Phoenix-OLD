@@ -32,6 +32,7 @@
 #include <Server/Iris.hpp>
 #include <Server/User.hpp>
 #include <Server/Voxels/BlockRegistry.hpp>
+
 #include <Common/CMS/ModManager.hpp>
 
 #include <entt/entt.hpp>
@@ -50,7 +51,7 @@ namespace phx::server
 		 *
 		 * @param save The save we are loading
 		 */
-		Server(std::string save);
+		Server(const std::string& save);
 		~Server();
 
 		/// @brief Main loop for the server
@@ -78,7 +79,6 @@ namespace phx::server
 		/// @brief The mod manager providing LUA API functionality
 		cms::ModManager* m_modManager;
 
-		/// The name of the save we are running
-		std::string m_save;
+		Save* m_save;
 	};
 } // namespace phx::server
