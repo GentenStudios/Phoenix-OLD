@@ -41,7 +41,7 @@ Map::Map(Save* save, const std::string& name, BlockReferrer* referrer)
 }
 
 Map::Map(
-    phx::BlockingQueue<std::pair<math::vec3, std::vector<std::byte>>>* queue,
+    phx::BlockingQueue<std::pair<phx::math::vec3, std::vector<std::byte>>>* queue,
     BlockReferrer*                                                     referrer)
     : m_referrer(referrer), m_queue(queue)
 {
@@ -104,7 +104,7 @@ Chunk* Map::getChunk(const phx::math::vec3& pos)
 		Chunk chunk(pos, m_referrer);
 		Chunk::BlockList& blocks = chunk.getBlocks();
 
-		std::string_view search = saveString;
+    std::string_view search = saveString;
 		std::size_t      strPos = 0;
 		std::size_t      i      = 0;
 		while ((strPos = search.find_first_of(';')) != std::string_view::npos)
@@ -183,7 +183,7 @@ Chunk* Map::getChunk(const phx::math::vec3& pos)
 }
 
 std::pair<phx::math::vec3, phx::math::vec3> Map::getBlockPos(
-    math::vec3 position)
+    phx::math::vec3 position)
 {
 	// This mess converts position types between world and inner chunk
 	// positioning
@@ -223,7 +223,7 @@ std::pair<phx::math::vec3, phx::math::vec3> Map::getBlockPos(
 	return {chunkPosition, position};
 }
 
-BlockType* Map::getBlockAt(math::vec3 position)
+BlockType* Map::getBlockAt(phx::math::vec3 position)
 {
 	const auto& pos   = getBlockPos(position);
 	Chunk*      chunk = getChunk(pos.first);
