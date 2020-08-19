@@ -60,7 +60,7 @@ jobs:
         CMakeArgs: ''
 
   steps:
-    - script: cmake -S . -BBuild - D UPDATE_SUBMODULES=ON
+    - script: cmake -S . -B Build -D UPDATE_SUBMODULES=ON
       displayName: 'CMake Configure'
     - script: cmake --build Build
       displayName: 'CMake Build'
