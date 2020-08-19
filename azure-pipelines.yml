@@ -44,7 +44,7 @@ jobs:
 #        key: 'ccache | "$(Agent.JobName)"'
 #        path: $(CCACHE_DIR)
 #      displayName: 'CCache'
-    - script: cmake -S . -B Build -D UPDATE_SUBMODULES=ON
+    - script: cmake -S . -B Build
       displayName: 'CMake Configure'
     - script: cmake --build Build
       displayName: 'CMake Build'
@@ -60,7 +60,7 @@ jobs:
         CMakeArgs: ''
 
   steps:
-    - script: cmake -S . -B Build -D UPDATE_SUBMODULES=ON
+    - script: cmake -S . -B Build
       displayName: 'CMake Configure'
     - script: cmake --build Build
       displayName: 'CMake Build'
@@ -71,7 +71,7 @@ jobs:
     vmImage: 'macOS-latest'
 
   steps:
-    - script: cmake -S . -B Build -D UPDATE_SUBMODULES=ON
+    - script: cmake -S . -B Build
       displayName: 'CMake Configure'
     - script: cmake --build Build
       displayName: 'CMake Build'
