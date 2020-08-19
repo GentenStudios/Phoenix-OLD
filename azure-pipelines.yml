@@ -60,9 +60,7 @@ jobs:
         CMakeArgs: ''
 
   steps:
-    - script: git submodule update --init
-      displayName: 'Cloning Submodules'
-    - script: cmake -H. -BBuild
+    - script: cmake -S . -BBuild - D UPDATE_SUBMODULES=ON
       displayName: 'CMake Configure'
     - script: cmake --build Build
       displayName: 'CMake Build'
@@ -73,9 +71,7 @@ jobs:
     vmImage: 'macOS-latest'
 
   steps:
-    - script: git submodule update --init
-      displayName: 'Cloning Submodules'
-    - script: cmake -H. -BBuild
+    - script: cmake -S . -B Build -D UPDATE_SUBMODULES=ON
       displayName: 'CMake Configure'
     - script: cmake --build Build
       displayName: 'CMake Build'
