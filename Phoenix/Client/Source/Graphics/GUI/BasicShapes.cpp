@@ -35,8 +35,9 @@
 
 using namespace phx::gui;
 
-Rectangle::Rectangle(Container* container, phx::math::vec2 pos, phx::math::vec2 size,
-                     phx::math::vec3 color, float alpha, bool hasParent)
+Rectangle::Rectangle(Container* container, phx::math::vec2 pos,
+                     phx::math::vec2 size, phx::math::vec3 color, float alpha,
+                     bool hasParent)
     : IComponent(container), m_pos(pos), m_size(size)
 {
 	glGenVertexArrays(1, &m_vao);
@@ -71,7 +72,7 @@ Rectangle::Rectangle(Container* container, phx::math::vec2 pos, phx::math::vec2 
 	// linearly interpolate to convert relative x position in the container to
 	// an absolute x position within the window (still a percentage).
 	phx::math::vec2 relativePos = (containerPos - (containerSize / 2.f)) +
-	                         ((m_pos / 100.f) * containerSize);
+	                              ((m_pos / 100.f) * containerSize);
 
 	// relativePos will still be between 0 and 100, so we need divide by 100.
 	relativePos /= 100.f;
@@ -83,11 +84,12 @@ Rectangle::Rectangle(Container* container, phx::math::vec2 pos, phx::math::vec2 
 	// 1.f * container size = the container size.
 	// 0.5f * container size = half the container size.
 	// it's a directly proportional value.
-	phx::math::vec2 relativeSize = (m_size / 100.f) * (containerSize / 100.f) * 2.f;
+	phx::math::vec2 relativeSize =
+	    (m_size / 100.f) * (containerSize / 100.f) * 2.f;
 
 	// calculate top left, and calculate everything from there.
 	phx::math::vec2 topLeft = {relativePos.x - relativeSize.x / 2.f,
-	                      relativePos.y + relativeSize.y / 2.f};
+	                           relativePos.y + relativeSize.y / 2.f};
 
 	phx::math::vec2 topRight = {topLeft.x + relativeSize.x, topLeft.y};
 
@@ -211,9 +213,15 @@ void Rectangle::setCorner(Corner corner, const Vertex& vertex)
 
 bool Rectangle::isPointInObject(const phx::math::vec2& pos)
 {
+	math::vec2 windowSize = container->getWindow()->getSize();
+
 	phx::math::vec2 newPos = pos;
-	newPos /= container->getWindow()->getSize();
+	// SDL2 mouse is from top left as (0, 0) so we have to invert it, we use
+	// bottom-left.
+	newPos.y = -newPos.y + windowSize.y;
+	newPos /= windowSize;
 	newPos -= 0.5f;
+	newPos *= 2.f;
 
 	/**
 	 * 1st OpenGL Vertex: Top Right     (0)
@@ -278,7 +286,7 @@ void Rectangle::setPosition(const phx::math::vec2& position)
 	// linearly interpolate to convert relative x position in the container to
 	// an absolute x position within the window (still a percentage).
 	phx::math::vec2 relativePos = (containerPos - (containerSize / 2.f)) +
-	                         ((m_pos / 100.f) * containerSize);
+	                              ((m_pos / 100.f) * containerSize);
 
 	// relativePos will still be between 0 and 100, so we need divide by 100.
 	relativePos /= 100.f;
@@ -289,7 +297,8 @@ void Rectangle::setPosition(const phx::math::vec2& position)
 	// 1.f * container size = the container size.
 	// 0.5f * container size = half the container size.
 	// it's a directly proportional value.
-	const phx::math::vec2 relativeSize = (m_size / 100.f) * (containerSize / 100.f) * 2.f;
+	const phx::math::vec2 relativeSize =
+	    (m_size / 100.f) * (containerSize / 100.f) * 2.f;
 
 	// converts the relative size and position into pixels.
 	const phx::math::vec2 staticObjectPos =
@@ -298,15 +307,18 @@ void Rectangle::setPosition(const phx::math::vec2& position)
 	    relativeSize /** container->getWindow()->getSize()*/;
 
 	// calculate top left, and calculate everything from there.
-	const phx::math::vec2 topLeft = {staticObjectPos.x - staticObjectSize.x / 2.f,
-	                            staticObjectPos.y + staticObjectSize.y / 2.f};
+	const phx::math::vec2 topLeft = {
+	    staticObjectPos.x - staticObjectSize.x / 2.f,
+	    staticObjectPos.y + staticObjectSize.y / 2.f};
 
-	const phx::math::vec2 topRight = {topLeft.x + staticObjectSize.x, topLeft.y};
+	const phx::math::vec2 topRight = {topLeft.x + staticObjectSize.x,
+	                                  topLeft.y};
 
 	const phx::math::vec2 bottomRight = {topRight.x,
-	                                topRight.y - staticObjectSize.y};
+	                                     topRight.y - staticObjectSize.y};
 
-	const phx::math::vec2 bottomLeft = {topLeft.x, topLeft.y - staticObjectSize.y};
+	const phx::math::vec2 bottomLeft = {topLeft.x,
+	                                    topLeft.y - staticObjectSize.y};
 
 	m_vertices[0].vert = topRight;
 	m_vertices[1].vert = bottomRight;

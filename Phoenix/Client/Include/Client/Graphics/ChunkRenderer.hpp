@@ -127,9 +127,10 @@ namespace phx::gfx
 		static std::vector<ShaderLayout> getRequiredShaderLayout();
 
 		/**
-		 * @brief Gets the table of textures and how they are allocated on the
-		 * GPU.
-		 * @return The locations of the textures on the GPU.
+		 * @brief Gets the table telling everything where each texture is in the
+		 * GPU-side array.
+		 * @return An associative table storing which textures are on which
+		 * layers within the texture array.
 		 */
 		const AssociativeTextureTable& getTextureTable() const;
 

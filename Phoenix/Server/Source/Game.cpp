@@ -38,11 +38,17 @@ using namespace phx;
 using namespace phx::server;
 
 Game::Game(BlockRegistry* blockReg, entt::registry* registry,
-           phx::server::net::Iris* iris, const std::string& save)
+           phx::server::net::Iris* iris, Save* save)
     : m_blockRegistry(blockReg), m_registry(registry), m_iris(iris),
       m_map(voxels::Map(save, "map1", &blockReg->referrer))
 {
 	m_commander = new Commander(m_iris);
+}
+
+Game::~Game()
+{
+    if (m_running){kill();}
+    delete m_commander;
 }
 
 void Game::registerAPI(cms::ModManager* manager)

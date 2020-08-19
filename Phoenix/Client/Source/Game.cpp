@@ -45,33 +45,16 @@
 using namespace phx::client;
 using namespace phx;
 
-///@todo This needs refactored to play nicely
-/**
-* This exists so we can call the message function from the chat client,
-* we definitely need to just clean that up so it all plays nicely. If
-* a second instance of the game is created, this entire system will break
-* (but so will a few others . . . )
-*/
-static Game* myGame = nullptr;
-
-static void rawEcho(const std::string& input, std::ostringstream& cout)
-{
-	myGame->sendMessage(input, cout);
-}
-
 Game::Game(gfx::Window* window, entt::registry* registry, bool networked)
     : Layer("Game"), m_registry(registry), m_window(window)
 {
-	m_chat = new ui::ChatWindow("Chat Window", 5,
-	                            "Type /help for a command list and help.");
-
-	/// @TODO replace with network callback
-	m_chat->registerCallback(rawEcho);
-
 	if (networked)
 	{
-		m_network = new client::Network(m_chat->cout,
-		                                phx::net::Address("127.0.0.1", 7777));
+		m_network = new client::Network(phx::net::Address("127.0.0.1", 7777));
+		m_chat->setMessageCallback([this](const std::string& message)
+		{
+			m_network->sendMessage(message);
+		});
 	}
 	// else TODO enable this else when we get mod list from network
 	//{
@@ -94,7 +77,7 @@ Game::Game(gfx::Window* window, entt::registry* registry, bool networked)
 	    [](std::string command, std::string help, sol::function f) {});
 
 	m_modManager->registerFunction("core.print", [=](const std::string& text) {
-		m_chat->cout << text << "\n";
+		m_network->sendMessage(text);
 	});
 
 	m_audio    = Client::get()->getAudioHandler();
@@ -250,8 +233,6 @@ Game::Game(gfx::Window* window, entt::registry* registry, bool networked)
 
 		Client::get()->getAudioPool()->queue(audioSource);
 	});
-
-	myGame = this;
 }
 
 Game::~Game() { delete m_chat; }
@@ -276,14 +257,22 @@ void Game::onAttach()
 	}
 
 	LOG_INFO("MAIN") << "Registering world";
-	const std::string save = "save1";
 	if (m_network != nullptr)
 	{
 		m_map = new voxels::Map(&m_network->chunkQueue, &m_blockRegistry.referrer);
 	}
 	else
 	{
-		m_map = new voxels::Map(save, "map1", &m_blockRegistry.referrer);
+		m_map = new voxels::Map(m_save, "map1", &m_blockRegistry.referrer);
+	}
+
+	if (m_network)
+	{
+		m_chat = new gfx::ChatBox(m_window, &m_network->messageQueue);
+	}
+	else
+	{
+		m_chat = new gfx::ChatBox(m_window, nullptr);
 	}
 	
 	m_registry->emplace<PlayerView>(m_player, m_map);
@@ -358,6 +347,12 @@ void Game::onEvent(events::Event& e)
 			}
 			e.handled = true;
 			break;
+
+		case events::Keys::KEY_T:
+			m_chat->setDrawBox(!m_chat->shouldDrawBox());
+			e.handled = true;
+			break;
+
 		case events::Keys::KEY_Q:
 			m_window->close();
 			e.handled = true;
@@ -469,11 +464,6 @@ void Game::tick(float dt)
 	m_worldRenderer->renderSelectionBox();
 
 	m_chat->draw();
-}
-
-void Game::sendMessage(const std::string& input, std::ostringstream& cout)
-{
-	m_network->sendMessage(input);
 }
 
 void Game::confirmState(const Position& position)

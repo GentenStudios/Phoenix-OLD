@@ -25,4 +25,3 @@ source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/Source" PREFIX "Source Files" FIL
 #################################################
 
 add_dependencies(${PROJECT_NAME} PhoenixModules-server)
-add_dependencies(${PROJECT_NAME} PhoenixSaves-server)

@@ -34,208 +34,197 @@ namespace phx
 		m_buffer.insert(m_buffer.begin(), data, data + dataLength);
 	}
 
-	inline Serializer& Serializer::operator&(bool& value)
+	inline Serializer& Serializer::operator<<(bool val)
 	{
-		if (m_mode == Mode::READ)
-		{
-			pop(value);
-		}
-		else
-		{
-			push(value);
-		}
+		push(val);
 		return *this;
 	}
 
-	inline Serializer& Serializer::operator&(char& value)
+	inline Serializer& Serializer::operator<<(char val)
 	{
-		if (m_mode == Mode::READ)
-		{
-			pop(value);
-		}
-		else
-		{
-			push(value);
-		}
+		push(val);
 		return *this;
 	}
 
-	inline Serializer& Serializer::operator&(unsigned char& value)
+	inline Serializer& Serializer::operator<<(unsigned char val)
 	{
-		if (m_mode == Mode::READ)
-		{
-			pop(value);
-		}
-		else
-		{
-			push(value);
-		}
+		push(val);
 		return *this;
 	}
 
-	inline Serializer& Serializer::operator&(float& value)
+	inline Serializer& Serializer::operator<<(float val)
 	{
-		if (m_mode == Mode::READ)
-		{
-			pop(value);
-		}
-		else
-		{
-			push(value);
-		}
+		push(val);
 		return *this;
 	}
 
-	inline Serializer& Serializer::operator&(double& value)
+	inline Serializer& Serializer::operator<<(double val)
 	{
-		if (m_mode == Mode::READ)
-		{
-			pop(value);
-		}
-		else
-		{
-			push(value);
-		}
+		push(val);
 		return *this;
 	}
 
-#if __INT32_EQUAL_LONG__
-	inline Serializer& Serializer::operator&(long& value)
+	inline Serializer& Serializer::operator<<(std::int16_t val)
 	{
-		if (m_mode == Mode::READ)
-		{
-			pop(value);
-		}
-		else
-		{
-			push(value);
-		}
+		push(val);
 		return *this;
 	}
-	
-	inline Serializer& Serializer::operator&(unsigned long& value)
-	{
-		if (m_mode == Mode::READ)
-		{
-			pop(value);
-		}
-		else
-		{
-			push(value);
-		}
-		return *this;
 
+	inline Serializer& Serializer::operator<<(std::int32_t val)
+	{
+		push(val);
+		return *this;
+	}
+
+	inline Serializer& Serializer::operator<<(std::int64_t val)
+	{
+		push(val);
+		return *this;
+	}
+
+	inline Serializer& Serializer::operator<<(std::uint16_t val)
+	{
+		push(val);
+		return *this;
+	}
+
+	inline Serializer& Serializer::operator<<(std::uint32_t val)
+	{
+		push(val);
+		return *this;
+	}
+
+	inline Serializer& Serializer::operator<<(std::uint64_t val)
+	{
+		push(val);
+		return *this;
+	}
+
+	inline Serializer& Serializer::operator<<(const ISerializable& val)
+	{
+		val >> *this;
+		return *this;
+	}
+
+#ifdef PHX_INT32_EQUAL_LONG
+	inline Serializer& Serializer::operator<<(long val)
+	{
+		push(val);
+		return *this;
+	}
+
+	inline Serializer& Serializer::operator<<(unsigned long val)
+	{
+		push(val);
+		return *this;
+	}
+#endif
+
+	template <typename T>
+	Serializer& Serializer::operator<<(const std::basic_string<T>& val)
+	{
+		push(val);
+		return *this;
+	}
+
+	inline Serializer& Serializer::operator>>(bool& val)
+	{
+		pop(val);
+		return *this;
+	}
+
+	inline Serializer& Serializer::operator>>(char& val)
+	{
+		pop(val);
+		return *this;
+	}
+
+	inline Serializer& Serializer::operator>>(unsigned char& val)
+	{
+		pop(val);
+		return *this;
+	}
+
+	inline Serializer& Serializer::operator>>(float& val)
+	{
+		pop(val);
+		return *this;
+	}
+
+	inline Serializer& Serializer::operator>>(double& val)
+	{
+		pop(val);
+		return *this;
+	}
+
+	inline Serializer& Serializer::operator>>(std::int16_t& val)
+	{
+		pop(val);
+		return *this;
+	}
+
+	inline Serializer& Serializer::operator>>(std::int32_t& val)
+	{
+		pop(val);
+		return *this;
+	}
+
+	inline Serializer& Serializer::operator>>(std::int64_t& val)
+	{
+		pop(val);
+		return *this;
+	}
+
+	inline Serializer& Serializer::operator>>(std::uint16_t& val)
+	{
+		pop(val);
+		return *this;
+	}
+
+	inline Serializer& Serializer::operator>>(std::uint32_t& val)
+	{
+		pop(val);
+		return *this;
+	}
+
+	inline Serializer& Serializer::operator>>(std::uint64_t& val)
+	{
+		pop(val);
+		return *this;
+	}
+
+	inline Serializer& Serializer::operator>>(ISerializable& val)
+	{
+		val << *this;
+		return *this;
+	}
+
+#ifdef PHX_INT32_EQUAL_LONG
+	inline Serializer& Serializer::operator>>(long& val)
+	{
+		pop(val);
+		return *this;
+	}
+
+	inline Serializer& Serializer::operator>>(unsigned long& val)
+	{
+		pop(val);
+		return *this;
 	}
 #endif
 	
-	inline Serializer& Serializer::operator&(std::int16_t& value)
-	{
-		if (m_mode == Mode::READ)
-		{
-			pop(value);
-		}
-		else
-		{
-			push(value);
-		}
-		return *this;
-	}
-
-	inline Serializer& Serializer::operator&(std::int32_t& value)
-	{
-		if (m_mode == Mode::READ)
-		{
-			pop(value);
-		}
-		else
-		{
-			push(value);
-		}
-		return *this;
-	}
-
-	inline Serializer& Serializer::operator&(std::int64_t& value)
-	{
-		if (m_mode == Mode::READ)
-		{
-			pop(value);
-		}
-		else
-		{
-			push(value);
-		}
-		return *this;
-	}
-	
-	inline Serializer& Serializer::operator&(std::uint16_t& value)
-	{
-		if (m_mode == Mode::READ)
-		{
-			pop(value);
-		}
-		else
-		{
-			push(value);
-		}
-		return *this;
-	}
-
-	inline Serializer& Serializer::operator&(std::uint32_t& value)
-	{
-		if (m_mode == Mode::READ)
-		{
-			pop(value);
-		}
-		else
-		{
-			push(value);
-		}
-		return *this;
-	}
-
-	inline Serializer& Serializer::operator&(std::uint64_t& value)
-	{
-		if (m_mode == Mode::READ)
-		{
-			pop(value);
-		}
-		else
-		{
-			push(value);
-		}
-		return *this;
-	}
-
 	template <typename T>
-	inline Serializer& Serializer::operator&(std::basic_string<T>& value)
+	Serializer& Serializer::operator>>(std::basic_string<T>& val)
 	{
-		if (m_mode == Mode::READ)
-		{
-			pop(value);
-		}
-		else
-		{
-			push(value);
-		}
+		pop(val);
 		return *this;
 	}
-
-	inline Serializer& Serializer::operator&(ISerializable& value)
-	{
-		return value & *this;
-	}
-
-
-	inline data::Data Serializer::end(Serializer& serializer)
-	{
-		return serializer.m_buffer;
-	}
-
 
 	template <typename T>
 	void Serializer::push(const T& data)
 	{
-		union {
+		union
+		{
 			std::byte bytes[sizeof(T)];
 			T         value;
 		} value;
@@ -260,10 +249,10 @@ namespace phx
 			// swapping endianness and essentially doing an unnecessary
 			// endianness swap.
 
-            // push size of string onto data at the end.
-            // specify unsigned int otherwise it will waste space allocating a
-            // 64 bit variable.
-            push(static_cast<unsigned int>(data.length()));
+			// push size of string onto data at the end.
+			// specify unsigned int otherwise it will waste space allocating a
+			// 64 bit variable.
+			push(static_cast<unsigned int>(data.length()));
 
 			// previous end of the array, so we can append onto that - rather
 			// than the new end.
@@ -282,21 +271,19 @@ namespace phx
 			// the reason this exists is because there are different strings in
 			// the standard library, them being 16bit and 32bit character
 			// strings.
-            push(static_cast<unsigned int>(data.length()));
+			push(static_cast<unsigned int>(data.length()));
 			for (auto c : data)
 			{
 				push(c);
 			}
-
 		}
 	}
-
-	inline void Serializer::push(ISerializable& data) { data&* this; }
 
 	template <typename T>
 	void Serializer::pop(T& data)
 	{
-		union {
+		union
+		{
 			std::byte bytes[sizeof(T)];
 			T         value;
 		} value;
@@ -328,7 +315,8 @@ namespace phx
 		}
 		else
 		{
-			union {
+			union
+			{
 				std::byte bytes[sizeof(T)];
 				T         c;
 			} values;
