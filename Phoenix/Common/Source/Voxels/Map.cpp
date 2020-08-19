@@ -257,9 +257,9 @@ void Map::save(const phx::math::vec3& pos)
 	}
 
 	std::ofstream saveFile;
-	std::string   position = "." + std::to_string(int(pos.x)) + "_" +
-	                       std::to_string(int(pos.y)) + "_" +
-	                       std::to_string(int(pos.z));
+	std::string   position = "." + std::to_string(static_cast<int>(pos.x)) + "_" +
+	                       std::to_string(static_cast<int>(pos.y)) + "_" +
+	                       std::to_string(static_cast<int>(pos.z));
 	saveFile.open("Saves/" + m_save->getName() + "/" + m_mapName + position + ".save");
 
 	std::string saveString;

@@ -60,8 +60,13 @@ std::vector<voxels::Chunk*> PlayerView::update(entt::registry* registry,
 				math::vec3 chunkToCheck = {static_cast<float>(x + posX),
 				                           static_cast<float>(y + posY),
 				                           static_cast<float>(z + posZ)};
-				chunkToCheck            = chunkToCheck *
-				               static_cast<float>(voxels::Chunk::CHUNK_WIDTH);
+
+				// this will allow it to work if we choose to make chunks non cube.
+				chunkToCheck =
+				    chunkToCheck * math::vec3 {voxels::Chunk::CHUNK_WIDTH,
+				                               voxels::Chunk::CHUNK_HEIGHT,
+				                               voxels::Chunk::CHUNK_DEPTH};
+				
 				bool hasChunk = false;
 				for (const auto chunk : view.chunks)
 				{
@@ -71,6 +76,7 @@ std::vector<voxels::Chunk*> PlayerView::update(entt::registry* registry,
 						break;
 					}
 				}
+
 				if (!hasChunk)
 				{
 					voxels::Chunk* chunk = view.map->getChunk(chunkToCheck);
@@ -84,5 +90,6 @@ std::vector<voxels::Chunk*> PlayerView::update(entt::registry* registry,
 			}
 		}
 	}
+
 	return newChunks;
 }

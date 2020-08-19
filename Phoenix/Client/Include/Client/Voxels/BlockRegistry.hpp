@@ -53,7 +53,8 @@ namespace phx::client
 	{
 		BlockRegistry()
 		{
-			textures.add(voxels::BlockType::UNKNOWN_BLOCK, {"Assets/unknown.png"});
+			textures.add(voxels::BlockType::UNKNOWN_BLOCK,
+			             {"Assets/unknown.png"});
 			textures.setUnknownReturnVal(
 			    textures.get(voxels::BlockType::UNKNOWN_BLOCK));
 		}
