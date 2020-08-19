@@ -26,7 +26,7 @@ if (GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
             message(FATAL_ERROR "git submodule update --init --recursive failed with ${GIT_SUBMODULE_RESULT}, please checkout submodules.")
         endif()
     else()
-        message(STATUS "Not updating")
+        message(STATUS "Git submodules set to manual update only, this can be changed with the UPDATE_SUBMODULES option.")
     endif()
 endif()
 
