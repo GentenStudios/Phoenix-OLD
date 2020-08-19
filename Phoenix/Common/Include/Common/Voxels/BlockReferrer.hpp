@@ -61,7 +61,7 @@ namespace phx::voxels
 			auto              uid = referrer.size();
 			voxels::BlockType unknown;
 			unknown.displayName      = "Unknown Block";
-			unknown.id               = "core:unknown";
+			unknown.id               = "core.unknown";
 			unknown.category         = voxels::BlockCategory::SOLID;
 			unknown.uniqueIdentifier = uid;
 			referrer.add(unknown.id, uid);
@@ -72,7 +72,7 @@ namespace phx::voxels
 			uid = referrer.size();
 			voxels::BlockType outOfBounds;
 			outOfBounds.displayName      = "Out of Bounds";
-			outOfBounds.id               = "core:out_ouf_bounds";
+			outOfBounds.id               = "core.out_ouf_bounds";
 			outOfBounds.category         = voxels::BlockCategory::AIR;
 			outOfBounds.uniqueIdentifier = uid;
 			referrer.add(outOfBounds.id, uid);
@@ -82,7 +82,7 @@ namespace phx::voxels
 			uid = referrer.size();
 			voxels::BlockType air;
 			air.displayName      = "Air";
-			air.id               = "core:air";
+			air.id               = "core.air";
 			air.category         = voxels::BlockCategory::AIR;
 			air.uniqueIdentifier = uid;
 			referrer.add(air.id, uid);
@@ -91,7 +91,7 @@ namespace phx::voxels
 			// by default will return unknown blocks if they don't exist.
 			// a tiny bit hacky but solves a lot of problems without writing a
 			// bunch of unnecessary code.
-			referrer.setUnknownReturnVal(referrer.get("core:unknown"));
+			referrer.setUnknownReturnVal(referrer.get("core.unknown"));
 			blocks.setUnknownReturnVal(
 			    blocks.get(voxels::BlockType::UNKNOWN_BLOCK));
 		}

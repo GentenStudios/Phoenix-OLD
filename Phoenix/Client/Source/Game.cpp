@@ -275,7 +275,6 @@ void Game::onAttach()
 		m_chat = new gfx::ChatBox(m_window, nullptr);
 	}
 	
-	m_world = new voxels::ChunkView(3, m_registry, m_player, &m_blockRegistry);
 	m_registry->emplace<PlayerView>(m_player, m_map);
 	m_camera = new gfx::FPSCamera(m_window, m_registry);
 	m_camera->setActor(m_player);
@@ -284,6 +283,12 @@ void Game::onAttach()
 	    m_player, m_blockRegistry.referrer.blocks.get(0));
 
 	LOG_INFO("MAIN") << "Prepare rendering";
+
+	m_worldRenderer =
+	    new gfx::ChunkRenderer(m_map, &m_blockRegistry, m_registry, m_player);
+	m_worldRenderer->attachCamera(m_camera);
+	m_worldRenderer->prep();
+
 	m_renderPipeline.prepare("Assets/SimpleWorld.vert",
 	                         "Assets/SimpleWorld.frag",
 	                         gfx::ChunkRenderer::getRequiredShaderLayout());
@@ -315,7 +320,7 @@ void Game::onAttach()
 
 void Game::onDetach()
 {
-	delete m_world;
+	delete m_worldRenderer;
 	delete m_inputQueue;
 	delete m_network;
 	delete m_camera;
@@ -448,10 +453,6 @@ void Game::tick(float dt)
 	m_listener->setPosition(position.position);
 	m_listener->setVelocity({0, 0, 0});
 
-	m_world->tick();
-
-	m_chat->draw();
-
 	m_renderPipeline.activate();
 	m_renderPipeline.setMatrix("u_view", m_camera->calculateViewMatrix());
 	m_renderPipeline.setMatrix("u_projection", m_camera->getProjection());
@@ -459,9 +460,10 @@ void Game::tick(float dt)
 	m_renderPipeline.setVector3("u_LightDir", lightdir);
 	m_renderPipeline.setFloat("u_Brightness", 0.6f);
 
-	m_world->render();
-	m_world->renderSelectionBox(m_camera->calculateViewMatrix(),
-	                            m_camera->getProjection());
+	m_worldRenderer->tick(dt);
+	m_worldRenderer->renderSelectionBox();
+
+	m_chat->draw();
 }
 
 void Game::confirmState(const Position& position)

@@ -18,7 +18,6 @@ set(graphicsHeaders
 
 	${currentDir}/ChunkMesher.hpp
 	${currentDir}/ChunkRenderer.hpp
-	${currentDir}/ChunkView.hpp
 
 	PARENT_SCOPE
 )

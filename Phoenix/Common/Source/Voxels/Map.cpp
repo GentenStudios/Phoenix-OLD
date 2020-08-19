@@ -102,7 +102,7 @@ Chunk* Map::getChunk(const phx::math::vec3& pos)
 		std::getline(saveFile, saveString);
 
 		Chunk chunk(pos, m_referrer);
-		auto& blocks = chunk.getBlocks();
+		Chunk::BlockList& blocks = chunk.getBlocks();
 
 		std::string_view search = saveString;
 		std::size_t      strPos = 0;
@@ -115,7 +115,8 @@ Chunk* Map::getChunk(const phx::math::vec3& pos)
 			search.remove_prefix(strPos + 1);
 		}
 
-		if (blocks.size() != Chunk::CHUNK_WIDTH * Chunk::CHUNK_HEIGHT * Chunk::CHUNK_DEPTH)
+		// something went wrong if the amount of blocks is different.
+		if (blocks.size() != Chunk::CHUNK_MAX_BLOCKS)
 		{
 			LOG_WARNING("MAP") << "Existing save for chunk at: " << pos
 			                   << " is invalid, regenerating";
@@ -127,30 +128,21 @@ Chunk* Map::getChunk(const phx::math::vec3& pos)
 			if (chunk.getChunkPos().y >= 0)
 			{
 				block = m_referrer->blocks.get(
-				    *m_referrer->referrer.get("core:air"));
+				    *m_referrer->referrer.get("core.air"));
 			}
 			else
 			{
 				block = m_referrer->blocks.get(
-				    *m_referrer->referrer.get("core:grass"));
+				    *m_referrer->referrer.get("core.grass"));
 			}
 
-			for (std::size_t i = 0;
-			     i <
-			     Chunk::CHUNK_WIDTH * Chunk::CHUNK_HEIGHT * Chunk::CHUNK_DEPTH;
-			     ++i)
+			for (int i = 0; i < Chunk::CHUNK_MAX_BLOCKS; ++i)
 			{
 				blocks.push_back(block);
 			}
-
-			m_chunks.emplace(pos, std::move(chunk));
-
-			save(pos);
 		}
-		else
-		{
-			m_chunks.emplace(pos, std::move(chunk));
-		}
+
+		m_chunks.emplace(pos, std::move(chunk));
 	}
 	else
 	{
@@ -161,12 +153,18 @@ Chunk* Map::getChunk(const phx::math::vec3& pos)
 		if (chunk.getChunkPos().y >= 0)
 		{
 			block =
-			    m_referrer->blocks.get(*m_referrer->referrer.get("core:air"));
+			    m_referrer->blocks.get(*m_referrer->referrer.get("core.air"));
 		}
 		else
 		{
 			block =
-			    m_referrer->blocks.get(*m_referrer->referrer.get("core:grass"));
+			    m_referrer->blocks.get(*m_referrer->referrer.get("core.grass"));
+		}
+
+		auto& blocks = chunk.getBlocks();
+		for (int i = 0; i < Chunk::CHUNK_MAX_BLOCKS; ++i)
+		{
+			blocks.push_back(block);
 		}
 
 		auto& blockRef = chunk.getBlocks();
@@ -259,9 +257,9 @@ void Map::save(const phx::math::vec3& pos)
 	}
 
 	std::ofstream saveFile;
-	std::string   position = "." + std::to_string(int(pos.x)) + "_" +
-	                       std::to_string(int(pos.y)) + "_" +
-	                       std::to_string(int(pos.z));
+	std::string   position = "." + std::to_string(static_cast<int>(pos.x)) + "_" +
+	                       std::to_string(static_cast<int>(pos.y)) + "_" +
+	                       std::to_string(static_cast<int>(pos.z));
 	saveFile.open("Saves/" + m_save->getName() + "/" + m_mapName + position + ".save");
 
 	std::string saveString;
