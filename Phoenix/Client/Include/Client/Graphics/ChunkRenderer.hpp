@@ -139,6 +139,7 @@ namespace phx::gfx
 	private:
 		client::BlockRegistry* m_blockRegistry;
 		voxels::Map*           m_map;
+		BlockingQueue<voxels::MapEvent> m_mapEvents;
 
 		entt::registry* m_registry;
 		entt::entity    m_entity;
