@@ -3,9 +3,6 @@ set(HAVE_LIBC TRUE)
 # make SDL build ONLY the static lib, we don't use the shared lib.
 set(SDL_SHARED_ENABLED_BY_DEFAULT OFF)
 
-# stop SDL trying to control our main function.
-add_definitions(-DSDL_MAIN_HANDLED)
-
 # turn off the JSON tests
 set(JSON_BuildTests OFF CACHE INTERNAL "")
 
@@ -18,17 +15,22 @@ set(ALSOFT_TESTS OFF)
 # turn off the EnTT tests.
 set(BUILD_TESTING OFF)
 
-# define for EnTT to work
-add_definitions(-DNOMINMAX)
-
 add_subdirectory (openal-soft)
 add_subdirectory (SDL2)
+
+# Stop SDL trying to control our main function.
+target_compile_definitions(SDL2main INTERFACE SDL_MAIN_HANDLED)
+
 add_subdirectory (Glad)
 add_subdirectory (ImGui)
 add_subdirectory (sol2)
 add_subdirectory (lua)
 add_subdirectory (enet)
 add_subdirectory (entt)
+
+# NOMINMAX setting required for std::min std::max to work properly on Windows.
+target_compile_definitions(EnTT INTERFACE $<$<PLATFORM_ID:"Windows">:NOMINMAX>)
+
 add_subdirectory (json)
 
 # new line for each group of dependencies. Currently SDL, OpenGL, Lua and then OpenAL.
@@ -61,7 +63,7 @@ set(PHX_THIRD_PARTY_INCLUDES
 set(PHX_THIRD_PARTY_LIBRARIES
 	SDL2-static 
 	SDL2main
-	Glad 
+	Glad
 	ImGui
 	enet
 	sol2
