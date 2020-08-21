@@ -29,7 +29,7 @@ add_subdirectory (enet)
 add_subdirectory (entt)
 
 # NOMINMAX setting required for std::min std::max to work properly on Windows.
-target_compile_definitions(EnTT INTERFACE $<$<PLATFORM_ID:"Windows">:NOMINMAX>)
+target_compile_definitions(EnTT INTERFACE $<$<PLATFORM_ID:Windows>:NOMINMAX>)
 
 add_subdirectory (json)
 
