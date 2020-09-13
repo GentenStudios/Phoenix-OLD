@@ -39,26 +39,7 @@
 
 #include <unordered_set>
 
-using namespace phx;
-using namespace gfx;
-
-// struct to help with laying out the data inside the buffers.
-struct Vertex
-{
-	float    x;
-	float    y;
-	float    z;
-	float    u;
-	float    v;
-	float    tex;
-	float    normX;
-	float    normY;
-	float    normZ;
-	unsigned color;
-	// float pos_x;
-	// float pos_y;
-	// float pos_z;
-};
+using namespace phx::gfx;
 
 ChunkRenderer::ChunkRenderer(voxels::Map*           map,
                              client::BlockRegistry* blockRegistry,
@@ -105,6 +86,8 @@ void ChunkRenderer::prep()
 	glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA8, 16, 16, 256, 0, GL_RGBA,
 	             GL_UNSIGNED_BYTE, nullptr);
 
+	stbi_set_flip_vertically_on_load(true);
+	
 	// we use the unordered_set since it will automatically remove duplicates.
 	std::unordered_set<std::string> texturePaths;
 	for (auto& element : m_blockRegistry->textures)
@@ -124,8 +107,23 @@ void ChunkRenderer::prep()
 
 		if (image != nullptr)
 		{
-			glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, i, 16, 16, 1, GL_RGBA,
-			                GL_UNSIGNED_BYTE, image);
+			if (nbChannels == 4)
+			{
+				glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, i, 16, 16, 1, GL_RGBA,
+				                GL_UNSIGNED_BYTE, image);
+			}
+			else if (nbChannels == 3)
+			{
+				glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, i, 16, 16, 1,
+				                GL_RGB, GL_UNSIGNED_BYTE, image);
+			}
+			else
+			{
+				std::cout << "[RENDERING][TEXTURES] The file: " << path
+				    << " uses an unsupported pixel layout (needs to be RGB or "
+				       "RGBA, thus 24 or 32 bit depth respectively)."
+				    << std::endl;
+			}
 
 			m_textureTable.insert({path, i});
 			++i;
@@ -186,25 +184,20 @@ void ChunkRenderer::add(voxels::Chunk* chunk)
 
 	glVertexAttribPointer(m_vertexAttributeLocation, 3, GL_FLOAT, GL_FALSE,
 	                      sizeof(Vertex),
-	                      reinterpret_cast<void*>(offsetof(Vertex, x)));
+	                      reinterpret_cast<void*>(offsetof(Vertex, pos)));
 
 	// we're gonna pack texLayer into the UV struct cos why not.
 	glVertexAttribPointer(m_uvAttributeLocation, 3, GL_FLOAT, GL_FALSE,
 	                      sizeof(Vertex),
-	                      reinterpret_cast<void*>(offsetof(Vertex, u)));
+	                      reinterpret_cast<void*>(offsetof(Vertex, uv)));
 
-	glVertexAttribPointer(m_normalAttributeLocation, 3, GL_FLOAT, GL_TRUE,
-	                      sizeof(Vertex),
-	                      reinterpret_cast<void*>(offsetof(Vertex, normX)));
-
-	glVertexAttribPointer(m_colorAttributeLocation, 1, GL_UNSIGNED_INT,
-	                      GL_FALSE, sizeof(Vertex),
-	                      reinterpret_cast<void*>(offsetof(Vertex, color)));
+	glVertexAttribPointer(
+	    m_normalAttributeLocation, 3, GL_FLOAT, GL_TRUE, sizeof(Vertex),
+	    reinterpret_cast<void*>(offsetof(Vertex, normal)));
 
 	glEnableVertexAttribArray(m_vertexAttributeLocation);
 	glEnableVertexAttribArray(m_uvAttributeLocation);
 	glEnableVertexAttribArray(m_normalAttributeLocation);
-	glEnableVertexAttribArray(m_colorAttributeLocation);
 
 	m_buffers.insert({chunk->getChunkPos(), {vao, buf, mesh.size()}});
 }
@@ -247,27 +240,23 @@ void ChunkRenderer::update(voxels::Chunk* chunk)
 
 		glVertexAttribPointer(m_vertexAttributeLocation, 3, GL_FLOAT, GL_FALSE,
 		                      sizeof(Vertex),
-		                      reinterpret_cast<void*>(offsetof(Vertex, x)));
+		                      reinterpret_cast<void*>(offsetof(Vertex, pos)));
 
 		// we're gonna pack texLayer into the UV struct cos why not.
 		glVertexAttribPointer(m_uvAttributeLocation, 3, GL_FLOAT, GL_FALSE,
 		                      sizeof(Vertex),
-		                      reinterpret_cast<void*>(offsetof(Vertex, u)));
+		                      reinterpret_cast<void*>(offsetof(Vertex, uv)));
 
-		glVertexAttribPointer(m_normalAttributeLocation, 3, GL_FLOAT, GL_TRUE,
-		                      sizeof(Vertex),
-		                      reinterpret_cast<void*>(offsetof(Vertex, normX)));
-
-		glVertexAttribPointer(m_colorAttributeLocation, 1, GL_UNSIGNED_INT,
-		                      GL_FALSE, sizeof(Vertex),
-		                      reinterpret_cast<void*>(offsetof(Vertex, color)));
+		glVertexAttribPointer(
+		    m_normalAttributeLocation, 3, GL_FLOAT, GL_TRUE, sizeof(Vertex),
+		    reinterpret_cast<void*>(offsetof(Vertex, normal)));
 
 		glEnableVertexAttribArray(m_vertexAttributeLocation);
 		glEnableVertexAttribArray(m_uvAttributeLocation);
 		glEnableVertexAttribArray(m_normalAttributeLocation);
-		glEnableVertexAttribArray(m_colorAttributeLocation);
 
 		data.vertexCount = mesh.size();
+		m_buffers.insert({chunk->getChunkPos(), data});
 	}
 	else
 	{
@@ -342,7 +331,7 @@ void ChunkRenderer::tick(float dt)
 			update(e.chunk);
 		}
 	}
-
+	
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D_ARRAY, m_textureArray);
 

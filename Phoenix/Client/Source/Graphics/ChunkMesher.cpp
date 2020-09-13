@@ -26,115 +26,13 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+#include <Client/Graphics/BaseBlockModels.hpp>
 #include <Client/Graphics/ChunkMesher.hpp>
-#include <Common/Voxels/Chunk.hpp>
 
-static const phx::math::vec3 CUBE_VERTS[] = {
-    // front
-    phx::math::vec3(-1.f, -1.f, -1.f),
-    phx::math::vec3(1.f, -1.f, -1.f),
-    phx::math::vec3(1.f, 1.f, -1.f),
-    phx::math::vec3(1.f, 1.f, -1.f),
-    phx::math::vec3(-1.f, 1.f, -1.f),
-    phx::math::vec3(-1.f, -1.f, -1.f),
+static constexpr std::size_t DEFAULT_MODEL_SIZE = 2;
 
-    // left
-    phx::math::vec3(-1.f, 1.f, 1.f),
-    phx::math::vec3(-1.f, 1.f, -1.f),
-    phx::math::vec3(-1.f, -1.f, -1.f),
-    phx::math::vec3(-1.f, -1.f, -1.f),
-    phx::math::vec3(-1.f, -1.f, 1.f),
-    phx::math::vec3(-1.f, 1.f, 1.f),
+using namespace phx::gfx;
 
-    // back
-    phx::math::vec3(-1.f, -1.f, 1.f),
-    phx::math::vec3(1.f, -1.f, 1.f),
-    phx::math::vec3(1.f, 1.f, 1.f),
-    phx::math::vec3(1.f, 1.f, 1.f),
-    phx::math::vec3(-1.f, 1.f, 1.f),
-    phx::math::vec3(-1.f, -1.f, 1.f),
-
-    // right
-    phx::math::vec3(1.f, 1.f, 1.f),
-    phx::math::vec3(1.f, 1.f, -1.f),
-    phx::math::vec3(1.f, -1.f, -1.f),
-    phx::math::vec3(1.f, -1.f, -1.f),
-    phx::math::vec3(1.f, -1.f, 1.f),
-    phx::math::vec3(1.f, 1.f, 1.f),
-
-    // top
-    phx::math::vec3(-1.f, 1.f, -1.f),
-    phx::math::vec3(1.f, 1.f, -1.f),
-    phx::math::vec3(1.f, 1.f, 1.f),
-    phx::math::vec3(1.f, 1.f, 1.f),
-    phx::math::vec3(-1.f, 1.f, 1.f),
-    phx::math::vec3(-1.f, 1.f, -1.f),
-
-    // bottom
-    phx::math::vec3(-1.f, -1.f, -1.f),
-    phx::math::vec3(1.f, -1.f, -1.f),
-    phx::math::vec3(1.f, -1.f, 1.f),
-    phx::math::vec3(1.f, -1.f, 1.f),
-    phx::math::vec3(-1.f, -1.f, 1.f),
-    phx::math::vec3(-1.f, -1.f, -1.f),
-};
-
-static const phx::math::vec2 CUBE_UV[] = {
-    // front north
-    phx::math::vec2(-0.f, 1.f),
-    phx::math::vec2(-1.f, 1.f),
-    phx::math::vec2(-1.f, 0.f),
-    phx::math::vec2(-1.f, 0.f),
-    phx::math::vec2(-0.f, 0.f),
-    phx::math::vec2(-0.f, 1.f),
-
-    // left west
-    phx::math::vec2(-0.f, 0.f),
-    phx::math::vec2(-1.f, 0.f),
-    phx::math::vec2(-1.f, 1.f),
-    phx::math::vec2(-1.f, 1.f),
-    phx::math::vec2(-0.f, 1.f),
-    phx::math::vec2(-0.f, 0.f),
-
-    // back south
-    phx::math::vec2(0.f, 1.f),
-    phx::math::vec2(1.f, 1.f),
-    phx::math::vec2(1.f, 0.f),
-    phx::math::vec2(1.f, 0.f),
-    phx::math::vec2(0.f, 0.f),
-    phx::math::vec2(0.f, 1.f),
-
-    // right east
-    phx::math::vec2(0.f, 0.f),
-    phx::math::vec2(1.f, 0.f),
-    phx::math::vec2(1.f, 1.f),
-    phx::math::vec2(1.f, 1.f),
-    phx::math::vec2(0.f, 1.f),
-    phx::math::vec2(0.f, 0.f),
-
-    // top
-    phx::math::vec2(0.f, -1.f),
-    phx::math::vec2(1.f, -1.f),
-    phx::math::vec2(1.f, -0.f),
-    phx::math::vec2(1.f, -0.f),
-    phx::math::vec2(0.f, -0.f),
-    phx::math::vec2(0.f, -1.f),
-
-    // bottom
-    phx::math::vec2(0.f, 1.f),
-    phx::math::vec2(1.f, 1.f),
-    phx::math::vec2(1.f, 0.f),
-    phx::math::vec2(1.f, 0.f),
-    phx::math::vec2(0.f, 0.f),
-    phx::math::vec2(0.f, 1.f),
-};
-
-const int ACTUAL_CUBE_SIZE  = 2;
-const int NUM_FACES_IN_CUBE = 6;
-const int NUM_VERTS_IN_FACE = 6;
-
-using namespace phx;
-using namespace gfx;
 
 std::vector<float> ChunkMesher::mesh(
     voxels::Chunk*                                chunk,
@@ -146,90 +44,6 @@ std::vector<float> ChunkMesher::mesh(
 	auto&      blocks   = chunk->getBlocks();
 	math::vec3 chunkPos = chunk->getChunkPos();
 
-	// funky lambda here, fix in the future, but this is actually a bit tidier
-	// than otherwise.
-	auto addBlockFace = [&mesh, &chunkPos, &blockRegistry,
-	                     &texTable](voxels::BlockType* block, BlockFace face,
-	                                math::vec3 pos) {
-		// we don't need to worry about nullptr being returned here since we
-		// have
-		// setup the unknown return val in the BlockRegistry constructor.
-		const auto* textures =
-		    blockRegistry->textures.get(block->uniqueIdentifier);
-
-		std::size_t texLayer = 0;
-		if (textures->size() != 6)
-		{
-			// we can ALWAYS guarantee 1 texture since core:unknown will have
-			// unknown.png registered. (the textures for core:unknown will be
-			// returned from the texture registry if a block's tex are not
-			// found.)
-			texLayer = texTable.at((*textures)[0]);
-		}
-		else
-		{
-			texLayer = texTable.at((*textures)[static_cast<std::size_t>(face)]);
-		}
-
-		math::vec3 normals;
-		switch (face)
-		{
-		case BlockFace::FRONT:
-			normals = math::vec3(0, 0, -1);
-			break;
-
-		case BlockFace::LEFT:
-			normals = math::vec3(-1, 0, 0);
-			break;
-
-		case BlockFace::BACK:
-			normals = math::vec3(0, 0, 1);
-			break;
-
-		case BlockFace::RIGHT:
-			normals = math::vec3(1, 0, 0);
-			break;
-
-		case BlockFace::TOP:
-			normals = math::vec3(0, 1, 0);
-			break;
-
-		case BlockFace::BOTTOM:
-			normals = math::vec3(0, -1, 0);
-			break;
-		}
-
-		for (int i = 0; i < NUM_VERTS_IN_FACE; ++i)
-		{
-			math::vec3 blockVertices =
-			    CUBE_VERTS[(static_cast<int>(face) * NUM_FACES_IN_CUBE) + i];
-			blockVertices.x +=
-			    (pos.x * ACTUAL_CUBE_SIZE) + (chunkPos.x * ACTUAL_CUBE_SIZE);
-			blockVertices.y +=
-			    (pos.y * ACTUAL_CUBE_SIZE) + (chunkPos.y * ACTUAL_CUBE_SIZE);
-			blockVertices.z +=
-			    (pos.z * ACTUAL_CUBE_SIZE) + (chunkPos.z * ACTUAL_CUBE_SIZE);
-
-			math::vec2 cubeUVs =
-			    CUBE_UV[(static_cast<int>(face) * NUM_FACES_IN_CUBE) + i];
-
-			mesh.push_back(blockVertices.x);
-			mesh.push_back(blockVertices.y);
-			mesh.push_back(blockVertices.z);
-
-			mesh.push_back(cubeUVs.x);
-			mesh.push_back(cubeUVs.y);
-
-			mesh.push_back(static_cast<float>(texLayer));
-
-			mesh.push_back(normals.x);
-			mesh.push_back(normals.y);
-			mesh.push_back(normals.z);
-
-			mesh.push_back(block->color);
-		}
-	};
-
 	using namespace voxels;
 	for (std::size_t i = 0;
 	     i < Chunk::CHUNK_WIDTH * Chunk::CHUNK_HEIGHT * Chunk::CHUNK_DEPTH; ++i)
@@ -239,33 +53,225 @@ std::vector<float> ChunkMesher::mesh(
 		if (block->category != BlockCategory::SOLID)
 			continue;
 
+		// get position of block in chunk.
 		const std::size_t x = i % Chunk::CHUNK_WIDTH;
 		const std::size_t y = (i / Chunk::CHUNK_WIDTH) % Chunk::CHUNK_HEIGHT;
 		const std::size_t z = i / (Chunk::CHUNK_WIDTH * Chunk::CHUNK_HEIGHT);
 
-		if (x == 0 || blocks[Chunk::getVectorIndex(x - 1, y, z)]->category !=
-		                  BlockCategory::SOLID)
-			addBlockFace(block, BlockFace::LEFT, {x, y, z});
-		if (x == Chunk::CHUNK_WIDTH - 1 ||
-		    blocks[Chunk::getVectorIndex(x + 1, y, z)]->category !=
-		        BlockCategory::SOLID)
-			addBlockFace(block, BlockFace::RIGHT, {x, y, z});
+		// the block is solid, lets get its model.
+		gfx::BlockModel blockModel =
+		    *blockRegistry->models.get(block->uniqueIdentifier);
 
-		if (y == 0 || blocks[Chunk::getVectorIndex(x, y - 1, z)]->category !=
-		                  BlockCategory::SOLID)
-			addBlockFace(block, BlockFace::BOTTOM, {x, y, z});
-		if (y == Chunk::CHUNK_WIDTH - 1 ||
-		    blocks[Chunk::getVectorIndex(x, y + 1, z)]->category !=
-		        BlockCategory::SOLID)
-			addBlockFace(block, BlockFace::TOP, {x, y, z});
+		bool addNorth  = false;
+		bool addSouth  = false;
+		bool addEast   = false;
+		bool addWest   = false;
+		bool addTop    = false;
+		bool addBottom = false;
 
-		if (z == 0 || blocks[Chunk::getVectorIndex(x, y, z - 1)]->category !=
-		                  BlockCategory::SOLID)
-			addBlockFace(block, BlockFace::FRONT, {x, y, z});
-		if (z == Chunk::CHUNK_DEPTH - 1 ||
-		    blocks[Chunk::getVectorIndex(x, y, z + 1)]->category !=
-		        BlockCategory::SOLID)
-			addBlockFace(block, BlockFace::BACK, {x, y, z});
+		// clang-format off
+		// if they're not xpanels, check which sides to add (xpanels don't need any meshing)
+		if (blockModel != BlockModel::X_PANEL && blockModel != BlockModel::X_PANEL_CUBE)
+		{
+			if (z == 0 || blocks[Chunk::getVectorIndex(x, y, z - 1)]->category != BlockCategory::SOLID)
+			{
+				addNorth = true;
+			}
+
+			if (x == 0 || blocks[Chunk::getVectorIndex(x - 1, y, z)]->category != BlockCategory::SOLID)
+			{
+				addEast = true;
+			}
+
+			if (z == Chunk::CHUNK_DEPTH - 1 || blocks[Chunk::getVectorIndex(x, y, z + 1)]->category != BlockCategory::SOLID)
+			{
+				addSouth = true;
+			}
+
+			if (x == Chunk::CHUNK_WIDTH - 1 || blocks[Chunk::getVectorIndex(x + 1, y, z)]->category != BlockCategory::SOLID)
+			{
+				addWest = true;
+			}
+
+			if (y == 0 || blocks[Chunk::getVectorIndex(x, y - 1, z)]->category != BlockCategory::SOLID)
+			{
+				addBottom = true;
+			}
+
+			if (y == Chunk::CHUNK_WIDTH - 1 || blocks[Chunk::getVectorIndex(x, y + 1, z)]->category != BlockCategory::SOLID)
+			{
+				addTop = true;
+			}
+
+			// if nothing to add, then continue so we don't waste any computing power.
+			if (!addNorth && !addEast && !addSouth && !addWest && !addTop && !addBottom)
+			{
+				continue;
+			}
+		}
+
+		// get textures since at this point we know we're gonna be meshing something.
+		const auto* tex = blockRegistry->textures.get(block->uniqueIdentifier);
+
+		auto insertToMesh = [&mesh, tex, texTable, chunkPos](DefaultMeshVertex const* vertex, std::size_t vertexCount, BlockFace face, const math::vec3& blockPos)
+		{
+			std::size_t texLayer = 0;
+			if ((*tex).size() != 6)
+			{
+				texLayer = texTable.at((*tex)[0]);
+			}
+			else
+			{
+				texLayer = texTable.at((*tex)[static_cast<int>(face)]);
+			}
+			
+			for (std::size_t i = 0; i < vertexCount; ++i)
+			{
+				DefaultMeshVertex const* current = vertex + i;
+			
+				mesh.push_back(current->pos.x + (blockPos.x * DEFAULT_MODEL_SIZE) + (chunkPos.x * DEFAULT_MODEL_SIZE));
+				mesh.push_back(current->pos.y + (blockPos.y * DEFAULT_MODEL_SIZE) + (chunkPos.y * DEFAULT_MODEL_SIZE));
+				mesh.push_back(current->pos.z + (blockPos.z * DEFAULT_MODEL_SIZE) + (chunkPos.z * DEFAULT_MODEL_SIZE));
+
+				mesh.push_back(current->uv.x);
+				mesh.push_back(current->uv.y);
+				mesh.push_back(texLayer);
+
+				mesh.push_back(current->normal.x);
+				mesh.push_back(current->normal.y);
+				mesh.push_back(current->normal.z);
+			}
+		};
+		
+		switch (blockModel)
+		{
+		case BlockModel::BLOCK:
+			if (addNorth)  insertToMesh(BLOCK_FRONT,  BLOCK_FACE_VERT_COUNT, BlockFace::NORTH,  {x, y, z});
+			if (addEast)   insertToMesh(BLOCK_RIGHT,  BLOCK_FACE_VERT_COUNT, BlockFace::EAST,   {x, y, z});
+			if (addSouth)  insertToMesh(BLOCK_BACK,   BLOCK_FACE_VERT_COUNT, BlockFace::SOUTH,  {x, y, z});
+			if (addWest)   insertToMesh(BLOCK_LEFT,   BLOCK_FACE_VERT_COUNT, BlockFace::WEST,   {x, y, z});
+			if (addTop)    insertToMesh(BLOCK_TOP,    BLOCK_FACE_VERT_COUNT, BlockFace::TOP,    {x, y, z});
+			if (addBottom) insertToMesh(BLOCK_BOTTOM, BLOCK_FACE_VERT_COUNT, BlockFace::BOTTOM, {x, y, z});
+			break;
+		case BlockModel::SLAB:
+			if (addNorth)  insertToMesh(SLAB_FRONT,  SLAB_FACE_VERT_COUNT, BlockFace::NORTH,  {x, y, z});
+			if (addEast)   insertToMesh(SLAB_RIGHT,  SLAB_FACE_VERT_COUNT, BlockFace::EAST,   {x, y, z});
+			if (addSouth)  insertToMesh(SLAB_BACK,   SLAB_FACE_VERT_COUNT, BlockFace::SOUTH,  {x, y, z});
+			if (addWest)   insertToMesh(SLAB_LEFT,   SLAB_FACE_VERT_COUNT, BlockFace::WEST,   {x, y, z});
+			if (addTop)    insertToMesh(SLAB_TOP,    SLAB_FACE_VERT_COUNT, BlockFace::TOP,    {x, y, z});
+			if (addBottom) insertToMesh(SLAB_BOTTOM, SLAB_FACE_VERT_COUNT, BlockFace::BOTTOM, {x, y, z});
+			break;
+		case BlockModel::STAIR:
+			if (addNorth)  insertToMesh(STAIR_FRONT,  STAIR_FRONT_COUNT,  BlockFace::NORTH,  {x, y, z});
+			if (addEast)   insertToMesh(STAIR_RIGHT,  STAIR_RIGHT_COUNT,  BlockFace::EAST,   {x, y, z});
+			if (addSouth)  insertToMesh(STAIR_BACK,   STAIR_BACK_COUNT,   BlockFace::SOUTH,  {x, y, z});
+			if (addWest)   insertToMesh(STAIR_LEFT,   STAIR_LEFT_COUNT,   BlockFace::WEST,   {x, y, z});
+			if (addTop)    insertToMesh(STAIR_TOP,    STAIR_TOP_COUNT,    BlockFace::TOP,    {x, y, z});
+			if (addBottom) insertToMesh(STAIR_BOTTOM, STAIR_BOTTOM_COUNT, BlockFace::BOTTOM, {x, y, z});
+			break;
+		case BlockModel::SLOPE:
+			if (addNorth)            insertToMesh(SLOPE_FRONT,  SLOPE_FRONT_COUNT,  BlockFace::NORTH,  {x, y, z});
+			if (addEast)             insertToMesh(SLOPE_RIGHT,  SLOPE_RIGHT_COUNT,  BlockFace::EAST,   {x, y, z});
+			if (addSouth)            insertToMesh(SLOPE_BACK,   SLOPE_BACK_COUNT,   BlockFace::SOUTH,  {x, y, z});
+			if (addTop && !addNorth) insertToMesh(SLOPE_FRONT,  SLOPE_FRONT_COUNT,  BlockFace::NORTH,  {x, y, z});
+			if (addBottom)           insertToMesh(SLOPE_BOTTOM, SLOPE_BOTTOM_COUNT, BlockFace::BOTTOM, {x, y, z});
+			break;
+		case BlockModel::X_PANEL:
+			// xpanels don't get meshed, add everything.
+			{
+				// just put xpanel shit here.
+				for (std::size_t q = 0; q < XPANEL_MAX_VERTS; ++q)
+				{
+					std::size_t texLayer = 0;
+					if ((*tex).size() != 4)
+					{
+						texLayer = texTable.at((*tex)[0]);
+					}
+					else
+					{
+						// int to int division will round down and make it return the value at either 1 to 4.
+						texLayer = texTable.at((*tex)[static_cast<std::size_t>(XPANEL_MAX_VERTS / 4)]);
+					}
+
+					phx::gfx::DefaultMeshVertex const* current = XPANEL_MESH + q;
+
+					mesh.push_back(current->pos.x + (x * DEFAULT_MODEL_SIZE) + (chunkPos.x * DEFAULT_MODEL_SIZE));
+					mesh.push_back(current->pos.y + (y * DEFAULT_MODEL_SIZE) + (chunkPos.y * DEFAULT_MODEL_SIZE));
+					mesh.push_back(current->pos.z + (z * DEFAULT_MODEL_SIZE) + (chunkPos.z * DEFAULT_MODEL_SIZE));
+
+					mesh.push_back(current->uv.x);
+					mesh.push_back(current->uv.y);
+					mesh.push_back(texLayer);
+
+					mesh.push_back(current->normal.x);
+					mesh.push_back(current->normal.y);
+					mesh.push_back(current->normal.z);
+				}
+			}
+			break;
+		case BlockModel::X_PANEL_CUBE:
+			// xpanels don't get meshed, add everything.
+			{
+				for (std::size_t q = 0; q < XPANEL_BLOCK_PANEL_VERT_COUNT; ++q)
+				{
+					std::size_t texLayer = 0;
+					if ((*tex).size() != 10)
+					{
+						texLayer = texTable.at((*tex)[0]);
+					}
+					else
+					{
+						// int to int division will round down and make it return the value at either 1 to 4.
+						texLayer = texTable.at((*tex)[static_cast<std::size_t>(XPANEL_BLOCK_PANEL_VERT_COUNT / 4)]);
+					}
+
+					phx::gfx::DefaultMeshVertex const* current = XPANEL_BLOCK_MESH + q;
+
+					mesh.push_back(current->pos.x + (x * DEFAULT_MODEL_SIZE) + (chunkPos.x * DEFAULT_MODEL_SIZE));
+					mesh.push_back(current->pos.y + (y * DEFAULT_MODEL_SIZE) + (chunkPos.y * DEFAULT_MODEL_SIZE));
+					mesh.push_back(current->pos.z + (z * DEFAULT_MODEL_SIZE) + (chunkPos.z * DEFAULT_MODEL_SIZE));
+
+					mesh.push_back(current->uv.x);
+					mesh.push_back(current->uv.y);
+					mesh.push_back(texLayer);
+
+					mesh.push_back(current->normal.x);
+					mesh.push_back(current->normal.y);
+					mesh.push_back(current->normal.z);
+				}
+
+				for (std::size_t q = 0; q < XPANEL_BLOCK_BLOCK_VERT_COUNT; ++q)
+				{
+					std::size_t texLayer = 0;
+					if ((*tex).size() != 10)
+					{
+						texLayer = texTable.at((*tex)[0]);
+					}
+					else
+					{
+						// divide by 6 to get face in block, +4 because first 4 textures should be for the xpanel.
+						texLayer = texTable.at((*tex)[static_cast<std::size_t>((XPANEL_BLOCK_BLOCK_VERT_COUNT / 6)) + 4]);
+					}
+
+					phx::gfx::DefaultMeshVertex const* current = XPANEL_BLOCK_BLOCK_MESH + q;
+
+					mesh.push_back(current->pos.x + (x * DEFAULT_MODEL_SIZE) + (chunkPos.x * DEFAULT_MODEL_SIZE));
+					mesh.push_back(current->pos.y + (y * DEFAULT_MODEL_SIZE) + (chunkPos.y * DEFAULT_MODEL_SIZE));
+					mesh.push_back(current->pos.z + (z * DEFAULT_MODEL_SIZE) + (chunkPos.z * DEFAULT_MODEL_SIZE));
+
+					mesh.push_back(current->uv.x);
+					mesh.push_back(current->uv.y);
+					mesh.push_back(texLayer);
+
+					mesh.push_back(current->normal.x);
+					mesh.push_back(current->normal.y);
+					mesh.push_back(current->normal.z);
+				}
+			}
+			break;
+		default: ;
+		}
+		// clang-format on
 	}
 
 	return mesh;

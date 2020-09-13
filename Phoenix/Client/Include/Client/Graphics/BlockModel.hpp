@@ -26,46 +26,58 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-/**
- * @file ChunkMesher.hpp
- * @brief The mesher class for use with chunks.
- *
- * @copyright Copyright (c) 2019-20 Genten Studios
- */
-
 #pragma once
-
-#include <Client/Graphics/ChunkRenderer.hpp>
-#include <Client/Voxels/BlockRegistry.hpp>
-
-#include <Common/Voxels/Block.hpp>
-#include <Common/Voxels/Chunk.hpp>
-
-#include <vector>
 
 namespace phx::gfx
 {
 	/**
-	 * @brief Meshes a chunk.
+	 * @brief Each face of one of the default block models.
 	 *
-	 * This mesher does not understand "smart"/"greedy" meshing, it will mesh
-	 * only this chunk, and will not take neighbor chunks into account as of
-	 * yet. As the project gains maturity and we have more features, this will
-	 * be improved.
-	 *
-	 * @paragraph Usage
-	 * @code
-	 * auto mesh = ChunkMesher::mesh(chunk, renderer->getTextureTable(),
-	 * blockRegistry);
-	 * @endcode
-	 *
+	 * This is the order in which textures in Lua MUST be registered. The
+	 * system only understands this format, or textures will be the wrong
+	 * way round and you won't know why.
 	 */
-	class ChunkMesher
+	enum class BlockFace : unsigned int
 	{
-	public:
-		static std::vector<float> mesh(
-		    voxels::Chunk*                                chunk,
-		    const ChunkRenderer::AssociativeTextureTable& texTable,
-		    client::BlockRegistry*                        blockRegistry);
+		NORTH = 0,
+		EAST,
+		SOUTH,
+		WEST,
+		TOP,
+		BOTTOM
 	};
+	
+	// supports some default block models, and customs too.
+	enum class BlockModel
+	{
+		BLOCK,
+		SLAB,
+		SLOPE,
+		STAIR,
+		X_PANEL,
+		X_PANEL_CUBE,
+	};
+
+	inline const char* blockModelToString(BlockModel model)
+	{
+		switch (model)
+		{
+		case BlockModel::BLOCK:
+			return "Block";
+		case BlockModel::SLAB:
+			return "Slab";
+		case BlockModel::SLOPE:
+			return "Slope";
+		case BlockModel::STAIR:
+			return "Stair";
+		case BlockModel::X_PANEL:
+			return "XPanel";
+		case BlockModel::X_PANEL_CUBE:
+			return "XPanelCube";
+		}
+
+		// don't need this here but clang-tidy keeps complaining and we don't
+		// lose anything.
+		return "";
+	}
 } // namespace phx::gfx

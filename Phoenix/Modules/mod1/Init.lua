@@ -63,3 +63,17 @@ block.onBreak = function(x, y, z)
                     audio.play(source)
                 end
 voxel.block.register(block)
+
+dirtStair = {}
+dirtStair.name = "Dirt Stair"
+dirtStair.id = "core.dirt_stair"
+dirtStair.model = "Stair"
+dirtStair.textures= {"Assets/dirt.png"}
+voxel.block.register(dirtStair)
+
+xpanel = {}
+xpanel.name = "Test XPanel"
+xpanel.id = "core.test_xpanel"
+xpanel.model = "XPanel"
+xpanel.textures= {"Assets/xpanel.png"}
+voxel.block.register(xpanel)

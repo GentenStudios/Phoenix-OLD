@@ -455,6 +455,7 @@ void Game::tick(float dt)
 	m_listener->setVelocity({0, 0, 0});
 
 	m_renderPipeline.activate();
+	m_renderPipeline.setInt("u_TexArray", 0);
 	m_renderPipeline.setMatrix("u_view", m_camera->calculateViewMatrix());
 	m_renderPipeline.setMatrix("u_projection", m_camera->getProjection());
 	m_renderPipeline.setFloat("u_AmbientStrength", 0.7f);
