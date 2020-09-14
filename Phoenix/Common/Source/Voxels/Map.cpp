@@ -29,15 +29,13 @@
 #include <Common/Logger.hpp>
 #include <Common/Voxels/Map.hpp>
 
-#include <iostream>
 #include <utility>
 
 using namespace phx::voxels;
 
 Map::Map(phx::Save* save, const std::string& name, BlockReferrer* referrer)
-    : m_referrer(referrer), m_mapName(name)
+    : m_referrer(referrer), m_save(save), m_mapName(name)
 {
-	m_save = save;
 }
 
 Map::Map(

@@ -151,7 +151,7 @@ const ChunkRenderer::AssociativeTextureTable& ChunkRenderer::getTextureTable()
 	return m_textureTable;
 }
 
-void ChunkRenderer::add(voxels::Chunk* chunk)
+void ChunkRenderer::add(phx::voxels::Chunk* chunk)
 {
 	const auto it = std::find(m_chunks.begin(), m_chunks.end(), chunk);
 	if (it == m_chunks.end())
@@ -202,7 +202,7 @@ void ChunkRenderer::add(voxels::Chunk* chunk)
 	m_buffers.insert({chunk->getChunkPos(), {vao, buf, mesh.size()}});
 }
 
-void ChunkRenderer::update(voxels::Chunk* chunk)
+void ChunkRenderer::update(phx::voxels::Chunk* chunk)
 {
 	const auto it = std::find(m_chunks.begin(), m_chunks.end(), chunk);
 	if (it == m_chunks.end())
@@ -281,7 +281,7 @@ void ChunkRenderer::update(voxels::Chunk* chunk)
 	}
 }
 
-void ChunkRenderer::remove(voxels::Chunk* chunk)
+void ChunkRenderer::remove(phx::voxels::Chunk* chunk)
 {
 	const auto it = std::find(m_chunks.begin(), m_chunks.end(), chunk);
 	if (it != m_chunks.end())
@@ -311,7 +311,7 @@ void ChunkRenderer::clear()
 	}
 }
 
-void ChunkRenderer::onMapEvent(const voxels::MapEvent& mapEvent)
+void ChunkRenderer::onMapEvent(const phx::voxels::MapEvent& mapEvent)
 {
 	m_mapEvents.push(mapEvent);
 }

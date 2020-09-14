@@ -33,16 +33,15 @@ static constexpr std::size_t DEFAULT_MODEL_SIZE = 2;
 
 using namespace phx::gfx;
 
-
 std::vector<float> ChunkMesher::mesh(
-    voxels::Chunk*                                chunk,
+    phx::voxels::Chunk*                           chunk,
     const ChunkRenderer::AssociativeTextureTable& texTable,
     client::BlockRegistry*                        blockRegistry)
 {
 	std::vector<float> mesh;
 
-	auto&      blocks   = chunk->getBlocks();
-	math::vec3 chunkPos = chunk->getChunkPos();
+	auto&           blocks   = chunk->getBlocks();
+	phx::math::vec3 chunkPos = chunk->getChunkPos();
 
 	using namespace voxels;
 	for (std::size_t i = 0;
@@ -59,7 +58,7 @@ std::vector<float> ChunkMesher::mesh(
 		const std::size_t z = i / (Chunk::CHUNK_WIDTH * Chunk::CHUNK_HEIGHT);
 
 		// the block is solid, lets get its model.
-		gfx::BlockModel blockModel =
+		BlockModel blockModel =
 		    *blockRegistry->models.get(block->uniqueIdentifier);
 
 		bool addNorth  = false;
@@ -73,32 +72,32 @@ std::vector<float> ChunkMesher::mesh(
 		// if they're not xpanels, check which sides to add (xpanels don't need any meshing)
 		if (blockModel != BlockModel::X_PANEL && blockModel != BlockModel::X_PANEL_CUBE)
 		{
-			if (z == 0 || blocks[Chunk::getVectorIndex(x, y, z - 1)]->category != BlockCategory::SOLID)
+			if (z == 0 || blocks[Chunk::getVectorIndex(x, y, z - 1)]->category != phx::voxels::BlockCategory::SOLID)
 			{
 				addNorth = true;
 			}
 
-			if (x == 0 || blocks[Chunk::getVectorIndex(x - 1, y, z)]->category != BlockCategory::SOLID)
+			if (x == 0 || blocks[Chunk::getVectorIndex(x - 1, y, z)]->category != phx::voxels::BlockCategory::SOLID)
 			{
 				addEast = true;
 			}
 
-			if (z == Chunk::CHUNK_DEPTH - 1 || blocks[Chunk::getVectorIndex(x, y, z + 1)]->category != BlockCategory::SOLID)
+			if (z == Chunk::CHUNK_DEPTH - 1 || blocks[Chunk::getVectorIndex(x, y, z + 1)]->category != phx::voxels::BlockCategory::SOLID)
 			{
 				addSouth = true;
 			}
 
-			if (x == Chunk::CHUNK_WIDTH - 1 || blocks[Chunk::getVectorIndex(x + 1, y, z)]->category != BlockCategory::SOLID)
+			if (x == Chunk::CHUNK_WIDTH - 1 || blocks[Chunk::getVectorIndex(x + 1, y, z)]->category != phx::voxels::BlockCategory::SOLID)
 			{
 				addWest = true;
 			}
 
-			if (y == 0 || blocks[Chunk::getVectorIndex(x, y - 1, z)]->category != BlockCategory::SOLID)
+			if (y == 0 || blocks[Chunk::getVectorIndex(x, y - 1, z)]->category != phx::voxels::BlockCategory::SOLID)
 			{
 				addBottom = true;
 			}
 
-			if (y == Chunk::CHUNK_WIDTH - 1 || blocks[Chunk::getVectorIndex(x, y + 1, z)]->category != BlockCategory::SOLID)
+			if (y == Chunk::CHUNK_WIDTH - 1 || blocks[Chunk::getVectorIndex(x, y + 1, z)]->category != phx::voxels::BlockCategory::SOLID)
 			{
 				addTop = true;
 			}
