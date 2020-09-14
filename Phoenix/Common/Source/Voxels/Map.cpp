@@ -34,7 +34,7 @@
 
 using namespace phx::voxels;
 
-Map::Map(Save* save, const std::string& name, BlockReferrer* referrer)
+Map::Map(phx::Save* save, const std::string& name, BlockReferrer* referrer)
     : m_referrer(referrer), m_mapName(name)
 {
 	m_save = save;
