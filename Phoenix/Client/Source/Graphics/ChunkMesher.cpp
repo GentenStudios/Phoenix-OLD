@@ -36,7 +36,7 @@ using namespace phx::gfx;
 std::vector<float> ChunkMesher::mesh(
     phx::voxels::Chunk*                           chunk,
     const ChunkRenderer::AssociativeTextureTable& texTable,
-    client::BlockRegistry*                        blockRegistry)
+    phx::client::BlockRegistry*                   blockRegistry)
 {
 	std::vector<float> mesh;
 

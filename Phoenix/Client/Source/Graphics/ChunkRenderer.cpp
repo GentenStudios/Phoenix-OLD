@@ -41,10 +41,10 @@
 
 using namespace phx::gfx;
 
-ChunkRenderer::ChunkRenderer(voxels::Map*           map,
-                             client::BlockRegistry* blockRegistry,
+ChunkRenderer::ChunkRenderer(phx::voxels::Map*           map,
+                             phx::client::BlockRegistry* blockRegistry,
                              entt::registry* registry, entt::entity entity)
-    : m_map(map), m_blockRegistry(blockRegistry), m_registry(registry),
+    : m_blockRegistry(blockRegistry), m_map(map), m_registry(registry),
       m_entity(entity)
 {
 	// lets say you have a view distance of 10, so lets do 10x10x10 and
