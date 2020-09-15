@@ -41,7 +41,10 @@ Save::Save(const std::string& save, const std::vector<std::string>& mods,
 	namespace fs = std::filesystem;
 
 	auto path = fs::current_path() / "Saves" / save;
-	if (!fs::exists(path))
+
+	// does not necessarily mean it's empty, it just means there's no save.json
+	// so we can do whatever.
+	if (!fs::exists(path / (save + ".json")))
 	{
 		LOG_INFO("SAVES") << "Save doesn't exist, creating.";
 		
