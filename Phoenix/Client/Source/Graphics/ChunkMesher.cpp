@@ -27,6 +27,9 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <Client/Graphics/ChunkMesher.hpp>
+
+#include <Common/Math/Math.hpp>
+#include <Common/Voxels/Block.hpp>
 #include <Common/Voxels/Chunk.hpp>
 
 static const phx::math::vec3 CUBE_VERTS[] = {
