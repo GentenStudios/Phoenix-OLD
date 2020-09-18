@@ -74,8 +74,6 @@ namespace phx::client
 
 				    const std::string category = luaBlock["category"];
 
-			    	// make solid by default in case none of below conditions are met.
-			    	block.category = voxels::BlockCategory::SOLID;
 				    if (category == "Solid")
 				    {
 					    block.category = voxels::BlockCategory::SOLID;
@@ -88,6 +86,12 @@ namespace phx::client
 				    {
 					    block.category = voxels::BlockCategory::AIR;
 				    }
+			    	else
+			    	{
+					    // make solid by default in case none of below
+					    // conditions are met.
+					    block.category = voxels::BlockCategory::SOLID;
+			    	}
 
 				    sol::optional<sol::function> onPlace = luaBlock["onPlace"];
 				    if (onPlace)
