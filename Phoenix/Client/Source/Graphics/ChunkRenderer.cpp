@@ -322,11 +322,25 @@ void ChunkRenderer::clear()
 	}
 }
 
+void ChunkRenderer::onMapEvent(const voxels::MapEvent& mapEvent)
+{
+	m_mapEvents.push(mapEvent);
+}
+
 void ChunkRenderer::tick(float dt)
 {
 	for (auto& chunk : PlayerView::update(m_registry, m_entity))
 	{
 		add(chunk);
+	}
+
+	voxels::MapEvent e;
+	while (m_mapEvents.try_pop(e))
+	{
+		if (e.type == voxels::MapEvent::CHUNK_UPDATE)
+		{
+			update(e.chunk);
+		}
 	}
 
 	glActiveTexture(GL_TEXTURE0);

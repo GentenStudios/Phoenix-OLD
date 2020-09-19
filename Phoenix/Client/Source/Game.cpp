@@ -287,6 +287,7 @@ void Game::onAttach()
 	m_worldRenderer =
 	    new gfx::ChunkRenderer(m_map, &m_blockRegistry, m_registry, m_player);
 	m_worldRenderer->attachCamera(m_camera);
+	m_map->registerEventSubscriber(m_worldRenderer);
 	m_worldRenderer->prep();
 
 	m_renderPipeline.prepare("Assets/SimpleWorld.vert",

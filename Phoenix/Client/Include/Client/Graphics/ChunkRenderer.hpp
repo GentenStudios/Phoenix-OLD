@@ -95,7 +95,7 @@ namespace phx::gfx
 	 * renderer->tick():
 	 * @endcode
 	 */
-	class ChunkRenderer
+	class ChunkRenderer : public voxels::MapEventSubscriber
 	{
 	public:
 		/// @brief Typedef to make it easier for use outside of this class.
@@ -115,6 +115,8 @@ namespace phx::gfx
 
 		void clear();
 
+		void onMapEvent(const voxels::MapEvent& mapEvent) override;
+		
 		// we don't need dt on here yet, but put it here for consistency.
 		void tick(float dt);
 
@@ -137,6 +139,7 @@ namespace phx::gfx
 	private:
 		client::BlockRegistry* m_blockRegistry;
 		voxels::Map*           m_map;
+		BlockingQueue<voxels::MapEvent> m_mapEvents;
 
 		entt::registry* m_registry;
 		entt::entity    m_entity;

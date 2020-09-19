@@ -246,6 +246,8 @@ void Map::setBlockAt(phx::math::vec3 position, BlockType* block)
 	{
 		save(pos.first);
 	}
+
+	dispatchToSubscriber({MapEvent::CHUNK_UPDATE, chunk});
 }
 
 void Map::save(const phx::math::vec3& pos)
@@ -272,4 +274,21 @@ void Map::save(const phx::math::vec3& pos)
 	saveFile << saveString;
 
 	saveFile.close();
+}
+
+void Map::registerEventSubscriber(MapEventSubscriber* subscriber)
+{
+	auto it = std::find(m_subscribers.begin(), m_subscribers.end(), subscriber);
+	if (it == m_subscribers.end())
+	{
+		m_subscribers.push_back(subscriber);
+	}
+}
+
+void Map::dispatchToSubscriber(const MapEvent& mapEvent) const
+{
+	for (MapEventSubscriber* sub : m_subscribers)
+	{
+		sub->onMapEvent(mapEvent);
+	}
 }
