@@ -64,14 +64,3 @@ jobs:
       displayName: 'CMake Configure'
     - script: cmake --build Build
       displayName: 'CMake Build'
-
-- job:
-  displayName: MacOSX
-  pool:
-    vmImage: 'macOS-latest'
-
-  steps:
-    - script: cmake -S . -B Build
-      displayName: 'CMake Configure'
-    - script: cmake --build Build
-      displayName: 'CMake Build'
