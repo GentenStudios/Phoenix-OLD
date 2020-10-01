@@ -57,58 +57,6 @@ std::vector<float> ChunkMesher::mesh(
 		const std::size_t y = (i / Chunk::CHUNK_WIDTH) % Chunk::CHUNK_HEIGHT;
 		const std::size_t z = i / (Chunk::CHUNK_WIDTH * Chunk::CHUNK_HEIGHT);
 
-		// the block is solid, lets get its model.
-		BlockModel blockModel =
-		    *blockRegistry->models.get(block->uniqueIdentifier);
-
-		bool addNorth  = false;
-		bool addSouth  = false;
-		bool addEast   = false;
-		bool addWest   = false;
-		bool addTop    = false;
-		bool addBottom = false;
-
-		// clang-format off
-		// if they're not xpanels, check which sides to add (xpanels don't need any meshing)
-		if (blockModel != BlockModel::X_PANEL && blockModel != BlockModel::X_PANEL_CUBE)
-		{
-			if (z == 0 || blocks[Chunk::getVectorIndex(x, y, z - 1)]->category != phx::voxels::BlockCategory::SOLID)
-			{
-				addNorth = true;
-			}
-
-			if (x == 0 || blocks[Chunk::getVectorIndex(x - 1, y, z)]->category != phx::voxels::BlockCategory::SOLID)
-			{
-				addEast = true;
-			}
-
-			if (z == Chunk::CHUNK_DEPTH - 1 || blocks[Chunk::getVectorIndex(x, y, z + 1)]->category != phx::voxels::BlockCategory::SOLID)
-			{
-				addSouth = true;
-			}
-
-			if (x == Chunk::CHUNK_WIDTH - 1 || blocks[Chunk::getVectorIndex(x + 1, y, z)]->category != phx::voxels::BlockCategory::SOLID)
-			{
-				addWest = true;
-			}
-
-			if (y == 0 || blocks[Chunk::getVectorIndex(x, y - 1, z)]->category != phx::voxels::BlockCategory::SOLID)
-			{
-				addBottom = true;
-			}
-
-			if (y == Chunk::CHUNK_WIDTH - 1 || blocks[Chunk::getVectorIndex(x, y + 1, z)]->category != phx::voxels::BlockCategory::SOLID)
-			{
-				addTop = true;
-			}
-
-			// if nothing to add, then continue so we don't waste any computing power.
-			if (!addNorth && !addEast && !addSouth && !addWest && !addTop && !addBottom)
-			{
-				continue;
-			}
-		}
-
 		// get textures since at this point we know we're gonna be meshing something.
 		const auto* tex = blockRegistry->textures.get(block->uniqueIdentifier);
 
@@ -141,44 +89,142 @@ std::vector<float> ChunkMesher::mesh(
 				mesh.push_back(current->normal.z);
 			}
 		};
+
+		// Meshing design thoughts:
+		//		We want meshing to be efficient, speedy but not too lenient on the amount of vertices produced.
+		//		To support this, I (beeper) think it's probably beneficial to cull faces of normal blocks next to each other, and just let other block models just add all their vertices.
+		//		We can explore this further at a later point in time, since it's just not that much of a concern right now.
+		//		If performance really tanks with the introduction of all the extra vertices, we will have to take a look sooner than later, but a couple hundred extra verts shouldn't kill any modern GPU.
+		//		This was written 1st Oct, 2020.
+
+		BlockModel blockModel =
+		    *blockRegistry->models.get(block->uniqueIdentifier);
 		
 		switch (blockModel)
 		{
 		case BlockModel::BLOCK:
-			if (addNorth)  insertToMesh(BLOCK_FRONT,  BLOCK_FACE_VERT_COUNT, BlockFace::NORTH,  {x, y, z});
-			if (addEast)   insertToMesh(BLOCK_RIGHT,  BLOCK_FACE_VERT_COUNT, BlockFace::EAST,   {x, y, z});
-			if (addSouth)  insertToMesh(BLOCK_BACK,   BLOCK_FACE_VERT_COUNT, BlockFace::SOUTH,  {x, y, z});
-			if (addWest)   insertToMesh(BLOCK_LEFT,   BLOCK_FACE_VERT_COUNT, BlockFace::WEST,   {x, y, z});
-			if (addTop)    insertToMesh(BLOCK_TOP,    BLOCK_FACE_VERT_COUNT, BlockFace::TOP,    {x, y, z});
-			if (addBottom) insertToMesh(BLOCK_BOTTOM, BLOCK_FACE_VERT_COUNT, BlockFace::BOTTOM, {x, y, z});
+			{
+				// check if block is on the north border of the chunk.
+				if (z == 0)
+				{
+					// if on north border, add north face.
+					insertToMesh(BLOCK_FRONT, BLOCK_FACE_VERT_COUNT, BlockFace::NORTH, {x, y, z});
+				}
+				else
+				{
+					// else get the block to the north.
+					BlockType* north = blocks[Chunk::getVectorIndex(x, y, z - 1)];
+
+					// if the block to the north is not solid, or is not a full block, add the north face.
+					if (north->category != BlockCategory::SOLID || *blockRegistry->models.get(north->uniqueIdentifier) != BlockModel::BLOCK)
+					{
+						insertToMesh(BLOCK_FRONT, BLOCK_FACE_VERT_COUNT, BlockFace::NORTH, {x, y, z});
+					}
+				}
+
+				// check if the block is on the south border
+				if (z == Chunk::CHUNK_DEPTH - 1)
+				{
+					insertToMesh(BLOCK_BACK, BLOCK_FACE_VERT_COUNT, BlockFace::SOUTH, {x, y, z});
+				}
+				else
+				{
+					// else get the block to the south.
+					BlockType* south = blocks[Chunk::getVectorIndex(x, y, z + 1)];
+
+					// if the block to the south is not solid, or is not a full block, add the south face.
+					if (south->category != BlockCategory::SOLID || *blockRegistry->models.get(south->uniqueIdentifier) != BlockModel::BLOCK)
+					{
+						insertToMesh(BLOCK_BACK, BLOCK_FACE_VERT_COUNT, BlockFace::SOUTH, {x, y, z});
+					}
+				}
+
+				// check if block is on the bottom border of the chunk.
+				if (y == 0)
+				{
+					// if on bottom border, add bottom face.
+					insertToMesh(BLOCK_BOTTOM, BLOCK_FACE_VERT_COUNT, BlockFace::BOTTOM, {x, y, z});
+				}
+				else
+				{
+					// else get the block underneath.
+					BlockType* bottom = blocks[Chunk::getVectorIndex(x, y - 1, z)];
+
+					if (bottom->category != BlockCategory::SOLID || *blockRegistry->models.get(bottom->uniqueIdentifier) != BlockModel::BLOCK)
+					{
+						insertToMesh(BLOCK_BOTTOM, BLOCK_FACE_VERT_COUNT, BlockFace::BOTTOM, {x, y, z});
+					}
+				}
+
+				// check if the block is on the top border.
+				if (y == Chunk::CHUNK_HEIGHT - 1)
+				{
+					insertToMesh(BLOCK_TOP, BLOCK_FACE_VERT_COUNT, BlockFace::TOP, {x, y, z});
+				}
+				else
+				{
+					// else get the block to the top of it.
+					BlockType* top = blocks[Chunk::getVectorIndex(x, y + 1, z)];
+
+					if (top->category != BlockCategory::SOLID || *blockRegistry->models.get(top->uniqueIdentifier) != BlockModel::BLOCK)
+					{
+						insertToMesh(BLOCK_TOP, BLOCK_FACE_VERT_COUNT, BlockFace::TOP, {x, y, z});
+					}
+				}
+
+				if (x == 0)
+				{
+					insertToMesh(BLOCK_RIGHT, BLOCK_FACE_VERT_COUNT, BlockFace::EAST, {x, y, z});
+				}
+				else
+				{
+					BlockType* east = blocks[Chunk::getVectorIndex(x - 1, y, z)];
+
+					if (east->category != BlockCategory::SOLID || *blockRegistry->models.get(east->uniqueIdentifier) != BlockModel::BLOCK)
+					{
+						insertToMesh(BLOCK_RIGHT, BLOCK_FACE_VERT_COUNT, BlockFace::EAST, {x, y, z});
+					}
+				}
+
+				if (x == Chunk::CHUNK_WIDTH - 1)
+				{
+					insertToMesh(BLOCK_LEFT, BLOCK_FACE_VERT_COUNT, BlockFace::WEST, {x, y, z});
+				}
+				else
+				{
+					BlockType* west = blocks[Chunk::getVectorIndex(x + 1, y, z)];
+
+					if (west->category != BlockCategory::SOLID || *blockRegistry->models.get(west->uniqueIdentifier) != BlockModel::BLOCK)
+					{
+						insertToMesh(BLOCK_LEFT, BLOCK_FACE_VERT_COUNT, BlockFace::WEST, {x, y, z});
+					}
+				}
+			}
 			break;
 		case BlockModel::SLAB:
-			if (addNorth)  insertToMesh(SLAB_FRONT,  SLAB_FACE_VERT_COUNT, BlockFace::NORTH,  {x, y, z});
-			if (addEast)   insertToMesh(SLAB_RIGHT,  SLAB_FACE_VERT_COUNT, BlockFace::EAST,   {x, y, z});
-			if (addSouth)  insertToMesh(SLAB_BACK,   SLAB_FACE_VERT_COUNT, BlockFace::SOUTH,  {x, y, z});
-			if (addWest)   insertToMesh(SLAB_LEFT,   SLAB_FACE_VERT_COUNT, BlockFace::WEST,   {x, y, z});
-			if (addTop)    insertToMesh(SLAB_TOP,    SLAB_FACE_VERT_COUNT, BlockFace::TOP,    {x, y, z});
-			if (addBottom) insertToMesh(SLAB_BOTTOM, SLAB_FACE_VERT_COUNT, BlockFace::BOTTOM, {x, y, z});
-			break;
-		case BlockModel::STAIR:
-			if (addNorth)  insertToMesh(STAIR_FRONT,  STAIR_FRONT_COUNT,  BlockFace::NORTH,  {x, y, z});
-			if (addEast)   insertToMesh(STAIR_RIGHT,  STAIR_RIGHT_COUNT,  BlockFace::EAST,   {x, y, z});
-			if (addSouth)  insertToMesh(STAIR_BACK,   STAIR_BACK_COUNT,   BlockFace::SOUTH,  {x, y, z});
-			if (addWest)   insertToMesh(STAIR_LEFT,   STAIR_LEFT_COUNT,   BlockFace::WEST,   {x, y, z});
-			if (addTop)    insertToMesh(STAIR_TOP,    STAIR_TOP_COUNT,    BlockFace::TOP,    {x, y, z});
-			if (addBottom) insertToMesh(STAIR_BOTTOM, STAIR_BOTTOM_COUNT, BlockFace::BOTTOM, {x, y, z});
+			insertToMesh(SLAB_FRONT,  SLAB_FACE_VERT_COUNT, BlockFace::NORTH,  {x, y, z});
+			insertToMesh(SLAB_RIGHT,  SLAB_FACE_VERT_COUNT, BlockFace::EAST,   {x, y, z});
+			insertToMesh(SLAB_BACK,   SLAB_FACE_VERT_COUNT, BlockFace::SOUTH,  {x, y, z});
+			insertToMesh(SLAB_LEFT,   SLAB_FACE_VERT_COUNT, BlockFace::WEST,   {x, y, z});
+			insertToMesh(SLAB_TOP,    SLAB_FACE_VERT_COUNT, BlockFace::TOP,    {x, y, z});
+			insertToMesh(SLAB_BOTTOM, SLAB_FACE_VERT_COUNT, BlockFace::BOTTOM, {x, y, z});
 			break;
 		case BlockModel::SLOPE:
-			if (addNorth)            insertToMesh(SLOPE_FRONT,  SLOPE_FRONT_COUNT,  BlockFace::NORTH,  {x, y, z});
-			if (addEast)             insertToMesh(SLOPE_RIGHT,  SLOPE_RIGHT_COUNT,  BlockFace::EAST,   {x, y, z});
-			if (addSouth)            insertToMesh(SLOPE_BACK,   SLOPE_BACK_COUNT,   BlockFace::SOUTH,  {x, y, z});
-			if (addTop && !addNorth) insertToMesh(SLOPE_FRONT,  SLOPE_FRONT_COUNT,  BlockFace::NORTH,  {x, y, z});
-			if (addBottom)           insertToMesh(SLOPE_BOTTOM, SLOPE_BOTTOM_COUNT, BlockFace::BOTTOM, {x, y, z});
+			insertToMesh(SLOPE_FRONT,  SLOPE_FRONT_COUNT,  BlockFace::NORTH,  {x, y, z});
+			insertToMesh(SLOPE_RIGHT,  SLOPE_RIGHT_COUNT,  BlockFace::EAST,   {x, y, z});
+			insertToMesh(SLOPE_BACK,   SLOPE_BACK_COUNT,   BlockFace::SOUTH,  {x, y, z});
+			insertToMesh(SLOPE_BOTTOM, SLOPE_BOTTOM_COUNT, BlockFace::BOTTOM, {x, y, z});
+			break;
+		case BlockModel::STAIR:
+			insertToMesh(STAIR_FRONT,  STAIR_FRONT_COUNT,  BlockFace::NORTH,  {x, y, z});
+			insertToMesh(STAIR_RIGHT,  STAIR_RIGHT_COUNT,  BlockFace::EAST,   {x, y, z});
+			insertToMesh(STAIR_BACK,   STAIR_BACK_COUNT,   BlockFace::SOUTH,  {x, y, z});
+			insertToMesh(STAIR_LEFT,   STAIR_LEFT_COUNT,   BlockFace::WEST,   {x, y, z});
+			insertToMesh(STAIR_TOP,    STAIR_TOP_COUNT,    BlockFace::TOP,    {x, y, z});
+			insertToMesh(STAIR_BOTTOM, STAIR_BOTTOM_COUNT, BlockFace::BOTTOM, {x, y, z});
 			break;
 		case BlockModel::X_PANEL:
-			// xpanels don't get meshed, add everything.
 			{
-				// just put xpanel shit here.
 				for (std::size_t q = 0; q < XPANEL_MAX_VERTS; ++q)
 				{
 					std::size_t texLayer = 0;
@@ -209,7 +255,6 @@ std::vector<float> ChunkMesher::mesh(
 			}
 			break;
 		case BlockModel::X_PANEL_CUBE:
-			// xpanels don't get meshed, add everything.
 			{
 				for (std::size_t q = 0; q < XPANEL_BLOCK_PANEL_VERT_COUNT; ++q)
 				{
@@ -268,7 +313,8 @@ std::vector<float> ChunkMesher::mesh(
 				}
 			}
 			break;
-		default: ;
+		default:
+			break;
 		}
 		// clang-format on
 	}
