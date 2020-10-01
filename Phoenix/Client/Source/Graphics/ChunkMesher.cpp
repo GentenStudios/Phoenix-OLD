@@ -29,8 +29,6 @@
 #include <Client/Graphics/BaseBlockModels.hpp>
 #include <Client/Graphics/ChunkMesher.hpp>
 
-static constexpr std::size_t DEFAULT_MODEL_SIZE = 2;
-
 using namespace phx::gfx;
 
 std::vector<float> ChunkMesher::mesh(

@@ -81,20 +81,25 @@ namespace phx::client
 				    block.id          = luaBlock["id"];
 
 				    const std::string category = luaBlock["category"];
-				    if (category == "Air")
+
+				    if (category == "Solid")
 				    {
-					    // put solid first since that's most likely.
-					    block.category = voxels::BlockCategory::AIR;
+					    block.category = voxels::BlockCategory::SOLID;
 				    }
 				    else if (category == "Liquid")
 				    {
 					    block.category = voxels::BlockCategory::LIQUID;
 				    }
-				    else
+				    else if (category == "Air")
 				    {
-					    // default to solid if not liquid or air.
-					    block.category = voxels::BlockCategory::SOLID;				    	
+					    block.category = voxels::BlockCategory::AIR;
 				    }
+			    	else
+			    	{
+					    // make solid by default in case none of below
+					    // conditions are met.
+					    block.category = voxels::BlockCategory::SOLID;
+			    	}
 
 				    sol::optional<sol::function> onPlace = luaBlock["onPlace"];
 				    if (onPlace)

@@ -49,6 +49,8 @@ namespace phx::gfx
 	};
 }
 
+static constexpr std::size_t DEFAULT_MODEL_SIZE = 2;
+
 // clang-format off
 static const phx::gfx::DefaultMeshVertex vertBlock[] = {
 	// front (north)
