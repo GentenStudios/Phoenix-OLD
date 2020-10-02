@@ -18,7 +18,7 @@ jobs:
         - {
             name: "Ubuntu 18.04 (GCC)",
             os: ubuntu-18.04,
-            build_type: "Release", cc: "gcc", cxx: "g++"
+            build_type: "Release", cc: "gcc-9", cxx: "g++-9"
           }
         - {
             name: "Ubuntu 18.04 (Clang)",
