@@ -7,7 +7,7 @@ add_library(${PROJECT_NAME} STATIC ${Headers} ${Sources})
 
 target_link_libraries(${PROJECT_NAME} 
 		PRIVATE ${PHX_THIRD_PARTY_LIBRARIES}
-		PUBLIC $<$<AND:$<CXX_COMPILER_ID:GNU>,$<VERSION_LESS:$<CXX_COMPILER_VERSION>,9.0>>:stdc++fs>)
+		PRIVATE $<$<AND:$<CXX_COMPILER_ID:GNU>,$<VERSION_LESS:$<CXX_COMPILER_VERSION>,9.0>>:stdc++fs>)
 
 target_include_directories(${PROJECT_NAME} PRIVATE Include ${PHX_THIRD_PARTY_INCLUDES})
 
