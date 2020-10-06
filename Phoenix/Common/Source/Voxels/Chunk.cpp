@@ -59,7 +59,7 @@ void Chunk::setBlockAt(phx::math::vec3 position, BlockType* newBlock)
 	}
 }
 
-phx::Serializer& Chunk::operator>>(Serializer& ser) const
+phx::Serializer& Chunk::operator>>(phx::Serializer& ser) const
 {
 	ser << m_pos.x << m_pos.y << m_pos.z;
 	for (const BlockType* block : m_blocks)
@@ -70,7 +70,7 @@ phx::Serializer& Chunk::operator>>(Serializer& ser) const
 	return ser;
 }
 
-phx::Serializer& Chunk::operator<<(Serializer& ser)
+phx::Serializer& Chunk::operator<<(phx::Serializer& ser)
 {
 	m_blocks.clear();
 	m_blocks.reserve(4096);
