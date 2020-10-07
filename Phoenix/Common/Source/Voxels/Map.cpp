@@ -34,7 +34,7 @@
 
 using namespace phx::voxels;
 
-Map::Map(Save* save, const std::string& name, BlockReferrer* referrer)
+Map::Map(phx::Save* save, const std::string& name, BlockReferrer* referrer)
     : m_referrer(referrer), m_mapName(name)
 {
 	m_save = save;
@@ -64,7 +64,7 @@ Chunk* Map::getChunk(const phx::math::vec3& pos)
 		std::size_t size = m_queue->size();
 		for (std::size_t i = 0; i < size; i++)
 		{
-			std::pair<math::vec3, std::vector<std::byte>> data;
+			std::pair<phx::math::vec3, std::vector<std::byte>> data;
 			if (!m_queue->try_pop(data))
 			{
 				LOG_WARNING("CHUNK_VIEW")
@@ -74,7 +74,7 @@ Chunk* Map::getChunk(const phx::math::vec3& pos)
 
 			// we have data.
 			Chunk chunk(data.first, m_referrer);
-			Serializer ser;
+			phx::Serializer ser;
 			ser.setBuffer(data.second);
 			ser << chunk;
 			
@@ -187,38 +187,38 @@ std::pair<phx::math::vec3, phx::math::vec3> Map::getBlockPos(
 {
 	// This mess converts position types between world and inner chunk
 	// positioning
-	int posX = static_cast<int>(position.x / voxels::Chunk::CHUNK_WIDTH);
-	int posY = static_cast<int>(position.y / voxels::Chunk::CHUNK_HEIGHT);
-	int posZ = static_cast<int>(position.z / voxels::Chunk::CHUNK_DEPTH);
+	int posX = static_cast<int>(position.x / Chunk::CHUNK_WIDTH);
+	int posY = static_cast<int>(position.y / Chunk::CHUNK_HEIGHT);
+	int posZ = static_cast<int>(position.z / Chunk::CHUNK_DEPTH);
 
 	position.x = static_cast<float>(static_cast<int>(position.x) %
-	                                voxels::Chunk::CHUNK_WIDTH);
+	                                Chunk::CHUNK_WIDTH);
 	if (position.x < 0)
 	{
 		posX -= 1;
-		position.x += voxels::Chunk::CHUNK_WIDTH;
+		position.x += Chunk::CHUNK_WIDTH;
 	}
 
 	position.y = static_cast<float>(static_cast<int>(position.y) %
-	                                voxels::Chunk::CHUNK_HEIGHT);
+	                                Chunk::CHUNK_HEIGHT);
 	if (position.y < 0)
 	{
 		posY -= 1;
-		position.y += voxels::Chunk::CHUNK_HEIGHT;
+		position.y += Chunk::CHUNK_HEIGHT;
 	}
 
 	position.z = static_cast<float>(static_cast<int>(position.z) %
-	                                voxels::Chunk::CHUNK_DEPTH);
+	                                Chunk::CHUNK_DEPTH);
 	if (position.z < 0)
 	{
 		posZ -= 1;
-		position.z += voxels::Chunk::CHUNK_DEPTH;
+		position.z += Chunk::CHUNK_DEPTH;
 	}
 
 	const math::vec3 chunkPosition =
-	    math::vec3(static_cast<float>(posX * voxels::Chunk::CHUNK_WIDTH),
-	               static_cast<float>(posY * voxels::Chunk::CHUNK_HEIGHT),
-	               static_cast<float>(posZ * voxels::Chunk::CHUNK_DEPTH));
+	    math::vec3(static_cast<float>(posX * Chunk::CHUNK_WIDTH),
+	               static_cast<float>(posY * Chunk::CHUNK_HEIGHT),
+	               static_cast<float>(posZ * Chunk::CHUNK_DEPTH));
 
 	return {chunkPosition, position};
 }
