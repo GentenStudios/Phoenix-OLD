@@ -16,7 +16,6 @@ target_include_directories(${PROJECT_NAME}
 		${PHX_THIRD_PARTY_INCLUDES}
 	PUBLIC
 		Include
-
 )
 
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_11)
