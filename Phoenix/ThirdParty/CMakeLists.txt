@@ -18,9 +18,6 @@ set(BUILD_TESTING OFF)
 add_subdirectory (openal-soft)
 add_subdirectory (SDL2)
 
-# Stop SDL trying to control our main function.
-target_compile_definitions(SDL2main INTERFACE SDL_MAIN_HANDLED)
-
 add_subdirectory (Glad)
 add_subdirectory (ImGui)
 add_subdirectory (sol2)
@@ -28,6 +25,8 @@ add_subdirectory (lua)
 add_subdirectory (enet)
 add_subdirectory (entt)
 
+# Stop SDL trying to control our main function.
+target_compile_definitions(SDL2main INTERFACE SDL_MAIN_HANDLED)
 # NOMINMAX setting required for std::min std::max to work properly on Windows.
 target_compile_definitions(EnTT INTERFACE $<$<PLATFORM_ID:Windows>:NOMINMAX>)
 
