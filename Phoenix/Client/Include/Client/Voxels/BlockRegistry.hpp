@@ -69,24 +69,60 @@ namespace phx::client
 			    "voxel.block.register", [manager, this](sol::table luaBlock) {
 				    voxels::BlockType block;
 
-				    block.displayName = luaBlock["name"];
-				    block.id          = luaBlock["id"];
+					sol::optional<std::string> name = luaBlock["name"];
+					if (name)
+					{
+						block.displayName = *name;
+					}
+					else
+					{
+						// log the error and return to make this a recoverable error.
+					    LOG_FATAL("MODDING")
+					        << "The mod at: " << manager->getCurrentModPath()
+					        << " attempts to register a block without "
+					        << "specifying a name.";
+						return;
+					}
 
-				    const std::string category = luaBlock["category"];
-				    if (category == "Air")
+					sol::optional<std::string> id = luaBlock["id"];
+					if (id)
 				    {
-					    // put solid first since that's most likely.
-					    block.category = voxels::BlockCategory::AIR;
-				    }
-				    else if (category == "Liquid")
+						block.id          = luaBlock.get<std::string>("id");
+					}
+					else
 				    {
-					    block.category = voxels::BlockCategory::LIQUID;
-				    }
-				    else
+					    // log the error and return to make this a recoverable
+					    // error.
+					    LOG_FATAL("MODDING")
+					        << "The mod at: " << manager->getCurrentModPath()
+					        << " attempts to register a block ("
+					        << block.displayName << ") without "
+					        << "specifying a name.";
+					    return;
+					}
+
+				    sol::optional<std::string> cat = luaBlock["category"];
+				    if (cat)
 				    {
-					    // default to solid if not liquid or air.
+						if (*cat == "Solid")
+						{
+							block.category = voxels::BlockCategory::SOLID;
+						}
+					    else if (*cat == "Liquid")
+						{
+							block.category = voxels::BlockCategory::LIQUID;
+						}
+					    else if (*cat == "Air")
+						{
+							block.category = voxels::BlockCategory::AIR;
+						}
+					}
+			    	else
+			    	{
+					    // make solid by default in case none of above
+					    // conditions are met.
 					    block.category = voxels::BlockCategory::SOLID;
-				    }
+			    	}
 
 				    sol::optional<sol::function> onPlace = luaBlock["onPlace"];
 				    if (onPlace)

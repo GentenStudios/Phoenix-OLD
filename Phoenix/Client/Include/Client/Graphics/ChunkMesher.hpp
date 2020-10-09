@@ -38,8 +38,6 @@
 #include <Client/Graphics/ChunkRenderer.hpp>
 #include <Client/Voxels/BlockRegistry.hpp>
 
-#include <Common/Math/Math.hpp>
-#include <Common/Voxels/Block.hpp>
 #include <Common/Voxels/Chunk.hpp>
 
 #include <vector>
