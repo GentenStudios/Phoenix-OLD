@@ -18,8 +18,11 @@ target_include_directories(${PROJECT_NAME}
 		Include
 )
 
-target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_11)
-set_target_properties(${PROJECT_NAME} PROPERTIES CXX_EXTENSIONS OFF)
+set_target_properties(${PROJECT_NAME} PROPERTIES
+	CXX_STANDARD 17
+	CXX_STANDARD_REQUIRED ON
+	CXX_EXTENSIONS OFF
+)
 
 #################################################
 ## ORGANISE FILES FOR IDEs (Xcode, VS, etc...) ##
