@@ -25,41 +25,56 @@ jobs:
             os: ubuntu-18.04,
             build_type: "Release", cc: "clang", cxx: "clang++"
           }
+	- {
+	    name: "MacOS 10.15 (Clang)",
+	    os: macos-10.15
+	    build_type: "Release", cc: "clang", cxx: "clang++"
+	  }
 
     env:
-      # compilers
+      # set the compilers to use.
       CC: ${{ matrix.config.cc }}
       CXX: ${{ matrix.config.cxx }}
 
       # ninja build, essentially a GNU make alternative.
-      NINJA_VERSION: v1.10.0
+      NINJA_VERSION: v1.10.1
       NINJA_STATUS: "[%f/%t %o/sec]"
 
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v2.3.1
+        uses: actions/checkout@v2.3.3
         with:
           submodules: "recursive"
 
       - name: Get Build Dependencies
         shell: cmake -P {0}
         run: |
+	  # decide which version of ninja to get.
           if ("${{ runner.os }}" STREQUAL "Windows")
             set(NINJA_SUFFIX "win.zip")
           elseif ("${{ runner.os }}" STREQUAL "Linux")
             set(NINJA_SUFFIX "linux.zip")
+	  elseif ("${{ runner.os }}" STREQUAL "macOS")
+	    set(NINJA_SUFFIX "mac.zip")
           endif()
+
+	  # create the build tools directory.
           execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory BUILD_TOOLS)
-          # download ninja.
+
+          # download & extract ninja.
           file(DOWNLOAD "https://github.com/ninja-build/ninja/releases/download/$ENV{NINJA_VERSION}/ninja-${NINJA_SUFFIX}" ./ninja.zip SHOW_PROGRESS)
           execute_process(COMMAND ${CMAKE_COMMAND} -E tar -xvf ../ninja.zip WORKING_DIRECTORY ./BUILD_TOOLS)
+
+	  # add ninja to the path (chmod +x if not on windows too).
           message("::add-path::$ENV{GITHUB_WORKSPACE}/BUILD_TOOLS")
           if (NOT "${{ runner.os }}" STREQUAL "Windows")
             execute_process(COMMAND chmod +x ninja WORKING_DIRECTORY ./BUILD_TOOLS)
           endif()
+
       - name: Configure CMake
         shell: cmake -P {0}
         run: |
+	  # if windows, setup the env vars to match the VS environmental script.
           if ("${{ runner.os }}" STREQUAL "Windows" AND NOT "x${{ matrix.config.environment_script }}" STREQUAL "x")
             execute_process(COMMAND "${{ matrix.config.environment_script }}" && set OUTPUT_FILE environment_script_output.txt)
             file(STRINGS environment_script_output.txt output_lines)
@@ -69,6 +84,8 @@ jobs:
               endif()
             endforeach()
           endif()
+
+	  # the actual cmake configuration command.
           execute_process(COMMAND ${CMAKE_COMMAND} 
             -S.
             -BBuild
@@ -76,12 +93,16 @@ jobs:
             -DCMAKE_BUILD_TYPE=${{ matrix.config.build_type }}
             RESULT_VARIABLE result
           )
+
+	  # output a coherant message on failure.
           if (NOT result EQUAL 0)
             message(FATAL_ERROR "Base setup and configuration failed.")
           endif()
+
       - name: Build Project
         shell: cmake -P {0}
         run: |
+	  # if windows, setup the env vars to match the VS environmental script.
           if ("${{ runner.os }}" STREQUAL "Windows" AND NOT "x${{ matrix.config.environment_script }}" STREQUAL "x")
             execute_process(COMMAND "${{ matrix.config.environment_script }}" && set OUTPUT_FILE environment_script_output.txt)
             file(STRINGS environment_script_output.txt output_lines)
@@ -91,7 +112,11 @@ jobs:
               endif()
             endforeach()
           endif()
+
+	  # initiate the actual build.
           execute_process(COMMAND ${CMAKE_COMMAND} --build Build RESULT_VARIABLE result)
+
+	  # output a coherant message on failure.
           if (NOT result EQUAL 0)
             message(FATAL_ERROR "CMake Build command failed.")
           endif()
