@@ -28,8 +28,8 @@
 
 #pragma once
 
-#include <Common/Serialization/Endian.hpp>
-#include <Common/Serialization/SharedTypes.hpp>
+#include <Common/Utility/Internal/Endian.hpp>
+#include <Common/Utility/Internal/SharedTypes.hpp>
 
 #include <cstddef>
 #include <vector>
@@ -204,4 +204,5 @@ namespace phx
 	};
 } // namespace phx::data
 
-#include <Common/Serialization/Serializer.inl>
+#include <Common/Utility/Serializer.inl>
+ 

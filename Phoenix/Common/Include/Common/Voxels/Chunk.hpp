@@ -34,7 +34,7 @@
 #include <Common/Voxels/BlockReferrer.hpp>
 #include <Common/Registry.hpp>
 
-#include <Common/Serialization/Serializer.hpp>
+#include <Common/Utility/Serializer.hpp>
 #include <vector>
 
 namespace phx::voxels

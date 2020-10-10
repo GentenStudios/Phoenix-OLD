@@ -35,7 +35,7 @@
 
 #include <Common/Input.hpp>
 #include <Common/Network/Host.hpp>
-#include <Common/Util/BlockingQueue.hpp>
+#include <Common/Utility/BlockingQueue.hpp>
 #include <Common/Voxels/Chunk.hpp>
 
 #include <enet/enet.h>

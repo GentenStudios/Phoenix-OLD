@@ -30,7 +30,7 @@
 #include <Client/Game.hpp>
 
 #include <Common/CMS/ModManager.hpp>
-#include <Common/Serialization/Serializer.hpp>
+#include <Common/Utility/Serializer.hpp>
 
 #include <Common/Actor.hpp>
 #include <Common/Commander.hpp>
