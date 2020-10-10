@@ -28,12 +28,12 @@
 
 #pragma once
 
+#include <Common/Utility/Internal/Front.hpp>
+
 #include <atomic>
 #include <condition_variable>
 #include <mutex>
 #include <queue>
-
-#include <Common/Util/Front.hpp>
 
 namespace phx
 {

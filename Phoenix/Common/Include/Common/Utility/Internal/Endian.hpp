@@ -29,7 +29,7 @@
 #pragma once
 
 #include <Common/CoreIntrinsics.hpp>
-#include <Common/Serialization/SharedTypes.hpp>
+#include <Common/Utility/Internal/SharedTypes.hpp>
 
 #include <cstddef>
 #include <cstdint>
