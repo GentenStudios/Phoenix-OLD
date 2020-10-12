@@ -28,10 +28,12 @@
 
 #pragma once
 
+#include <Client/Graphics/GUI/Button.hpp>
+#include <Client/Graphics/GUI/Container.hpp>
 #include <Client/Graphics/Layer.hpp>
 #include <Client/Graphics/Window.hpp>
-#include <Client/Graphics/GUI/Container.hpp>
-#include <Client/Graphics/GUI/Button.hpp>
+
+#include <Common/Settings.hpp>
 
 namespace phx::client
 {
@@ -55,6 +57,14 @@ namespace phx::client
 
 	private:
         gfx::Window* m_window;
+
+		enum class Page {
+			MAIN, SETTINGS
+		};
+		Page m_page = Page::MAIN;
+
+        int      m_currentSensitivity = 1;
+        Setting* m_sensitivity        = nullptr;
 	};
 } // namespace phx::client
 

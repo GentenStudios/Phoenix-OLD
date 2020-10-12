@@ -58,6 +58,7 @@ void DebugOverlay::onEvent(events::Event& e) {}
 
 void DebugOverlay::tick(float dt)
 {
+    ImGui::SetNextWindowPos({50,50}, ImGuiCond_Once);
 	ImGui::Begin("Phoenix");
 
 	if (ImGui::CollapsingHeader("Graphics Information"))

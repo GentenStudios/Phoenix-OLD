@@ -37,19 +37,66 @@ using namespace phx;
 EscapeMenu::EscapeMenu(gfx::Window* window)
     : gfx::Overlay("EscapeMenu"), m_window(window){}
 
-void EscapeMenu::onAttach(){}
+void EscapeMenu::onAttach(){
+	m_page = Page::MAIN;
+
+    m_sensitivity        = Settings::get()->getSetting("camera:sensitivity");
+    m_currentSensitivity = m_sensitivity->value();
+}
 void EscapeMenu::onDetach(){}
-void EscapeMenu::onEvent(events::Event& e){}
+void EscapeMenu::onEvent(events::Event& e){
+    switch (e.type)
+	{
+	case events::EventType::KEY_PRESSED:
+		switch (e.keyboard.key)
+		{
+		case events::Keys::KEY_ESCAPE:
+			switch(m_page)
+            {
+			case Page::MAIN:
+				break;
+			case Page::SETTINGS:
+				m_page = Page::MAIN;
+                e.handled = true;
+				break;
+			}
+		default:
+			break;
+		}
+	default:
+		break;
+	}
+}
 
 void EscapeMenu::tick(float dt) {
-    ImGui::SetNextWindowPos({m_window->getSize().x / 2-50,m_window->getSize().y / 2-50});
-    ImGui::SetNextWindowSize({100,100});
-    ImGui::Begin("Phoenix", nullptr, ImGuiWindowFlags_NoResize);
-	{
-		if (ImGui::Button("Exit", {90,20}))
-		{
-			m_window->close();
-		}
+    ImGui::SetNextWindowPos({m_window->getSize().x / 2-150,m_window->getSize().y / 2-150}, ImGuiCond_Once);
+
+    ImGui::Begin("Menu", nullptr, ImGuiWindowFlags_NoResize);
+    switch(m_page)
+    {
+	case Page::MAIN:
+        if (ImGui::Button("Settings", {290,30}))
+        {
+            m_page = Page::SETTINGS;
+        }
+        if (ImGui::Button("Exit", {290,30}))
+        {
+            m_window->close();
+        }
+		break;
+	case Page::SETTINGS:
+        int i = m_currentSensitivity;
+        ImGui::SliderInt("Sensitivity", &i, 0, 100);
+        if (i != m_currentSensitivity)
+        {
+            m_currentSensitivity = i;
+            m_sensitivity->set(m_currentSensitivity);
+        }
+        if (ImGui::Button("Back", {290,30}))
+        {
+            m_page = Page::MAIN;
+        }
+		break;
 	}
     ImGui::End();
 }
