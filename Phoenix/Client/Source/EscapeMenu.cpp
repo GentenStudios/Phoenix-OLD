@@ -35,55 +35,21 @@ using namespace phx::client;
 using namespace phx;
 
 EscapeMenu::EscapeMenu(gfx::Window* window)
-    : gfx::Overlay("EscapeMenu"), m_window(window)
-{
-	const math::vec2 size = window->getSize();
-	m_windowCentre         = {size.x / 2, size.y / 2};
-}
+    : gfx::Overlay("EscapeMenu"), m_window(window){}
 
-EscapeMenu::~EscapeMenu()
-{
-	// delete them just in case onDetach is never called.
-	delete m_button;
-	delete m_container;
-}
+void EscapeMenu::onAttach(){}
+void EscapeMenu::onDetach(){}
+void EscapeMenu::onEvent(events::Event& e){}
 
-void EscapeMenu::onEvent(events::Event& e)
-{
-	if (e.type == events::EventType::WINDOW_RESIZED)
+void EscapeMenu::tick(float dt) {
+    ImGui::SetNextWindowPos({m_window->getSize().x / 2-50,m_window->getSize().y / 2-50});
+    ImGui::SetNextWindowSize({100,100});
+    ImGui::Begin("Phoenix", nullptr, ImGuiWindowFlags_NoResize);
 	{
-		m_windowCentre = {e.size.width / 2, e.size.height / 2};
-		// dont set handled because we want this to propagate down, this event
-		// isn't being handled, we're just using the data for our own help.
-	}
-
-	m_container->onEvent(e);
-}
-
-void EscapeMenu::onAttach()
-{
-	m_container =
-	    new gui::Container("", {50, 50}, {30, 30}, {0, 0, 0}, 1.f, m_window);
-
-	m_button = new gui::Button(m_container, {50, 50}, {90, 100},
-	                           {128, 128, 128}, 1.f);
-
-	m_button->setCallback([this](const events::Event& e)
-	{
-		if (e.mouse.button == events::MouseButtons::LEFT)
+		if (ImGui::Button("Exit", {90,20}))
 		{
 			m_window->close();
 		}
-	});
+	}
+    ImGui::End();
 }
-
-void EscapeMenu::onDetach()
-{
-	delete m_button;
-	m_button = nullptr;
-
-	delete m_container;
-	m_container = nullptr;
-}
-
-void EscapeMenu::tick(float dt) { m_container->tick(dt); }
