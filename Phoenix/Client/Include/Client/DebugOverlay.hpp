@@ -59,4 +59,3 @@ namespace phx::client
 		unsigned int m_time = 0;
 	};
 } // namespace phx::client
-

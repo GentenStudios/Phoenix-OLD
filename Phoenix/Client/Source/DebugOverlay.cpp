@@ -58,7 +58,7 @@ void DebugOverlay::onEvent(events::Event& e) {}
 
 void DebugOverlay::tick(float dt)
 {
-    ImGui::SetNextWindowPos({50,50}, ImGuiCond_Once);
+	ImGui::SetNextWindowPos({50, 50}, ImGuiCond_Once);
 	ImGui::Begin("Phoenix");
 
 	if (ImGui::CollapsingHeader("Graphics Information"))
@@ -92,4 +92,3 @@ void DebugOverlay::tick(float dt)
 	if (m_time >= 3600)
 		m_time = 0;
 }
-

@@ -51,20 +51,21 @@ namespace phx::client
 
 		void onAttach() override;
 		void onDetach() override;
-        void onEvent(events::Event& e) override;
+		void onEvent(events::Event& e) override;
 
 		void tick(float dt) override;
 
 	private:
-        gfx::Window* m_window;
+		gfx::Window* m_window;
 
-		enum class Page {
-			MAIN, SETTINGS
+		enum class Page
+		{
+			MAIN,
+			SETTINGS
 		};
 		Page m_page = Page::MAIN;
 
-        int      m_currentSensitivity = 1;
-        Setting* m_sensitivity        = nullptr;
+		int      m_currentSensitivity = 1;
+		Setting* m_sensitivity        = nullptr;
 	};
 } // namespace phx::client
-

@@ -35,29 +35,33 @@ using namespace phx::client;
 using namespace phx;
 
 EscapeMenu::EscapeMenu(gfx::Window* window)
-    : gfx::Overlay("EscapeMenu"), m_window(window){}
+    : gfx::Overlay("EscapeMenu"), m_window(window)
+{
+}
 
-void EscapeMenu::onAttach(){
+void EscapeMenu::onAttach()
+{
 	m_page = Page::MAIN;
 
-    m_sensitivity        = Settings::get()->getSetting("camera:sensitivity");
-    m_currentSensitivity = m_sensitivity->value();
+	m_sensitivity        = Settings::get()->getSetting("camera:sensitivity");
+	m_currentSensitivity = m_sensitivity->value();
 }
-void EscapeMenu::onDetach(){}
-void EscapeMenu::onEvent(events::Event& e){
-    switch (e.type)
+void EscapeMenu::onDetach() {}
+void EscapeMenu::onEvent(events::Event& e)
+{
+	switch (e.type)
 	{
 	case events::EventType::KEY_PRESSED:
 		switch (e.keyboard.key)
 		{
 		case events::Keys::KEY_ESCAPE:
-			switch(m_page)
-            {
+			switch (m_page)
+			{
 			case Page::MAIN:
 				break;
 			case Page::SETTINGS:
-				m_page = Page::MAIN;
-                e.handled = true;
+				m_page    = Page::MAIN;
+				e.handled = true;
 				break;
 			}
 		default:
@@ -68,35 +72,38 @@ void EscapeMenu::onEvent(events::Event& e){
 	}
 }
 
-void EscapeMenu::tick(float dt) {
-    ImGui::SetNextWindowPos({m_window->getSize().x / 2-150,m_window->getSize().y / 2-150}, ImGuiCond_Once);
+void EscapeMenu::tick(float dt)
+{
+	ImGui::SetNextWindowPos(
+	    {m_window->getSize().x / 2 - 150, m_window->getSize().y / 2 - 150},
+	    ImGuiCond_Once);
 
-    ImGui::Begin("Menu", nullptr, ImGuiWindowFlags_NoResize);
-    switch(m_page)
-    {
+	ImGui::Begin("Menu", nullptr, ImGuiWindowFlags_NoResize);
+	switch (m_page)
+	{
 	case Page::MAIN:
-        if (ImGui::Button("Settings", {290,30}))
-        {
-            m_page = Page::SETTINGS;
-        }
-        if (ImGui::Button("Exit", {290,30}))
-        {
-            m_window->close();
-        }
+		if (ImGui::Button("Settings", {290, 30}))
+		{
+			m_page = Page::SETTINGS;
+		}
+		if (ImGui::Button("Exit", {290, 30}))
+		{
+			m_window->close();
+		}
 		break;
 	case Page::SETTINGS:
-        int i = m_currentSensitivity;
-        ImGui::SliderInt("Sensitivity", &i, 0, 100);
-        if (i != m_currentSensitivity)
-        {
-            m_currentSensitivity = i;
-            m_sensitivity->set(m_currentSensitivity);
-        }
-        if (ImGui::Button("Back", {290,30}))
-        {
-            m_page = Page::MAIN;
-        }
+		int i = m_currentSensitivity;
+		ImGui::SliderInt("Sensitivity", &i, 0, 100);
+		if (i != m_currentSensitivity)
+		{
+			m_currentSensitivity = i;
+			m_sensitivity->set(m_currentSensitivity);
+		}
+		if (ImGui::Button("Back", {290, 30}))
+		{
+			m_page = Page::MAIN;
+		}
 		break;
 	}
-    ImGui::End();
+	ImGui::End();
 }
