@@ -33,7 +33,7 @@
 #include <Common/Logger.hpp>
 #include <Common/Movement.hpp>
 #include <Common/Position.hpp>
-#include <Common/Serialization/Serializer.hpp>
+#include <Common/Utility/Serializer.hpp>
 
 using namespace phx;
 using namespace phx::net;

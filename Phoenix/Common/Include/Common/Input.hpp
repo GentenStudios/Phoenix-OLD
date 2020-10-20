@@ -29,7 +29,7 @@
 #pragma once
 
 #include <Common/Math/Math.hpp>
-#include <Common/Serialization/Serializer.hpp>
+#include <Common/Utility/Serializer.hpp>
 #include <cstddef>
 
 namespace phx
