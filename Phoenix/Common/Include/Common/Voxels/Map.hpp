@@ -84,6 +84,12 @@ namespace phx::voxels
 	private:
 		void dispatchToSubscriber(const MapEvent& mapEvent) const;
 
+		/**
+		 * @brief Get the save filepath for a chunk position.
+		 *
+		 * @param chunkPos The position of the chunk
+		 * @return Relative path to the save directory.
+		 */
 		std::filesystem::path chunkPosToSavePath(const math::vec3i chunkPos);
 		
 	private:
