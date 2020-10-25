@@ -62,6 +62,8 @@ void Setting::setMin(int value) { m_minValue = value; }
 
 std::string Setting::getKey() const { return m_key; }
 
+std::string Setting::getName() const { return m_name; }
+
 int Setting::value() const { return m_value; }
 
 int Setting::getDefault() const { return m_default; }
@@ -127,4 +129,9 @@ void Settings::save(const std::string& saveFile)
 	file.open(saveFile);
 	file << std::setw(4) << m_data << std::endl;
 	file.close();
+}
+
+const std::unordered_map<std::string, Setting>& Settings::getSettings()
+{
+    return m_settings;
 }
