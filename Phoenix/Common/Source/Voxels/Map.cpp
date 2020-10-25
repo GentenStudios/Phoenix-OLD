@@ -27,8 +27,13 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <Common/Logger.hpp>
+#include <Common/Math/Math.hpp>
 #include <Common/Voxels/Map.hpp>
 
+#include <filesystem>
+#include <iostream>
+#include <string>
+#include <string_view>
 #include <utility>
 
 using namespace phx::voxels;
@@ -88,11 +93,8 @@ Chunk* Map::getChunk(const phx::math::vec3& pos)
 	}
 
 	// Chunk isn't in memory and we aren't networked, so lets create one
-	std::ifstream saveFile;
-	std::string position = "." + std::to_string(static_cast<int>(pos.x)) + "_" +
-	                       std::to_string(static_cast<int>(pos.y)) + "_" +
-	                       std::to_string(static_cast<int>(pos.z));
-	saveFile.open("Saves/" + m_save->getName() + "/" + m_mapName + position + ".save");
+	std::ifstream saveFile {
+		chunkPosToSavePath(static_cast<math::vec3i>(pos)) };
 
 	if (saveFile)
 	{
@@ -256,11 +258,8 @@ void Map::save(const phx::math::vec3& pos)
 		return;
 	}
 
-	std::ofstream saveFile;
-	std::string   position = "." + std::to_string(static_cast<int>(pos.x)) + "_" +
-	                       std::to_string(static_cast<int>(pos.y)) + "_" +
-	                       std::to_string(static_cast<int>(pos.z));
-	saveFile.open("Saves/" + m_save->getName() + "/" + m_mapName + position + ".save");
+	std::ofstream saveFile {
+		chunkPosToSavePath(static_cast<math::vec3i>(pos)) };
 
 	std::string saveString;
 	auto&       blocks = m_chunks.at(pos).getBlocks();
@@ -289,4 +288,17 @@ void Map::dispatchToSubscriber(const MapEvent& mapEvent) const
 	{
 		sub->onMapEvent(mapEvent);
 	}
+}
+
+std::filesystem::path Map::chunkPosToSavePath(const math::vec3i chunkPos)
+{
+	const std::string posString {
+		std::to_string(chunkPos.x) + '_' +
+		std::to_string(chunkPos.y) + '_' +
+		std::to_string(chunkPos.z) };
+
+	const std::filesystem::path savePath { saveDir + m_save->getName() + '/' +
+		m_mapName + '.' + posString + ".save" };
+
+	return savePath;
 }

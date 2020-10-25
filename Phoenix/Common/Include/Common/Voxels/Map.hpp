@@ -33,10 +33,17 @@
 #include <Common/Voxels/BlockReferrer.hpp>
 #include <Common/Voxels/Chunk.hpp>
 
+#include <filesystem>
 #include <unordered_map>
 
 namespace phx::voxels
 {
+
+	namespace
+	{
+		inline constexpr const char* saveDir{ "Saves/" };
+	}
+
 	struct MapEvent
 	{
 		// only one event for now, but to streamline things in the future if we
@@ -76,6 +83,8 @@ namespace phx::voxels
 
 	private:
 		void dispatchToSubscriber(const MapEvent& mapEvent) const;
+
+		std::filesystem::path chunkPosToSavePath(const math::vec3i chunkPos);
 		
 	private:
 		std::unordered_map<math::vec3, Chunk, math::Vector3Hasher,
