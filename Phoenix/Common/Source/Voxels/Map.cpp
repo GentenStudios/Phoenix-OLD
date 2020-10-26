@@ -28,8 +28,10 @@
 
 #include <Common/Logger.hpp>
 #include <Common/Math/Math.hpp>
+#include <Common/Utility/Serializer.hpp>
 #include <Common/Voxels/Map.hpp>
 
+#include <cstddef>
 #include <filesystem>
 #include <iostream>
 #include <string>
@@ -50,6 +52,12 @@ Map::Map(
 {
 }
 
+/*
+    Chunks are kept in an unordered map of vec3 : Chunk. If a chunk is already
+    in the map, return it. Otherwise, if there is a queue of chunks from the
+    server, get a new chunk from the queue. If we are offline, create a new
+    chunk and return it. Nullptr is returned if no chunk can be found/made.
+*/
 Chunk* Map::getChunk(const phx::math::vec3& pos)
 {
 	if (m_chunks.find(pos) != m_chunks.end())
@@ -57,33 +65,9 @@ Chunk* Map::getChunk(const phx::math::vec3& pos)
 		return &m_chunks.at(pos);
 	}
 
-	if (m_queue != nullptr)
+	if (m_queue)
 	{
-		if (m_queue->empty())
-		{
-			return nullptr;
-		}
-		
-		std::size_t size = m_queue->size();
-		for (std::size_t i = 0; i < size; i++)
-		{
-			std::pair<phx::math::vec3, std::vector<std::byte>> data;
-			if (!m_queue->try_pop(data))
-			{
-				LOG_WARNING("CHUNK_VIEW")
-				    << "Attempted to pop from empty chunk queue";
-				return nullptr;
-			}
-
-			// we have data.
-			Chunk chunk(data.first, m_referrer);
-			phx::Serializer ser;
-			ser.setBuffer(data.second);
-			ser << chunk;
-			
-			m_chunks.emplace(chunk.getChunkPos(), chunk);
-		}
-
+		updateChunkQueue();
 		if (m_chunks.find(pos) != m_chunks.end())
 		{
 			return &m_chunks.at(pos);
@@ -94,7 +78,7 @@ Chunk* Map::getChunk(const phx::math::vec3& pos)
 
 	// Chunk isn't in memory and we aren't networked, so lets create one
 	std::ifstream saveFile {
-		chunkPosToSavePath(static_cast<math::vec3i>(pos)) };
+		toSavePath(static_cast<phx::math::vec3i>(pos)) };
 
 	if (saveFile)
 	{
@@ -104,7 +88,7 @@ Chunk* Map::getChunk(const phx::math::vec3& pos)
 		Chunk chunk(pos, m_referrer);
 		Chunk::BlockList& blocks = chunk.getBlocks();
 
-    std::string_view search = saveString;
+		std::string_view search = saveString;
 		std::size_t      strPos = 0;
 		std::size_t      i      = 0;
 		while ((strPos = search.find_first_of(';')) != std::string_view::npos)
@@ -259,7 +243,7 @@ void Map::save(const phx::math::vec3& pos)
 	}
 
 	std::ofstream saveFile {
-		chunkPosToSavePath(static_cast<math::vec3i>(pos)) };
+		toSavePath(static_cast<phx::math::vec3i>(pos)) };
 
 	std::string saveString;
 	auto&       blocks = m_chunks.at(pos).getBlocks();
@@ -290,7 +274,39 @@ void Map::dispatchToSubscriber(const MapEvent& mapEvent) const
 	}
 }
 
-std::filesystem::path Map::chunkPosToSavePath(const math::vec3i chunkPos)
+void Map::updateChunkQueue()
+{
+	if (!m_queue || m_queue->empty())
+	{
+		return;
+	}
+
+	// BlockingQueue methods have mutex overhead, so we minimize method calls.
+	// The size of the queue changes during iteration.
+	const std::size_t nChunksQueued { m_queue->size() };
+	for (std::size_t i { 0 }; i < nChunksQueued; ++i)
+	{
+		chunkData_t data;
+		if (!m_queue->try_pop(data))
+		{
+			LOG_WARNING("CHUNK_VIEW") <<
+				"Attempted to pop from empty chunk queue";
+			break;
+		}
+
+		// We have chunk data.
+		Chunk chunk {data.first, m_referrer};
+		phx::Serializer ser;
+		ser.setBuffer(data.second);
+		ser << chunk;
+
+		m_chunks.emplace(chunk.getChunkPos(), chunk);
+	}
+
+	return;
+}
+
+std::filesystem::path Map::toSavePath(const phx::math::vec3i chunkPos) const
 {
 	const std::string posString {
 		std::to_string(chunkPos.x) + '_' +

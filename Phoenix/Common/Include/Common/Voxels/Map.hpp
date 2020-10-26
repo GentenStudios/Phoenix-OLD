@@ -28,16 +28,21 @@
 
 #pragma once
 
+#include <Common/Math/Math.hpp>
 #include <Common/Save.hpp>
 #include <Common/Utility/BlockingQueue.hpp>
 #include <Common/Voxels/BlockReferrer.hpp>
 #include <Common/Voxels/Chunk.hpp>
 
+#include <cstddef>
 #include <filesystem>
 #include <unordered_map>
+#include <utility>
 
 namespace phx::voxels
 {
+
+	using chunkData_t = std::pair<phx::math::vec3, std::vector<std::byte>>;
 
 	namespace
 	{
@@ -84,13 +89,15 @@ namespace phx::voxels
 	private:
 		void dispatchToSubscriber(const MapEvent& mapEvent) const;
 
+		void updateChunkQueue();
+
 		/**
 		 * @brief Get the save filepath for a chunk position.
 		 *
 		 * @param chunkPos The position of the chunk
 		 * @return Relative path to the save directory.
 		 */
-		std::filesystem::path chunkPosToSavePath(const math::vec3i chunkPos);
+		std::filesystem::path toSavePath(const phx::math::vec3i chunkPos) const;
 		
 	private:
 		std::unordered_map<math::vec3, Chunk, math::Vector3Hasher,
