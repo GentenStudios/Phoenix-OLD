@@ -26,68 +26,29 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Common/Voxels/Chunk.hpp>
+/**
+ * @file Metadata.hpp
+ * @brief Used to store unique data per individual instances
+ *
+ * @copyright Copyright (c) Genten Studios 2019 - 2020
+ *
+ */
 
-using namespace phx::voxels;
+#pragma once
 
-Chunk::Chunk(const phx::math::vec3& chunkPos, BlockReferrer* referrer)
-    : m_pos(chunkPos), m_referrer(referrer)
+#include <string>
+
+namespace phx
 {
-	m_blocks.reserve(CHUNK_WIDTH * CHUNK_HEIGHT * CHUNK_DEPTH);
-}
 
-phx::math::vec3   Chunk::getChunkPos() const { return m_pos; }
-Chunk::BlockList& Chunk::getBlocks() { return m_blocks; }
-
-BlockType* Chunk::getBlockAt(phx::math::vec3 position) const
-{
-	if (position.x < CHUNK_WIDTH && position.y < CHUNK_HEIGHT &&
-	    position.z < CHUNK_DEPTH)
+	struct Metadata
 	{
-		return m_blocks[getVectorIndex(position)];
-	}
+		enum Type{String, Numeral, Reference};
 
-	return m_referrer->blocks.get(BlockType::OUT_OF_BOUNDS_BLOCK);
-}
+		Type type;
+		void* data;
 
-void Chunk::setBlockAt(phx::math::vec3 position, BlockType* newBlock)
-{
-	if (position.x < CHUNK_WIDTH && position.y < CHUNK_HEIGHT &&
-	    position.z < CHUNK_DEPTH)
-	{
-		m_blocks[getVectorIndex(position)] = newBlock;
-	}
-}
-
-std::unordered_map<std::string, Metadata> Chunk::getBlockMetadata(
-    phx::math::vec3 position)
-{
-    return std::unordered_map<std::string, Metadata>();
-}
-
-phx::Serializer& Chunk::operator>>(phx::Serializer& ser) const
-{
-	ser << m_pos.x << m_pos.y << m_pos.z;
-	for (const BlockType* block : m_blocks)
-	{
-		ser << block->uniqueIdentifier;
-	}
-
-	return ser;
-}
-
-phx::Serializer& Chunk::operator<<(phx::Serializer& ser)
-{
-	m_blocks.clear();
-	m_blocks.reserve(4096);
-
-	ser >> m_pos.x >> m_pos.y >> m_pos.z;
-	for (int i = 0; i < CHUNK_DEPTH * CHUNK_WIDTH * CHUNK_HEIGHT; i++)
-	{
-		std::size_t id = 0;
-		ser >> id;
-		m_blocks.push_back(m_referrer->blocks.get(id));
-	}
-
-	return ser;
+		std::string save();
+		bool load(std::string data);
+	};
 }
