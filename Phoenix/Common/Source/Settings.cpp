@@ -60,9 +60,9 @@ void Setting::setMax(int value) { m_maxValue = value; }
 
 void Setting::setMin(int value) { m_minValue = value; }
 
-std::string Setting::getKey() const { return m_key; }
+const std::string& Setting::getKey() { return m_key; }
 
-std::string Setting::getName() const { return m_name; }
+const std::string& Setting::getName() { return m_name; }
 
 int Setting::value() const { return m_value; }
 

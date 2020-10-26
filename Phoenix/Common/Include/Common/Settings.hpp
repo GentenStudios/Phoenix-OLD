@@ -111,7 +111,7 @@ namespace phx
 		 * @param value The maximum value the setting can be.
 		 */
 		void setMax(int value);
-		int getMax() const {return m_maxValue;};
+		int  getMax() const { return m_maxValue; }
 
 		/**
 		 * @brief Set the minimum value for the setting.
@@ -119,16 +119,16 @@ namespace phx
 		 * @param value The minimum value the setting can be.
 		 */
 		void setMin(int value);
-		int getMin() const {return m_minValue;};
+		int  getMin() const { return m_minValue; }
 
 		/**
 		 * @brief Gets the value of a setting.
 		 *
 		 * @return std::string the unique key for the setting.
 		 */
-		std::string getKey() const;
+		const std::string& getKey();
 
-		std::string getName() const;
+		const std::string& getName();
 
 		/**
 		 * @brief Gets the value of a setting.
