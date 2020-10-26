@@ -126,9 +126,9 @@ namespace phx
 		 *
 		 * @return std::string the unique key for the setting.
 		 */
-		const std::string& getKey();
+		const std::string& getKey() const;
 
-		const std::string& getName();
+		const std::string& getName() const;
 
 		/**
 		 * @brief Gets the value of a setting.
