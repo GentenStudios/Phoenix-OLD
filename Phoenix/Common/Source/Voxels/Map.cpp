@@ -45,9 +45,9 @@ Map::Map(phx::Save* save, const std::string& name, BlockReferrer* referrer)
 {
 }
 
-Map::Map(
-    phx::BlockingQueue<std::pair<phx::math::vec3, std::vector<std::byte>>>* queue,
-    BlockReferrer*                                                     referrer)
+Map::Map(phx::BlockingQueue<std::pair<phx::math::vec3, std::vector<std::byte>>>*
+                        queue,
+         BlockReferrer* referrer)
     : m_referrer(referrer), m_queue(queue)
 {
 }
@@ -77,15 +77,14 @@ Chunk* Map::getChunk(const phx::math::vec3& pos)
 	}
 
 	// Chunk isn't in memory and we aren't networked, so lets create one
-	std::ifstream saveFile {
-		toSavePath(static_cast<phx::math::vec3i>(pos)) };
+	std::ifstream saveFile {toSavePath(static_cast<phx::math::vec3i>(pos))};
 
 	if (saveFile)
 	{
 		std::string saveString;
 		std::getline(saveFile, saveString);
 
-		Chunk chunk(pos, m_referrer);
+		Chunk             chunk(pos, m_referrer);
 		Chunk::BlockList& blocks = chunk.getBlocks();
 
 		std::string_view search = saveString;
@@ -95,7 +94,8 @@ Chunk* Map::getChunk(const phx::math::vec3& pos)
 		{
 			std::string result;
 			result = search.substr(0, strPos);
-			blocks.push_back(m_referrer->blocks.get(*m_referrer->referrer.get(result)));
+			blocks.push_back(
+			    m_referrer->blocks.get(*m_referrer->referrer.get(result)));
 			search.remove_prefix(strPos + 1);
 		}
 
@@ -107,7 +107,7 @@ Chunk* Map::getChunk(const phx::math::vec3& pos)
 
 			blocks.clear();
 			blocks.reserve(4096);
-			
+
 			BlockType* block = nullptr;
 			if (chunk.getChunkPos().y >= 0)
 			{
@@ -158,11 +158,11 @@ Chunk* Map::getChunk(const phx::math::vec3& pos)
 		{
 			blockRef.push_back(block);
 		}
-		
+
 		m_chunks.emplace(pos, std::move(chunk));
 		save(pos);
 	}
-	
+
 	return &m_chunks.at(pos);
 }
 
@@ -175,24 +175,24 @@ std::pair<phx::math::vec3, phx::math::vec3> Map::getBlockPos(
 	int posY = static_cast<int>(position.y / Chunk::CHUNK_HEIGHT);
 	int posZ = static_cast<int>(position.z / Chunk::CHUNK_DEPTH);
 
-	position.x = static_cast<float>(static_cast<int>(position.x) %
-	                                Chunk::CHUNK_WIDTH);
+	position.x =
+	    static_cast<float>(static_cast<int>(position.x) % Chunk::CHUNK_WIDTH);
 	if (position.x < 0)
 	{
 		posX -= 1;
 		position.x += Chunk::CHUNK_WIDTH;
 	}
 
-	position.y = static_cast<float>(static_cast<int>(position.y) %
-	                                Chunk::CHUNK_HEIGHT);
+	position.y =
+	    static_cast<float>(static_cast<int>(position.y) % Chunk::CHUNK_HEIGHT);
 	if (position.y < 0)
 	{
 		posY -= 1;
 		position.y += Chunk::CHUNK_HEIGHT;
 	}
 
-	position.z = static_cast<float>(static_cast<int>(position.z) %
-	                                Chunk::CHUNK_DEPTH);
+	position.z =
+	    static_cast<float>(static_cast<int>(position.z) % Chunk::CHUNK_DEPTH);
 	if (position.z < 0)
 	{
 		posZ -= 1;
@@ -242,8 +242,7 @@ void Map::save(const phx::math::vec3& pos)
 		return;
 	}
 
-	std::ofstream saveFile {
-		toSavePath(static_cast<phx::math::vec3i>(pos)) };
+	std::ofstream saveFile {toSavePath(static_cast<phx::math::vec3i>(pos))};
 
 	std::string saveString;
 	auto&       blocks = m_chunks.at(pos).getBlocks();
@@ -283,19 +282,19 @@ void Map::updateChunkQueue()
 
 	// BlockingQueue methods have mutex overhead, so we minimize method calls.
 	// The size of the queue changes during iteration.
-	const std::size_t nChunksQueued { m_queue->size() };
-	for (std::size_t i { 0 }; i < nChunksQueued; ++i)
+	const std::size_t nChunksQueued {m_queue->size()};
+	for (std::size_t i {0}; i < nChunksQueued; ++i)
 	{
 		chunkData_t data;
 		if (!m_queue->try_pop(data))
 		{
-			LOG_WARNING("CHUNK_VIEW") <<
-				"Attempted to pop from empty chunk queue";
+			LOG_WARNING("CHUNK_VIEW")
+			    << "Attempted to pop from empty chunk queue";
 			break;
 		}
 
 		// We have chunk data.
-		Chunk chunk {data.first, m_referrer};
+		Chunk           chunk {data.first, m_referrer};
 		phx::Serializer ser;
 		ser.setBuffer(data.second);
 		ser << chunk;
@@ -308,13 +307,13 @@ void Map::updateChunkQueue()
 
 std::filesystem::path Map::toSavePath(const phx::math::vec3i chunkPos) const
 {
-	const std::string posString {
-		std::to_string(chunkPos.x) + '_' +
-		std::to_string(chunkPos.y) + '_' +
-		std::to_string(chunkPos.z) };
+	const std::string posString {std::to_string(chunkPos.x) + '_' +
+	                             std::to_string(chunkPos.y) + '_' +
+	                             std::to_string(chunkPos.z)};
 
-	const std::filesystem::path savePath { saveDir + m_save->getName() + '/' +
-		m_mapName + '.' + posString + ".save" };
+	const std::filesystem::path savePath {saveDir + m_save->getName() + '/' +
+	                                      m_mapName + '.' + posString +
+	                                      ".save"};
 
 	return savePath;
 }

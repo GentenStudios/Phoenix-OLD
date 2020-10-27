@@ -46,7 +46,7 @@ namespace phx::voxels
 
 	namespace
 	{
-		inline constexpr const char* saveDir{ "Saves/" };
+		inline constexpr const char* saveDir {"Saves/"};
 	}
 
 	struct MapEvent
@@ -59,7 +59,7 @@ namespace phx::voxels
 			CHUNK_UPDATE
 		};
 
-		Event      type;
+		Event          type;
 		voxels::Chunk* chunk;
 	};
 
@@ -98,7 +98,7 @@ namespace phx::voxels
 		 * @return Relative path to the save directory.
 		 */
 		std::filesystem::path toSavePath(const phx::math::vec3i chunkPos) const;
-		
+
 	private:
 		std::unordered_map<math::vec3, Chunk, math::Vector3Hasher,
 		                   math::Vector3KeyComparator>
