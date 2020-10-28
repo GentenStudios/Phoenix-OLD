@@ -210,6 +210,7 @@ std::vector<float> ChunkMesher::mesh(
 		case BlockModel::SLOPE:
 			insertToMesh(SLOPE_FRONT,  SLOPE_FRONT_COUNT,  BlockFace::NORTH,  {x, y, z});
 			insertToMesh(SLOPE_RIGHT,  SLOPE_RIGHT_COUNT,  BlockFace::EAST,   {x, y, z});
+			insertToMesh(SLOPE_LEFT,   SLOPE_LEFT_COUNT,   BlockFace::WEST,   {x, y, z});
 			insertToMesh(SLOPE_BACK,   SLOPE_BACK_COUNT,   BlockFace::SOUTH,  {x, y, z});
 			insertToMesh(SLOPE_BOTTOM, SLOPE_BOTTOM_COUNT, BlockFace::BOTTOM, {x, y, z});
 			break;
@@ -291,7 +292,7 @@ std::vector<float> ChunkMesher::mesh(
 					else
 					{
 						// divide by 6 to get face in block, +4 because first 4 textures should be for the xpanel.
-						texLayer = texTable.at((*tex)[(XPANEL_BLOCK_BLOCK_VERT_COUNT + 24) / 6]);
+						texLayer = texTable.at((*tex)[(XPANEL_BLOCK_BLOCK_VERT_COUNT / 6) + 4]);
 					}
 
 					phx::gfx::DefaultMeshVertex const* current = XPANEL_BLOCK_BLOCK_MESH + q;

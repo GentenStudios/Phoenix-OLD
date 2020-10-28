@@ -82,12 +82,12 @@ xpanelBlock = {}
 xpanelBlock.name = "Test XPanelBlock"
 xpanelBlock.id = "core.test_xpanel_block"
 xpanelBlock.model = "XPanelCube"
-xpanelBlock.textures= {"Assets/xpanblock.png"}
+xpanelBlock.textures= {"Assets/xpanel.png"}
 voxel.block.register(xpanelBlock)
 
 slope = {}
 slope.name = "Test Slope"
 slope.id = "core.test_slope"
 slope.model = "Slope"
-slope.textures= {"Assets/test.png"}
-voxel.block.register(xpanel)
+slope.textures= {"Assets/xpanel.png"}
+voxel.block.register(slope)
