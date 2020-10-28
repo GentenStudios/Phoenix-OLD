@@ -58,9 +58,7 @@ namespace phx::client
 	private:
 		entt::registry* m_registry;
 
-		bool*    m_followCam          = nullptr;
-		int      m_currentSensitivity = 1;
-		Setting* m_sensitivity        = nullptr;
+		bool* m_followCam = nullptr;
 
 		entt::entity m_player;
 	};

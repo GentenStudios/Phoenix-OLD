@@ -37,53 +37,73 @@ using namespace phx;
 EscapeMenu::EscapeMenu(gfx::Window* window)
     : gfx::Overlay("EscapeMenu"), m_window(window)
 {
-	const math::vec2 size = window->getSize();
-	m_windowCentre         = {size.x / 2, size.y / 2};
-}
-
-EscapeMenu::~EscapeMenu()
-{
-	// delete them just in case onDetach is never called.
-	delete m_button;
-	delete m_container;
-}
-
-void EscapeMenu::onEvent(events::Event& e)
-{
-	if (e.type == events::EventType::WINDOW_RESIZED)
-	{
-		m_windowCentre = {e.size.width / 2, e.size.height / 2};
-		// dont set handled because we want this to propagate down, this event
-		// isn't being handled, we're just using the data for our own help.
-	}
-
-	m_container->onEvent(e);
 }
 
 void EscapeMenu::onAttach()
 {
-	m_container =
-	    new gui::Container("", {50, 50}, {30, 30}, {0, 0, 0}, 1.f, m_window);
+	m_page = Page::MAIN;
 
-	m_button = new gui::Button(m_container, {50, 50}, {90, 100},
-	                           {128, 128, 128}, 1.f);
-
-	m_button->setCallback([this](const events::Event& e)
+	m_sensitivity        = Settings::get()->getSetting("camera:sensitivity");
+	m_currentSensitivity = m_sensitivity->value();
+}
+void EscapeMenu::onDetach() {}
+void EscapeMenu::onEvent(events::Event& e)
+{
+	switch (e.type)
 	{
-		if (e.mouse.button == events::MouseButtons::LEFT)
+	case events::EventType::KEY_PRESSED:
+		switch (e.keyboard.key)
+		{
+		case events::Keys::KEY_ESCAPE:
+			switch (m_page)
+			{
+			case Page::MAIN:
+				break;
+			case Page::SETTINGS:
+				m_page    = Page::MAIN;
+				e.handled = true;
+				break;
+			}
+		default:
+			break;
+		}
+	default:
+		break;
+	}
+}
+
+void EscapeMenu::tick(float dt)
+{
+	ImGui::SetNextWindowPos(
+	    {m_window->getSize().x / 2 - 150, m_window->getSize().y / 2 - 150},
+	    ImGuiCond_Once);
+
+	ImGui::Begin("Menu", nullptr, ImGuiWindowFlags_NoResize);
+	switch (m_page)
+	{
+	case Page::MAIN:
+		if (ImGui::Button("Settings", {290, 30}))
+		{
+			m_page = Page::SETTINGS;
+		}
+		if (ImGui::Button("Exit", {290, 30}))
 		{
 			m_window->close();
 		}
-	});
+		break;
+	case Page::SETTINGS:
+		int i = m_currentSensitivity;
+		ImGui::SliderInt("Sensitivity", &i, 0, 100);
+		if (i != m_currentSensitivity)
+		{
+			m_currentSensitivity = i;
+			m_sensitivity->set(m_currentSensitivity);
+		}
+		if (ImGui::Button("Back", {290, 30}))
+		{
+			m_page = Page::MAIN;
+		}
+		break;
+	}
+	ImGui::End();
 }
-
-void EscapeMenu::onDetach()
-{
-	delete m_button;
-	m_button = nullptr;
-
-	delete m_container;
-	m_container = nullptr;
-}
-
-void EscapeMenu::tick(float dt) { m_container->tick(dt); }

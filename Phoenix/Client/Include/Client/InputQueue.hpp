@@ -32,7 +32,7 @@
 #include <Client/InputMap.hpp>
 #include <Client/Network.hpp>
 
-#include <Common/Util/BlockingQueue.hpp>
+#include <Common/Utility/BlockingQueue.hpp>
 
 namespace phx::client
 {

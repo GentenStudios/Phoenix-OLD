@@ -77,26 +77,57 @@ namespace phx::client
 			    "voxel.block.register", [manager, this](sol::table luaBlock) {
 				    voxels::BlockType block;
 
-				    block.displayName = luaBlock["name"];
-				    block.id          = luaBlock["id"];
+					sol::optional<std::string> name = luaBlock["name"];
+					if (name)
+					{
+						block.displayName = *name;
+					}
+					else
+					{
+						// log the error and return to make this a recoverable error.
+					    LOG_FATAL("MODDING")
+					        << "The mod at: " << manager->getCurrentModPath()
+					        << " attempts to register a block without "
+					        << "specifying a name.";
+						return;
+					}
 
-				    const std::string category = luaBlock["category"];
+					sol::optional<std::string> id = luaBlock["id"];
+					if (id)
+				    {
+						block.id          = luaBlock.get<std::string>("id");
+					}
+					else
+				    {
+					    // log the error and return to make this a recoverable
+					    // error.
+					    LOG_FATAL("MODDING")
+					        << "The mod at: " << manager->getCurrentModPath()
+					        << " attempts to register a block ("
+					        << block.displayName << ") without "
+					        << "specifying a name.";
+					    return;
+					}
 
-				    if (category == "Solid")
+				    sol::optional<std::string> cat = luaBlock["category"];
+				    if (cat)
 				    {
-					    block.category = voxels::BlockCategory::SOLID;
-				    }
-				    else if (category == "Liquid")
-				    {
-					    block.category = voxels::BlockCategory::LIQUID;
-				    }
-				    else if (category == "Air")
-				    {
-					    block.category = voxels::BlockCategory::AIR;
-				    }
+						if (*cat == "Solid")
+						{
+							block.category = voxels::BlockCategory::SOLID;
+						}
+					    else if (*cat == "Liquid")
+						{
+							block.category = voxels::BlockCategory::LIQUID;
+						}
+					    else if (*cat == "Air")
+						{
+							block.category = voxels::BlockCategory::AIR;
+						}
+					}
 			    	else
 			    	{
-					    // make solid by default in case none of below
+					    // make solid by default in case none of above
 					    // conditions are met.
 					    block.category = voxels::BlockCategory::SOLID;
 			    	}

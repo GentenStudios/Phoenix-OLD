@@ -43,11 +43,7 @@ GameTools::GameTools(bool* followCam, entt::registry* registry,
 {
 }
 
-void GameTools::onAttach()
-{
-	m_sensitivity        = Settings::get()->getSetting("camera:sensitivity");
-	m_currentSensitivity = m_sensitivity->value();
-}
+void GameTools::onAttach() {}
 
 void GameTools::onDetach() {}
 
@@ -59,14 +55,6 @@ void GameTools::tick(float dt)
 	if (ImGui::CollapsingHeader("Game Tools"))
 	{
 		ImGui::Checkbox("Follow Camera", m_followCam);
-
-		int i = m_currentSensitivity;
-		ImGui::SliderInt("cam sensitivity", &i, 0, 100);
-		if (i != m_currentSensitivity)
-		{
-			m_currentSensitivity = i;
-			m_sensitivity->set(m_currentSensitivity);
-		}
 
 		ImGui::Text("X: %f\nY: %f\nZ: %f",
 		            m_registry->get<Position>(m_player).position.x,

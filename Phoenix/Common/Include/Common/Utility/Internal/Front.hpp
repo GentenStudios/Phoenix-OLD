@@ -28,6 +28,9 @@
 
 #pragma once
 
+#include <string>
+#include <queue>
+
 namespace
 {
 	namespace internal

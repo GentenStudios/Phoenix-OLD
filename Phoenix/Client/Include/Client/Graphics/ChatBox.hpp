@@ -30,7 +30,7 @@
 
 #include <Client/Graphics/Window.hpp>
 
-#include <Common/Util/BlockingQueue.hpp>
+#include <Common/Utility/BlockingQueue.hpp>
 
 #include <deque>
 #include <functional>

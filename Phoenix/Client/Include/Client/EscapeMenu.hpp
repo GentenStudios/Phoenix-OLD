@@ -28,10 +28,12 @@
 
 #pragma once
 
+#include <Client/Graphics/GUI/Button.hpp>
+#include <Client/Graphics/GUI/Container.hpp>
 #include <Client/Graphics/Layer.hpp>
 #include <Client/Graphics/Window.hpp>
-#include <Client/Graphics/GUI/Container.hpp>
-#include <Client/Graphics/GUI/Button.hpp>
+
+#include <Common/Settings.hpp>
 
 namespace phx::client
 {
@@ -45,19 +47,25 @@ namespace phx::client
 	{
 	public:
 		EscapeMenu(gfx::Window* window);
-		~EscapeMenu() override;
+		~EscapeMenu() override = default;
 
-		void onEvent(events::Event& e) override;
 		void onAttach() override;
 		void onDetach() override;
+		void onEvent(events::Event& e) override;
 
 		void tick(float dt) override;
 
 	private:
-		math::vec2i m_windowCentre;
 		gfx::Window* m_window;
-		gui::Container* m_container;
-		gui::Button* m_button;
+
+		enum class Page
+		{
+			MAIN,
+			SETTINGS
+		};
+		Page m_page = Page::MAIN;
+
+		int      m_currentSensitivity = 1;
+		Setting* m_sensitivity        = nullptr;
 	};
 } // namespace phx::client
-

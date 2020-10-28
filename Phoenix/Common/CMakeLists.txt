@@ -4,12 +4,24 @@ add_subdirectory(Include/Common)
 add_subdirectory(Source)
 
 add_library(${PROJECT_NAME} STATIC ${Headers} ${Sources})
-target_link_libraries(${PROJECT_NAME} PRIVATE ${PHX_THIRD_PARTY_LIBRARIES})
-target_include_directories(${PROJECT_NAME} PRIVATE Include ${PHX_THIRD_PARTY_INCLUDES})
+
+target_link_libraries(${PROJECT_NAME}
+	PRIVATE
+		${PHX_THIRD_PARTY_LIBRARIES}
+		$<$<AND:$<CXX_COMPILER_ID:GNU>,$<VERSION_LESS:$<CXX_COMPILER_VERSION>,9.0>>:stdc++fs>
+)
+
+target_include_directories(${PROJECT_NAME}
+	PRIVATE
+		${PHX_THIRD_PARTY_INCLUDES}
+	PUBLIC
+		Include
+)
+
 set_target_properties(${PROJECT_NAME} PROPERTIES
 	CXX_STANDARD 17
-	CMAKE_CXX_STANDARD_REQUIRED ON
-	CMAKE_CXX_EXTENSIONS OFF
+	CXX_STANDARD_REQUIRED ON
+	CXX_EXTENSIONS OFF
 )
 
 #################################################
