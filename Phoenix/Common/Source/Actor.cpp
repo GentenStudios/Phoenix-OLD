@@ -26,11 +26,11 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Common/Game/Actor.hpp>
+#include <Common/Actor.hpp>
 
-#include <Common/Game/Movement.hpp>
-#include <Common/Game/PlayerView.hpp>
-#include <Common/Game/Components/Position.hpp>
+#include <Common/Movement.hpp>
+#include <Common/PlayerView.hpp>
+#include <Common/Position.hpp>
 
 using namespace phx;
 

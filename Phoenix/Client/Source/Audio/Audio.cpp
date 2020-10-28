@@ -165,8 +165,11 @@ unsigned int Audio::loadMP3(const std::string& uniqueName,
 	             info.buffer, bufferSize, info.hz);
 
 	// checks for an error.
-	if (alGetError() != AL_NO_ERROR)
+	ALenum error = alGetError();
+	if (error != AL_NO_ERROR)
 	{
+		std::cout << error << std::endl;
+		
 		LOG_FATAL("AUDIO")
 		    << "An unexpected (but recoverable) error occurred while loading: "
 		    << filePath;

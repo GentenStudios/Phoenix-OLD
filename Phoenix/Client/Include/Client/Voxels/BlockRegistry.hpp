@@ -181,34 +181,37 @@ namespace phx::client
 				    // system, liquids and gasses will have another system too.)
 			    	if (block.category == voxels::BlockCategory::SOLID)
 			    	{
-					    gfx::BlockModel   model    = gfx::BlockModel::BLOCK;
-					    const std::string luaModel = luaBlock["model"];
+					    gfx::BlockModel model = gfx::BlockModel::BLOCK;
 
 						// this is shit, lets find a better way to do this.
-			    		if (luaModel == "Block")
-					    {
-						    model = gfx::BlockModel::BLOCK;
-					    }
-					    else if (luaModel == "Slab")
-					    {
-						    model = gfx::BlockModel::SLAB;
-					    }
-					    else if (luaModel == "Slope")
-					    {
-						    model = gfx::BlockModel::SLOPE;
-					    }
-					    else if (luaModel == "Stair")
-					    {
-						    model = gfx::BlockModel::STAIR;
-					    }
-					    else if (luaModel == "XPanel")
-					    {
-						    model = gfx::BlockModel::X_PANEL;
-					    }
-					    else if (luaModel == "XPanelCube")
-					    {
-						    model = gfx::BlockModel::X_PANEL_CUBE;
-					    }
+					    sol::optional<std::string> luaModel = luaBlock["model"];
+			    		if (luaModel)
+			    		{
+						    if (luaModel == "Block")
+						    {
+							    model = gfx::BlockModel::BLOCK;
+						    }
+						    else if (luaModel == "Slab")
+						    {
+							    model = gfx::BlockModel::SLAB;
+						    }
+						    else if (luaModel == "Slope")
+						    {
+							    model = gfx::BlockModel::SLOPE;
+						    }
+						    else if (luaModel == "Stair")
+						    {
+							    model = gfx::BlockModel::STAIR;
+						    }
+						    else if (luaModel == "XPanel")
+						    {
+							    model = gfx::BlockModel::X_PANEL;
+						    }
+						    else if (luaModel == "XPanelCube")
+						    {
+							    model = gfx::BlockModel::X_PANEL_CUBE;
+						    }
+			    		}
 			    		
 					    models.add(blockUID, model);
 			    	}
