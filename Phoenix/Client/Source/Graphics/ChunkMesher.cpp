@@ -264,7 +264,7 @@ std::vector<float> ChunkMesher::mesh(
 					else
 					{
 						// int to int division will round down and make it return the value at either 1 to 4.
-						texLayer = texTable.at((*tex)[static_cast<std::size_t>(q / 6)]);
+						texLayer = texTable.at((*tex)[q / 6]);
 					}
 
 					phx::gfx::DefaultMeshVertex const* current = XPANEL_BLOCK_MESH + q;
@@ -292,7 +292,7 @@ std::vector<float> ChunkMesher::mesh(
 					else
 					{
 						// divide by 6 to get face in block, +4 because first 4 textures should be for the xpanel.
-						texLayer = texTable.at((*tex)[(XPANEL_BLOCK_BLOCK_VERT_COUNT / 6) + 4]);
+						texLayer = texTable.at((*tex)[(q / 6) + 4]);
 					}
 
 					phx::gfx::DefaultMeshVertex const* current = XPANEL_BLOCK_BLOCK_MESH + q;
