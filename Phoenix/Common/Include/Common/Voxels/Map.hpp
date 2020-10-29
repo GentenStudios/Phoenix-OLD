@@ -36,6 +36,7 @@
 
 #include <cstddef>
 #include <filesystem>
+#include <string_view>
 #include <unordered_map>
 #include <utility>
 
@@ -89,12 +90,32 @@ namespace phx::voxels
 	private:
 		void dispatchToSubscriber(const MapEvent& mapEvent) const;
 
+		/**
+		 * @brief Update the loaded chunks from the queue of incoming chunks.
+		 */
 		void updateChunkQueue();
+
+		/*
+		 * @brief Parse a save string into a chunk.
+		 *
+		 * @param searchView A string view of the save data to be parsed.
+		 * @param chunk The chunk to be filled with the appropriate blocks.
+		 * @return true if the parsing was successful, otherwise false.
+		 */
+		bool parseChunkSave(std::string_view searchView, Chunk &chunk);
+
+		/*
+		 * @brief Load a chunk from the save files.
+		 *
+		 * @param chunkPos The coordinates of the chunk.
+		 * @return true if chunk was loaded from save, otherwise false.
+		 */
+		bool loadChunk(const phx::math::vec3 chunkPos);
 
 		/**
 		 * @brief Get the save filepath for a chunk position.
 		 *
-		 * @param chunkPos The position of the chunk
+		 * @param chunkPos The integer coordinates of the chunk.
 		 * @return Relative path to the save directory.
 		 */
 		std::filesystem::path toSavePath(const phx::math::vec3i chunkPos) const;

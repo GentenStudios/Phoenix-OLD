@@ -77,58 +77,7 @@ Chunk* Map::getChunk(const phx::math::vec3& pos)
 	}
 
 	// Chunk isn't in memory and we aren't networked, so lets create one
-	std::ifstream saveFile {toSavePath(static_cast<phx::math::vec3i>(pos))};
-
-	if (saveFile)
-	{
-		std::string saveString;
-		std::getline(saveFile, saveString);
-
-		Chunk             chunk(pos, m_referrer);
-		Chunk::BlockList& blocks = chunk.getBlocks();
-
-		std::string_view search = saveString;
-		std::size_t      strPos = 0;
-		std::size_t      i      = 0;
-		while ((strPos = search.find_first_of(';')) != std::string_view::npos)
-		{
-			std::string result;
-			result = search.substr(0, strPos);
-			blocks.push_back(
-			    m_referrer->blocks.get(*m_referrer->referrer.get(result)));
-			search.remove_prefix(strPos + 1);
-		}
-
-		// something went wrong if the amount of blocks is different.
-		if (blocks.size() != Chunk::CHUNK_MAX_BLOCKS)
-		{
-			LOG_WARNING("MAP") << "Existing save for chunk at: " << pos
-			                   << " is invalid, regenerating";
-
-			blocks.clear();
-			blocks.reserve(4096);
-
-			BlockType* block = nullptr;
-			if (chunk.getChunkPos().y >= 0)
-			{
-				block = m_referrer->blocks.get(
-				    *m_referrer->referrer.get("core.air"));
-			}
-			else
-			{
-				block = m_referrer->blocks.get(
-				    *m_referrer->referrer.get("core.grass"));
-			}
-
-			for (int i = 0; i < Chunk::CHUNK_MAX_BLOCKS; ++i)
-			{
-				blocks.push_back(block);
-			}
-		}
-
-		m_chunks.emplace(pos, std::move(chunk));
-	}
-	else
+	if (!loadChunk(pos))
 	{
 		// save doesn't exist, generate it.
 		Chunk chunk(pos, m_referrer);
@@ -303,6 +252,56 @@ void Map::updateChunkQueue()
 	}
 
 	return;
+}
+
+bool Map::parseChunkSave(std::string_view searchView, Chunk &chunk)
+{
+	// We will add blocks to the chunk as they are parsed.
+	Chunk::BlockList& blocks {chunk.getBlocks()};
+
+	for (std::size_t delimiterPos {searchView.find_first_of(';')};
+			delimiterPos != std::string_view::npos;
+			searchView.remove_prefix(delimiterPos + 1),
+				delimiterPos = searchView.find_first_of(';'))
+	{
+		const std::string blockName {searchView.substr(0, delimiterPos)};
+		blocks.push_back(
+			m_referrer->blocks.get(*m_referrer->referrer.get(blockName)));
+	}
+	
+	if (blocks.size() != Chunk::CHUNK_MAX_BLOCKS)
+	{
+		LOG_WARNING("MAP") << "Existing save for chunk at: "
+		                   << chunk.getChunkPos() << "is invalid";
+		return false;
+	}
+
+	return true;
+}
+
+bool Map::loadChunk(const phx::math::vec3 chunkPos)
+{
+	std::ifstream saveFile {
+		toSavePath(static_cast<phx::math::vec3i>(chunkPos))};
+
+	if (!saveFile)
+	{
+		// File could not be opened.
+		return false;
+	}
+
+	std::string saveString;
+	std::getline(saveFile, saveString);
+
+	Chunk chunk {chunkPos, m_referrer};
+
+	if (!parseChunkSave(saveString, chunk))
+	{
+		return false;
+	}
+
+	m_chunks.emplace(chunkPos, std::move(chunk));
+	return true;
 }
 
 std::filesystem::path Map::toSavePath(const phx::math::vec3i chunkPos) const
