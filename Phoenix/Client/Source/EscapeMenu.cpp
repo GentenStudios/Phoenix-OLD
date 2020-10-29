@@ -92,12 +92,18 @@ void EscapeMenu::tick(float dt)
 		}
 		break;
 	case Page::SETTINGS:
-		int i = m_currentSensitivity;
-		ImGui::SliderInt("Sensitivity", &i, 0, 100);
-		if (i != m_currentSensitivity)
+		const std::unordered_map<std::string, Setting>& settings =
+		    Settings::get()->getSettings();
+
+		for (const auto& setting : settings)
 		{
-			m_currentSensitivity = i;
-			m_sensitivity->set(m_currentSensitivity);
+			int i = setting.second.value();
+			ImGui::SliderInt(setting.second.getName().c_str(), &i,
+			                 setting.second.getMin(), setting.second.getMax());
+			if (i != setting.second.value())
+			{
+				Settings::get()->getSetting(setting.second.getKey())->set(i);
+			}
 		}
 		if (ImGui::Button("Back", {290, 30}))
 		{
