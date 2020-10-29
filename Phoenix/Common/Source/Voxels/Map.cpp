@@ -272,7 +272,7 @@ bool Map::parseChunkSave(std::string_view searchView, Chunk &chunk)
 	if (blocks.size() != Chunk::CHUNK_MAX_BLOCKS)
 	{
 		LOG_WARNING("MAP") << "Existing save for chunk at: "
-		                   << chunk.getChunkPos() << "is invalid";
+		                   << chunk.getChunkPos() << " is invalid";
 		return false;
 	}
 
