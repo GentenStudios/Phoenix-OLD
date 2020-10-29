@@ -134,6 +134,13 @@ namespace phx::gfx
 		void activate();
 
 		/**
+		 * @brief Sets a uniform location to an int.
+		 * @param location The location being set.
+		 * @param value The value to set provided location.
+		 */
+		void setInt(const std::string& location, int value);
+		
+		/**
 		 * @brief Sets a uniform location to a float.
 		 * @param location The location being set.
 		 * @param value The value to set provided location.
@@ -145,7 +152,7 @@ namespace phx::gfx
 		 * @param location The location being set.
 		 * @param value The value to set provided location.
 		 */
-		void setVector2(const std::string& location, math::vec2 value);
+		void setVector2(const std::string& location, const math::vec2& value);
 
 		/**
 		 * @brief Sets a uniform location to a 3 component vector.
@@ -156,7 +163,7 @@ namespace phx::gfx
 		 * provided to identify data specific to this type in the shaders
 		 * themselves.
 		 */
-		void setVector3(const std::string& location, math::vec3 value);
+		void setVector3(const std::string& location, const math::vec3& value);
 
 		/**
 		 * @brief Sets a uniform location to a 4x4 matrix.
@@ -167,7 +174,7 @@ namespace phx::gfx
 		 * provided to identify data specific to this type in the shaders
 		 * themselves.
 		 */
-		void setMatrix(const std::string& location, math::mat4 value);
+		void setMatrix(const std::string& location, const math::mat4& value);
 
 		/**
 		 * @brief Queries the location set for a specific attribute.

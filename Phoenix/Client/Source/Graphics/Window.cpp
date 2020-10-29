@@ -105,6 +105,9 @@ Window::Window(const std::string& title, int width, int height)
 	GLCheck(glEnable(GL_MULTISAMPLE));
 	GLCheck(glEnable(GL_BLEND));
 	GLCheck(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+	GLCheck(glEnable(GL_CULL_FACE))
+	GLCheck(glCullFace(GL_BACK))
+	GLCheck(glFrontFace(GL_CW))
 
 	m_running = true;
 

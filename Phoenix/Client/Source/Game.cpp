@@ -87,15 +87,15 @@ Game::Game(gfx::Window* window, entt::registry* registry, bool networked)
 	auto handle = m_audio->loadMP3("core:background_music1",
 	                               "Assets/Audio/background_music.mp3");
 
-	audio::Source backMusic((*m_audio)[handle]);
-	backMusic.enableLoop(true);
+	//audio::Source backMusic((*m_audio)[handle]);
+	//backMusic.enableLoop(true);
 
-	// background music shouldn't be spatial.
-	backMusic.enableSpatial(false);
+	//// background music shouldn't be spatial.
+	//backMusic.enableSpatial(false);
 
-	backMusic.setGain(0.1f);
+	//backMusic.setGain(0.1f);
 
-	Client::get()->getAudioPool()->queue(backMusic);
+	//Client::get()->getAudioPool()->queue(backMusic);
 
 	Settings::get()->registerAPI(m_modManager);
 	InputMap::get()->registerAPI(m_modManager);
@@ -455,6 +455,7 @@ void Game::tick(float dt)
 	m_listener->setVelocity({0, 0, 0});
 
 	m_renderPipeline.activate();
+	m_renderPipeline.setInt("u_TexArray", 0);
 	m_renderPipeline.setMatrix("u_view", m_camera->calculateViewMatrix());
 	m_renderPipeline.setMatrix("u_projection", m_camera->getProjection());
 	m_renderPipeline.setFloat("u_AmbientStrength", 0.7f);

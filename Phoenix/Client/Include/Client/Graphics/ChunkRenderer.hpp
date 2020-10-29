@@ -51,6 +51,13 @@ namespace phx::gfx
 	// forward declaration
 	class ShaderPipeline;
 
+	struct Vertex
+	{
+		math::vec3 pos;
+		math::vec3 uv;
+		math::vec3 normal;
+	};
+	
 	/**
 	 * @brief A struct to store the data required to render chunks.
 	 *
