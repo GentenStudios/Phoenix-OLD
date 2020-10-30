@@ -53,10 +53,12 @@ Map::Map(phx::BlockingQueue<std::pair<phx::math::vec3, std::vector<std::byte>>>*
 }
 
 /*
-    Chunks are kept in an unordered map of vec3 : Chunk. If a chunk is already
-    in the map, return it. Otherwise, if there is a queue of chunks from the
-    server, get a new chunk from the queue. If we are offline, create a new
-    chunk and return it. Nullptr is returned if no chunk can be found/made.
+    Chunks are kept in an unordered map of vec3 : Chunk. The algorithm looks
+    first in the map. The next behavior depends on whether we are in online or
+    offline mode. If we are networked, it updates the map from the queue of
+    chunks from the server, then if it still isn't found, nullptr is returned.
+    If we are not networked, the chunk is loaded from the save files. If the
+    save file does not exist yet or is damaged, a new chunk will be generated.
 */
 Chunk* Map::getChunk(const phx::math::vec3& pos)
 {
@@ -80,36 +82,7 @@ Chunk* Map::getChunk(const phx::math::vec3& pos)
 	if (!loadChunk(pos))
 	{
 		// save doesn't exist, generate it.
-		Chunk chunk(pos, m_referrer);
-
-		BlockType* block = nullptr;
-		if (chunk.getChunkPos().y >= 0)
-		{
-			block =
-			    m_referrer->blocks.get(*m_referrer->referrer.get("core.air"));
-		}
-		else
-		{
-			block =
-			    m_referrer->blocks.get(*m_referrer->referrer.get("core.grass"));
-		}
-
-		auto& blocks = chunk.getBlocks();
-		for (int i = 0; i < Chunk::CHUNK_MAX_BLOCKS; ++i)
-		{
-			blocks.push_back(block);
-		}
-
-		auto& blockRef = chunk.getBlocks();
-		for (std::size_t i = 0;
-		     i < Chunk::CHUNK_WIDTH * Chunk::CHUNK_HEIGHT * Chunk::CHUNK_DEPTH;
-		     ++i)
-		{
-			blockRef.push_back(block);
-		}
-
-		m_chunks.emplace(pos, std::move(chunk));
-		save(pos);
+		generateChunk(pos);
 	}
 
 	return &m_chunks.at(pos);
@@ -302,6 +275,36 @@ bool Map::loadChunk(const phx::math::vec3 chunkPos)
 
 	m_chunks.emplace(chunkPos, std::move(chunk));
 	return true;
+}
+
+// Creates a new chunk and fills it with either grass or air, depending on its
+// position on the y axis. If it is below y = 0, it will be grass. Otherwise
+// air will be generated.
+void Map::generateChunk(const phx::math::vec3 chunkPos)
+{
+	Chunk chunk {chunkPos, m_referrer};
+	BlockType* fillBlock {};
+	// Position type needs to be converted.
+	if (chunk.getChunkPos().y >= 0)
+	{
+		fillBlock =
+			m_referrer->blocks.get(*m_referrer->referrer.get("core.air"));
+	}
+	else
+	{
+		fillBlock =
+			m_referrer->blocks.get(*m_referrer->referrer.get("core.grass"));
+	}
+
+	Chunk::BlockList& blocks = chunk.getBlocks();
+	for (std::size_t i {0}; i < Chunk::CHUNK_MAX_BLOCKS; ++i)
+	{
+		blocks.push_back(fillBlock);
+	}
+
+	m_chunks.emplace(chunkPos, std::move(chunk));
+
+	save(chunkPos);
 }
 
 std::filesystem::path Map::toSavePath(const phx::math::vec3i chunkPos) const

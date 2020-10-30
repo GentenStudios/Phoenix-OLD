@@ -112,6 +112,14 @@ namespace phx::voxels
 		 */
 		bool loadChunk(const phx::math::vec3 chunkPos);
 
+
+		/**
+		 * @brief Create a new chunk and write a save file for it.
+		 *
+		 * @param chunkPos The coordinates of the chunk.
+		 */
+		void generateChunk(const phx::math::vec3 chunkPos);
+
 		/**
 		 * @brief Get the save filepath for a chunk position.
 		 *
