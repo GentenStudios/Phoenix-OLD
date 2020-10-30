@@ -265,6 +265,7 @@ bool Map::loadChunk(const phx::math::vec3 chunkPos)
 
 	std::string saveString;
 	std::getline(saveFile, saveString);
+	saveFile.close();
 
 	Chunk chunk {chunkPos, m_referrer};
 
@@ -282,10 +283,9 @@ bool Map::loadChunk(const phx::math::vec3 chunkPos)
 // air will be generated.
 void Map::generateChunk(const phx::math::vec3 chunkPos)
 {
-	Chunk chunk {chunkPos, m_referrer};
 	BlockType* fillBlock {};
 	// Position type needs to be converted.
-	if (chunk.getChunkPos().y >= 0)
+	if (chunkPos.y >= 0)
 	{
 		fillBlock =
 			m_referrer->blocks.get(*m_referrer->referrer.get("core.air"));
@@ -296,6 +296,7 @@ void Map::generateChunk(const phx::math::vec3 chunkPos)
 			m_referrer->blocks.get(*m_referrer->referrer.get("core.grass"));
 	}
 
+	Chunk chunk {chunkPos, m_referrer};
 	Chunk::BlockList& blocks = chunk.getBlocks();
 	for (std::size_t i {0}; i < Chunk::CHUNK_MAX_BLOCKS; ++i)
 	{
