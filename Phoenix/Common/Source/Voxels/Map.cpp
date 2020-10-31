@@ -40,6 +40,11 @@
 
 using namespace phx::voxels;
 
+namespace
+{
+	constexpr const char* saveDir {"Saves/"};
+}
+
 Map::Map(phx::Save* save, const std::string& name, BlockReferrer* referrer)
     : m_referrer(referrer), m_save(save), m_mapName(name)
 {

@@ -45,11 +45,6 @@ namespace phx::voxels
 
 	using ChunkData = std::pair<phx::math::vec3, std::vector<std::byte>>;
 
-	namespace
-	{
-		inline constexpr const char* saveDir {"Saves/"};
-	}
-
 	struct MapEvent
 	{
 		// only one event for now, but to streamline things in the future if we
