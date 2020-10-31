@@ -110,7 +110,7 @@ namespace phx::voxels
 		 * @param chunkPos The coordinates of the chunk.
 		 * @return true if chunk was loaded from save, otherwise false.
 		 */
-		bool loadChunk(const phx::math::vec3 chunkPos);
+		bool loadChunk(const phx::math::vec3 &chunkPos);
 
 
 		/**
@@ -118,7 +118,7 @@ namespace phx::voxels
 		 *
 		 * @param chunkPos The coordinates of the chunk.
 		 */
-		void generateChunk(const phx::math::vec3 chunkPos);
+		void generateChunk(const phx::math::vec3 &chunkPos);
 
 		/**
 		 * @brief Get the save filepath for a chunk position.
@@ -126,7 +126,8 @@ namespace phx::voxels
 		 * @param chunkPos The integer coordinates of the chunk.
 		 * @return Relative path to the save directory.
 		 */
-		std::filesystem::path toSavePath(const phx::math::vec3i chunkPos) const;
+		std::filesystem::path
+			toSavePath(const phx::math::vec3i &chunkPos) const;
 
 	private:
 		std::unordered_map<math::vec3, Chunk, math::Vector3Hasher,

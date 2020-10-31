@@ -252,7 +252,7 @@ bool Map::parseChunkSave(std::string_view searchView, Chunk &chunk)
 	return true;
 }
 
-bool Map::loadChunk(const phx::math::vec3 chunkPos)
+bool Map::loadChunk(const phx::math::vec3 &chunkPos)
 {
 	std::ifstream saveFile {
 		toSavePath(static_cast<phx::math::vec3i>(chunkPos))};
@@ -281,7 +281,7 @@ bool Map::loadChunk(const phx::math::vec3 chunkPos)
 // Creates a new chunk and fills it with either grass or air, depending on its
 // position on the y axis. If it is below y = 0, it will be grass. Otherwise
 // air will be generated.
-void Map::generateChunk(const phx::math::vec3 chunkPos)
+void Map::generateChunk(const phx::math::vec3 &chunkPos)
 {
 	BlockType* fillBlock {};
 	// Position type needs to be converted.
@@ -308,7 +308,7 @@ void Map::generateChunk(const phx::math::vec3 chunkPos)
 	save(chunkPos);
 }
 
-std::filesystem::path Map::toSavePath(const phx::math::vec3i chunkPos) const
+std::filesystem::path Map::toSavePath(const phx::math::vec3i &chunkPos) const
 {
 	const std::string posString {std::to_string(chunkPos.x) + '_' +
 	                             std::to_string(chunkPos.y) + '_' +
