@@ -209,8 +209,8 @@ void Map::updateChunkQueue()
 
 	// BlockingQueue methods have mutex overhead, so we minimize method calls.
 	// The size of the queue changes during iteration.
-	const std::size_t nChunksQueued {m_queue->size()};
-	for (std::size_t i {0}; i < nChunksQueued; ++i)
+	const std::size_t chunksQueued = m_queue->size();
+	for (std::size_t i = 0; i < chunksQueued; ++i)
 	{
 		ChunkData data;
 		if (!m_queue->try_pop(data))
@@ -235,14 +235,15 @@ void Map::updateChunkQueue()
 bool Map::parseChunkSave(std::string_view searchView, Chunk &chunk)
 {
 	// We will add blocks to the chunk as they are parsed.
-	Chunk::BlockList& blocks {chunk.getBlocks()};
+	Chunk::BlockList& blocks = chunk.getBlocks();
 
-	for (std::size_t delimiterPos {searchView.find_first_of(';')};
+	for (std::size_t delimiterPos = searchView.find_first_of(';');
 			delimiterPos != std::string_view::npos;
 			searchView.remove_prefix(delimiterPos + 1),
 				delimiterPos = searchView.find_first_of(';'))
 	{
-		const std::string blockName {searchView.substr(0, delimiterPos)};
+		const std::string blockName =
+			static_cast<std::string>(searchView.substr(0, delimiterPos));
 		blocks.push_back(
 			m_referrer->blocks.get(*m_referrer->referrer.get(blockName)));
 	}
@@ -259,8 +260,8 @@ bool Map::parseChunkSave(std::string_view searchView, Chunk &chunk)
 
 bool Map::loadChunk(const phx::math::vec3 &chunkPos)
 {
-	std::ifstream saveFile {
-		toSavePath(static_cast<phx::math::vec3i>(chunkPos))};
+	std::ifstream saveFile =
+		toSavePath(static_cast<phx::math::vec3i>(chunkPos));
 
 	if (!saveFile)
 	{
@@ -302,7 +303,7 @@ void Map::generateChunk(const phx::math::vec3 &chunkPos)
 
 	Chunk chunk {chunkPos, m_referrer};
 	Chunk::BlockList& blocks = chunk.getBlocks();
-	for (std::size_t i {0}; i < Chunk::CHUNK_MAX_BLOCKS; ++i)
+	for (std::size_t i = 0; i < Chunk::CHUNK_MAX_BLOCKS; ++i)
 	{
 		blocks.push_back(fillBlock);
 	}
@@ -314,13 +315,13 @@ void Map::generateChunk(const phx::math::vec3 &chunkPos)
 
 std::filesystem::path Map::toSavePath(const phx::math::vec3i &chunkPos) const
 {
-	const std::string posString {std::to_string(chunkPos.x) + '_' +
-	                             std::to_string(chunkPos.y) + '_' +
-	                             std::to_string(chunkPos.z)};
+	const std::string posString = std::to_string(chunkPos.x) + '_' +
+	                              std::to_string(chunkPos.y) + '_' +
+	                              std::to_string(chunkPos.z);
 
-	const std::filesystem::path savePath {saveDir + m_save->getName() + '/' +
-	                                      m_mapName + '.' + posString +
-	                                      ".save"};
+	const std::filesystem::path savePath = saveDir + m_save->getName() + '/' +
+	                                       m_mapName + '.' + posString +
+	                                       ".save";
 
 	return savePath;
 }
