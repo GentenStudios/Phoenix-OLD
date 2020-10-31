@@ -97,7 +97,7 @@ namespace phx::voxels
 		 * @param chunk The chunk to be filled with the appropriate blocks.
 		 * @return true if the parsing was successful, otherwise false.
 		 */
-		bool parseChunkSave(std::string_view searchView, Chunk &chunk);
+		bool parseChunkSave(std::string_view searchView, Chunk& chunk);
 
 		/*
 		 * @brief Load a chunk from the save files.
@@ -105,15 +105,14 @@ namespace phx::voxels
 		 * @param chunkPos The coordinates of the chunk.
 		 * @return true if chunk was loaded from save, otherwise false.
 		 */
-		bool loadChunk(const phx::math::vec3 &chunkPos);
-
+		bool loadChunk(const phx::math::vec3& chunkPos);
 
 		/**
 		 * @brief Create a new chunk and write a save file for it.
 		 *
 		 * @param chunkPos The coordinates of the chunk.
 		 */
-		void generateChunk(const phx::math::vec3 &chunkPos);
+		void generateChunk(const phx::math::vec3& chunkPos);
 
 		/**
 		 * @brief Get the save filepath for a chunk position.
@@ -121,8 +120,8 @@ namespace phx::voxels
 		 * @param chunkPos The integer coordinates of the chunk.
 		 * @return Relative path to the save directory.
 		 */
-		std::filesystem::path
-			toSavePath(const phx::math::vec3i &chunkPos) const;
+		std::filesystem::path toSavePath(
+		    const phx::math::vec3i& chunkPos) const;
 
 	private:
 		std::unordered_map<math::vec3, Chunk, math::Vector3Hasher,

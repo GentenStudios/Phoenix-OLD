@@ -232,22 +232,22 @@ void Map::updateChunkQueue()
 	return;
 }
 
-bool Map::parseChunkSave(std::string_view searchView, Chunk &chunk)
+bool Map::parseChunkSave(std::string_view searchView, Chunk& chunk)
 {
 	// We will add blocks to the chunk as they are parsed.
 	Chunk::BlockList& blocks = chunk.getBlocks();
 
 	for (std::size_t delimiterPos = searchView.find_first_of(';');
-			delimiterPos != std::string_view::npos;
-			searchView.remove_prefix(delimiterPos + 1),
-				delimiterPos = searchView.find_first_of(';'))
+	     delimiterPos != std::string_view::npos;
+	     searchView.remove_prefix(delimiterPos + 1),
+	                 delimiterPos = searchView.find_first_of(';'))
 	{
 		const std::string blockName =
-			static_cast<std::string>(searchView.substr(0, delimiterPos));
+		    static_cast<std::string>(searchView.substr(0, delimiterPos));
 		blocks.push_back(
-			m_referrer->blocks.get(*m_referrer->referrer.get(blockName)));
+		    m_referrer->blocks.get(*m_referrer->referrer.get(blockName)));
 	}
-	
+
 	if (blocks.size() != Chunk::CHUNK_MAX_BLOCKS)
 	{
 		LOG_WARNING("MAP") << "Existing save for chunk at: "
@@ -258,10 +258,10 @@ bool Map::parseChunkSave(std::string_view searchView, Chunk &chunk)
 	return true;
 }
 
-bool Map::loadChunk(const phx::math::vec3 &chunkPos)
+bool Map::loadChunk(const phx::math::vec3& chunkPos)
 {
 	std::ifstream saveFile =
-		toSavePath(static_cast<phx::math::vec3i>(chunkPos));
+	    toSavePath(static_cast<phx::math::vec3i>(chunkPos));
 
 	if (!saveFile)
 	{
@@ -286,22 +286,22 @@ bool Map::loadChunk(const phx::math::vec3 &chunkPos)
 // Creates a new chunk and fills it with either grass or air, depending on its
 // position on the y axis. If it is below y = 0, it will be grass. Otherwise
 // air will be generated.
-void Map::generateChunk(const phx::math::vec3 &chunkPos)
+void Map::generateChunk(const phx::math::vec3& chunkPos)
 {
 	BlockType* fillBlock {};
 	// Position type needs to be converted.
 	if (chunkPos.y >= 0)
 	{
 		fillBlock =
-			m_referrer->blocks.get(*m_referrer->referrer.get("core.air"));
+		    m_referrer->blocks.get(*m_referrer->referrer.get("core.air"));
 	}
 	else
 	{
 		fillBlock =
-			m_referrer->blocks.get(*m_referrer->referrer.get("core.grass"));
+		    m_referrer->blocks.get(*m_referrer->referrer.get("core.grass"));
 	}
 
-	Chunk chunk {chunkPos, m_referrer};
+	Chunk             chunk {chunkPos, m_referrer};
 	Chunk::BlockList& blocks = chunk.getBlocks();
 	for (std::size_t i = 0; i < Chunk::CHUNK_MAX_BLOCKS; ++i)
 	{
@@ -313,7 +313,7 @@ void Map::generateChunk(const phx::math::vec3 &chunkPos)
 	save(chunkPos);
 }
 
-std::filesystem::path Map::toSavePath(const phx::math::vec3i &chunkPos) const
+std::filesystem::path Map::toSavePath(const phx::math::vec3i& chunkPos) const
 {
 	const std::string posString = std::to_string(chunkPos.x) + '_' +
 	                              std::to_string(chunkPos.y) + '_' +
