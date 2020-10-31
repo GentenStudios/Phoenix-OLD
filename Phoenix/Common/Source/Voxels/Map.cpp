@@ -265,7 +265,6 @@ bool Map::loadChunk(const phx::math::vec3 &chunkPos)
 
 	std::string saveString;
 	std::getline(saveFile, saveString);
-	saveFile.close();
 
 	Chunk chunk {chunkPos, m_referrer};
 
