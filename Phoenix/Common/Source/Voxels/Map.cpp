@@ -207,7 +207,7 @@ void Map::updateChunkQueue()
 	const std::size_t nChunksQueued {m_queue->size()};
 	for (std::size_t i {0}; i < nChunksQueued; ++i)
 	{
-		chunkData_t data;
+		ChunkData data;
 		if (!m_queue->try_pop(data))
 		{
 			LOG_WARNING("CHUNK_VIEW")

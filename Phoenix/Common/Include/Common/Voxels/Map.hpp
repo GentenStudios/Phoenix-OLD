@@ -43,7 +43,7 @@
 namespace phx::voxels
 {
 
-	using chunkData_t = std::pair<phx::math::vec3, std::vector<std::byte>>;
+	using ChunkData = std::pair<phx::math::vec3, std::vector<std::byte>>;
 
 	namespace
 	{
