@@ -169,7 +169,8 @@ void Map::save(const phx::math::vec3& pos)
 		return;
 	}
 
-	std::ofstream saveFile {toSavePath(static_cast<phx::math::vec3i>(pos))};
+	std::ofstream saveFile;
+	saveFile.open(toSavePath(static_cast<phx::math::vec3i>(pos)));
 
 	std::string saveString;
 	auto&       blocks = m_chunks.at(pos).getBlocks();
@@ -260,8 +261,8 @@ bool Map::parseChunkSave(std::string_view searchView, Chunk& chunk)
 
 bool Map::loadChunk(const phx::math::vec3& chunkPos)
 {
-	std::ifstream saveFile =
-	    toSavePath(static_cast<phx::math::vec3i>(chunkPos));
+	std::ifstream saveFile;
+	saveFile.open(toSavePath(static_cast<phx::math::vec3i>(chunkPos)));
 
 	if (!saveFile)
 	{
