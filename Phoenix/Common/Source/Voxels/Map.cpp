@@ -239,8 +239,7 @@ bool Map::parseChunkSave(std::string_view searchView, Chunk& chunk)
 	     searchView.remove_prefix(delimiterPos + 1),
 	                 delimiterPos = searchView.find_first_of(';'))
 	{
-		const std::string blockName =
-		    static_cast<std::string>(searchView.substr(0, delimiterPos));
+		const std::string blockName {searchView.substr(0, delimiterPos)};
 		blocks.push_back(
 		    m_referrer->blocks.get(*m_referrer->referrer.get(blockName)));
 	}
