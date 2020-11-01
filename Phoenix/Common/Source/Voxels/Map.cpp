@@ -28,6 +28,7 @@
 
 #include <Common/Logger.hpp>
 #include <Common/Math/Math.hpp>
+#include <Common/Save.hpp>
 #include <Common/Utility/Serializer.hpp>
 #include <Common/Voxels/Map.hpp>
 
@@ -39,11 +40,6 @@
 #include <utility>
 
 using namespace phx::voxels;
-
-namespace
-{
-	constexpr const char* saveDir {"Saves/"};
-}
 
 Map::Map(phx::Save* save, const std::string& name, BlockReferrer* referrer)
     : m_referrer(referrer), m_save(save), m_mapName(name)
@@ -320,8 +316,8 @@ std::filesystem::path Map::toSavePath(const phx::math::vec3i& chunkPos) const
 	                              std::to_string(chunkPos.y) + '_' +
 	                              std::to_string(chunkPos.z);
 
-	const std::filesystem::path savePath = saveDir + m_save->getName() + '/' +
-	                                       m_mapName + '.' + posString +
+	const std::filesystem::path savePath = phx::saveDir + m_save->getName() +
+	                                       '/' + m_mapName + '.' + posString +
 	                                       ".save";
 
 	return savePath;
