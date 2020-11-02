@@ -109,28 +109,22 @@ namespace phx::client
 					    return;
 					}
 
+				    block.category = voxels::BlockCategory::SOLID;
 				    sol::optional<std::string> cat = luaBlock["category"];
 				    if (cat)
 				    {
-						if (*cat == "Solid")
-						{
-							block.category = voxels::BlockCategory::SOLID;
-						}
+					    if (*cat == "Solid")
+					    {
+					    }
 					    else if (*cat == "Liquid")
-						{
-							block.category = voxels::BlockCategory::LIQUID;
-						}
+					    {
+						    block.category = voxels::BlockCategory::LIQUID;
+					    }
 					    else if (*cat == "Air")
-						{
-							block.category = voxels::BlockCategory::AIR;
-						}
-					}
-			    	else
-			    	{
-					    // make solid by default in case none of above
-					    // conditions are met.
-					    block.category = voxels::BlockCategory::SOLID;
-			    	}
+					    {
+						    block.category = voxels::BlockCategory::AIR;
+					    }
+				    }
 
 				    sol::optional<sol::function> onPlace = luaBlock["onPlace"];
 				    if (onPlace)
