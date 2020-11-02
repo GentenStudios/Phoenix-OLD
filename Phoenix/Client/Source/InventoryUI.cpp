@@ -26,26 +26,38 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#pragma once
+#include <Client/Client.hpp>
+#include <Client/InventoryUI.hpp>
 
-#include <Common/Voxels/Item.hpp>
+#include <imgui.h>
 
-namespace phx::voxels
+using namespace phx::client;
+using namespace phx;
+InventoryUI::InventoryUI(gfx::Window* window, voxels::Inventory* inventory)
+    : gfx::Overlay("Inventory"), m_window(window), m_inventory(inventory)
 {
-	class Inventory
+}
+void InventoryUI::onAttach() {}
+void InventoryUI::onDetach() {}
+void InventoryUI::onEvent(events::Event& e) {}
+void InventoryUI::tick(float dt)
+{
+	ImGui::SetNextWindowPos(
+	    {m_window->getSize().x / 2 - 150, m_window->getSize().y / 2 - 150},
+	    ImGuiCond_Once);
+
+	ImGui::Begin("Inventory", nullptr, ImGuiWindowFlags_NoResize);
+	for (size_t i = 0; i < m_inventory->getSize(); i++)
 	{
-	public:
-		Inventory(std::size_t size);
-
-		const ItemType* getItem(std::size_t slot);
-		bool            addItem(std::size_t slot, ItemType* item);
-		ItemType*       removeItem(std::size_t slot);
-
-		const std::vector<ItemType*>& getItems() const { return m_slots; };
-		const size_t                  getSize() const { return m_size; };
-
-	private:
-		size_t                 m_size;
-		std::vector<ItemType*> m_slots;
-	};
-} // namespace phx::voxels
+		const voxels::ItemType* item = m_inventory->getItem(i);
+		if (item == nullptr)
+		{
+			ImGui::Button("", {100, 100});
+		}
+		else
+		{
+			ImGui::Button(item->displayName.c_str(), {100, 100});
+		}
+	}
+	ImGui::End();
+}

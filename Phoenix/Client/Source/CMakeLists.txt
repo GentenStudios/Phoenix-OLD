@@ -18,6 +18,7 @@ set(Sources
 
         ${currentDir}/DebugOverlay.cpp
         ${currentDir}/GameTools.cpp
+        ${currentDir}/InventoryUI.cpp
 
         ${currentDir}/Main.cpp
 

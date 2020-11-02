@@ -28,24 +28,35 @@
 
 #pragma once
 
-#include <Common/Voxels/Item.hpp>
+#include <Common/Voxels/Inventory.hpp>
 
-namespace phx::voxels
+#include <Client/Graphics/Layer.hpp>
+#include <Client/Graphics/Window.hpp>
+
+#include <Common/Settings.hpp>
+
+namespace phx::client
 {
-	class Inventory
+	/**
+	 * @brief The escape menu within the game.
+	 *
+	 * @see Layer
+	 * @see LayerStack
+	 */
+	class InventoryUI : public gfx::Overlay
 	{
 	public:
-		Inventory(std::size_t size);
+		InventoryUI(gfx::Window* window, voxels::Inventory* inventory);
+		~InventoryUI() override = default;
 
-		const ItemType* getItem(std::size_t slot);
-		bool            addItem(std::size_t slot, ItemType* item);
-		ItemType*       removeItem(std::size_t slot);
+		void onAttach() override;
+		void onDetach() override;
+		void onEvent(events::Event& e) override;
 
-		const std::vector<ItemType*>& getItems() const { return m_slots; };
-		const size_t                  getSize() const { return m_size; };
+		void tick(float dt) override;
 
 	private:
-		size_t                 m_size;
-		std::vector<ItemType*> m_slots;
+		gfx::Window*       m_window;
+		voxels::Inventory* m_inventory;
 	};
-} // namespace phx::voxels
+} // namespace phx::client
