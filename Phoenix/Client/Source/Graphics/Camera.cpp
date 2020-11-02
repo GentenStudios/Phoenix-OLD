@@ -26,6 +26,7 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+#include <Client/Client.hpp>
 #include <Client/Graphics/Camera.hpp>
 
 #include <Common/Position.hpp>
@@ -52,6 +53,9 @@ FPSCamera::FPSCamera(Window* window, entt::registry* registry)
 	    Settings::get()->add("Sensitivity", "camera:sensitivity", 50);
 	m_settingSensitivity->setMax(100);
 	m_settingSensitivity->setMin(1);
+
+	m_crosshair = new client::Crosshair(m_window);
+	client::Client::get()->pushLayer(m_crosshair);
 }
 
 void FPSCamera::setProjection(const math::mat4& projection)
@@ -104,11 +108,13 @@ void FPSCamera::enable(bool enabled)
 		// gain control of the cursor
 		m_window->setCursorState(gfx::CursorState::DISABLED);
 		m_window->setCursorPosition(m_windowCentre);
+		client::Client::get()->pushLayer(m_crosshair);
 	}
 	else
 	{
 		// release cursor for the user to do whatever they want.
 		m_window->setCursorState(gfx::CursorState::NORMAL);
+		client::Client::get()->popLayer(m_crosshair);
 	}
 
 	m_enabled = enabled;
