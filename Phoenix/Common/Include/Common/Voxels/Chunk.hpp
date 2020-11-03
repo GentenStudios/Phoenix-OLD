@@ -34,7 +34,7 @@
 #include <Common/Voxels/BlockReferrer.hpp>
 #include <Common/Registry.hpp>
 
-#include <Common/Utility/Metadata.hpp>
+#include <Common/Metadata.hpp>
 #include <Common/Utility/Serializer.hpp>
 #include <vector>
 

@@ -36,19 +36,38 @@
 
 #pragma once
 
+#include <any>
 #include <string>
 
 namespace phx
 {
 
-	struct Metadata
+	class Metadata
 	{
-		enum Type{String, Numeral, Reference};
-
-		Type type;
-		void* data;
+	public:
+		/**
+		 * @brief sets or inserts metadata
+		 * @param key The key associated with the metadata
+		 * @return true if the data was set
+		 * @return false if the data already exists with a different data type
+		 */
+		bool set(const std::any& existing, const std::string& key);
+		/**
+		 * @brief gets metadata by key
+		 * @param key The key associated with the metadata
+		 * @return A pointer to the data
+		 */
+		const std::any* get(const std::string& key) const;
+		/**
+		 * @brief Erases metadata
+		 * @param key The key associated with the metadata
+		 */
+		void erase(const std::string& key);
 
 		std::string save();
-		bool load(std::string data);
+		bool        load(std::string data);
+
+	private:
+		std::unordered_map<std::string, std::any> m_data;
 	};
 }
