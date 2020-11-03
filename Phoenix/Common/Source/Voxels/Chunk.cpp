@@ -59,12 +59,6 @@ void Chunk::setBlockAt(phx::math::vec3 position, BlockType* newBlock)
 	}
 }
 
-std::unordered_map<std::string, Metadata> Chunk::getBlockMetadata(
-    phx::math::vec3 position)
-{
-    return std::unordered_map<std::string, Metadata>();
-}
-
 phx::Serializer& Chunk::operator>>(phx::Serializer& ser) const
 {
 	ser << m_pos.x << m_pos.y << m_pos.z;

@@ -37,6 +37,7 @@
 #pragma once
 
 #include <Common/Math/Math.hpp>
+#include <Common/Metadata.hpp>
 
 #include <sol/sol.hpp>
 
@@ -140,5 +141,11 @@ namespace phx::voxels
 		 * life)
 		 */
 		std::string data;
+	};
+
+	struct Block
+	{
+		BlockType* type;
+		Metadata   metadata;
 	};
 } // namespace phx::voxels

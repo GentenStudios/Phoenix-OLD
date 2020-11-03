@@ -33,8 +33,8 @@
 #include <Common/Voxels/Block.hpp>
 #include <Common/Voxels/BlockReferrer.hpp>
 #include <Common/Registry.hpp>
-
 #include <Common/Metadata.hpp>
+
 #include <Common/Utility/Serializer.hpp>
 #include <vector>
 
@@ -106,12 +106,12 @@ namespace phx::voxels
 		 */
 		BlockList& getBlocks();
 
-        /**
-         * @brief Gets the Block at the supplied position.
-         * @param position Position of the block relative to the chunk.
-         * @return BlockType* The requested block.
-         */
-        BlockType* getBlockAt(math::vec3 position) const;
+		/**
+		 * @brief Gets the Block at the supplied position.
+		 * @param position Position of the block relative to the chunk.
+		 * @return BlockType* The requested block.
+		 */
+		BlockType* getBlockAt(math::vec3 position) const;
 
 		/**
 		 * @brief Sets the Block At the supplied position.
@@ -119,40 +119,6 @@ namespace phx::voxels
 		 * @param newBlock The block that exists at this location.
 		 */
 		void setBlockAt(math::vec3 position, BlockType* newBlock);
-
-        /**
-         * @brief Gets the specified metadata of the Block at the position.
-         * @param position Position of the block relative to the chunk.
-         * @param key Key of the metadata to retrieve.
-         * @return Metadata& The requested metadata.
-         */
-        Metadata* getBlockMetadata(math::vec3 position, std::string key);
-
-        /**
-         * @brief Deletes the specified metadata of the Block at the position.
-         * @param position Position of the block relative to the chunk.
-         * @param key Key of the metadata to delete.
-         * @return true if the metadata was deleted.
-         * @return false if the metadata does not exist.
-         */
-        bool deleteBlockMetadata(math::vec3 position, std::string key);
-
-        /**
-         * @brief Deletes all metadata of the Block at the position.
-         * @param position Position of the block relative to the chunk.
-         * @return true if the metadata was deleted.
-         * @return false if the metadata does not exist.
-         */
-        bool clearBlockMetadata(math::vec3 position);
-
-        /**
-         * @brief Adds metadata to the Block at the supplied position.
-         * @param position Position of the block relative to the chunk.
-         * @param key Key of the metadata to add.
-         * @return true if the metadata was inserted.
-         * @return false if the metadata already exists.
-         */
-        bool addBlockMetadata(math::vec3 position, std::string key, Metadata);
 
 		/// @brief How wide a chunk is (x axis).
 		static constexpr int CHUNK_WIDTH = 16;
@@ -205,10 +171,9 @@ namespace phx::voxels
 		Serializer& operator<<(Serializer& ser) override;
 
 	private:
-		math::vec3 m_pos;
-		BlockList m_blocks;
-		std::vector<std::unordered_map<std::string,Metadata>> m_metadata;
-
-		BlockReferrer* m_referrer;
+		math::vec3            m_pos;
+		BlockList             m_blocks;
+		std::vector<Metadata> m_metadata;
+		BlockReferrer*        m_referrer;
 	};
 } // namespace phx::voxels

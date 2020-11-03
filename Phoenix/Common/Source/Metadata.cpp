@@ -49,7 +49,7 @@ const std::any* Metadata::get(const std::string& key) const
 	auto existing = m_data.find(key);
 	if (existing != m_data.end())
 	{
-		return existing.second;
+		return &existing->second;
 	}
 	return nullptr;
 }
