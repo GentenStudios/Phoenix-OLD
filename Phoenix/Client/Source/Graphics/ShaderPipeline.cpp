@@ -105,24 +105,31 @@ void ShaderPipeline::prepare(const std::string& vertShaderPath,
 
 void ShaderPipeline::activate() { glUseProgram(m_program); }
 
+void ShaderPipeline::setInt(const std::string& location, int value)
+{
+	glUniform1i(glGetUniformLocation(m_program, location.c_str()), value);
+}
+
 void ShaderPipeline::setFloat(const std::string& location, float value)
 {
 	glUniform1f(glGetUniformLocation(m_program, location.c_str()), value);
 }
 
-void ShaderPipeline::setVector2(const std::string& location, math::vec2 value)
+void ShaderPipeline::setVector2(const std::string& location,
+                                const math::vec2&  value)
 {
 	glUniform2fv(glGetUniformLocation(m_program, location.c_str()), 1,
 	             &value.x);
 }
 
-void ShaderPipeline::setVector3(const std::string& location, math::vec3 value)
+void ShaderPipeline::setVector3(const std::string& location,
+                                const math::vec3&  value)
 {
 	glUniform3fv(glGetUniformLocation(m_program, location.c_str()), 1,
 	             &value.x);
 }
 
-void ShaderPipeline::setMatrix(const std::string& location, math::mat4 value)
+void ShaderPipeline::setMatrix(const std::string& location, const math::mat4& value)
 {
 	glUniformMatrix4fv(glGetUniformLocation(m_program, location.c_str()), 1,
 	                   GL_FALSE, value.elements);

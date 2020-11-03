@@ -113,9 +113,6 @@ namespace phx::voxels
 		/// @brief Callback for when the block is interacted with.
 		BlockCallback onInteract;
 
-		/// @brief (temporary) a bitpacked color: rrrrggggbbbbaaaa (a letter = 1 bit)
-		unsigned color = 0b1111111111111111;
-
 		/// @brief comparison operator.
 		bool operator==(const BlockType& rhs) const { return (id == rhs.id); }
 	};

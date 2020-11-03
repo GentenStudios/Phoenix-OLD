@@ -28,6 +28,8 @@
 
 #pragma once
 
+#include <Client/Graphics/BlockModel.hpp>
+
 #include <Common/CMS/ModManager.hpp>
 #include <Common/Registry.hpp>
 #include <Common/Voxels/BlockReferrer.hpp>
@@ -57,11 +59,17 @@ namespace phx::client
 			             {"Assets/unknown.png"});
 			textures.setUnknownReturnVal(
 			    textures.get(voxels::BlockType::UNKNOWN_BLOCK));
+
+			models.add(voxels::BlockType::UNKNOWN_BLOCK,
+			           gfx::BlockModel::BLOCK);
+			models.setUnknownReturnVal(
+			    models.get(voxels::BlockType::UNKNOWN_BLOCK));
 		}
 
 		voxels::BlockReferrer referrer;
 
 		Registry<std::size_t, std::vector<std::string>> textures;
+		Registry<std::size_t, gfx::BlockModel> models;
 
 		void registerAPI(cms::ModManager* manager)
 		{
@@ -163,10 +171,50 @@ namespace phx::client
 
 				    referrer.referrer.add(block.id, blockUID);
 				    referrer.blocks.add(blockUID, block);
-				    if (setTex)
+
+			    	if (setTex)
 				    {
 					    textures.add(blockUID, *luaTextures);
 				    }
+
+			    	// only add model if a solid (entities will have different
+				    // system, liquids and gasses will have another system too.)
+			    	if (block.category == voxels::BlockCategory::SOLID)
+			    	{
+					    gfx::BlockModel model = gfx::BlockModel::BLOCK;
+
+						// this is shit, lets find a better way to do this.
+					    sol::optional<std::string> luaModel = luaBlock["model"];
+			    		if (luaModel)
+			    		{
+						    if (luaModel == "Block")
+						    {
+							    model = gfx::BlockModel::BLOCK;
+						    }
+						    else if (luaModel == "Slab")
+						    {
+							    model = gfx::BlockModel::SLAB;
+						    }
+						    else if (luaModel == "Slope")
+						    {
+							    model = gfx::BlockModel::SLOPE;
+						    }
+						    else if (luaModel == "Stair")
+						    {
+							    model = gfx::BlockModel::STAIR;
+						    }
+						    else if (luaModel == "XPanel")
+						    {
+							    model = gfx::BlockModel::X_PANEL;
+						    }
+						    else if (luaModel == "XPanelCube")
+						    {
+							    model = gfx::BlockModel::X_PANEL_CUBE;
+						    }
+			    		}
+			    		
+					    models.add(blockUID, model);
+			    	}
 			    });
 		}
 	};

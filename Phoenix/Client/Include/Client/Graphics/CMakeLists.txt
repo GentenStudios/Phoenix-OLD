@@ -16,6 +16,8 @@ set(graphicsHeaders
 
 	${currentDir}/ChatBox.hpp
 
+	${currentDir}/BlockModel.hpp
+	${currentDir}/BaseBlockModels.hpp
 	${currentDir}/ChunkMesher.hpp
 	${currentDir}/ChunkRenderer.hpp
 

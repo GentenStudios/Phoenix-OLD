@@ -60,7 +60,9 @@ void Setting::setMax(int value) { m_maxValue = value; }
 
 void Setting::setMin(int value) { m_minValue = value; }
 
-std::string Setting::getKey() const { return m_key; }
+const std::string& Setting::getKey() const { return m_key; }
+
+const std::string& Setting::getName() const { return m_name; }
 
 int Setting::value() const { return m_value; }
 
@@ -71,9 +73,36 @@ Settings::Settings() : m_data(json::object()) {}
 void Settings::registerAPI(cms::ModManager* manager)
 {
 	manager->registerFunction(
-	    "core.setting.register",
-	    [](std::string displayName, std::string key, int defaultValue) {
-		    Settings::get()->add(displayName, key, defaultValue);
+	    "core.setting.register",[manager, this](sol::table data) {
+          sol::optional<std::string> name = data["name"];
+          if (!name)
+          {
+              // log the error and return to make this a recoverable error.
+              LOG_FATAL("MODDING")
+                      << "The mod at: " << manager->getCurrentModPath()
+                      << " attempted to register a block without "
+                      << "specifying a key.";
+              return;
+          }
+          sol::optional<std::string> key = data["key"];
+          if (!key)
+          {
+              // log the error and return to make this a recoverable error.
+              LOG_FATAL("MODDING")
+                      << "The mod at: " << manager->getCurrentModPath()
+                      << " attempted to register a setting without "
+                      << "specifying a key.";
+              return;
+          }
+          sol::optional<int> defaultVal = data["default"];
+          if (!defaultVal){defaultVal = 0;}
+
+		  auto setting = Settings::get()->add(*name, *key, *defaultVal);
+
+          sol::optional<int> max = data["max"];
+          if (max){setting->setMax(*max);}
+          sol::optional<int> min = data["min"];
+          if (min){setting->setMin(*min);}
 	    });
 
 	manager->registerFunction("core.setting.get", [](std::string key) {
@@ -127,4 +156,9 @@ void Settings::save(const std::string& saveFile)
 	file.open(saveFile);
 	file << std::setw(4) << m_data << std::endl;
 	file.close();
+}
+
+const std::unordered_map<std::string, Setting>& Settings::getSettings()
+{
+    return m_settings;
 }
