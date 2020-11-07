@@ -13,6 +13,7 @@ set(graphicsSources
 
 	${currentDir}/ChatBox.cpp
 
+	${currentDir}/TexturePacker.cpp
 	${currentDir}/ChunkMesher.cpp
 	${currentDir}/ChunkRenderer.cpp
 

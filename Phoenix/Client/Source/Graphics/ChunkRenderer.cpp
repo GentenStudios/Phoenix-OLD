@@ -78,78 +78,10 @@ std::vector<ShaderLayout> ChunkRenderer::getRequiredShaderLayout()
 
 void ChunkRenderer::prep()
 {
-	// @todo implement multithreading of texture loading.
-
-	glGenTextures(1, &m_textureArray);
-	glBindTexture(GL_TEXTURE_2D_ARRAY, m_textureArray);
-
-	glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA8, 16, 16, 256, 0, GL_RGBA,
-	             GL_UNSIGNED_BYTE, nullptr);
-
-	stbi_set_flip_vertically_on_load(true);
-	
-	// we use the unordered_set since it will automatically remove duplicates.
-	std::unordered_set<std::string> texturePaths;
-	for (auto& element : m_blockRegistry->textures)
-	{
-		for (auto& tex : element.second)
-		{
-			texturePaths.insert(tex);
-		}
-	}
-
-	std::size_t i = 0;
-	for (const std::string& path : texturePaths)
-	{
-		int            width = -1, height = -1, nbChannels = -1;
-		unsigned char* image =
-		    stbi_load(path.c_str(), &width, &height, &nbChannels, 0);
-
-		if (image != nullptr)
-		{
-			if (nbChannels == 4)
-			{
-				glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, i, 16, 16, 1, GL_RGBA,
-				                GL_UNSIGNED_BYTE, image);
-			}
-			else if (nbChannels == 3)
-			{
-				glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, i, 16, 16, 1,
-				                GL_RGB, GL_UNSIGNED_BYTE, image);
-			}
-			else
-			{
-				std::cout << "[RENDERING][TEXTURES] The file: " << path
-				    << " uses an unsupported pixel layout (needs to be RGB or "
-				       "RGBA, thus 24 or 32 bit depth respectively)."
-				    << std::endl;
-			}
-
-			m_textureTable.insert({path, i});
-			++i;
-		}
-		else
-		{
-			std::cout << "[RENDERING][TEXTURES] The file: " << path
-			          << " does not exist." << std::endl;
-		}
-
-		stbi_image_free(image);
-	}
-
-	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	m_blockRegistry->texturePacker.pack();
 }
 
 void ChunkRenderer::attachCamera(FPSCamera* camera) { m_camera = camera; }
-
-const ChunkRenderer::AssociativeTextureTable& ChunkRenderer::getTextureTable()
-    const
-{
-	return m_textureTable;
-}
 
 void ChunkRenderer::add(phx::voxels::Chunk* chunk)
 {
@@ -164,7 +96,7 @@ void ChunkRenderer::add(phx::voxels::Chunk* chunk)
 		return;
 	}
 
-	auto mesh = ChunkMesher::mesh(chunk, m_textureTable, m_blockRegistry);
+	auto mesh = ChunkMesher::mesh(chunk, m_blockRegistry);
 	if (mesh.empty())
 	{
 		// the mesh is empty, don't bother with adding it or anything.
@@ -212,7 +144,7 @@ void ChunkRenderer::update(phx::voxels::Chunk* chunk)
 		return;
 	}
 
-	auto mesh = ChunkMesher::mesh(chunk, m_textureTable, m_blockRegistry);
+	auto mesh = ChunkMesher::mesh(chunk, m_blockRegistry);
 
 	// we can't just say return if the mesh is empty, since we might be emptying
 	// a mesh (breaking the final block in a chunk so only air is left or
@@ -332,8 +264,7 @@ void ChunkRenderer::tick(float dt)
 		}
 	}
 	
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D_ARRAY, m_textureArray);
+	m_blockRegistry->texturePacker.activate(0);
 
 	for (auto& buffer : m_buffers)
 	{
