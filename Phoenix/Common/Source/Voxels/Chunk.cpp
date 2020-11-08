@@ -56,8 +56,11 @@ void Chunk::setBlockAt(phx::math::vec3 position, Block newBlock)
 	if (position.x < CHUNK_WIDTH && position.y < CHUNK_HEIGHT &&
 	    position.z < CHUNK_DEPTH)
 	{
-		m_blocks[getVectorIndex(position)]   = newBlock.type;
-		m_metadata[getVectorIndex(position)] = *newBlock.metadata;
+		m_blocks[getVectorIndex(position)] = newBlock.type;
+		if (newBlock.metadata)
+		{
+			m_metadata[getVectorIndex(position)] = *newBlock.metadata;
+		}
 	}
 }
 

@@ -230,7 +230,7 @@ BlockType* Map::getBlockAt(phx::math::vec3 position)
 		return m_referrer->blocks.get(BlockType::OUT_OF_BOUNDS_BLOCK);
 	}
 
-	return chunk->getBlockAt(pos.second);
+	return chunk->getBlockAt(pos.second).type;
 }
 
 void Map::setBlockAt(phx::math::vec3 position, BlockType* block)
@@ -238,7 +238,7 @@ void Map::setBlockAt(phx::math::vec3 position, BlockType* block)
 	const auto& pos   = getBlockPos(position);
 	Chunk*      chunk = getChunk(pos.first);
 
-	chunk->setBlockAt(pos.second, block);
+	chunk->setBlockAt(pos.second, {block, nullptr});
 
 	if (m_queue == nullptr)
 	{
