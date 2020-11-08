@@ -146,6 +146,6 @@ namespace phx::voxels
 	struct Block
 	{
 		BlockType* type;
-		Metadata   metadata;
+		Metadata*  metadata;
 	};
 } // namespace phx::voxels

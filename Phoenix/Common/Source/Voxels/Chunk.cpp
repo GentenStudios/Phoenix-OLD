@@ -39,24 +39,40 @@ Chunk::Chunk(const phx::math::vec3& chunkPos, BlockReferrer* referrer)
 phx::math::vec3   Chunk::getChunkPos() const { return m_pos; }
 Chunk::BlockList& Chunk::getBlocks() { return m_blocks; }
 
-BlockType* Chunk::getBlockAt(phx::math::vec3 position) const
+Block Chunk::getBlockAt(phx::math::vec3 position)
 {
 	if (position.x < CHUNK_WIDTH && position.y < CHUNK_HEIGHT &&
 	    position.z < CHUNK_DEPTH)
 	{
-		return m_blocks[getVectorIndex(position)];
+		return {m_blocks[getVectorIndex(position)],
+		        &m_metadata[getVectorIndex(position)]};
 	}
 
-	return m_referrer->blocks.get(BlockType::OUT_OF_BOUNDS_BLOCK);
+	return {m_referrer->blocks.get(BlockType::OUT_OF_BOUNDS_BLOCK), nullptr};
 }
 
-void Chunk::setBlockAt(phx::math::vec3 position, BlockType* newBlock)
+void Chunk::setBlockAt(phx::math::vec3 position, Block newBlock)
 {
 	if (position.x < CHUNK_WIDTH && position.y < CHUNK_HEIGHT &&
 	    position.z < CHUNK_DEPTH)
 	{
-		m_blocks[getVectorIndex(position)] = newBlock;
+		m_blocks[getVectorIndex(position)]   = newBlock.type;
+		m_metadata[getVectorIndex(position)] = *newBlock.metadata;
 	}
+}
+
+// TODO Should we return a tuple with an error type here? There are two things
+// that could go wrong either the block is OOB or the metadata type is invalid.
+// Or should we just assert on the second error?
+bool Chunk::setMetadataAt(phx::math::vec3 position, const std::string& key,
+                          std::any* newData)
+{
+	if (position.x < CHUNK_WIDTH && position.y < CHUNK_HEIGHT &&
+	    position.z < CHUNK_DEPTH)
+	{
+		return m_metadata[getVectorIndex(position)].set(newData, key);
+	}
+	return false;
 }
 
 phx::Serializer& Chunk::operator>>(phx::Serializer& ser) const
