@@ -40,7 +40,7 @@ Save::Save(const std::string& save, const std::vector<std::string>& mods,
 {
 	namespace fs = std::filesystem;
 
-	auto path = fs::current_path() / "Saves" / save;
+	auto path = fs::current_path() / phx::saveDir / save;
 
 	// does not necessarily mean it's empty, it just means there's no save.json
 	// so we can do whatever.
@@ -111,7 +111,7 @@ std::vector<std::string> Save::listAllSaves()
 
 	std::vector<std::string> saves;
 	
-	auto path = fs::current_path() / "Saves";
+	auto path = fs::current_path() / phx::saveDir;
 	for (auto& p : fs::directory_iterator(path))
 	{
 		if (p.is_directory())
@@ -159,7 +159,7 @@ void Save::toFile(const std::string& name)
 	{
 		m_name = name;
 
-		const auto path = fs::current_path() / "Saves" / name;
+		const auto path = fs::current_path() / phx::saveDir / name;
 
 		// save already exists, overwrite json.
 		if (fs::exists(path))
@@ -207,7 +207,7 @@ void Save::toFile(const std::string& name)
 		// the save hasn't been renamed, and the settings have changed, now
 		// update file, otherwise there's no point.
 
-		const auto path = fs::current_path() / "Saves" / m_name;
+		const auto path = fs::current_path() / phx::saveDir / m_name;
 
 		// this exists as a error check to prevent an exception being thrown when opening the json file.
 		if (!fs::exists(path))
