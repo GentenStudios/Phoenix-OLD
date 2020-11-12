@@ -59,8 +59,7 @@ void Chunk::setBlockAt(phx::math::vec3 position, Block newBlock)
 		m_blocks[getVectorIndex(position)] = newBlock.type;
 		if (newBlock.metadata != nullptr)
 		{
-			m_metadata[getVectorIndex(position)] =
-			    std::move(*newBlock.metadata);
+			m_metadata[getVectorIndex(position)] = *newBlock.metadata;
 		}
 	}
 }
