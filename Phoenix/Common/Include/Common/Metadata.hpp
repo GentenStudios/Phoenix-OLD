@@ -52,7 +52,7 @@ namespace phx
 		 * @return true if the data was set
 		 * @return false if the data already exists with a different data type
 		 */
-		bool set(const std::any& existing, const std::string& key);
+		bool set(const std::string& key, const std::any& existing);
 		/**
 		 * @brief gets metadata by key
 		 * @param key The key associated with the metadata
@@ -64,6 +64,8 @@ namespace phx
 		 * @param key The key associated with the metadata
 		 */
 		void erase(const std::string& key);
+
+		size_t size() { return m_data.size(); };
 
 		std::string save();
 		bool        load(std::string data);

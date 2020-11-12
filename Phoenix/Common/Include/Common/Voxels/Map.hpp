@@ -69,14 +69,14 @@ namespace phx::voxels
 		static std::pair<math::vec3, math::vec3> getBlockPos(
 		    math::vec3 position);
 		BlockType* getBlockAt(math::vec3 position);
-		void       setBlockAt(math::vec3 pos, BlockType* block);
+		void       setBlockAt(math::vec3 pos, const Block& block);
 		void       save(const math::vec3& pos);
 
 		void registerEventSubscriber(MapEventSubscriber* subscriber);
 
 	private:
 		void dispatchToSubscriber(const MapEvent& mapEvent) const;
-		
+
 	private:
 		std::unordered_map<math::vec3, Chunk, math::Vector3Hasher,
 		                   math::Vector3KeyComparator>

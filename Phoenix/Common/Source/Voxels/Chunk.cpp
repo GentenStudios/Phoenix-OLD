@@ -57,9 +57,10 @@ void Chunk::setBlockAt(phx::math::vec3 position, Block newBlock)
 	    position.z < CHUNK_DEPTH)
 	{
 		m_blocks[getVectorIndex(position)] = newBlock.type;
-		if (newBlock.metadata)
+		if (newBlock.metadata != nullptr)
 		{
-			m_metadata[getVectorIndex(position)] = *newBlock.metadata;
+			m_metadata[getVectorIndex(position)] =
+			    std::move(*newBlock.metadata);
 		}
 	}
 }
@@ -73,7 +74,7 @@ bool Chunk::setMetadataAt(phx::math::vec3 position, const std::string& key,
 	if (position.x < CHUNK_WIDTH && position.y < CHUNK_HEIGHT &&
 	    position.z < CHUNK_DEPTH)
 	{
-		return m_metadata[getVectorIndex(position)].set(newData, key);
+		return m_metadata[getVectorIndex(position)].set(key, newData);
 	}
 	return false;
 }

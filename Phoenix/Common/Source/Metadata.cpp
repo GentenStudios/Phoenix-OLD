@@ -30,7 +30,7 @@
 
 using namespace phx;
 
-bool Metadata::set(const std::any& data, const std::string& key)
+bool Metadata::set(const std::string& key, const std::any& data)
 {
 	auto existing = m_data.find(key);
 	if (existing != m_data.end())

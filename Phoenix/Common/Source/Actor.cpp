@@ -31,6 +31,7 @@
 #include <Common/Movement.hpp>
 #include <Common/PlayerView.hpp>
 #include <Common/Position.hpp>
+#include <Common/Voxels/Block.hpp>
 
 using namespace phx;
 
@@ -127,7 +128,8 @@ bool ActorSystem::action1(entt::registry* registry, entt::entity entity)
 		if (currentBlock->category == voxels::BlockCategory::SOLID)
 		{
 			map->setBlockAt(
-			    pos, m_blockReferrer->blocks.get(voxels::BlockType::AIR_BLOCK));
+			    pos, {m_blockReferrer->blocks.get(voxels::BlockType::AIR_BLOCK),
+			          nullptr});
 
 			if (currentBlock->onBreak)
 			{
@@ -145,10 +147,11 @@ bool ActorSystem::action1(entt::registry* registry, entt::entity entity)
 
 bool ActorSystem::action2(entt::registry* registry, entt::entity entity)
 {
-	math::vec3   pos = (registry->get<Position>(entity).position / 2.f) + .5f;
-	voxels::Map* map = registry->get<PlayerView>(entity).map;
+	math::vec3 pos = (registry->get<Position>(entity).position / 2.f) + .5f;
+	const math::vec3& dir = registry->get<Position>(entity).getDirection();
+	voxels::Map*      map = registry->get<PlayerView>(entity).map;
 
-	math::Ray ray(pos, registry->get<Position>(entity).getDirection());
+	math::Ray ray(pos, dir);
 
 	while (ray.getLength() < m_reach)
 	{
@@ -160,12 +163,34 @@ bool ActorSystem::action2(entt::registry* registry, entt::entity entity)
 			math::vec3 back = ray.backtrace(RAY_INCREMENT);
 			back.floor();
 
-			map->setBlockAt(back, registry->get<Hand>(entity).hand);
-
-			if (registry->get<Hand>(entity).hand->onPlace)
+			voxels::Block block = {registry->get<Hand>(entity).hand, nullptr};
+			Metadata      data;
+			// If block is rotatable
 			{
-				registry->get<Hand>(entity).hand->onPlace(back.x, back.y,
-				                                          back.z);
+				math::vec3 rotation = {};
+				if (dir.x > 0)
+				{
+					rotation.x += 180;
+				}
+				if (dir.z > 0)
+				{
+					rotation.x += 90;
+				}
+				if (rotation.x > 0)
+				{
+					data.set("core.rotation", rotation);
+				}
+			}
+			if (data.size() > 0)
+			{
+				block.metadata = &data;
+			}
+
+			map->setBlockAt(back, block);
+
+			if (block.type->onPlace)
+			{
+				block.type->onPlace(back.x, back.y, back.z);
 			}
 
 			return true;

@@ -233,12 +233,12 @@ BlockType* Map::getBlockAt(phx::math::vec3 position)
 	return chunk->getBlockAt(pos.second).type;
 }
 
-void Map::setBlockAt(phx::math::vec3 position, BlockType* block)
+void Map::setBlockAt(phx::math::vec3 position, const Block& block)
 {
 	const auto& pos   = getBlockPos(position);
 	Chunk*      chunk = getChunk(pos.first);
 
-	chunk->setBlockAt(pos.second, {block, nullptr});
+	chunk->setBlockAt(pos.second, block);
 
 	if (m_queue == nullptr)
 	{
