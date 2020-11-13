@@ -183,9 +183,9 @@ namespace phx::voxels
 		Serializer& operator<<(Serializer& ser) override;
 
 	private:
-		math::vec3            m_pos;
-		BlockList             m_blocks;
-		std::vector<Metadata> m_metadata;
-		BlockReferrer*        m_referrer;
+		math::vec3                                m_pos;
+		BlockList                                 m_blocks;
+		std::unordered_map<std::size_t, Metadata> m_metadata;
+		BlockReferrer*                            m_referrer;
 	};
 } // namespace phx::voxels
