@@ -66,10 +66,13 @@ jobs:
           execute_process(COMMAND ${CMAKE_COMMAND} -E tar -xvf ../ninja.zip WORKING_DIRECTORY ./BUILD_TOOLS)
 
           # add ninja to the path (chmod +x if not on windows too).
-          execute_process(COMMAND echo "$GITHUB_WORKSPACE/BUILD_TOOLS/" >> $GITHUB_PATH)
           if (NOT "${{ runner.os }}" STREQUAL "Windows")
             execute_process(COMMAND chmod +x ninja WORKING_DIRECTORY ./BUILD_TOOLS)
           endif()
+
+      - name: Add Directory to Path
+        run: |
+          echo '$GITHUB_WORKSPACE/BUILD_TOOLS/' >> $GITHUB_PATH
 
       - name: Configure CMake
         shell: cmake -P {0}
