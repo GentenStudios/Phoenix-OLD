@@ -31,6 +31,7 @@
 
 #include <cstring>
 #include <sstream>
+#include <algorithm>
 
 using namespace phx;
 
