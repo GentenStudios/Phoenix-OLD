@@ -66,7 +66,7 @@ jobs:
           execute_process(COMMAND ${CMAKE_COMMAND} -E tar -xvf ../ninja.zip WORKING_DIRECTORY ./BUILD_TOOLS)
 
           # add ninja to the path (chmod +x if not on windows too).
-          message("::add-path::$ENV{GITHUB_WORKSPACE}/BUILD_TOOLS")
+          execute_process(COMMAND echo "$GITHUB_WORKSPACE/BUILD_TOOLS/" >> $GITHUB_PATH)
           if (NOT "${{ runner.os }}" STREQUAL "Windows")
             execute_process(COMMAND chmod +x ninja WORKING_DIRECTORY ./BUILD_TOOLS)
           endif()
