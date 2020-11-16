@@ -72,7 +72,7 @@ jobs:
 
       - name: Add Directory to Path
         run: |
-          echo '$GITHUB_WORKSPACE/BUILD_TOOLS/' >> $GITHUB_PATH
+          echo '${GITHUB_WORKSPACE}/BUILD_TOOLS/' >> $GITHUB_PATH
 
       - name: Configure CMake
         shell: cmake -P {0}
