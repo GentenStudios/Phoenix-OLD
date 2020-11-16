@@ -72,7 +72,14 @@ jobs:
 
       - name: Add Directory to Path
         run: |
-          echo '${GITHUB_WORKSPACE}/BUILD_TOOLS/' >> $GITHUB_PATH
+          # disable workflow command processing.
+          echo "::stop-commands::`echo -n ${{ github.token }} | sha256sum | head -c 64`"
+
+          # add build tools directory to path.
+          echo "::add-path::${GITHUB_WORKSPACE}/BUILD_TOOLS"
+
+          # enable workflow processing.
+          echo "::`echo -n ${{ github.token }} | sha256sum | head -c 64`::"
 
       - name: Configure CMake
         shell: cmake -P {0}
