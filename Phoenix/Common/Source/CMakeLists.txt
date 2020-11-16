@@ -10,6 +10,8 @@ set(Sources
 	${cmsSources}
 	${networkSources}
 
+	${currentDir}/CLIParser.cpp
+
 	${currentDir}/Actor.cpp
 	${currentDir}/Settings.cpp
 	${currentDir}/Logger.cpp
