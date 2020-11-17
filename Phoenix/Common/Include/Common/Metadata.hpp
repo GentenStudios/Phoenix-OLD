@@ -36,6 +36,7 @@
 
 #pragma once
 
+#include <Common/Utility/Serializer.hpp>
 #include <any>
 #include <string>
 #include <unordered_map>
@@ -43,7 +44,7 @@
 namespace phx
 {
 
-	class Metadata
+	class Metadata : public ISerializable
 	{
 	public:
 		/**
@@ -63,12 +64,15 @@ namespace phx
 		 * @brief Erases metadata
 		 * @param key The key associated with the metadata
 		 */
-		void erase(const std::string& key);
+		void erase(const std::string& key) { m_data.erase(key); };
 
 		size_t size() { return m_data.size(); };
 
-		std::string save();
-		bool        load(std::string data);
+		// serialize.
+		Serializer& operator>>(Serializer& ser) const override;
+
+		// deserialize.
+		Serializer& operator<<(Serializer& ser) override;
 
 	private:
 		std::unordered_map<std::string, std::any> m_data;

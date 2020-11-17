@@ -26,6 +26,8 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+#include <Common/Logger.hpp>
+#include <Common/Math/Math.hpp>
 #include <Common/Metadata.hpp>
 
 using namespace phx;
@@ -54,4 +56,64 @@ const std::any* Metadata::get(const std::string& key) const
 	return nullptr;
 }
 
-void Metadata::erase(const std::string& key) { m_data.erase(key); }
+Serializer& Metadata::operator>>(Serializer& ser) const
+{
+	ser << m_data.size();
+	for (auto& data : m_data)
+	{
+		if (data.second.type() == typeid(int))
+		{
+			ser << "i" << std::any_cast<int>(data.second);
+		}
+		else if (data.second.type() == typeid(float))
+		{
+			ser << "f" << std::any_cast<float>(data.second);
+		}
+		else if (data.second.type() == typeid(phx::math::vec3))
+		{
+			ser << "vec3" << std::any_cast<math::vec3>(data.second);
+		}
+		else
+		{
+			LOG_FATAL("Metadata")
+			    << "Attempted to serialize unsupported data type";
+		}
+	}
+}
+
+Serializer& Metadata::operator<<(Serializer& ser)
+{
+	int size;
+	ser >> size;
+	for (int i = 0; i < size; i++)
+	{
+		std::string key;
+		ser >> key;
+		std::string type;
+		ser >> type;
+		std::any val;
+		if (type == "i")
+		{
+			int v;
+			ser >> v;
+			set(key, val);
+		}
+		else if (type == "f")
+		{
+			float v;
+			ser >> v;
+			set(key, val);
+		}
+		else if (type == "vec3")
+		{
+			math::vec3 v;
+			ser >> v;
+			set(key, val);
+		}
+		else
+		{
+			LOG_FATAL("Metadata")
+			    << "Attempted to deserialize unsupported data type";
+		}
+	}
+}

@@ -28,6 +28,7 @@
 
 #pragma once
 
+#include <Common/Utility/Serializer.hpp>
 #include <cmath>
 #include <iostream>
 #include <ostream>
@@ -37,7 +38,7 @@ namespace phx::math
 	namespace detail
 	{
 		template <typename T>
-		class Vector3
+		class Vector3 : public ISerializable
 		{
 		public:
 			using ValueType           = T;
@@ -47,7 +48,8 @@ namespace phx::math
 			static constexpr int SIZE = 3;
 			static constexpr int size() { return SIZE; }
 
-			union {
+			union
+			{
 				T data[SIZE];
 				struct
 				{
@@ -324,6 +326,14 @@ namespace phx::math
 				os << "(" << vec.x << ", " << vec.y << ", " << vec.z << ")";
 				return os;
 			}
+
+			// Serialize
+			Serializer& operator>>(Serializer& ser) const
+			{
+				ser >> x >> y >> z;
+			}
+			// Deserialize
+			Serializer& operator<<(Serializer& ser) { ser << x << y << z; }
 		};
 	} // namespace detail
 
