@@ -119,7 +119,9 @@ void Client::onEvent(events::Event e)
 void Client::run()
 {
 	Settings::get()->load("settings.txt");
-    LoggerConfig config;
+
+	LoggerConfig config;
+	config.logFile   = "PhoenixClient.log";
     config.verbosity = LogVerbosity::DEBUG;
     Logger::initialize(config);
 
