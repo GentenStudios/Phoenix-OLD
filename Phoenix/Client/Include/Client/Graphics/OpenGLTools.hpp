@@ -49,7 +49,9 @@
 #endif
 
 // Uncomment this in order to enable detailed OpenGL logging.
-#define OPENGL_DIAGNOSTICS_ENABLED
+#ifdef ENGINE_DEBUG
+#	define OPENGL_DIAGNOSTICS_ENABLED
+#endif
 
 namespace phx::gfx
 {
