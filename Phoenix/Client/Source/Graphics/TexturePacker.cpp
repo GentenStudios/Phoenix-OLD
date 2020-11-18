@@ -66,7 +66,7 @@ TexturePacker::Handle TexturePacker::add(const std::string& path)
 
 		// note: handle starts at one, this lets us place a placeholder at index
 		// 0 in the loaded array.
-		return m_texturesToLoad.size();
+		return m_texturesToLoad.size() + 1;
 	}
 
 	// if the element already exists, return the position of it.
