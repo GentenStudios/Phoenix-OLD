@@ -121,6 +121,7 @@ void Client::run()
 	Settings::get()->load("settings.txt");
 
 	LoggerConfig config;
+	config.logToFile = true;
 	config.logFile   = "PhoenixClient.log";
     config.verbosity = LogVerbosity::DEBUG;
     Logger::initialize(config);
