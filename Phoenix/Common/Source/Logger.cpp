@@ -237,9 +237,10 @@ void Logger::loggerInternal(const Log& log)
 		// for info & release builds: [%s][%s] %s\n (6 base characters)
 		// for debug builds (verb != info): [%s][%s] %s:%d %s\n (9 base chars)
 		// the base structure will always have at least 6 format characters.
+		// it needs an extra one at the end for the null terminator.
 		std::size_t length =
 		    g_logVerbToTextStringLength[static_cast<int>(log.verbosity)] +
-		    log.component.size() + logStream.size() + 6;
+		    log.component.size() + logStream.size() + 6 + 1;
 
 #		ifdef ENGINE_DEBUG
 		if (log.verbosity != LogVerbosity::INFO)
@@ -252,18 +253,18 @@ void Logger::loggerInternal(const Log& log)
 #		endif
 		
 		// +1 because null terminator.
-		buffer = new char[length + 1];
+		buffer = new char[length];
 
 		if (log.verbosity == LogVerbosity::INFO)
 		{
-			snprintf(buffer, length + 1, "[%s][%s] %s\n",
+			snprintf(buffer, length, "[%s][%s] %s\n",
 			         g_logVerbToText[static_cast<int>(log.verbosity)],
 			         log.component.c_str(), log.stream.str().c_str());
 		}
 		else
 		{
 #ifdef ENGINE_DEBUG
-			snprintf(buffer, length + 1, "[%s] %s:%i [%s] %s\n",
+			snprintf(buffer, length, "[%s] %s:%i [%s] %s\n",
 			         g_logVerbToText[static_cast<int>(log.verbosity)],
 			         log.errorFile.c_str(), log.errorLine,
 			         log.component.c_str(), log.stream.str().c_str());
@@ -274,16 +275,19 @@ void Logger::loggerInternal(const Log& log)
 #endif
 		}
 
+		// with fwrite do -1 on the length because printing the null terminator
+		// makes a random space.
+		
 		if (m_logToConsole)
 		{
 			setTerminalTextColor(log.verbosity);
-			fwrite(buffer, 1, length + 1, stdout);
+			fwrite(buffer, 1, length - 1, stdout);
 			setTerminalTextColor(TextColor::WHITE);
 		}
 
 		if (m_logToFile)
 		{
-			fwrite(buffer, 1, length + 1, m_file);
+			fwrite(buffer, 1, length - 1, m_file);
 		}
 	}
 }
