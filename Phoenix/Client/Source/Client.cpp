@@ -33,6 +33,8 @@
 #include <Common/Logger.hpp>
 #include <Common/Settings.hpp>
 
+#include <glad/glad.h>
+
 using namespace phx::client;
 using namespace phx;
 
@@ -98,14 +100,6 @@ void Client::onEvent(events::Event e)
 			break;
 		}
 		break;
-	case EventType::LAYER_DESTROYED:
-		if (std::string(e.layer) == "SplashScreen")
-		{
-			Game* game = new Game(&m_window, &m_registry);
-			m_layerStack.pushLayer(game);
-			e.handled = true;
-		}
-		break;
 	default:
 		break;
 	}
@@ -123,8 +117,8 @@ void Client::run()
     config.verbosity = LogVerbosity::DEBUG;
     Logger::initialize(config);
 
-	SplashScreen* splashScreen = new SplashScreen();
-	m_layerStack.pushLayer(splashScreen);
+	Game* game = new Game(&m_window, &m_registry);
+	m_layerStack.pushLayer(game);
 
 	std::size_t last = SDL_GetPerformanceCounter();
 	while (m_window.isRunning())

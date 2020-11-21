@@ -33,9 +33,7 @@
 #include <Common/Actor.hpp>
 #include <Common/PlayerView.hpp>
 
-#define STB_IMAGE_IMPLEMENTATION
 #include <glad/glad.h>
-#include <stb_image.h>
 
 #include <unordered_set>
 

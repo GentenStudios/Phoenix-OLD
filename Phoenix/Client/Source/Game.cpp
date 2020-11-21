@@ -147,11 +147,11 @@ void Game::onAttach()
 
 	LOG_INFO("MAIN") << "Prepare rendering";
 
-	m_worldRenderer =
+	m_mapRenderer =
 	    new gfx::ChunkRenderer(m_map, &m_blockRegistry, m_registry, m_player);
-	m_worldRenderer->attachCamera(m_camera);
-	m_map->registerEventSubscriber(m_worldRenderer);
-	m_worldRenderer->prep();
+	m_mapRenderer->attachCamera(m_camera);
+	m_map->registerEventSubscriber(m_mapRenderer);
+	m_mapRenderer->prep();
 
 	m_renderPipeline.prepare("Assets/SimpleWorld.vert",
 	                         "Assets/SimpleWorld.frag",
@@ -162,6 +162,15 @@ void Game::onAttach()
 	const math::mat4 model;
 	m_renderPipeline.setMatrix("u_model", model);
 
+	m_worldRenderer = new gfx::WorldRenderer();
+
+	std::vector<std::string> skyboxTex = {
+	    "Assets/Skybox/north.png",  "Assets/Skybox/west.png",
+	    "Assets/Skybox/south.png",  "Assets/Skybox/east.png",
+	    "Assets/Skybox/zenith.png", "Assets/Skybox/nadir.png"};
+	m_worldRenderer->setSkyboxTextures(skyboxTex);
+	m_worldRenderer->attachCamera(m_camera);
+	
 	LOG_INFO("MAIN") << "Register GUI";
 	m_escapeMenu = new EscapeMenu(m_window);
 
@@ -182,7 +191,7 @@ void Game::onAttach()
 
 void Game::onDetach()
 {
-	delete m_worldRenderer;
+	delete m_mapRenderer;
 	delete m_inputQueue;
 	delete m_network;
 	delete m_camera;
@@ -318,8 +327,10 @@ void Game::tick(float dt)
 	m_renderPipeline.setVector3("u_LightDir", lightdir);
 	m_renderPipeline.setFloat("u_Brightness", 0.6f);
 
+	m_mapRenderer->tick(dt);
+	m_mapRenderer->renderSelectionBox();
+
 	m_worldRenderer->tick(dt);
-	m_worldRenderer->renderSelectionBox();
 
 	m_chat->draw();
 }

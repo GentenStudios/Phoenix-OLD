@@ -49,9 +49,6 @@
 
 namespace phx::gfx
 {
-	// forward declaration
-	class ShaderPipeline;
-
 	struct Vertex
 	{
 		math::vec3 pos;
