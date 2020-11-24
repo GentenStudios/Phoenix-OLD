@@ -81,7 +81,7 @@ float skyboxVertices[] = {
 
 using namespace phx::gfx;
 
-void WorldRenderer::setSkyboxTextures(std::vector<std::string>& textures)
+void WorldRenderer::setSkyboxTextures(const std::vector<std::string>& textures)
 {
 	// we want the order front, left, back, right, top, bottom
 	if (textures.size() == 6)

@@ -44,7 +44,7 @@ namespace phx::gfx
 		~WorldRenderer() = default;
 
 		// give in front, left, back, right, top, bottom
-		void setSkyboxTextures(std::vector<std::string>& textures);
+		void setSkyboxTextures(const std::vector<std::string>& textures);
 
 		void attachCamera(FPSCamera* camera);
 		void tick(float dt);
