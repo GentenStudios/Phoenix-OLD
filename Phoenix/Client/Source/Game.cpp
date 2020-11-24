@@ -164,11 +164,10 @@ void Game::onAttach()
 
 	m_worldRenderer = new gfx::WorldRenderer();
 
-	std::vector<std::string> skyboxTex = {
-	    "Assets/Skybox/north.png",  "Assets/Skybox/west.png",
-	    "Assets/Skybox/south.png",  "Assets/Skybox/east.png",
-	    "Assets/Skybox/zenith.png", "Assets/Skybox/nadir.png"};
-	m_worldRenderer->setSkyboxTextures(skyboxTex);
+	m_worldRenderer->setSkyboxTextures(
+	    {"Assets/Skybox/north.png", "Assets/Skybox/west.png",
+	     "Assets/Skybox/south.png", "Assets/Skybox/east.png",
+	     "Assets/Skybox/zenith.png", "Assets/Skybox/nadir.png"});
 	m_worldRenderer->attachCamera(m_camera);
 	
 	LOG_INFO("MAIN") << "Register GUI";
