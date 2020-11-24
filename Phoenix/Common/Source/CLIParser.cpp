@@ -29,6 +29,7 @@
 #include <Common/CLIParser.hpp>
 #include <Common/Logger.hpp>
 
+#include <iostream>
 #include <cstring>
 #include <sstream>
 #include <algorithm>
@@ -53,10 +54,12 @@ void CLIParser::addParameter(const CLIParameter& parameter)
 			}
 			else
 			{
-				LOG_WARNING("CLI")
-				    << "The shorthand parameter: " << parameter.shorthand
+				std::cerr
+				    << "[CLI ERROR]: The shorthand parameter: "
+				    << parameter.shorthand
 				    << " has already been used by another parameter. Either "
-				       "disable the shorthand, or select another character.";
+				       "disable the shorthand, or select another character."
+				    << std::endl;
 			}
 		}
 		else
@@ -67,9 +70,10 @@ void CLIParser::addParameter(const CLIParameter& parameter)
 	}
 	else
 	{
-		LOG_WARNING("CLI") << "The parameter: " << parameter.parameter
-		                   << " has already been selected, either disable this "
-		                      "parameter or select another name";
+		std::cerr << "[CLI ERROR]: The parameter: " << parameter.parameter
+		          << " has already been selected, either disable this "
+		             "parameter or select another name."
+		          << std::endl;
 	}
 }
 
@@ -88,8 +92,9 @@ bool CLIParser::parse(int argc, char** argv)
 			// if it's less than two characters, then it's not enough for smth
 			// lik -c, and it's not enough --command (obviously)
 
-			LOG_FATAL("CLI") << "Invalid Command Line arguments.";
-			LOG_FATAL("CLI") << getHelpString();
+			std::cerr << "[CLI ERROR]: Invalid Command Line arguments, refer "
+			             "to the help below:\n"
+			          << getHelpString() << std::endl;
 
 			return false;
 		}
@@ -114,9 +119,9 @@ bool CLIParser::parse(int argc, char** argv)
 			{
 				// not found.
 
-				LOG_FATAL("CLI") << "Unrecognized Parameter: " << key;
-				LOG_FATAL("CLI") << "Refer to the help below: ";
-				LOG_FATAL("CLI") << getHelpString();
+				std::cerr << "[CLI ERROR]: Unrecognized Parameter: " << key
+				          << ", refer to the help below:\n" << getHelpString()
+				          << std::endl;
 
 				return false;
 			}
@@ -124,8 +129,10 @@ bool CLIParser::parse(int argc, char** argv)
 			// now actually handle what comes next.
 
 			// if the arg is a flag, keep going.
-			if ((*it).isFlag)
+			if (it->isFlag)
 			{
+				m_arguments.insert({m_fullParamMap.at(it->parameter), {}});
+				
 				// we don't need to do anything now, increment and dip.
 				++index;
 				continue;
@@ -137,10 +144,10 @@ bool CLIParser::parse(int argc, char** argv)
 			{
 				// there isn't, so lets say there's an error.
 
-				LOG_FATAL("CLI") << "Expected a value for this parameter ("
-				                 << key << "). None were given.";
-				LOG_FATAL("CLI") << "Refer to the help below: ";
-				LOG_FATAL("CLI") << getHelpString();
+				std::cerr
+				    << "[CLI ERROR]: Expected a value for this parameter ("
+				    << key << "). None were given."
+				    << "Refer to the help below:\n" << getHelpString();
 
 				return false;
 			}
@@ -185,6 +192,19 @@ bool CLIParser::parse(int argc, char** argv)
 		{
 			std::string key {argv[index] + 1, argv[index] + argLen};
 
+			if (argLen > 2)
+			{
+				// frankly, shorthand args should be -s or -c or similar, only
+				// one character.
+
+				std::cerr << "[CLI ERROR]: Malformed Shorthand Parameter: "
+				          << key
+				          << ", too many characters, refer to the help below:\n"
+				          << getHelpString();
+
+				return false;
+			}
+			
 			const auto it =
 			    std::find_if(m_parameters.begin(), m_parameters.end(),
 			                 [key](const CLIParameter& param) {
@@ -200,16 +220,19 @@ bool CLIParser::parse(int argc, char** argv)
 			{
 				// not found.
 
-				LOG_FATAL("CLI") << "Unrecognized Shorthand Parameter: " << key;
-				LOG_FATAL("CLI") << "Refer to the help below: ";
-				LOG_FATAL("CLI") << getHelpString();
+				std::cerr << "[CLI ERROR]: Unrecognized Shorthand Parameter: "
+				          << key
+				          << ", refer to the help below:\n"
+				          << getHelpString();
 
 				return false;
 			}
 
 			// if the arg is a flag, keep going.
-			if ((*it).isFlag)
+			if (it->isFlag)
 			{
+				m_arguments.insert({m_shorthandMap.at(it->parameter), {}});
+				
 				// we don't need to do anything now, increment and dip.
 				++index;
 				continue;
@@ -221,16 +244,16 @@ bool CLIParser::parse(int argc, char** argv)
 			{
 				// there isn't, so lets say there's an error.
 
-				LOG_FATAL("CLI")
-				    << "Expected a value for this shorthand parameter (" << key
-				    << "). None were given.";
-				LOG_FATAL("CLI") << "Refer to the help below: ";
-				LOG_FATAL("CLI") << getHelpString();
+				std::cerr << "[CLI ERROR]: Expected a value for this shorthand "
+				             "parameter ("
+				          << key
+				          << "). None were given. Refer to the help below:\n"
+				          << getHelpString();
 
 				return false;
 			}
 
-			if ((*it).multiValue)
+			if (it->multiValue)
 			{
 				while (index < argc)
 				{
@@ -275,13 +298,18 @@ std::string CLIParser::getHelpString() const
 {
 	std::stringstream help;
 
-	for (auto& param : m_parameters)
+	for (const auto& param : m_parameters)
 	{
-		help << "\n";
 		help << "--" << param.parameter;
-		help << " ("
-		     << "-" << param.shorthand << "): ";
+		if (param.enableShorthand)
+		{
+			help << " ("
+			     << "-" << param.shorthand << ")";
+		}
+
+		help << ":\n";
 		help << param.helpString;
+		help << "\n";
 	}
 
 	return help.str();
@@ -304,5 +332,5 @@ std::vector<std::string> const* CLIParser::getArgument(
 		return nullptr;
 	}
 
-	return &((*it2).second);
+	return &it2->second;
 }

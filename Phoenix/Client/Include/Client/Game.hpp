@@ -64,28 +64,14 @@ namespace phx::client
 	class Game : public gfx::Layer
 	{
 	public:
-		explicit Game(gfx::Window* window, entt::registry* registry,
-		              bool networked = false);
-		~Game() override;
+		explicit Game(gfx::Window* window, entt::registry* registry);
+		~Game() override {};
 
-		void onAttach() override;
-		void onDetach() override;
+		void onAttach() override {};
+		void onDetach() override {};
 
-		void onEvent(events::Event& e) override;
-		void tick(float dt) override;
-
-	private:
-		/**
-		 * @brief This confirms that the prediction on the client was accurate
-		 * to what the server decided to accept and send back in a confirmation.
-		 *
-		 * @param position The current player position to confirm
-		 *
-		 * @note This is a rough implementation, ideally it doesn't live in the
-		 * main game class forever but it is easier to work on it with access to
-		 * the values it needs.
-		 */
-		void confirmState(const Position& position);
+		void onEvent(events::Event& e) override {};
+		void tick(float dt) override {};
 
 	private:
 		BlockRegistry m_blockRegistry;
@@ -110,12 +96,6 @@ namespace phx::client
 		bool        m_followCam  = true;
 		math::vec3  m_prevPos;
 		int         m_playerHand = 0;
-
-		client::Network*    m_network    = nullptr;
-		client::InputQueue* m_inputQueue = nullptr;
-
-		// This is an internal log of the recent input states sent to the server
-		std::list<InputState> m_states;
 
 		Save* m_save = nullptr;
 	};

@@ -27,12 +27,28 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <Client/Client.hpp>
+#include <Common/CLIParser.hpp>
+#include <Common/Logger.hpp>
+
+#include <Common/CoreIntrinsics.hpp>
 
 using namespace phx;
 
 #undef main
 int main(int argc, char** argv)
 {
+	CLIParser parser;
+
+	client::Client::get()->setupCLIParam(&parser);
+
+	// .parse returns true/false depending on success.
+	if (!parser.parse(argc, argv))
+	{
+		// if error, things have already been outputted so we can just leave it
+		// here.
+		return 1;
+	}
+
 	client::Client::get()->run();
 
 	return 0;

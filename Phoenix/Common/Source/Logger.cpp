@@ -147,6 +147,9 @@ Log& Log::operator=(const Log& rhs)
 
 void Logger::initialize(const LoggerConfig& config)
 {
+	ENGINE_ASSERT(m_instance != nullptr,
+	              "Logger is already initialized when being re-initialized.");
+		
 	m_instance = new Logger(config);
 }
 

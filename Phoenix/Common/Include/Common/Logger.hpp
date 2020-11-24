@@ -145,4 +145,3 @@ namespace phx
 		FILE*      m_file = nullptr;
 	};
 } // namespace phx
-

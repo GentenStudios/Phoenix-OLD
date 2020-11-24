@@ -28,6 +28,8 @@
 
 #pragma once
 
+#include <cassert>
+
 #if defined(_DEBUG)
 #	define ENGINE_DEBUG
 #endif
@@ -89,8 +91,8 @@
 // TODO: (beeperdeeper089) Log the assertion fail & allow all the extra arguments to go
 #if defined(ENGINE_DEBUG)
 #	define ENGINE_ASSERT(condition, ...) \
-		{                             \
-			assert(condition);        \
+		{                                \
+			assert(condition, ...);      \
 		}
 #else
 #	define ENGINE_ASSERT(condition, ...)

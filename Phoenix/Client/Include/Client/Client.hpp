@@ -34,6 +34,7 @@
 #include <Client/Graphics/Window.hpp>
 
 #include <Common/Singleton.hpp>
+#include <Common/CLIParser.hpp>
 
 #include <entt/entt.hpp>
 
@@ -45,6 +46,8 @@ namespace phx::client
 		Client();
 		~Client() = default;
 
+		void setupCLIParam(CLIParser* parser);
+		
 		void pushLayer(gfx::Layer* layer);
 		void popLayer(gfx::Layer* layer);
 		bool isDebugLayerActive() const { return m_debugOverlayActive; }
@@ -53,6 +56,8 @@ namespace phx::client
 		void run();
 
 	private:
+		CLIParser* m_cliArguments;
+		
 	    entt::registry  m_registry;
 		
 		gfx::Window     m_window;
