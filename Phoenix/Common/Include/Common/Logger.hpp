@@ -71,6 +71,7 @@ namespace phx
 		LogVerbosity verbosity    = LogVerbosity::INFO;
 		bool         threaded     = false;
 		bool         logToConsole = true;
+		bool         logToFile  = true;
 	};
 
 	class Log
@@ -139,8 +140,9 @@ namespace phx
 		std::thread             m_worker;
 		void                    loggerThreadHandle();
 
-		bool          m_logToConsole;
-		std::ofstream m_file;
+		bool       m_logToConsole;
+		bool       m_logToFile;
+		FILE*      m_file = nullptr;
 	};
 } // namespace phx
 

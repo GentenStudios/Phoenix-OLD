@@ -31,12 +31,18 @@
 
 #ifdef ENGINE_PLATFORM_WINDOWS
 #	include <Windows.h>
+// supress warnings for fopen and FILE*
+#	define _CRT_SECURE_NO_WARNINGS
 #endif
 
 #include <cstdio>
+#include <cstring>
+#include <cmath>
 
 using namespace phx;
 
+// just the lengths of the strings for the verbosity texts,
+static const std::size_t g_logVerbToTextStringLength[] = {5, 7, 4, 5};
 static const char* g_logVerbToText[] = {"FATAL", "WARNING", "INFO", "DEBUG"};
 
 #ifdef ENGINE_PLATFORM_WINDOWS
@@ -172,6 +178,7 @@ Logger::Logger(const LoggerConfig& config)
 	m_threaded     = config.threaded;
 	m_verbosity    = config.verbosity;
 	m_logToConsole = config.logToConsole;
+	m_logToFile    = config.logToFile;
 
 	if (m_threaded)
 	{
@@ -180,17 +187,24 @@ Logger::Logger(const LoggerConfig& config)
 		m_worker.swap(thread);
 	}
 
-	m_file.open(config.logFile, std::ios_base::app);
-	if (!m_file.is_open())
+	if (m_logToFile)
 	{
-		Log message = {LogVerbosity::INFO, "", 0, "LOGGING"};
-		message << "A log file was not specified, logging only to console.";
-		log(message);
+		m_file = fopen(config.logFile.c_str(), "a");
+		if (m_file == nullptr)
+		{
+			m_logToFile = false;
+
+			Log message = {LogVerbosity::INFO, "", 0, "LOGGING"};
+			message << "A log file was not specified, logging only to console.";
+			log(message);
+
+		}
 	}
 }
 
 Logger::~Logger()
 {
+	// could use fwrite here, but printf does the job in a more readable way.
 	printf("\n");
 
 	if (m_threaded)
@@ -202,36 +216,78 @@ Logger::~Logger()
 			m_worker.join();
 	}
 
-	m_file.close();
+	if (m_logToFile)
+	{
+		fclose(m_file);
+	}
 }
 
 void Logger::loggerInternal(const Log& log)
 {
 	if (m_logToConsole)
 	{
+		// because you can't get the length of a stringstream????
+		std::string logStream = log.stream.str();
+
+		char* buffer = nullptr;
+
+		// the base structure will also always have the verb, component and
+		// actual stream.
+		//
+		// for info & release builds: [%s][%s] %s\n (6 base characters)
+		// for debug builds (verb != info): [%s][%s] %s:%d %s\n (9 base chars)
+		// the base structure will always have at least 6 format characters.
+		// it needs an extra one at the end for the null terminator.
+		std::size_t length =
+		    g_logVerbToTextStringLength[static_cast<int>(log.verbosity)] +
+		    log.component.size() + logStream.size() + 6 + 1;
+
+#		ifdef ENGINE_DEBUG
+		if (log.verbosity != LogVerbosity::INFO)
+		{
+			// +3 since we've already added 6 base chars above, debug & !info
+			// messages have 9 so... 3 is the difference.
+			length +=
+			    3 + log.errorFile.size() + (std::log10(log.errorLine) + 1);
+		}
+#		endif
+		
+		// +1 because null terminator.
+		buffer = new char[length];
+
 		if (log.verbosity == LogVerbosity::INFO)
 		{
-			setTerminalTextColor(LogVerbosity::INFO);
-			printf("[%s][%s] %s\n",
-			       g_logVerbToText[static_cast<int>(log.verbosity)],
-			       log.component.c_str(), log.stream.str().c_str());
-			setTerminalTextColor(TextColor::WHITE);
+			snprintf(buffer, length, "[%s][%s] %s\n",
+			         g_logVerbToText[static_cast<int>(log.verbosity)],
+			         log.component.c_str(), log.stream.str().c_str());
 		}
 		else
 		{
-			setTerminalTextColor(log.verbosity);
 #ifdef ENGINE_DEBUG
-			printf("[%s] %s:%i [%s] %s\n",
-			       g_logVerbToText[static_cast<int>(log.verbosity)],
-			       log.errorFile.c_str(), log.errorLine, log.component.c_str(),
-			       log.stream.str().c_str());
-			setTerminalTextColor(TextColor::WHITE);
+			snprintf(buffer, length, "[%s] %s:%i [%s] %s\n",
+			         g_logVerbToText[static_cast<int>(log.verbosity)],
+			         log.errorFile.c_str(), log.errorLine,
+			         log.component.c_str(), log.stream.str().c_str());
 #else
-			printf("[%s][%s] %s\n",
-			       g_logVerbToText[static_cast<int>(log.verbosity)],
-			       log.component.c_str(), log.stream.str().c_str());
-			setTerminalTextColor(TextColor::WHITE);
+			snprintf(buffer, length + 1, "[%s][%s] %s\n",
+			         g_logVerbToText[static_cast<int>(log.verbosity)],
+			         log.component.c_str(), log.stream.str().c_str());
 #endif
+		}
+
+		// with fwrite do -1 on the length because printing the null terminator
+		// makes a random space.
+		
+		if (m_logToConsole)
+		{
+			setTerminalTextColor(log.verbosity);
+			fwrite(buffer, 1, length - 1, stdout);
+			setTerminalTextColor(TextColor::WHITE);
+		}
+
+		if (m_logToFile)
+		{
+			fwrite(buffer, 1, length - 1, m_file);
 		}
 	}
 }

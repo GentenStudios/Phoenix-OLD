@@ -18,6 +18,7 @@ set(Headers
 	${currentDir}/FileIO.hpp
 	${currentDir}/Logger.hpp
 	${currentDir}/Registry.hpp
+	${currentDir}/CLIParser.hpp
 
 	${currentDir}/Settings.hpp
 	${currentDir}/Commander.hpp
