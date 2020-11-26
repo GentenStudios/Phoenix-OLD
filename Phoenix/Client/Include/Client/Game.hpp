@@ -33,6 +33,7 @@
 
 #include <Client/Graphics/Camera.hpp>
 #include <Client/Graphics/ChunkRenderer.hpp>
+#include <Client/Graphics/WorldRenderer.hpp>
 #include <Client/Graphics/Layer.hpp>
 #include <Client/Graphics/ShaderPipeline.hpp>
 #include <Client/Graphics/Window.hpp>
@@ -94,8 +95,9 @@ namespace phx::client
 
 		gfx::Window*        m_window;
 		gfx::FPSCamera*     m_camera        = nullptr;
-		gfx::ChunkRenderer* m_worldRenderer = nullptr;
+		gfx::ChunkRenderer* m_mapRenderer   = nullptr;
 		voxels::Map*        m_map           = nullptr;
+		gfx::WorldRenderer* m_worldRenderer = nullptr;
 
 		gfx::ShaderPipeline m_renderPipeline;
 
