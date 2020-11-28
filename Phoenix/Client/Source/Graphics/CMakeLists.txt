@@ -13,8 +13,10 @@ set(graphicsSources
 
 	${currentDir}/ChatBox.cpp
 
+	${currentDir}/TexturePacker.cpp
 	${currentDir}/ChunkMesher.cpp
 	${currentDir}/ChunkRenderer.cpp
+	${currentDir}/WorldRenderer.cpp
 
 	PARENT_SCOPE
 )

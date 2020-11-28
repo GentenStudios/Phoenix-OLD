@@ -28,52 +28,59 @@
 
 #pragma once
 
-#include <Client/Audio/Audio.hpp>
-#include <Client/Audio/Source.hpp>
+#include <Common/Math/Math.hpp>
 
-#include <deque>
+#include <unordered_map>
 #include <vector>
-#include <mutex>
 
-namespace phx::audio
+namespace phx::gfx
 {
-	class SourcePool
+	enum class TextureSize
+	{
+		X16  = 16,
+		X32  = 32,
+		X64  = 64,
+		X128 = 128,
+		X256 = 256,
+		X512 = 512,
+		UNKNOWN
+	};
+
+	struct TextureData
+	{
+		std::size_t layer = 0;
+
+		// add uvSize.y to bottomLeftUV to get topLeft.
+		// add uvSize.x to bottomLeftUV to get bottomRight.
+		math::vec2 bottomLeftUV;
+		math::vec2 uvSize;
+	};
+
+	class TexturePacker
 	{
 	public:
-		/**
-		 * @brief The maximum amount of sources that can be played at once.
-		 *
-		 * This is set to 32 since that's the maximum concurrently playing
-		 * sources on iOS devices. 32 should be fairly generous for a voxel game
-		 * anyways.
-		 */
-		constexpr static std::size_t MAX_SIMULTANEOUS_SOURCES = 32;
+		using Handle = std::size_t;
+
+		// the maximum size of a texture for a block/item that can be loaded.
+		// may be improved upon in the future.
+		constexpr static unsigned int MAX_TEXTURE_SIZE = 512;
 
 	public:
-		SourcePool();
-		~SourcePool() = default;
+		TexturePacker();
+		~TexturePacker();
 
-		void queue(const Source& source);
-		void queue(Source&& source);
+		Handle             add(const std::string& path);
+		const TextureData* getData(Handle handle) const;
 
-		void forceNext(const Source& source);
-		void forceNext(Source&& source);
+		void pack();
 
-		void clear();
-		std::size_t playingCount() const;
-		
-		void pause();
-		void play();
-		void stop();
-
-		void tick();
+		void activate(unsigned int slot);
 
 	private:
-		bool m_paused = false;
-		
-		std::mutex m_mutex;
-		
-		std::deque<Source> m_sourcesToPlay;
-		std::vector<Source> m_playingSources;
+		bool                                    m_packed = false;
+		std::vector<std::string>                m_texturesToLoad;
+		std::unordered_map<Handle, TextureData> m_loadedTexData;
+
+		unsigned int m_textureID = 0;
 	};
-} // namespace phx::audio
+} // namespace phx::gfx

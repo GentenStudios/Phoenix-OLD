@@ -28,15 +28,23 @@
 
 #pragma once
 
+#include <Common/Math/Math.hpp>
 #include <Common/Save.hpp>
 #include <Common/Utility/BlockingQueue.hpp>
 #include <Common/Voxels/BlockReferrer.hpp>
 #include <Common/Voxels/Chunk.hpp>
 
+#include <cstddef>
+#include <filesystem>
+#include <string_view>
 #include <unordered_map>
+#include <utility>
 
 namespace phx::voxels
 {
+
+	using ChunkData = std::pair<phx::math::vec3, std::vector<std::byte>>;
+
 	struct MapEvent
 	{
 		// only one event for now, but to streamline things in the future if we
@@ -47,7 +55,7 @@ namespace phx::voxels
 			CHUNK_UPDATE
 		};
 
-		Event      type;
+		Event          type;
 		voxels::Chunk* chunk;
 	};
 
@@ -76,6 +84,44 @@ namespace phx::voxels
 
 	private:
 		void dispatchToSubscriber(const MapEvent& mapEvent) const;
+
+		/**
+		 * @brief Update the loaded chunks from the queue of incoming chunks.
+		 */
+		void updateChunkQueue();
+
+		/*
+		 * @brief Parse a save string into a chunk.
+		 *
+		 * @param searchView A string view of the save data to be parsed.
+		 * @param chunk The chunk to be filled with the appropriate blocks.
+		 * @return true if the parsing was successful, otherwise false.
+		 */
+		bool parseChunkSave(std::string_view searchView, Chunk& chunk);
+
+		/*
+		 * @brief Load a chunk from the save files.
+		 *
+		 * @param chunkPos The coordinates of the chunk.
+		 * @return true if chunk was loaded from save, otherwise false.
+		 */
+		bool loadChunk(const phx::math::vec3& chunkPos);
+
+		/**
+		 * @brief Create a new chunk and write a save file for it.
+		 *
+		 * @param chunkPos The coordinates of the chunk.
+		 */
+		void generateChunk(const phx::math::vec3& chunkPos);
+
+		/**
+		 * @brief Get the save filepath for a chunk position.
+		 *
+		 * @param chunkPos The integer coordinates of the chunk.
+		 * @return Relative path to the save directory.
+		 */
+		std::filesystem::path toSavePath(
+		    const phx::math::vec3i& chunkPos) const;
 
 	private:
 		std::unordered_map<math::vec3, Chunk, math::Vector3Hasher,

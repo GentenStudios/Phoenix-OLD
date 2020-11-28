@@ -35,6 +35,7 @@
 
 #pragma once
 
+#include <Client/Graphics/TexturePacker.hpp>
 #include <Client/Graphics/ChunkRenderer.hpp>
 #include <Client/Voxels/BlockRegistry.hpp>
 
@@ -62,9 +63,7 @@ namespace phx::gfx
 	class ChunkMesher
 	{
 	public:
-		static std::vector<float> mesh(
-		    voxels::Chunk*                                chunk,
-		    const ChunkRenderer::AssociativeTextureTable& texTable,
-		    client::BlockRegistry*                        blockRegistry);
+		static std::vector<float> mesh(voxels::Chunk*         chunk,
+		                               client::BlockRegistry* blockRegistry);
 	};
 } // namespace phx::gfx

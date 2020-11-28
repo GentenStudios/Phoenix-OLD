@@ -32,8 +32,6 @@
 #include <Client/Events/IEventListener.hpp>
 #include <Client/Graphics/LayerStack.hpp>
 #include <Client/Graphics/Window.hpp>
-#include <Client/Audio/Audio.hpp>
-#include <Client/Audio/SourcePool.hpp>
 
 #include <Common/Singleton.hpp>
 
@@ -51,17 +49,11 @@ namespace phx::client
 		void popLayer(gfx::Layer* layer);
 		bool isDebugLayerActive() const { return m_debugOverlayActive; }
 
-		audio::Audio*      getAudioHandler() { return m_audio; }
-		audio::SourcePool* getAudioPool() { return m_audioPool; }
-
 		void onEvent(events::Event e) override;
 		void run();
 
 	private:
 	    entt::registry  m_registry;
-
-		audio::Audio* m_audio;
-		audio::SourcePool* m_audioPool;
 		
 		gfx::Window     m_window;
 		gfx::LayerStack m_layerStack;
@@ -70,4 +62,3 @@ namespace phx::client
 		DebugOverlay* m_debugOverlay       = nullptr;
 	};
 } // namespace phx::client
-
