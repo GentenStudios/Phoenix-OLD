@@ -38,7 +38,7 @@ namespace phx::math
 	namespace detail
 	{
 		template <typename T>
-		class Vector3 : public ISerializable
+		class Vector3
 		{
 		public:
 			using ValueType           = T;
@@ -326,14 +326,6 @@ namespace phx::math
 				os << "(" << vec.x << ", " << vec.y << ", " << vec.z << ")";
 				return os;
 			}
-
-			// Serialize
-			Serializer& operator>>(Serializer& ser) const
-			{
-				ser >> x >> y >> z;
-			}
-			// Deserialize
-			Serializer& operator<<(Serializer& ser) { ser << x << y << z; }
 		};
 	} // namespace detail
 
