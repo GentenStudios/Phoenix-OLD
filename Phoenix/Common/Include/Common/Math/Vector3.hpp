@@ -28,7 +28,6 @@
 
 #pragma once
 
-#include <Common/Utility/Serializer.hpp>
 #include <cmath>
 #include <iostream>
 #include <ostream>
