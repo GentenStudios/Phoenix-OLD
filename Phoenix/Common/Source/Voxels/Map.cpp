@@ -168,14 +168,9 @@ void Map::save(const phx::math::vec3& pos)
 	std::ofstream saveFile;
 	saveFile.open(toSavePath(static_cast<phx::math::vec3i>(pos)));
 
-	std::string saveString;
-	auto&       blocks = m_chunks.at(pos).getBlocks();
-	for (auto* block : blocks)
-	{
-		saveString += block->id + ";";
-	}
-
-	saveFile << saveString;
+	Serializer ser;
+	ser << m_chunks.at(pos);
+	saveFile << ser.getBuffer().data();
 
 	saveFile.close();
 }
@@ -256,8 +251,8 @@ bool Map::parseChunkSave(std::string_view searchView, Chunk& chunk)
 
 bool Map::loadChunk(const phx::math::vec3& chunkPos)
 {
-	std::ifstream saveFile;
-	saveFile.open(toSavePath(static_cast<phx::math::vec3i>(chunkPos)));
+	std::ifstream saveFile(toSavePath(static_cast<phx::math::vec3i>(chunkPos)),
+	                       std::ifstream::binary);
 
 	if (!saveFile)
 	{
@@ -265,15 +260,19 @@ bool Map::loadChunk(const phx::math::vec3& chunkPos)
 		return false;
 	}
 
-	std::string saveString;
-	std::getline(saveFile, saveString);
+	saveFile.seekg(0, std::ifstream::end);
+	int length = saveFile.tellg();
+	saveFile.seekg(0, std::ifstream::beg);
+
+	Serializer ser;
+	// auto data = ser.getBuffer().data();
+	data::Data data(length);
+	// char* data = new char [length];
+	saveFile.read((char*) &data[0], length);
+	ser.setBuffer(data);
 
 	Chunk chunk {chunkPos, m_referrer};
-
-	if (!parseChunkSave(saveString, chunk))
-	{
-		return false;
-	}
+	ser >> chunk;
 
 	m_chunks.emplace(chunkPos, std::move(chunk));
 	return true;

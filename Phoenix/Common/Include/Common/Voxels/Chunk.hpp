@@ -108,6 +108,13 @@ namespace phx::voxels
 
 		/**
 		 * @brief Gets the Block at the supplied position.
+		 * @param index flattened location of the block in the chunk.
+		 * @return Block The requested block.
+		 */
+		Block getBlockAt(std::size_t index);
+
+		/**
+		 * @brief Gets the Block at the supplied position.
 		 * @param position Position of the block relative to the chunk.
 		 * @return Block The requested block.
 		 */
