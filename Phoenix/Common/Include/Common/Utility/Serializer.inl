@@ -34,67 +34,67 @@ namespace phx
 		m_buffer.insert(m_buffer.begin(), data, data + dataLength);
 	}
 
-	inline Serializer& Serializer::operator<<(bool val)
+	inline Serializer& Serializer::operator<<(const bool& val)
 	{
 		push(val);
 		return *this;
 	}
 
-	inline Serializer& Serializer::operator<<(char val)
+	inline Serializer& Serializer::operator<<(const char& val)
 	{
 		push(val);
 		return *this;
 	}
 
-	inline Serializer& Serializer::operator<<(unsigned char val)
+	inline Serializer& Serializer::operator<<(const unsigned char& val)
 	{
 		push(val);
 		return *this;
 	}
 
-	inline Serializer& Serializer::operator<<(float val)
+	inline Serializer& Serializer::operator<<(const float& val)
 	{
 		push(val);
 		return *this;
 	}
 
-	inline Serializer& Serializer::operator<<(double val)
+	inline Serializer& Serializer::operator<<(const double& val)
 	{
 		push(val);
 		return *this;
 	}
 
-	inline Serializer& Serializer::operator<<(std::int16_t val)
+	inline Serializer& Serializer::operator<<(const std::int16_t& val)
 	{
 		push(val);
 		return *this;
 	}
 
-	inline Serializer& Serializer::operator<<(std::int32_t val)
+	inline Serializer& Serializer::operator<<(const std::int32_t& val)
 	{
 		push(val);
 		return *this;
 	}
 
-	inline Serializer& Serializer::operator<<(std::int64_t val)
+	inline Serializer& Serializer::operator<<(const std::int64_t& val)
 	{
 		push(val);
 		return *this;
 	}
 
-	inline Serializer& Serializer::operator<<(std::uint16_t val)
+	inline Serializer& Serializer::operator<<(const std::uint16_t& val)
 	{
 		push(val);
 		return *this;
 	}
 
-	inline Serializer& Serializer::operator<<(std::uint32_t val)
+	inline Serializer& Serializer::operator<<(const std::uint32_t& val)
 	{
 		push(val);
 		return *this;
 	}
 
-	inline Serializer& Serializer::operator<<(std::uint64_t val)
+	inline Serializer& Serializer::operator<<(const std::uint64_t& val)
 	{
 		push(val);
 		return *this;
@@ -107,13 +107,13 @@ namespace phx
 	}
 
 #ifdef PHX_INT32_EQUAL_LONG
-	inline Serializer& Serializer::operator<<(long val)
+	inline Serializer& Serializer::operator<<(const long& val)
 	{
 		push(val);
 		return *this;
 	}
 
-	inline Serializer& Serializer::operator<<(unsigned long val)
+	inline Serializer& Serializer::operator<<(const unsigned long& val)
 	{
 		push(val);
 		return *this;
@@ -127,6 +127,13 @@ namespace phx
 		return *this;
 	}
 
+	template <typename T>
+	Serializer& Serializer::operator<<(const std::vector<T>& val)
+	{
+		push(val);
+		return *this;
+	}
+	
 	inline Serializer& Serializer::operator>>(bool& val)
 	{
 		pop(val);
@@ -221,6 +228,13 @@ namespace phx
 	}
 
 	template <typename T>
+	Serializer& Serializer::operator>>(std::vector<T>& val)
+	{
+		pop(val);
+		return *this;
+	}
+	
+	template <typename T>
 	void Serializer::push(const T& data)
 	{
 		union
@@ -234,6 +248,36 @@ namespace phx
 		for (std::size_t i = 0; i < sizeof(T); ++i)
 		{
 			m_buffer.push_back(value.bytes[i]);
+		}
+	}
+
+	template <typename T>
+	void Serializer::push(const std::vector<T>& data)
+	{
+		union
+		{
+			std::byte bytes[sizeof(T)];
+			T         value;
+		} value;
+
+		// push the number of elements.
+		push(data.size());
+
+		// get the number of bytes to reserve
+		const std::size_t totalSize = data.size() * sizeof(T);
+
+		m_buffer.reserve(totalSize);
+
+		for (const auto& val : data)
+		{
+			// don't just call push because we could be calling it a good 1000
+			// times just like this.
+			
+			value.value = data::endian::swapForNetwork(val);
+			for (std::size_t i = 0; i < sizeof(T); ++i)
+			{
+				m_buffer.push_back(value.bytes[i]);
+			}
 		}
 	}
 
@@ -278,7 +322,7 @@ namespace phx
 			}
 		}
 	}
-
+	
 	template <typename T>
 	void Serializer::pop(T& data)
 	{
@@ -294,6 +338,33 @@ namespace phx
 		m_buffer.erase(m_buffer.begin(), m_buffer.begin() + sizeof(T));
 
 		data = data::endian::swapForHost(value.value);
+	}
+
+	template <typename T>
+	void Serializer::pop(std::vector<T>& data)
+	{
+		union
+		{
+			std::byte bytes[sizeof(T)];
+			T         value;
+		} value;
+
+		std::size_t dataCount;
+		pop(dataCount);
+
+		data.reserve(dataCount);
+		for (std::size_t i = 0; i < dataCount; ++i)
+		{
+			std::memcpy(value.bytes, m_buffer.data() + (i * sizeof(T)),
+			            sizeof(T));
+
+			value.value = data::endian::swapForHost(value.value);
+
+			data.push_back(value.value);
+		}
+
+		m_buffer.erase(m_buffer.begin(),
+		               m_buffer.begin() + (dataCount * sizeof(T)));
 	}
 
 	template <typename T>

@@ -125,41 +125,44 @@ namespace phx
 	class Serializer
 	{
 	public:
-		enum class Mode
-		{
-			READ,
-			WRITE
-		};
-
-	public:
 		Serializer() = default;
 
 		data::Data& getBuffer() { return m_buffer; }
-		void  setBuffer(std::byte* data, std::size_t dataLength);
-		void  setBuffer(const data::Data& data) { m_buffer = data; }
-		void  setBuffer(data::Data&& data) { m_buffer = std::move(data); }
+		void        setBuffer(std::byte* data, std::size_t dataLength);
+		void        setBuffer(const data::Data& data) { m_buffer = data; }
+		void        setBuffer(data::Data&& data) { m_buffer = std::move(data); }
 
-		Serializer& operator<<(bool val);
-		Serializer& operator<<(char val);
-		Serializer& operator<<(unsigned char val);
-		Serializer& operator<<(float val);
-		Serializer& operator<<(double val);
-		Serializer& operator<<(std::int16_t val);
-		Serializer& operator<<(std::int32_t val);
-		Serializer& operator<<(std::int64_t val);
-		Serializer& operator<<(std::uint16_t val);
-		Serializer& operator<<(std::uint32_t val);
-		Serializer& operator<<(std::uint64_t val);
+		void appendToBuffer(const std::vector<std::byte>& data)
+		{
+			m_buffer.insert(m_buffer.end(), data.begin(), data.end());
+		}
+
+		bool empty() const { return m_buffer.empty(); }
+		
+		Serializer& operator<<(const bool& val);
+		Serializer& operator<<(const char& val);
+		Serializer& operator<<(const unsigned char& val);
+		Serializer& operator<<(const float& val);
+		Serializer& operator<<(const double& val);
+		Serializer& operator<<(const std::int16_t& val);
+		Serializer& operator<<(const std::int32_t& val);
+		Serializer& operator<<(const std::int64_t& val);
+		Serializer& operator<<(const std::uint16_t& val);
+		Serializer& operator<<(const std::uint32_t& val);
+		Serializer& operator<<(const std::uint64_t& val);
 		Serializer& operator<<(const ISerializable& val);
 
 // idk but mac seems to complain without this.
 #ifdef PHX_INT32_EQUAL_LONG
-		Serializer& operator<<(long value);
-		Serializer& operator<<(unsigned long value);
+		Serializer& operator<<(const long& value);
+		Serializer& operator<<(const unsigned long& value);
 #endif
 		
 		template <typename T>
 		Serializer& operator<<(const std::basic_string<T>& val);
+
+		template <typename T>
+		Serializer& operator<<(const std::vector<T>& val);
 
 		Serializer& operator>>(bool& val);
 		Serializer& operator>>(char& val);
@@ -176,12 +179,15 @@ namespace phx
 
 // idk but mac seems to complain without this.
 #ifdef PHX_INT32_EQUAL_LONG
-		Serializer& operator>>(long& value);
-		Serializer& operator>>(unsigned long& value);
+		Serializer& operator>>(long& val);
+		Serializer& operator>>(unsigned long& val);
 #endif
 		
 		template <typename T>
 		Serializer& operator>>(std::basic_string<T>& val);
+
+		template <typename T>
+		Serializer& operator>>(std::vector<T>& val);
 		
 	private:
 		template <typename T>
@@ -191,13 +197,16 @@ namespace phx
 		void push(const std::basic_string<T>& data);
 
 		template <typename T>
+		void push(const std::vector<T>& data);
+
+		template <typename T>
 		void pop(T& data);
 
 		template <typename T>
 		void pop(std::basic_string<T>& data);
 
-	public:
-		Mode m_mode;
+		template <typename T>
+		void pop(std::vector<T>& data);
 
 	private:
 		data::Data m_buffer;
