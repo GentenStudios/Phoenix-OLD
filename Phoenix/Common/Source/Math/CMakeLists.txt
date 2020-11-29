@@ -1,5 +1,7 @@
 set(currentDir ${CMAKE_CURRENT_LIST_DIR})
-set(mathSources
+set(Sources
+	${Sources}
+
 	${currentDir}/Matrix4x4.cpp
 	${currentDir}/Ray.cpp
 

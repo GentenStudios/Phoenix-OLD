@@ -1,5 +1,7 @@
 set(currentDir ${CMAKE_CURRENT_LIST_DIR})
-set(mathHeaders
+set(Headers
+	${Headers}
+
 	${currentDir}/Math.hpp
 	${currentDir}/MathUtils.hpp
 	${currentDir}/Matrix4x4.hpp

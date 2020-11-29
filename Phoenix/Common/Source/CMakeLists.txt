@@ -5,10 +5,7 @@ add_subdirectory(Network)
 
 set(currentDir ${CMAKE_CURRENT_LIST_DIR})
 set(Sources
-	${mathSources}
-	${voxelSources}
-	${cmsSources}
-	${networkSources}
+	${Sources}
 
 	${currentDir}/CLIParser.cpp
 

@@ -2,7 +2,7 @@ add_subdirectory(Graphics)
 
 set(currentDir ${CMAKE_CURRENT_LIST_DIR})
 set(Sources
-        ${graphicsSources}
+        ${Sources}
 
         ${currentDir}/InputQueue.cpp
 
