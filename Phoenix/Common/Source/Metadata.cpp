@@ -58,21 +58,23 @@ const std::any* Metadata::get(const std::string& key) const
 
 Serializer& Metadata::operator>>(Serializer& ser) const
 {
-	ser << m_data.size();
+	int size = m_data.size();
+	ser << size;
 	for (auto& data : m_data)
 	{
+		ser << data.first;
 		if (data.second.type() == typeid(int))
 		{
-			ser << "i" << std::any_cast<int>(data.second);
+			ser << std::string("int") << std::any_cast<int>(data.second);
 		}
 		else if (data.second.type() == typeid(float))
 		{
-			ser << "f" << std::any_cast<float>(data.second);
+			ser << std::string("float") << std::any_cast<float>(data.second);
 		}
 		else if (data.second.type() == typeid(phx::math::vec3))
 		{
 			math::vec3 v = std::any_cast<math::vec3>(data.second);
-			ser << "vec3" << v.x << v.y << v.z;
+			ser << std::string("vec3") << v.x << v.y << v.z;
 		}
 		else
 		{
@@ -94,13 +96,13 @@ Serializer& Metadata::operator<<(Serializer& ser)
 		std::string type;
 		ser >> type;
 		std::any val;
-		if (type == "i")
+		if (type == "int")
 		{
 			int v;
 			ser >> v;
 			set(key, v);
 		}
-		else if (type == "f")
+		else if (type == "float")
 		{
 			float v;
 			ser >> v;
