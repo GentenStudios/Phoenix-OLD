@@ -1,5 +1,7 @@
 set(currentDir ${CMAKE_CURRENT_LIST_DIR})
-set(networkHeaders
+set(Headers
+	${Headers}
+
 	${currentDir}/Types.hpp
 	${currentDir}/Address.hpp
 	${currentDir}/Peer.hpp

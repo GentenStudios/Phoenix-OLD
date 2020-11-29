@@ -1,5 +1,7 @@
 set(currentDir ${CMAKE_CURRENT_LIST_DIR})
-set(utilHeaders
+set(Headers
+	${Headers}
+
 	${currentDir}/SharedTypes.hpp
 	${currentDir}/Endian.hpp
 	${currentDir}/Front.hpp

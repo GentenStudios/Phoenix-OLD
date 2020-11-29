@@ -12,5 +12,4 @@ add_subdirectory(Common)
 add_subdirectory(Assets)
 add_subdirectory(Modules)
 
-# not doing PhoenixSaves-client because we need to remember to remove it once we can.
 set_target_properties(PhoenixAssets-client PhoenixModules-client PhoenixModules-server PROPERTIES FOLDER Dependencies)

@@ -1,7 +1,9 @@
 add_subdirectory(Internal)
 
 set(currentDir ${CMAKE_CURRENT_LIST_DIR})
-set(utilityHeaders
+set(Headers
+	${Headers}
+
 	${currentDir}/BlockingQueue.hpp
 
         ${currentDir}/Serializer.hpp
