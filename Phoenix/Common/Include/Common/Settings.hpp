@@ -199,3 +199,46 @@ namespace phx
 		json m_data;
 	};
 }; // namespace phx
+
+namespace phx
+{
+	namespace settings
+	{
+		template <typename T>
+		class Setting
+		{
+		public:
+			explicit Setting(nlohmann::json* json) : m_setting(json) {}
+
+			explicit operator T() { return m_setting->get_ref<T>(); }
+			explicit operator T() const { return m_setting->get_ref<T>(); }
+
+		private:
+			nlohmann::json* m_setting;
+		};
+
+		class SettingsManager : Singleton<SettingsManager>
+		{
+		public:
+			SettingsManager() = default;
+			~SettingsManager() = default;
+
+			void registerAPI(cms::ModManager* manager);
+
+			template <typename Type>
+			bool valid(const std::string& key)
+			{
+				
+			}
+
+			template <typename Type>
+			Setting<Type> get(const std::string& key)
+			{
+				return Setting<Type>(m_settings[key]);
+			}
+			
+		private:
+			nlohmann::json m_settings;
+		};
+	}
+}
