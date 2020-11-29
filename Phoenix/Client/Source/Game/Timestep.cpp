@@ -85,14 +85,11 @@ void FixedTimestep::clear()
 	m_last        = SDL_GetPerformanceCounter();
 }
 
-bool FixedTimestep::shouldStep()
+bool FixedTimestep::shouldUpdate() const
 {
-	if (m_accumulator >= m_timestep)
-	{
-		m_accumulator -= m_timestep;
-
-		return true;
-	}
-
-	return false;
+	return m_accumulator >= m_timestep;
 }
+
+void FixedTimestep::update() { m_accumulator -= m_timestep; }
+
+float FixedTimestep::getTimestep() const { return m_timestep; }
