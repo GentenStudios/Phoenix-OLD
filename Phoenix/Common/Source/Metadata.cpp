@@ -80,6 +80,7 @@ Serializer& Metadata::operator>>(Serializer& ser) const
 			    << "Attempted to serialize unsupported data type";
 		}
 	}
+	return ser;
 }
 
 Serializer& Metadata::operator<<(Serializer& ser)
@@ -118,4 +119,5 @@ Serializer& Metadata::operator<<(Serializer& ser)
 			    << "Attempted to deserialize unsupported data type";
 		}
 	}
+	return ser;
 }

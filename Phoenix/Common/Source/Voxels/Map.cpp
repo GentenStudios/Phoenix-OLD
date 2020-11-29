@@ -165,12 +165,12 @@ void Map::save(const phx::math::vec3& pos)
 		return;
 	}
 
-	std::ofstream saveFile;
-	saveFile.open(toSavePath(static_cast<phx::math::vec3i>(pos)));
+	std::ofstream saveFile(toSavePath(static_cast<phx::math::vec3i>(pos)),
+	                       std::ofstream::binary);
 
 	Serializer ser;
 	ser << m_chunks.at(pos);
-	saveFile << ser.getBuffer().data();
+	saveFile.write((char*) &ser.getBuffer()[0], ser.getBuffer().size());
 
 	saveFile.close();
 }
