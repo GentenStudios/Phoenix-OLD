@@ -42,8 +42,15 @@ bool Metadata::set(const std::string& key, const std::any& data)
 			return false;
 		}
 	}
-	m_data[key] = data;
-	return true;
+	if (data.type() == typeid(int) || data.type() == typeid(float) ||
+	    data.type() == typeid(phx::math::vec3))
+	{
+		m_data[key] = data;
+		return true;
+	}
+	LOG_DEBUG("Metadata") << "Attempted to store unsupported datatype"
+	                      << data.type().name() << "in metadata container";
+	return false;
 }
 
 const std::any* Metadata::get(const std::string& key) const

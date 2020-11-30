@@ -37,6 +37,7 @@
 #pragma once
 
 #include <Common/Utility/Serializer.hpp>
+
 #include <any>
 #include <string>
 #include <unordered_map>
@@ -48,24 +49,30 @@ namespace phx
 	{
 	public:
 		/**
-		 * @brief sets or inserts metadata
-		 * @param key The key associated with the metadata
-		 * @return true if the data was set
-		 * @return false if the data already exists with a different data type
+		 * @brief Sets or inserts metadata.
+		 * @param key The key associated with the metadata.
+		 * @return true If the data was set.
+		 * @return false If the data already exists with a different data type
+		 * or an incompatible data type was provided.
 		 */
 		bool set(const std::string& key, const std::any& existing);
+
 		/**
-		 * @brief gets metadata by key
-		 * @param key The key associated with the metadata
-		 * @return A pointer to the data
+		 * @brief Gets metadata by key.
+		 * @param key The key associated with the metadata.
+		 * @return A pointer to the data.
 		 */
 		const std::any* get(const std::string& key) const;
+
 		/**
-		 * @brief Erases metadata
-		 * @param key The key associated with the metadata
+		 * @brief Erases metadata.
+		 * @param key The key associated with the metadata.
 		 */
 		void erase(const std::string& key) { m_data.erase(key); };
 
+		/**
+		 * @return the size of the contained map object.
+		 */
 		size_t size() { return m_data.size(); };
 
 		// serialize.

@@ -53,12 +53,12 @@ Block Chunk::getBlockAt(std::size_t index)
 	return {m_referrer->blocks.get(BlockType::OUT_OF_BOUNDS_BLOCK), nullptr};
 }
 
-Block Chunk::getBlockAt(phx::math::vec3 position)
+Block Chunk::getBlockAt(const phx::math::vec3& position)
 {
 	return getBlockAt(getVectorIndex(position));
 }
 
-void Chunk::setBlockAt(phx::math::vec3 position, Block newBlock)
+void Chunk::setBlockAt(const phx::math::vec3& position, Block newBlock)
 {
 	if (position.x < CHUNK_WIDTH && position.y < CHUNK_HEIGHT &&
 	    position.z < CHUNK_DEPTH)
@@ -74,8 +74,8 @@ void Chunk::setBlockAt(phx::math::vec3 position, Block newBlock)
 // TODO Should we return a tuple with an error type here? There are two things
 // that could go wrong either the block is OOB or the metadata type is invalid.
 // Or should we just assert on the second error?
-bool Chunk::setMetadataAt(phx::math::vec3 position, const std::string& key,
-                          std::any* newData)
+bool Chunk::setMetadataAt(const phx::math::vec3& position,
+                          const std::string& key, std::any* newData)
 {
 	if (position.x < CHUNK_WIDTH && position.y < CHUNK_HEIGHT &&
 	    position.z < CHUNK_DEPTH)

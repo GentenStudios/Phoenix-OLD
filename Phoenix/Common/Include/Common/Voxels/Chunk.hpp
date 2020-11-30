@@ -118,14 +118,14 @@ namespace phx::voxels
 		 * @param position Position of the block relative to the chunk.
 		 * @return Block The requested block.
 		 */
-		Block getBlockAt(math::vec3 position);
+		Block getBlockAt(const math::vec3& position);
 
 		/**
 		 * @brief Sets the Block at the supplied position.
 		 * @param position Position of the block relative to the chunk.
 		 * @param newBlock The block that now exists at this location.
 		 */
-		void setBlockAt(math::vec3 position, Block newBlock);
+		void setBlockAt(const math::vec3& position, Block newBlock);
 
 		/**
 		 * @brief Sets metadata for the Block at the supplied position.
@@ -136,8 +136,8 @@ namespace phx::voxels
 		 * @return false if the data already exists with a different data type
 		 * OR if the supplied position is out of bounds for the chunk.
 		 */
-		bool setMetadataAt(phx::math::vec3 position, const std::string& key,
-		                   std::any* newData);
+		bool setMetadataAt(const phx::math::vec3& position,
+		                   const std::string& key, std::any* newData);
 
 		/// @brief How wide a chunk is (x axis).
 		static constexpr int CHUNK_WIDTH = 16;
