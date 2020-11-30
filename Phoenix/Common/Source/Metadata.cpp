@@ -87,6 +87,7 @@ Serializer& Metadata::operator>>(Serializer& ser) const
 		{
 			LOG_FATAL("Metadata")
 			    << "Attempted to serialize unsupported data type";
+			exit(EXIT_FAILURE);
 		}
 	}
 	return ser;
@@ -126,6 +127,7 @@ Serializer& Metadata::operator<<(Serializer& ser)
 		{
 			LOG_FATAL("Metadata")
 			    << "Attempted to deserialize unsupported data type";
+			exit(EXIT_FAILURE);
 		}
 	}
 	return ser;
