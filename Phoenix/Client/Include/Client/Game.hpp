@@ -41,6 +41,7 @@
 #include <Client/InputQueue.hpp>
 #include <Client/Voxels/BlockRegistry.hpp>
 
+#include "HUD.hpp"
 #include <Common/CMS/ModManager.hpp>
 #include <Common/Save.hpp>
 
@@ -105,6 +106,7 @@ namespace phx::client
 
 		cms::ModManager* m_modManager;
 
+		HUD*        m_hud        = nullptr;
 		EscapeMenu* m_escapeMenu = nullptr;
 		GameTools*  m_gameDebug  = nullptr;
 		bool        m_followCam  = true;
