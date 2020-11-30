@@ -28,6 +28,8 @@
 
 #pragma once
 
+#include <cstddef>
+
 namespace phx::client
 {
 	/**
@@ -114,8 +116,8 @@ namespace phx::client
 		float getMicroseconds() const { return m_time * 1000000; }
 
 	private:
-		float m_time = 0.f;
-		float m_last = 0.f;
+		float       m_time = 0.f;
+		std::size_t m_last = 0.f;
 	};
 
 	/**

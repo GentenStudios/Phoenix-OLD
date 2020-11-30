@@ -34,12 +34,12 @@ using namespace phx::client;
 
 Timestep::Timestep()
 {
-	m_last = static_cast<float>(SDL_GetPerformanceCounter());
+	m_last = SDL_GetPerformanceCounter();
 }
 
 Timestep& Timestep::step()
 {
-	const auto now = static_cast<float>(SDL_GetPerformanceCounter());
+	const std::size_t now = SDL_GetPerformanceCounter();
 
 	// m_time is now delta time in SECONDS.
 	m_time = static_cast<float>(now - m_last) /
