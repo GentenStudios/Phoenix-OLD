@@ -179,8 +179,8 @@ void Game::onAttach()
 		Client::get()->pushLayer(m_gameDebug);
 	}
 
-	//	m_hud = new HUD(m_window, m_registry, m_player);
-	//	Client::get()->pushLayer(m_hud);
+	m_hud = new HUD(m_window, m_registry, m_player);
+	Client::get()->pushLayer(m_hud);
 
 	m_inputQueue = new InputQueue(m_registry, m_player, m_camera);
 	if (m_network != nullptr)

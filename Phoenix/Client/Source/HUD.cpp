@@ -56,10 +56,10 @@ void HUD::tick(float dt)
 
 	ImGui::Begin("HUD", nullptr, ImGuiWindowFlags_NoResize);
 	{
-		ImGui::Text("%s",
-		            map->getBlockAt(ActorSystem::getTarget(m_registry, m_player)
-		                                .getCurrentPosition())
-		                ->displayName.c_str());
+		auto target =
+		    ActorSystem::getTarget(m_registry, m_player).getCurrentPosition();
+		target.floor();
+		ImGui::Text("%s", map->getBlockAt(target)->displayName.c_str());
 		ImGui::Text("Hand: %s",
 		            m_registry->get<Hand>(m_player).hand->displayName.c_str());
 	}
