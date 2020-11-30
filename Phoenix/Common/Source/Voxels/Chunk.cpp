@@ -71,9 +71,11 @@ void Chunk::setBlockAt(const phx::math::vec3& position, Block newBlock)
 	}
 }
 
-// TODO Should we return a tuple with an error type here? There are two things
-// that could go wrong either the block is OOB or the metadata type is invalid.
-// Or should we just assert on the second error?
+/**
+ * @TODO Should we return a tuple with an error type here? There are two things
+ * that could go wrong either the block is OOB or the metadata type is invalid.
+ * Or should we just assert on the second error?
+ */
 bool Chunk::setMetadataAt(const phx::math::vec3& position,
                           const std::string& key, std::any* newData)
 {

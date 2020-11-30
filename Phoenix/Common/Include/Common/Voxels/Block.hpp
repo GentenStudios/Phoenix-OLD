@@ -105,6 +105,12 @@ namespace phx::voxels
 		/// @brief The material state of the block.
 		BlockCategory category = BlockCategory::AIR;
 
+		/// @brief If the object can be rotated horizontally
+		bool rotH = false;
+		/// @brief If the block can be rotated vertically, [[rotH]] must already
+		/// be true
+		bool rotV = false;
+
 		/// @brief Callback for when the block is placed.
 		BlockCallback onPlace;
 
@@ -119,30 +125,11 @@ namespace phx::voxels
 	};
 
 	/**
-	 * @brief A Block's Metadata.
+	 * @brief Container representing a single instance of a block.
 	 *
-	 * This class is used in conjunction with the Chunk class - well, it
-	 * isn't used right now, but it's here as a placeholder to make specific
-	 * methods easier to handle and "future-proof". This stores the block
-	 * position as it allows for storage in a SEPARATE container to allow
-	 * for just "on-demand" metadata rather than metadata for all blocks -
-	 * since some would just not need it.
+	 * This holds a pointer to the universal type of the block and either the
+	 * metadata for the block or a nullptr if there is none.
 	 */
-	struct BlockMetadata
-	{
-		/**
-		 * @brief The position of the block in the world.
-		 */
-		math::vec3 blockPos;
-
-		/**
-		 * @brief serialized data, we can decide how we wanna do this some
-		 * other time. (just an implementation attempt to stop pains later in
-		 * life)
-		 */
-		std::string data;
-	};
-
 	struct Block
 	{
 		BlockType* type;

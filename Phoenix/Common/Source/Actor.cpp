@@ -165,7 +165,7 @@ bool ActorSystem::action2(entt::registry* registry, entt::entity entity)
 
 			voxels::Block block = {registry->get<Hand>(entity).hand, nullptr};
 			Metadata      data;
-			// If block is rotatable
+			if (block.type->rotH)
 			{
 				math::vec3 rotation = {};
 				if (dir.x > 0)
