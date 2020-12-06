@@ -93,7 +93,7 @@ phx::Serializer& Chunk::operator>>(phx::Serializer& ser) const
 	for (int i = 0; i < CHUNK_MAX_BLOCKS; i++)
 	// for (const BlockType* block : m_blocks)
 	{
-		ser << m_blocks[i]->uniqueIdentifier;
+		ser << m_blocks[i]->id;
 		if (m_metadata.find(i) != m_metadata.end())
 		{
 			ser << '+' << m_metadata.at(i);
@@ -114,9 +114,10 @@ phx::Serializer& Chunk::operator<<(phx::Serializer& ser)
 	ser >> m_pos.x >> m_pos.y >> m_pos.z;
 	for (int i = 0; i < CHUNK_MAX_BLOCKS; i++)
 	{
-		std::size_t id = 0;
+		std::string id;
 		ser >> id;
-		m_blocks.push_back(m_referrer->blocks.get(id));
+		m_blocks.push_back(
+		    m_referrer->blocks.get(*m_referrer->referrer.get(id)));
 		char c;
 		ser >> c;
 		if (c == ';')
