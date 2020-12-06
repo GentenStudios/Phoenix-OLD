@@ -72,16 +72,16 @@ Serializer& Metadata::operator>>(Serializer& ser) const
 		ser << data.first;
 		if (data.second.type() == typeid(int))
 		{
-			ser << std::string("int") << std::any_cast<int>(data.second);
+			ser << 'i' << std::any_cast<int>(data.second);
 		}
 		else if (data.second.type() == typeid(float))
 		{
-			ser << std::string("float") << std::any_cast<float>(data.second);
+			ser << 'f' << std::any_cast<float>(data.second);
 		}
 		else if (data.second.type() == typeid(phx::math::vec3))
 		{
 			math::vec3 v = std::any_cast<math::vec3>(data.second);
-			ser << std::string("vec3") << v.x << v.y << v.z;
+			ser << 'v' << v.x << v.y << v.z;
 		}
 		else
 		{
@@ -101,22 +101,22 @@ Serializer& Metadata::operator<<(Serializer& ser)
 	{
 		std::string key;
 		ser >> key;
-		std::string type;
+		char type;
 		ser >> type;
 		std::any val;
-		if (type == "int")
+		if (type == 'i')
 		{
 			int v;
 			ser >> v;
 			set(key, v);
 		}
-		else if (type == "float")
+		else if (type == 'f')
 		{
 			float v;
 			ser >> v;
 			set(key, v);
 		}
-		else if (type == "vec3")
+		else if (type == 'v')
 		{
 			float x, y, z;
 			ser >> x >> y >> z;
