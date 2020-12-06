@@ -39,14 +39,9 @@ namespace phx::voxels
 		/**
 		 * Create an inventory for storing items.
 		 * @param size The size of the inventory.
+		 * @param referrer The ItemReferrer used for this instance of the game.
 		 */
-		explicit Inventory(std::size_t size);
-		/**
-		 * Create an inventory for storing items with a supplied list of items.
-		 * @param size The size of the inventory.
-		 * @param items The items to be inserted into the inventory.
-		 */
-		Inventory(std::size_t size, const std::vector<ItemType*>& items);
+		Inventory(std::size_t size, ItemReferrer* referrer);
 
 		/**
 		 * Get an item from the inventory without removing the item.
@@ -101,9 +96,9 @@ namespace phx::voxels
 		Serializer& operator<<(Serializer& ser) override;
 
 	private:
-		size_t                                    m_size;
-		std::vector<ItemType*>                    m_slots;
-		std::unordered_map<std::size_t, Metadata> m_metadata;
-		ItemReferrer*                             m_referrer;
+		size_t                 m_size;
+		std::vector<ItemType*> m_slots;
+		Metadata::Container    m_metadata;
+		ItemReferrer*          m_referrer;
 	};
 } // namespace phx::voxels

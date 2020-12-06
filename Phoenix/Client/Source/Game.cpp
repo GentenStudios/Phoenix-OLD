@@ -67,10 +67,11 @@ Game::Game(gfx::Window* window, entt::registry* registry, bool networked)
 	// must manually edit the JSON to load an another mod after initialization.
 	std::vector<std::string> commandLineModList = {"mod1", "mod2", "mod3"};
 	m_save = new Save(saveToUse, commandLineModList);
-	
+
 	m_modManager = new cms::ModManager(m_save->getModList(), {"Modules"});
 
 	m_blockRegistry.registerAPI(m_modManager);
+	m_itemRegistry.registerAPI(m_modManager);
 
 	m_modManager->registerFunction(
 	    "core.command.register",
@@ -231,13 +232,13 @@ void Game::onEvent(events::Event& e)
 		case events::Keys::KEY_E:
 			m_playerHand++;
 			m_registry->get<Hand>(m_player).hand =
-			    m_blockRegistry.referrer.blocks.get(m_playerHand);
+			    m_itemRegistry.referrer.items.get(m_playerHand);
 			e.handled = true;
 			break;
 		case events::Keys::KEY_R:
 			m_playerHand--;
 			m_registry->get<Hand>(m_player).hand =
-			    m_blockRegistry.referrer.blocks.get(m_playerHand);
+			    m_itemRegistry.referrer.items.get(m_playerHand);
 			e.handled = true;
 			break;
 		case events::Keys::KEY_P:

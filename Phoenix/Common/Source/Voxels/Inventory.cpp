@@ -31,19 +31,10 @@
 
 using namespace phx::voxels;
 
-Inventory::Inventory(std::size_t size) : m_size(size)
+Inventory::Inventory(std::size_t size, ItemReferrer* referrer)
+    : m_size(size), m_referrer(referrer)
 {
 	m_slots.reserve(m_size);
-}
-
-Inventory::Inventory(std::size_t size, const std::vector<ItemType*>& items)
-    : m_size(size)
-{
-	m_slots.reserve(m_size);
-	for (std::size_t i = 0; i < m_size && i < items.size(); i++)
-	{
-		m_slots[i] = items[i];
-	}
 }
 
 const ItemType* Inventory::getItem(std::size_t slot)

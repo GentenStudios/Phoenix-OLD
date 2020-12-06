@@ -49,6 +49,12 @@ namespace phx
 	{
 	public:
 		/**
+		 * @brief QOL "typedef" for use in implementations where metadata needs
+		 * stored in relation to indexed objects and this is obnoxious to type.
+		 */
+		using Container = std::unordered_map<std::size_t, Metadata>;
+
+		/**
 		 * @brief Sets or inserts metadata.
 		 * @param key The key associated with the metadata.
 		 * @return true If the data was set.

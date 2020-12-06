@@ -36,6 +36,7 @@
 #include <Common/Input.hpp>
 #include <Common/Voxels/Block.hpp>
 #include <Common/Voxels/BlockReferrer.hpp>
+#include <Common/Voxels/Item.hpp>
 
 #include <entt/entt.hpp>
 
@@ -43,7 +44,7 @@ namespace phx
 {
 	struct Hand
 	{
-		voxels::BlockType* hand;
+		voxels::ItemType* hand;
 	};
 
 	class ActorSystem

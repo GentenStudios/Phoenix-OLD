@@ -36,19 +36,13 @@
 namespace phx::voxels
 {
 	/**
-	 * @brief Acts as a universal pairing between string and block.
+	 * @brief Acts as a universal pairing between string and item.
 	 *
 	 * This class is a universal struct that can be passed around to act as a
 	 * minimal set of data.
 	 *
-	 * Originally we had a BlockRegistry that was on the Client/Server but we
-	 * realised that things like the Server don't need to store data about
-	 * textures and the likes, so by only having this as a common piece between
-	 * the two, the Client and Server can store extra data that they actually
-	 * need and potentially reduce unnecessary memory usage.
-	 *
-	 * Each application implements their own BlockRegistry with a few more
-	 * pieces of data and lua registration methods.
+	 * Each application implements their own Registry with a few more pieces
+	 * of data and lua registration methods.
 	 */
 	struct ItemReferrer
 	{

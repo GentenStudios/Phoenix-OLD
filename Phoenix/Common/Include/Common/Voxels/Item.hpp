@@ -78,11 +78,19 @@ namespace phx::voxels
 		/// variable.
 		std::size_t uniqueIdentifier = -1;
 
+		/**
+		 * @brief The block that is placed when onPlace is called. If left
+		 * undefined, no block is placed.
+		 *
+		 * @note onPlace is still called regardless of if this is defined
+		 */
+		std::string places;
+
 		/// @brief Callback for when the secondary interaction button is called.
-		ItemCallback onPlace = NULL;
+		ItemCallback onPlace;
 
 		/// @brief Callback for when the primary interaction is called.
-		ItemCallback onInteract = NULL;
+		ItemCallback onInteract;
 	};
 
 	/**
