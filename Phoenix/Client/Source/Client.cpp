@@ -28,7 +28,7 @@
 
 #include <Client/Client.hpp>
 #include <Client/Game.hpp>
-#include <Client/SplashScreen.hpp>
+#include <Client/Game/Timestep.hpp>
 
 #include <Common/Logger.hpp>
 #include <Common/Settings.hpp>
@@ -123,18 +123,13 @@ void Client::run()
 	Game* game = new Game(&m_window, &m_registry);
 	m_layerStack.pushLayer(game);
 
-	std::size_t last = SDL_GetPerformanceCounter();
+	Timestep timer;
 	while (m_window.isRunning())
 	{
-		const std::size_t now = SDL_GetPerformanceCounter();
-		const float       dt  = static_cast<float>(now - last) /
-		                 static_cast<float>(SDL_GetPerformanceFrequency());
-		last = now;
-
 		m_window.startFrame();
 
 		if (!m_layerStack.empty())
-			m_layerStack.tick(dt);
+			m_layerStack.tick(timer.step());
 
 		m_window.endFrame();
 	}

@@ -1,5 +1,7 @@
 set(currentDir ${CMAKE_CURRENT_LIST_DIR})
-set(voxelHeaders
+set(Headers
+		${Headers}
+
 		${currentDir}/Block.hpp
 		${currentDir}/BlockReferrer.hpp
 		${currentDir}/Chunk.hpp
@@ -8,5 +10,5 @@ set(voxelHeaders
 		${currentDir}/ItemReferrer.hpp
 		${currentDir}/Map.hpp
 
-		PARENT_SCOPE
-		)
+	PARENT_SCOPE
+)
