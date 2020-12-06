@@ -38,10 +38,10 @@
 #include <Client/Graphics/ShaderPipeline.hpp>
 #include <Client/Graphics/Window.hpp>
 #include <Client/Graphics/ChatBox.hpp>
-#include <Client/InputQueue.hpp>
 #include <Client/Voxels/BlockRegistry.hpp>
+#include <Client/InputQueue.hpp>
+#include <Client/HUD.hpp>
 
-#include "HUD.hpp"
 #include <Common/CMS/ModManager.hpp>
 #include <Common/Save.hpp>
 
