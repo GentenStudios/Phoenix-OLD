@@ -26,6 +26,7 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+#include <Common/Logger.hpp>
 #include <Common/Voxels/Inventory.hpp>
 
 using namespace phx::voxels;
@@ -35,7 +36,8 @@ Inventory::Inventory(std::size_t size) : m_size(size)
 	m_slots.reserve(m_size);
 }
 
-Inventory::Inventory(std::size_t size, const ItemList& items) : m_size(size)
+Inventory::Inventory(std::size_t size, const std::vector<ItemType*>& items)
+    : m_size(size)
 {
 	m_slots.reserve(m_size);
 	for (std::size_t i = 0; i < m_size && i < items.size(); i++)
@@ -53,23 +55,31 @@ const ItemType* Inventory::getItem(std::size_t slot)
 	return nullptr;
 }
 
-bool Inventory::addItem(std::size_t slot, ItemType* item)
+bool Inventory::addItem(std::size_t slot, Item item)
 {
 	if (getItem(slot) == nullptr && m_size >= slot)
 	{
-		m_slots[slot] = item;
+		m_slots[slot] = item.type;
+		if (item.metadata != nullptr)
+		{
+			m_metadata[slot] = *item.metadata;
+		}
 		return true;
 	}
 	return false;
 }
 
-int Inventory::addItem(ItemType* item)
+int Inventory::addItem(Item item)
 {
 	for (std::size_t i = 0; i < m_size; i++)
 	{
 		if (m_slots.at(i) == nullptr)
 		{
-			m_slots[i] = item;
+			m_slots[i] = item.type;
+			if (item.metadata != nullptr)
+			{
+				m_metadata[i] = *item.metadata;
+			}
 			return i;
 		}
 	}
@@ -78,11 +88,71 @@ int Inventory::addItem(ItemType* item)
 
 ItemType* Inventory::removeItem(std::size_t slot)
 {
-	if (m_slots.size() <= slot)
+	if (m_size <= slot)
 	{
 		ItemType* item = m_slots[slot];
 		m_slots[slot]  = nullptr;
 		return item;
 	}
 	return nullptr;
+}
+
+/**
+ * @TODO Should we return a tuple with an error type here? There are two things
+ * that could go wrong either the block is OOB or the metadata type is invalid.
+ * Or should we just assert on the second error?
+ */
+bool Inventory::setMetadataAt(std::size_t slot, const std::string& key,
+                              std::any* newData)
+{
+	if (m_size <= slot)
+	{
+		return m_metadata[slot].set(key, newData);
+	}
+	LOG_DEBUG("Inventory.cpp")
+	    << "Attempted to set metadata for out of bounds inventory slot";
+	return false;
+}
+
+phx::Serializer& Inventory::operator>>(phx::Serializer& ser) const
+{
+	ser << m_size;
+	for (std::size_t i = 0; i < m_size; i++)
+	// for (const BlockType* block : m_blocks)
+	{
+		ser << m_slots[i]->uniqueIdentifier;
+		if (m_metadata.find(i) != m_metadata.end())
+		{
+			ser << '+' << m_metadata.at(i);
+		}
+		else
+		{
+			ser << ';';
+		}
+	}
+	return ser;
+}
+
+phx::Serializer& Inventory::operator<<(phx::Serializer& ser)
+{
+	ser >> m_size;
+	for (std::size_t i = 0; i < m_size; i++)
+	{
+		std::size_t id = 0;
+		ser >> id;
+		m_slots.push_back(m_referrer->items.get(id));
+		char c;
+		ser >> c;
+		if (c == ';')
+		{
+		}
+		else if (c == '+')
+		{
+			Metadata data;
+			ser >> data;
+			m_metadata[i] = data;
+		}
+	}
+
+	return ser;
 }

@@ -5,6 +5,7 @@ set(voxelHeaders
 		${currentDir}/Chunk.hpp
 		${currentDir}/Inventory.hpp
 		${currentDir}/Item.hpp
+		${currentDir}/ItemReferrer.hpp
 		${currentDir}/Map.hpp
 
 		PARENT_SCOPE

@@ -28,12 +28,12 @@
 
 #pragma once
 
+#include "ItemReferrer.hpp"
 #include <Common/Voxels/Item.hpp>
 
 namespace phx::voxels
 {
-	using ItemList = std::vector<ItemType*>;
-	class Inventory
+	class Inventory : public ISerializable
 	{
 	public:
 		/**
@@ -46,7 +46,7 @@ namespace phx::voxels
 		 * @param size The size of the inventory.
 		 * @param items The items to be inserted into the inventory.
 		 */
-		Inventory(std::size_t size, const ItemList& items);
+		Inventory(std::size_t size, const std::vector<ItemType*>& items);
 
 		/**
 		 * Get an item from the inventory without removing the item.
@@ -62,7 +62,7 @@ namespace phx::voxels
 		 * @return true If the item was inserted.
 		 * @return false If the item was not inserted.
 		 */
-		bool addItem(std::size_t slot, ItemType* item);
+		bool addItem(std::size_t slot, Item item);
 
 		/**
 		 * Add an item to the next open slot in the inventory.
@@ -70,7 +70,7 @@ namespace phx::voxels
 		 * @return The index of the item slot if the item was inserted.
 		 * @return -1 If the item was not inserted.
 		 */
-		int addItem(ItemType* item);
+		int addItem(Item item);
 
 		/**
 		 * Removes an item from the inventory.
@@ -79,11 +79,31 @@ namespace phx::voxels
 		 */
 		ItemType* removeItem(std::size_t slot);
 
-		const ItemList& getItems() const { return m_slots; };
-		const size_t    getSize() const { return m_size; };
+		/**
+		 * @brief Sets metadata for the Item at the supplied slot.
+		 * @param slot The slot the item is in.
+		 * @param key The key associated with the metadata.
+		 * @param newData The new value for the data.
+		 * @return true if the data was set.
+		 * @return false if the data already exists with a different data type
+		 * OR if the supplied slot is out of bounds for the inventory.
+		 */
+		bool setMetadataAt(std::size_t slot, const std::string& key,
+		                   std::any* newData);
+
+		const std::vector<ItemType*>& getItems() const { return m_slots; };
+		size_t                        getSize() const { return m_size; };
+
+		// serialize.
+		Serializer& operator>>(Serializer& ser) const override;
+
+		// deserialize.
+		Serializer& operator<<(Serializer& ser) override;
 
 	private:
-		size_t   m_size;
-		ItemList m_slots;
+		size_t                                    m_size;
+		std::vector<ItemType*>                    m_slots;
+		std::unordered_map<std::size_t, Metadata> m_metadata;
+		ItemReferrer*                             m_referrer;
 	};
 } // namespace phx::voxels

@@ -32,6 +32,7 @@
 
 #include <sol/sol.hpp>
 
+#include <Common/Metadata.hpp>
 #include <array>
 #include <functional>
 #include <string>
@@ -59,7 +60,7 @@ namespace phx::voxels
 	class ItemType
 	{
 	public:
-		// the base BlockReferrer object implements this.
+		// the base ItemReferrer object implements this.
 		static constexpr std::size_t UNKNOWN_ITEM       = 0;
 		static constexpr std::size_t OUT_OF_BOUNDS_ITEM = 1;
 
@@ -82,5 +83,17 @@ namespace phx::voxels
 
 		/// @brief Callback for when the primary interaction is called.
 		ItemCallback onInteract = NULL;
+	};
+
+	/**
+	 * @brief Container representing a single instance of an Item.
+	 *
+	 * This holds a pointer to the universal type of the item and either the
+	 * metadata for the item or a nullptr if there is none.
+	 */
+	struct Item
+	{
+		ItemType* type;
+		Metadata* metadata;
 	};
 } // namespace phx::voxels
