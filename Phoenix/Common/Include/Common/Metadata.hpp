@@ -26,54 +26,62 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+/**
+ * @file Metadata.hpp
+ * @brief Used to store unique data per individual instances
+ *
+ * @copyright Copyright (c) Genten Studios 2019 - 2020
+ *
+ */
+
 #pragma once
 
-#include <Client/Audio/Audio.hpp>
-#include <Client/Audio/Source.hpp>
+#include <Common/Utility/Serializer.hpp>
 
-#include <deque>
-#include <vector>
-#include <mutex>
+#include <any>
+#include <string>
+#include <unordered_map>
 
-namespace phx::audio
+namespace phx
 {
-	class SourcePool
+
+	class Metadata : public ISerializable
 	{
 	public:
 		/**
-		 * @brief The maximum amount of sources that can be played at once.
-		 *
-		 * This is set to 32 since that's the maximum concurrently playing
-		 * sources on iOS devices. 32 should be fairly generous for a voxel game
-		 * anyways.
+		 * @brief Sets or inserts metadata.
+		 * @param key The key associated with the metadata.
+		 * @return true If the data was set.
+		 * @return false If the data already exists with a different data type
+		 * or an incompatible data type was provided.
 		 */
-		constexpr static std::size_t MAX_SIMULTANEOUS_SOURCES = 32;
+		bool set(const std::string& key, const std::any& existing);
 
-	public:
-		SourcePool();
-		~SourcePool() = default;
+		/**
+		 * @brief Gets metadata by key.
+		 * @param key The key associated with the metadata.
+		 * @return A pointer to the data.
+		 */
+		const std::any* get(const std::string& key) const;
 
-		void queue(const Source& source);
-		void queue(Source&& source);
+		/**
+		 * @brief Erases metadata.
+		 * @param key The key associated with the metadata.
+		 */
+		void erase(const std::string& key) { m_data.erase(key); };
 
-		void forceNext(const Source& source);
-		void forceNext(Source&& source);
+		/**
+		 * @return the size of the contained map object.
+		 */
+		size_t size() { return m_data.size(); };
 
-		void clear();
-		std::size_t playingCount() const;
-		
-		void pause();
-		void play();
-		void stop();
+		// serialize.
+		Serializer& operator>>(Serializer& ser) const override;
 
-		void tick();
+		// deserialize.
+		Serializer& operator<<(Serializer& ser) override;
 
 	private:
-		bool m_paused = false;
-		
-		std::mutex m_mutex;
-		
-		std::deque<Source> m_sourcesToPlay;
-		std::vector<Source> m_playingSources;
+		std::unordered_map<std::string, std::any> m_data;
 	};
-} // namespace phx::audio
+}

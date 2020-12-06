@@ -35,8 +35,8 @@
 
 #pragma once
 
+#include <Client/Crosshair.hpp>
 #include <Client/Graphics/Window.hpp>
-
 #include <Client/InputMap.hpp>
 
 #include <Common/Math/Math.hpp>
@@ -194,7 +194,8 @@ namespace phx::gfx
 		math::vec2 m_windowCentre;
 
 		// Also used by InputQueue to determine if camera is focused or not
-		std::atomic<bool> m_enabled;
+		std::atomic<bool>  m_enabled;
+		client::Crosshair* m_crosshair = nullptr;
 
 		Setting* m_settingSensitivity;
 

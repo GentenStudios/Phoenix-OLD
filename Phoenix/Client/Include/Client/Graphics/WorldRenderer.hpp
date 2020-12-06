@@ -26,28 +26,38 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Client/Audio/Listener.hpp>
+#pragma once
 
-#include <AL/al.h>
+#include <Client/Graphics/Camera.hpp>
+#include <Client/Graphics/ShaderPipeline.hpp>
 
-using namespace phx::audio;
+#include <vector>
+#include <string>
 
-void Listener::setGain(float gain) { alListenerf(AL_GAIN, gain); }
-
-void Listener::setPosition(const phx::math::vec3& position)
+namespace phx::gfx
 {
-	alListener3f(AL_POSITION, position.x, position.y, position.z);
-}
+	// currently only renders skybox, will do more in the future.
+	class WorldRenderer
+	{
+	public:
+		WorldRenderer() = default;
+		~WorldRenderer() = default;
 
-void Listener::setVelocity(const phx::math::vec3& velocity)
-{
-	alListener3f(AL_VELOCITY, velocity.x, velocity.y, velocity.z);
-}
+		// give in front, left, back, right, top, bottom
+		void setSkyboxTextures(const std::vector<std::string>& textures);
 
-void Listener::setOrientation(const phx::math::vec3& direction,
-                              const phx::math::vec3& up)
-{
-	float orientation[6] = {direction.x, direction.y, direction.z,
-	                        -up.x,       -up.y,       -up.z};
-	alListenerfv(AL_ORIENTATION, orientation);
-}
+		void attachCamera(FPSCamera* camera);
+		void tick(float dt);
+
+	private:
+		bool         m_initialTick   = true;
+		bool         m_skyboxEnabled = false;
+
+		unsigned int   m_skyboxTex;
+		unsigned int   m_skyboxVao;
+		unsigned int   m_skyboxVbo;
+		ShaderPipeline m_skyboxPipeline;
+
+		FPSCamera* m_camera = nullptr;
+	};
+} // namespace phx::gfx

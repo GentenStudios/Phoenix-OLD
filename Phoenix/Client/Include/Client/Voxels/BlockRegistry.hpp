@@ -29,6 +29,7 @@
 #pragma once
 
 #include <Client/Graphics/BlockModel.hpp>
+#include <Client/Graphics/TexturePacker.hpp>
 
 #include <Common/CMS/ModManager.hpp>
 #include <Common/Registry.hpp>
@@ -55,8 +56,11 @@ namespace phx::client
 	{
 		BlockRegistry()
 		{
-			textures.add(voxels::BlockType::UNKNOWN_BLOCK,
-			             {"Assets/unknown.png"});
+			textureHandles.add(voxels::BlockType::UNKNOWN_BLOCK, {0});
+			textureHandles.setUnknownReturnVal(
+			    textureHandles.get(voxels::BlockType::UNKNOWN_BLOCK));
+
+			textures.add(voxels::BlockType::UNKNOWN_BLOCK, "unknown.png");
 			textures.setUnknownReturnVal(
 			    textures.get(voxels::BlockType::UNKNOWN_BLOCK));
 
@@ -68,7 +72,11 @@ namespace phx::client
 
 		voxels::BlockReferrer referrer;
 
-		Registry<std::size_t, std::vector<std::string>> textures;
+		gfx::TexturePacker texturePacker;
+		Registry<std::size_t, std::vector<gfx::TexturePacker::Handle>>
+		    textureHandles;
+		Registry<gfx::TexturePacker::Handle, std::string> textures;
+
 		Registry<std::size_t, gfx::BlockModel> models;
 
 		void registerAPI(cms::ModManager* manager)
@@ -109,21 +117,39 @@ namespace phx::client
 					    return;
 					}
 
-				    block.category = voxels::BlockCategory::SOLID;
 				    sol::optional<std::string> cat = luaBlock["category"];
 				    if (cat)
 				    {
-					    if (*cat == "Solid")
-					    {
-					    }
+						if (*cat == "Solid")
+						{
+							block.category = voxels::BlockCategory::SOLID;
+						}
 					    else if (*cat == "Liquid")
-					    {
-						    block.category = voxels::BlockCategory::LIQUID;
-					    }
+						{
+							block.category = voxels::BlockCategory::LIQUID;
+						}
 					    else if (*cat == "Air")
 					    {
 						    block.category = voxels::BlockCategory::AIR;
 					    }
+				    }
+				    else
+				    {
+					    // make solid by default in case none of above
+					    // conditions are met.
+					    block.category = voxels::BlockCategory::SOLID;
+				    }
+
+				    sol::optional<bool> rotH = luaBlock["roth"];
+				    if (rotH)
+				    {
+					    block.rotH = *rotH;
+				    }
+
+				    sol::optional<bool> rotV = luaBlock["roth"];
+				    if (rotH)
+				    {
+					    block.rotH = *rotV;
 				    }
 
 				    sol::optional<sol::function> onPlace = luaBlock["onPlace"];
@@ -145,19 +171,20 @@ namespace phx::client
 					    block.onInteract = *onInteract;
 				    }
 
-				    bool                                    setTex = false;
-				    sol::optional<std::vector<std::string>> luaTextures =
-				        luaBlock["textures"];
+				    sol::optional<std::vector<std::string>> luaTextures = luaBlock["textures"]; // NOLINT: ugly
+				    std::vector<gfx::TexturePacker::Handle> handles;
 				    if (luaTextures)
 				    {
-					    for (auto& tex : *luaTextures)
+					    for (const auto& tex : *luaTextures)
 					    {
-						    // we have to do this so it's pointing to the right
-						    // directory.
-						    tex = manager->getCurrentModPath() + tex;
-					    }
+						    auto handle = texturePacker.add(
+						        manager->getCurrentModPath() + tex);
 
-					    setTex = true;
+					    	handles.push_back(handle);
+
+					    	// don't add the whole path to the real texture names.
+						    textures.add(handle, tex);
+					    }
 				    }
 
 				    std::size_t blockUID   = referrer.referrer.size();
@@ -166,10 +193,11 @@ namespace phx::client
 				    referrer.referrer.add(block.id, blockUID);
 				    referrer.blocks.add(blockUID, block);
 
-			    	if (setTex)
-				    {
-					    textures.add(blockUID, *luaTextures);
-				    }
+			    	// if handles are empty, then there clearly aren't any textures so don't waste any memory :)
+			    	if (!handles.empty())
+			    	{
+					    textureHandles.add(blockUID, handles);
+			    	}
 
 			    	// only add model if a solid (entities will have different
 				    // system, liquids and gasses will have another system too.)

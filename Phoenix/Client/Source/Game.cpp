@@ -80,23 +80,6 @@ Game::Game(gfx::Window* window, entt::registry* registry, bool networked)
 		m_network->sendMessage(text);
 	});
 
-	m_audio    = Client::get()->getAudioHandler();
-	m_listener = m_audio->getListener();
-
-	// play background music
-	auto handle = m_audio->loadMP3("core:background_music1",
-	                               "Assets/Audio/background_music.mp3");
-
-	//audio::Source backMusic((*m_audio)[handle]);
-	//backMusic.enableLoop(true);
-
-	//// background music shouldn't be spatial.
-	//backMusic.enableSpatial(false);
-
-	//backMusic.setGain(0.1f);
-
-	//Client::get()->getAudioPool()->queue(backMusic);
-
 	Settings::get()->registerAPI(m_modManager);
 	InputMap::get()->registerAPI(m_modManager);
 	CommandBook::get()->registerAPI(m_modManager);
@@ -112,126 +95,6 @@ Game::Game(gfx::Window* window, entt::registry* registry, bool networked)
 	});
 	m_modManager->registerFunction("core.log_debug", [](std::string message) {
 		LOG_DEBUG("MODULE") << message;
-	});
-
-	m_modManager->registerFunction(
-	    "audio.loadMP3",
-	    [=](const std::string& uniqueName, const std::string& filePath) {
-		    return Client::get()->getAudioHandler()->loadMP3(uniqueName,
-		                                                     filePath);
-	    });
-
-	m_modManager->registerFunction("audio.play", [=](sol::table source) {
-		audio::Source audioSource;
-
-		// set which piece of audio is being played.
-		sol::optional<std::string> isString = source["id"];
-		if (isString)
-		{
-			audioSource.setAudioData(
-			    (*Client::get()->getAudioHandler())[*isString]);
-		}
-		else
-		{
-			sol::optional<unsigned int> isInt = source["id"];
-			if (isInt)
-			{
-				audioSource.setAudioData(
-				    (*Client::get()->getAudioHandler())[*isInt]);
-			}
-		}
-
-		// set if the audio is spatial (no idea what the default is, we should
-		// find out).
-		sol::optional<bool> isBool = source["spatial"];
-		if (isBool)
-		{
-			audioSource.enableSpatial(*isBool);
-		}
-		else
-		{
-			audioSource.enableSpatial(true);
-		}
-
-		// set position.
-		if (source["position"])
-		{
-			float x = source["position"]["x"];
-			float y = source["position"]["y"];
-			float z = source["position"]["z"];
-
-			audioSource.setPos({x, y, z});
-		}
-
-		// set direction, if nothing, don't do anything since openal is
-		// omnidirectional by default.
-		if (source["direction"])
-		{
-			sol::optional<float> doesXExist = source["direction"]["x"];
-			if (doesXExist)
-			{
-				float x = source.get_or(std::tie("direction", "x"), 0.f);
-				float y = source.get_or(std::tie("direction", "y"), 0.f);
-				float z = source.get_or(std::tie("direction", "z"), 0.f);
-				audioSource.setDirection({x, y, z});
-			}
-			else
-			{
-				sol::optional<std::string> isWorldDirection =
-				    source["direction"];
-
-				if (isWorldDirection)
-				{
-					if (*isWorldDirection == "north")
-					{
-						audioSource.setDirection({0.f, 0.f, -1.f});
-					}
-					if (*isWorldDirection == "south")
-					{
-						audioSource.setDirection({0.f, 0.f, 1.f});
-					}
-					if (*isWorldDirection == "east")
-					{
-						audioSource.setDirection({1.f, 0.f, 0.f});
-					}
-					if (*isWorldDirection == "west")
-					{
-						audioSource.setDirection({-1.f, 0.f, 0.f});
-					}
-					if (*isWorldDirection == "up")
-					{
-						audioSource.setDirection({0.f, 1.f, 0.f});
-					}
-					if (*isWorldDirection == "down")
-					{
-						audioSource.setDirection({0.f, -1.f, 0.f});
-					}
-				}
-			}
-		}
-
-		// set the gain, 1.0 by default.
-		sol::optional<float> isFloat = source["gain"];
-		if (isBool)
-		{
-			audioSource.setGain(*isFloat);
-		}
-
-		// set the pitch, 1.0 by default.
-		sol::optional<float> isFloatPitch = source["pitch"];
-		if (isFloatPitch)
-		{
-			audioSource.setPitch(*isFloatPitch);
-		}
-
-		// set looping status, disabled by default.
-		sol::optional<bool> isLooped = source["loop"];
-		if (isLooped)
-		{
-			audioSource.enableLoop(*isLooped);
-		}
-
-		Client::get()->getAudioPool()->queue(audioSource);
 	});
 }
 
@@ -284,11 +147,11 @@ void Game::onAttach()
 
 	LOG_INFO("MAIN") << "Prepare rendering";
 
-	m_worldRenderer =
+	m_mapRenderer =
 	    new gfx::ChunkRenderer(m_map, &m_blockRegistry, m_registry, m_player);
-	m_worldRenderer->attachCamera(m_camera);
-	m_map->registerEventSubscriber(m_worldRenderer);
-	m_worldRenderer->prep();
+	m_mapRenderer->attachCamera(m_camera);
+	m_map->registerEventSubscriber(m_mapRenderer);
+	m_mapRenderer->prep();
 
 	m_renderPipeline.prepare("Assets/SimpleWorld.vert",
 	                         "Assets/SimpleWorld.frag",
@@ -299,10 +162,16 @@ void Game::onAttach()
 	const math::mat4 model;
 	m_renderPipeline.setMatrix("u_model", model);
 
+	m_worldRenderer = new gfx::WorldRenderer();
+
+	m_worldRenderer->setSkyboxTextures(
+	    {"Assets/Skybox/north.png", "Assets/Skybox/west.png",
+	     "Assets/Skybox/south.png", "Assets/Skybox/east.png",
+	     "Assets/Skybox/zenith.png", "Assets/Skybox/nadir.png"});
+	m_worldRenderer->attachCamera(m_camera);
+	
 	LOG_INFO("MAIN") << "Register GUI";
-	m_crosshair  = new Crosshair(m_window);
 	m_escapeMenu = new EscapeMenu(m_window);
-	Client::get()->pushLayer(m_crosshair);
 
 	if (Client::get()->isDebugLayerActive())
 	{
@@ -321,7 +190,7 @@ void Game::onAttach()
 
 void Game::onDetach()
 {
-	delete m_worldRenderer;
+	delete m_mapRenderer;
 	delete m_inputQueue;
 	delete m_network;
 	delete m_camera;
@@ -339,12 +208,10 @@ void Game::onEvent(events::Event& e)
 			if (!m_camera->isEnabled())
 			{
 				Client::get()->pushLayer(m_escapeMenu);
-				Client::get()->popLayer(m_crosshair);
 			}
 			else
 			{
 				Client::get()->popLayer(m_escapeMenu);
-				Client::get()->pushLayer(m_crosshair);
 			}
 			e.handled = true;
 			break;
@@ -451,9 +318,6 @@ void Game::tick(float dt)
 		m_prevPos = position.position;
 	}
 
-	m_listener->setPosition(position.position);
-	m_listener->setVelocity({0, 0, 0});
-
 	m_renderPipeline.activate();
 	m_renderPipeline.setInt("u_TexArray", 0);
 	m_renderPipeline.setMatrix("u_view", m_camera->calculateViewMatrix());
@@ -462,8 +326,10 @@ void Game::tick(float dt)
 	m_renderPipeline.setVector3("u_LightDir", lightdir);
 	m_renderPipeline.setFloat("u_Brightness", 0.6f);
 
+	m_mapRenderer->tick(dt);
+	m_mapRenderer->renderSelectionBox();
+
 	m_worldRenderer->tick(dt);
-	m_worldRenderer->renderSelectionBox();
 
 	m_chat->draw();
 }

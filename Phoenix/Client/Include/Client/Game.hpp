@@ -28,12 +28,12 @@
 
 #pragma once
 
-#include <Client/Crosshair.hpp>
 #include <Client/EscapeMenu.hpp>
 #include <Client/GameTools.hpp>
 
 #include <Client/Graphics/Camera.hpp>
 #include <Client/Graphics/ChunkRenderer.hpp>
+#include <Client/Graphics/WorldRenderer.hpp>
 #include <Client/Graphics/Layer.hpp>
 #include <Client/Graphics/ShaderPipeline.hpp>
 #include <Client/Graphics/Window.hpp>
@@ -95,8 +95,9 @@ namespace phx::client
 
 		gfx::Window*        m_window;
 		gfx::FPSCamera*     m_camera        = nullptr;
-		gfx::ChunkRenderer* m_worldRenderer = nullptr;
+		gfx::ChunkRenderer* m_mapRenderer   = nullptr;
 		voxels::Map*        m_map           = nullptr;
+		gfx::WorldRenderer* m_worldRenderer = nullptr;
 
 		gfx::ShaderPipeline m_renderPipeline;
 
@@ -104,7 +105,6 @@ namespace phx::client
 
 		cms::ModManager* m_modManager;
 
-		Crosshair*  m_crosshair  = nullptr;
 		EscapeMenu* m_escapeMenu = nullptr;
 		GameTools*  m_gameDebug  = nullptr;
 		bool        m_followCam  = true;
@@ -113,13 +113,9 @@ namespace phx::client
 
 		client::Network*    m_network    = nullptr;
 		client::InputQueue* m_inputQueue = nullptr;
+
 		// This is an internal log of the recent input states sent to the server
 		std::list<InputState> m_states;
-
-		// intermediary variables to prevent getting the pointer from the client
-		// singleton every tick.
-		audio::Audio*    m_audio;
-		audio::Listener* m_listener;
 
 		Save* m_save = nullptr;
 	};

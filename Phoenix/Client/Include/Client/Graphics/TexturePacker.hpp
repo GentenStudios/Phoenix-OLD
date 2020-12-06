@@ -26,44 +26,61 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-/**
- * @file ChunkMesher.hpp
- * @brief The mesher class for use with chunks.
- *
- * @copyright Copyright (c) 2019-20 Genten Studios
- */
-
 #pragma once
 
-#include <Client/Graphics/TexturePacker.hpp>
-#include <Client/Graphics/ChunkRenderer.hpp>
-#include <Client/Voxels/BlockRegistry.hpp>
+#include <Common/Math/Math.hpp>
 
-#include <Common/Voxels/Chunk.hpp>
-
+#include <unordered_map>
 #include <vector>
 
 namespace phx::gfx
 {
-	/**
-	 * @brief Meshes a chunk.
-	 *
-	 * This mesher does not understand "smart"/"greedy" meshing, it will mesh
-	 * only this chunk, and will not take neighbor chunks into account as of
-	 * yet. As the project gains maturity and we have more features, this will
-	 * be improved.
-	 *
-	 * @paragraph Usage
-	 * @code
-	 * auto mesh = ChunkMesher::mesh(chunk, renderer->getTextureTable(),
-	 * blockRegistry);
-	 * @endcode
-	 *
-	 */
-	class ChunkMesher
+	enum class TextureSize
+	{
+		X16  = 16,
+		X32  = 32,
+		X64  = 64,
+		X128 = 128,
+		X256 = 256,
+		X512 = 512,
+		UNKNOWN
+	};
+
+	struct TextureData
+	{
+		std::size_t layer = 0;
+
+		// add uvSize.y to bottomLeftUV to get topLeft.
+		// add uvSize.x to bottomLeftUV to get bottomRight.
+		math::vec2 bottomLeftUV;
+		math::vec2 uvSize;
+	};
+
+	class TexturePacker
 	{
 	public:
-		static std::vector<float> mesh(voxels::Chunk*         chunk,
-		                               client::BlockRegistry* blockRegistry);
+		using Handle = std::size_t;
+
+		// the maximum size of a texture for a block/item that can be loaded.
+		// may be improved upon in the future.
+		constexpr static unsigned int MAX_TEXTURE_SIZE = 512;
+
+	public:
+		TexturePacker();
+		~TexturePacker();
+
+		Handle             add(const std::string& path);
+		const TextureData* getData(Handle handle) const;
+
+		void pack();
+
+		void activate(unsigned int slot);
+
+	private:
+		bool                                    m_packed = false;
+		std::vector<std::string>                m_texturesToLoad;
+		std::unordered_map<Handle, TextureData> m_loadedTexData;
+
+		unsigned int m_textureID = 0;
 	};
 } // namespace phx::gfx

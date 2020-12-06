@@ -33,6 +33,8 @@
 #include <Common/Logger.hpp>
 #include <Common/Settings.hpp>
 
+#include <glad/glad.h>
+
 using namespace phx::client;
 using namespace phx;
 
@@ -98,14 +100,6 @@ void Client::onEvent(events::Event e)
 			break;
 		}
 		break;
-	case EventType::LAYER_DESTROYED:
-		if (std::string(e.layer) == "SplashScreen")
-		{
-			Game* game = new Game(&m_window, &m_registry);
-			m_layerStack.pushLayer(game);
-			e.handled = true;
-		}
-		break;
 	default:
 		break;
 	}
@@ -119,16 +113,15 @@ void Client::onEvent(events::Event e)
 void Client::run()
 {
 	Settings::get()->load("settings.txt");
-    LoggerConfig config;
+
+	LoggerConfig config;
+	config.logToFile = true;
+	config.logFile   = "PhoenixClient.log";
     config.verbosity = LogVerbosity::DEBUG;
     Logger::initialize(config);
 
-	audio::Audio::initialize();
-	m_audio = new audio::Audio();
-	m_audioPool = new audio::SourcePool();
-
-	SplashScreen* splashScreen = new SplashScreen();
-	m_layerStack.pushLayer(splashScreen);
+	Game* game = new Game(&m_window, &m_registry);
+	m_layerStack.pushLayer(game);
 
 	std::size_t last = SDL_GetPerformanceCounter();
 	while (m_window.isRunning())
@@ -143,15 +136,8 @@ void Client::run()
 		if (!m_layerStack.empty())
 			m_layerStack.tick(dt);
 
-		m_audioPool->tick();
-
 		m_window.endFrame();
 	}
-
-	delete m_audioPool;
-	delete m_audio;
-	
-	audio::Audio::teardown();
 
 	Settings::get()->save("settings.txt");
 }

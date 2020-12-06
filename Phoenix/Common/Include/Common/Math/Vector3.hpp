@@ -47,7 +47,8 @@ namespace phx::math
 			static constexpr int SIZE = 3;
 			static constexpr int size() { return SIZE; }
 
-			union {
+			union
+			{
 				T data[SIZE];
 				struct
 				{

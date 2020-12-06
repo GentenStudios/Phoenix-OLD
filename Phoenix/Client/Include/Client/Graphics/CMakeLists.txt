@@ -18,8 +18,10 @@ set(graphicsHeaders
 
 	${currentDir}/BlockModel.hpp
 	${currentDir}/BaseBlockModels.hpp
+	${currentDir}/TexturePacker.hpp
 	${currentDir}/ChunkMesher.hpp
 	${currentDir}/ChunkRenderer.hpp
+	${currentDir}/WorldRenderer.hpp
 
 	PARENT_SCOPE
 )

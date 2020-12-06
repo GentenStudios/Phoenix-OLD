@@ -38,6 +38,7 @@
 #include <Client/Graphics/Camera.hpp>
 #include <Client/Graphics/ShaderPipeline.hpp>
 #include <Client/Voxels/BlockRegistry.hpp>
+#include <Client/Graphics/TexturePacker.hpp>
 
 #include <Common/Voxels/Map.hpp>
 
@@ -48,9 +49,6 @@
 
 namespace phx::gfx
 {
-	// forward declaration
-	class ShaderPipeline;
-
 	struct Vertex
 	{
 		math::vec3 pos;
@@ -160,9 +158,6 @@ namespace phx::gfx
 		std::unordered_map<math::vec3, ChunkRenderData, math::Vector3Hasher,
 		                   math::Vector3KeyComparator>
 		    m_buffers;
-
-		unsigned int            m_textureArray = 0;
-		AssociativeTextureTable m_textureTable;
 
 		const int m_vertexAttributeLocation = 0;
 		const int m_uvAttributeLocation     = 1;

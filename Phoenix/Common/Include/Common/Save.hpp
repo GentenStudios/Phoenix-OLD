@@ -38,6 +38,9 @@
 
 namespace phx
 {
+
+	inline constexpr const char* saveDir {"Saves/"};
+
 	// temporary class until map is updated.
 	class Dimension
 	{

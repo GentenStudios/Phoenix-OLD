@@ -1,4 +1,4 @@
-[![Build Status](https://dev.azure.com/GentenStudios/ProjectPhoenix/_apis/build/status/GentenStudios.Phoenix?branchName=develop)](https://dev.azure.com/GentenStudios/ProjectPhoenix/_build/latest?definitionId=1&branchName=develop)
+[![Build Status](https://github.com/GentenStudios/Phoenix/workflows/C++%20CI/badge.svg)](https://github.com/GentenStudios/Phoenix/actions)
 # GENTEN STUDIOS: PROJECT PHOENIX
 ## Introduction
 Project Phoenix is an open world sandbox style voxel game with a twist. The program itself does not provide any content but gets that content entirely from modules written in Lua. An easy to use Lua API provides the capability to define all of the games content in addition to some functional features. This allows content to be quickly created by someone with little to no programming experience while still retaining the power of C++. 
