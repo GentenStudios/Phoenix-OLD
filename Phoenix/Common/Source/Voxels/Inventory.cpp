@@ -30,7 +30,19 @@
 
 using namespace phx::voxels;
 
-Inventory::Inventory(std::size_t size) : m_size(size) {}
+Inventory::Inventory(std::size_t size) : m_size(size)
+{
+	m_slots.reserve(m_size);
+}
+
+Inventory::Inventory(std::size_t size, const ItemList& items) : m_size(size)
+{
+	m_slots.reserve(m_size);
+	for (std::size_t i = 0; i < m_size && i < items.size(); i++)
+	{
+		m_slots[i] = items[i];
+	}
+}
 
 const ItemType* Inventory::getItem(std::size_t slot)
 {
@@ -49,6 +61,19 @@ bool Inventory::addItem(std::size_t slot, ItemType* item)
 		return true;
 	}
 	return false;
+}
+
+int Inventory::addItem(ItemType* item)
+{
+	for (std::size_t i = 0; i < m_size; i++)
+	{
+		if (m_slots.at(i) == nullptr)
+		{
+			m_slots[i] = item;
+			return i;
+		}
+	}
+	return -1;
 }
 
 ItemType* Inventory::removeItem(std::size_t slot)

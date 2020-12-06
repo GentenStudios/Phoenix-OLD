@@ -32,20 +32,58 @@
 
 namespace phx::voxels
 {
+	using ItemList = std::vector<ItemType*>;
 	class Inventory
 	{
 	public:
-		Inventory(std::size_t size);
+		/**
+		 * Create an inventory for storing items.
+		 * @param size The size of the inventory.
+		 */
+		explicit Inventory(std::size_t size);
+		/**
+		 * Create an inventory for storing items with a supplied list of items.
+		 * @param size The size of the inventory.
+		 * @param items The items to be inserted into the inventory.
+		 */
+		Inventory(std::size_t size, const ItemList& items);
 
+		/**
+		 * Get an item from the inventory without removing the item.
+		 * @param slot The slot the item is in.
+		 * @return The item or nullptr if the slot is empty.
+		 */
 		const ItemType* getItem(std::size_t slot);
-		bool            addItem(std::size_t slot, ItemType* item);
-		ItemType*       removeItem(std::size_t slot);
 
-		const std::vector<ItemType*>& getItems() const { return m_slots; };
-		const size_t                  getSize() const { return m_size; };
+		/**
+		 * Add an item to the inventory.
+		 * @param slot The slot you want to insert the item into.
+		 * @param item The item you want to insert into the inventory.
+		 * @return true If the item was inserted.
+		 * @return false If the item was not inserted.
+		 */
+		bool addItem(std::size_t slot, ItemType* item);
+
+		/**
+		 * Add an item to the next open slot in the inventory.
+		 * @param item The item you want to insert into the inventory.
+		 * @return The index of the item slot if the item was inserted.
+		 * @return -1 If the item was not inserted.
+		 */
+		int addItem(ItemType* item);
+
+		/**
+		 * Removes an item from the inventory.
+		 * @param slot The slot the item is in.
+		 * @return The item or nullptr if the slot is empty.
+		 */
+		ItemType* removeItem(std::size_t slot);
+
+		const ItemList& getItems() const { return m_slots; };
+		const size_t    getSize() const { return m_size; };
 
 	private:
-		size_t                 m_size;
-		std::vector<ItemType*> m_slots;
+		size_t   m_size;
+		ItemList m_slots;
 	};
 } // namespace phx::voxels
