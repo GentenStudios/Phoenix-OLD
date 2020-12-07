@@ -143,8 +143,7 @@ void Game::onAttach()
 	m_camera = new gfx::FPSCamera(m_window, m_registry);
 	m_camera->setActor(m_player);
 
-	m_registry->emplace<Hand>(
-	    m_player, m_blockRegistry.referrer.blocks.get(0));
+	m_registry->emplace<Hand>(m_player, m_itemRegistry.referrer.items.get(2));
 
 	LOG_INFO("MAIN") << "Prepare rendering";
 

@@ -96,6 +96,11 @@ namespace phx::voxels
 			    blocks.get(voxels::BlockType::UNKNOWN_BLOCK));
 		}
 
+		BlockType* getByID(const std::string& id)
+		{
+			return blocks.get(*referrer.get(id));
+		};
+
 		// referrer refers a string to int, which in turn is used to get the
 		// blocktype.
 		Registry<std::string, std::size_t> referrer;
