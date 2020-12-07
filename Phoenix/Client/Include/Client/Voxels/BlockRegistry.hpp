@@ -63,7 +63,7 @@ namespace phx::client
 			textures.add(voxels::BlockType::UNKNOWN_BLOCK, "unknown.png");
 			textures.setUnknownReturnVal(
 			    textures.get(voxels::BlockType::UNKNOWN_BLOCK));
-			
+
 			models.add(voxels::BlockType::UNKNOWN_BLOCK,
 			           gfx::BlockModel::BLOCK);
 			models.setUnknownReturnVal(
