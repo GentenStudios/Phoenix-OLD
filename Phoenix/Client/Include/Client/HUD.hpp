@@ -26,70 +26,40 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Client/Game/Timestep.hpp>
+#pragma once
 
-#include <SDL.h>
+#include <Client/Graphics/Layer.hpp>
+#include <Client/Graphics/Window.hpp>
 
-using namespace phx::client;
+#include <Common/Settings.hpp>
 
-Timestep::Timestep()
+#include <entt/entt.hpp>
+
+namespace phx::client
 {
-	m_last = SDL_GetPerformanceCounter();
-}
+	/**
+	 * @brief The Heads Up Display
+	 *
+	 * @see Layer
+	 * @see LayerStack
+	 */
+	class HUD : public gfx::Overlay
+	{
+	public:
+		HUD(gfx::Window* window, entt::registry* registry, entt::entity player);
+		~HUD() override = default;
 
-Timestep& Timestep::step()
-{
-	const std::size_t now = SDL_GetPerformanceCounter();
+		void onAttach() override;
+		void onDetach() override;
+		void onEvent(events::Event& e) override;
 
-	// m_time is now delta time in SECONDS.
-	m_time = static_cast<float>(now - m_last) /
-	         static_cast<float>(SDL_GetPerformanceFrequency());
+		void tick(float dt) override;
 
-	m_last = now;
-	
-	return *this;
-}
+	private:
+		entt::registry* m_registry;
 
-void Timestep::clear()
-{
-	// this will just mean that if you call clear, you can essentially eliminate
-	// any lag.
-	m_last = static_cast<float>(SDL_GetPerformanceCounter());
-	m_time = 0.f;
-}
+		gfx::Window* m_window;
 
-FixedTimestep::FixedTimestep(float timestep) : m_timestep(timestep)
-{
-	m_last = static_cast<float>(SDL_GetPerformanceCounter());
-}
-
-FixedTimestep& FixedTimestep::step()
-{
-	const float now = static_cast<float>(SDL_GetPerformanceCounter());
-
-	// m_time is delta time in seconds.
-	m_time = static_cast<float>(now - m_last) /
-	         static_cast<float>(SDL_GetPerformanceFrequency());
-
-	m_accumulator += m_time;
-
-	m_last = now;
-
-	return *this;
-}
-
-void FixedTimestep::clear()
-{
-	m_accumulator = 0.f;
-	m_time        = 0.f;
-	m_last        = SDL_GetPerformanceCounter();
-}
-
-bool FixedTimestep::shouldUpdate() const
-{
-	return m_accumulator >= m_timestep;
-}
-
-void FixedTimestep::update() { m_accumulator -= m_timestep; }
-
-float FixedTimestep::getTimestep() const { return m_timestep; }
+		entt::entity m_player;
+	};
+} // namespace phx::client

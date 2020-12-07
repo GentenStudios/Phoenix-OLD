@@ -169,7 +169,7 @@ void Game::onAttach()
 	     "Assets/Skybox/south.png", "Assets/Skybox/east.png",
 	     "Assets/Skybox/zenith.png", "Assets/Skybox/nadir.png"});
 	m_worldRenderer->attachCamera(m_camera);
-	
+
 	LOG_INFO("MAIN") << "Register GUI";
 	m_escapeMenu = new EscapeMenu(m_window);
 
@@ -178,6 +178,9 @@ void Game::onAttach()
 		m_gameDebug = new GameTools(&m_followCam, m_registry, m_player);
 		Client::get()->pushLayer(m_gameDebug);
 	}
+
+	m_hud = new HUD(m_window, m_registry, m_player);
+	Client::get()->pushLayer(m_hud);
 
 	m_inputQueue = new InputQueue(m_registry, m_player, m_camera);
 	if (m_network != nullptr)

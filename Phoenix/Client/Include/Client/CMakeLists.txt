@@ -14,6 +14,7 @@ set(Headers
         ${currentDir}/Crosshair.hpp
         ${currentDir}/Game.hpp
         ${currentDir}/EscapeMenu.hpp
+        ${currentDir}/HUD.hpp
         ${currentDir}/InputMap.hpp
         ${currentDir}/Network.hpp
 

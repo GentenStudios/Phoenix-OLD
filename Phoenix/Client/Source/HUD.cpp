@@ -26,70 +26,51 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Client/Game/Timestep.hpp>
+#include <Client/Client.hpp>
+#include <Client/HUD.hpp>
 
-#include <SDL.h>
+#include <Common/Actor.hpp>
+#include <Common/PlayerView.hpp>
+
+#include <imgui.h>
 
 using namespace phx::client;
+using namespace phx;
 
-Timestep::Timestep()
+HUD::HUD(gfx::Window* window, entt::registry* registry, entt::entity player)
+    : gfx::Overlay("HUD"), m_window(window), m_registry(registry),
+      m_player(player)
 {
-	m_last = SDL_GetPerformanceCounter();
 }
 
-Timestep& Timestep::step()
+void HUD::onAttach() {}
+void HUD::onDetach() {}
+void HUD::onEvent(events::Event& e) {}
+
+void HUD::tick(float dt)
 {
-	const std::size_t now = SDL_GetPerformanceCounter();
+	voxels::Map* map = m_registry->get<PlayerView>(m_player).map;
+	ImGui::SetNextWindowPos(
+	    {m_window->getSize().x / 2 - 250, m_window->getSize().y - 100},
+	    ImGuiCond_Once);
+	ImGui::SetNextWindowSize(ImVec2(500, 50), ImGuiCond_Once);
 
-	// m_time is now delta time in SECONDS.
-	m_time = static_cast<float>(now - m_last) /
-	         static_cast<float>(SDL_GetPerformanceFrequency());
+	ImGui::Begin("HUD", nullptr,
+	             ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove);
+	{
+		std::string target_display;
+		auto        target =
+		    ActorSystem::getTarget(m_registry, m_player).getCurrentPosition();
+		target.floor();
+		auto target_block = map->getBlockAt(target);
+		if (target_block->category == voxels::BlockCategory::SOLID)
+		{
+			target_display = target_block->displayName;
+		}
+		ImGui::Text("%s", target_display.c_str());
 
-	m_last = now;
-	
-	return *this;
+		ImGui::Text("Hand: %s",
+		            m_registry->get<Hand>(m_player).hand->displayName.c_str());
+	}
+	ImGui::End();
 }
-
-void Timestep::clear()
-{
-	// this will just mean that if you call clear, you can essentially eliminate
-	// any lag.
-	m_last = static_cast<float>(SDL_GetPerformanceCounter());
-	m_time = 0.f;
-}
-
-FixedTimestep::FixedTimestep(float timestep) : m_timestep(timestep)
-{
-	m_last = static_cast<float>(SDL_GetPerformanceCounter());
-}
-
-FixedTimestep& FixedTimestep::step()
-{
-	const float now = static_cast<float>(SDL_GetPerformanceCounter());
-
-	// m_time is delta time in seconds.
-	m_time = static_cast<float>(now - m_last) /
-	         static_cast<float>(SDL_GetPerformanceFrequency());
-
-	m_accumulator += m_time;
-
-	m_last = now;
-
-	return *this;
-}
-
-void FixedTimestep::clear()
-{
-	m_accumulator = 0.f;
-	m_time        = 0.f;
-	m_last        = SDL_GetPerformanceCounter();
-}
-
-bool FixedTimestep::shouldUpdate() const
-{
-	return m_accumulator >= m_timestep;
-}
-
-void FixedTimestep::update() { m_accumulator -= m_timestep; }
-
-float FixedTimestep::getTimestep() const { return m_timestep; }
