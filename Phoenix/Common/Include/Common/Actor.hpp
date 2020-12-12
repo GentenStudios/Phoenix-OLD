@@ -38,13 +38,41 @@
 #include <Common/Voxels/BlockReferrer.hpp>
 #include <Common/Voxels/Item.hpp>
 
+#include <Common/Logger.hpp>
+#include <Common/Voxels/Inventory.hpp>
+
 #include <entt/entt.hpp>
 
 namespace phx
 {
+	/**
+	 * @brief Wrapper for the player hotbar with bounds checked hand-slot
+	 * variable accessors
+	 */
 	struct Hand
 	{
-		voxels::ItemType* hand;
+	public:
+		Hand(size_t hand, voxels::Inventory* hotbar)
+		    : m_hand(hand), hotbar(hotbar) {};
+		voxels::ItemType* getHand() const { return hotbar->getItem(m_hand); };
+
+		void setHandSlot(std::size_t slot)
+		{
+			if (slot < 0)
+			{
+				m_hand = hotbar->getSize() - 1;
+			}
+			else
+			{
+				m_hand = slot % hotbar->getSize();
+			}
+		};
+		std::size_t getHandSlot() const { return m_hand; };
+
+		voxels::Inventory* hotbar;
+
+	private:
+		std::size_t m_hand;
 	};
 
 	class ActorSystem

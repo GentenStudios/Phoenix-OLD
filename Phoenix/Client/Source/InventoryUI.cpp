@@ -33,30 +33,54 @@
 
 using namespace phx::client;
 using namespace phx;
-InventoryUI::InventoryUI(gfx::Window* window, voxels::Inventory* inventory)
-    : gfx::Overlay("Inventory"), m_window(window), m_inventory(inventory)
+InventoryUI::InventoryUI(gfx::Window* window, gfx::FPSCamera* camera,
+                         voxels::Inventory* inventory)
+    : gfx::Overlay("Inventory"), m_window(window), m_inventory(inventory),
+      m_camera(camera)
 {
 }
-void InventoryUI::onAttach() {}
-void InventoryUI::onDetach() {}
-void InventoryUI::onEvent(events::Event& e) {}
+void InventoryUI::onAttach()
+{
+	m_active = true;
+	m_camera->enable(false);
+}
+void InventoryUI::onDetach()
+{
+	m_active = false;
+	m_camera->enable(true);
+}
+void InventoryUI::onEvent(events::Event& e)
+{
+	if (e.type == events::EventType::KEY_PRESSED &&
+	    (e.keyboard.key == events::Keys::KEY_I ||
+	     e.keyboard.key == events::Keys::KEY_ESCAPE))
+	{
+		Client::get()->popLayer(this);
+		e.handled = true;
+	}
+}
 void InventoryUI::tick(float dt)
 {
 	ImGui::SetNextWindowPos(
-	    {m_window->getSize().x / 2 - 150, m_window->getSize().y / 2 - 150},
+	    {m_window->getSize().x / 2 - 300, m_window->getSize().y / 2 - 250},
 	    ImGuiCond_Once);
+	ImGui::SetNextWindowSize(ImVec2(600, 300), ImGuiCond_Once);
 
 	ImGui::Begin("Inventory", nullptr, ImGuiWindowFlags_NoResize);
 	for (size_t i = 0; i < m_inventory->getSize(); i++)
 	{
+		if ((i % 10) != 0)
+		{
+			ImGui::SameLine();
+		}
 		const voxels::ItemType* item = m_inventory->getItem(i);
 		if (item == nullptr)
 		{
-			ImGui::Button("", {100, 100});
+			ImGui::Button("", {50, 50});
 		}
 		else
 		{
-			ImGui::Button(item->displayName.c_str(), {100, 100});
+			ImGui::Button(item->displayName.c_str(), {50, 50});
 		}
 	}
 	ImGui::End();

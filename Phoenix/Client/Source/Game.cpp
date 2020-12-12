@@ -123,12 +123,18 @@ void Game::onAttach()
 	LOG_INFO("MAIN") << "Registering world";
 	if (m_network != nullptr)
 	{
-		m_map = new voxels::Map(&m_network->chunkQueue, &m_blockRegistry.referrer);
+		m_map =
+		    new voxels::Map(&m_network->chunkQueue, &m_blockRegistry.referrer);
 	}
 	else
 	{
 		m_map = new voxels::Map(m_save, "map1", &m_blockRegistry.referrer);
 	}
+	m_invManager =
+	    new voxels::InventoryManager(m_save, &m_itemRegistry.referrer);
+	m_playerInventory =
+	    m_invManager->getInventory(m_invManager->createInventory(30));
+	auto hotbar = m_invManager->getInventory(m_invManager->createInventory(10));
 
 	if (m_network)
 	{
@@ -138,12 +144,12 @@ void Game::onAttach()
 	{
 		m_chat = new gfx::ChatBox(m_window, nullptr);
 	}
-	
+
 	m_registry->emplace<PlayerView>(m_player, m_map);
 	m_camera = new gfx::FPSCamera(m_window, m_registry);
 	m_camera->setActor(m_player);
 
-	m_registry->emplace<Hand>(m_player, m_itemRegistry.referrer.items.get(2));
+	m_registry->emplace<Hand>(m_player, std::size_t(1), hotbar);
 
 	LOG_INFO("MAIN") << "Prepare rendering";
 
@@ -171,7 +177,8 @@ void Game::onAttach()
 	m_worldRenderer->attachCamera(m_camera);
 
 	LOG_INFO("MAIN") << "Register GUI";
-	m_escapeMenu = new EscapeMenu(m_window);
+	m_escapeMenu = new EscapeMenu(m_window, m_camera);
+	m_inventory  = new InventoryUI(m_window, m_camera, m_playerInventory);
 
 	if (Client::get()->isDebugLayerActive())
 	{
@@ -207,15 +214,12 @@ void Game::onEvent(events::Event& e)
 		switch (e.keyboard.key)
 		{
 		case events::Keys::KEY_ESCAPE:
-			m_camera->enable(!m_camera->isEnabled());
-			if (!m_camera->isEnabled())
-			{
-				Client::get()->pushLayer(m_escapeMenu);
-			}
-			else
-			{
-				Client::get()->popLayer(m_escapeMenu);
-			}
+			Client::get()->pushLayer(m_escapeMenu);
+			e.handled = true;
+			break;
+
+		case events::Keys::KEY_I:
+			Client::get()->pushLayer(m_inventory);
 			e.handled = true;
 			break;
 
@@ -229,17 +233,19 @@ void Game::onEvent(events::Event& e)
 			e.handled = true;
 			break;
 		case events::Keys::KEY_E:
-			m_playerHand++;
-			m_registry->get<Hand>(m_player).hand =
-			    m_itemRegistry.referrer.items.get(m_playerHand);
+		{
+			auto& hand = m_registry->get<Hand>(m_player);
+			hand.setHandSlot(hand.getHandSlot() - 1);
 			e.handled = true;
 			break;
+		}
 		case events::Keys::KEY_R:
-			m_playerHand--;
-			m_registry->get<Hand>(m_player).hand =
-			    m_itemRegistry.referrer.items.get(m_playerHand);
+		{
+			auto& hand = m_registry->get<Hand>(m_player);
+			hand.setHandSlot(hand.getHandSlot() + 1);
 			e.handled = true;
 			break;
+		}
 		case events::Keys::KEY_P:
 			if (Client::get()->isDebugLayerActive())
 				if (m_gameDebug == nullptr)
@@ -263,7 +269,6 @@ void Game::onEvent(events::Event& e)
 		default:
 			break;
 		}
-		break;
 	case events::EventType::MOUSE_BUTTON_PRESSED:
 		if (!m_camera->isEnabled())
 			break;

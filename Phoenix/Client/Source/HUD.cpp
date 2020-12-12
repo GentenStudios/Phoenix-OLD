@@ -51,9 +51,9 @@ void HUD::tick(float dt)
 {
 	voxels::Map* map = m_registry->get<PlayerView>(m_player).map;
 	ImGui::SetNextWindowPos(
-	    {m_window->getSize().x / 2 - 250, m_window->getSize().y - 100},
+	    {m_window->getSize().x / 2 - 300, m_window->getSize().y - 100},
 	    ImGuiCond_Once);
-	ImGui::SetNextWindowSize(ImVec2(500, 50), ImGuiCond_Once);
+	ImGui::SetNextWindowSize(ImVec2(600, 100), ImGuiCond_Once);
 
 	ImGui::Begin("HUD", nullptr,
 	             ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove);
@@ -69,8 +69,31 @@ void HUD::tick(float dt)
 		}
 		ImGui::Text("%s", target_display.c_str());
 
-		ImGui::Text("Hand: %s",
-		            m_registry->get<Hand>(m_player).hand->displayName.c_str());
+		Hand& hand = m_registry->get<Hand>(m_player);
+		for (size_t i = 0; i < 10; i++)
+		{
+			if ((i % 10) != 0)
+			{
+				ImGui::SameLine();
+			}
+			if (i == hand.getHandSlot())
+			{
+				ImGui::PushStyleColor(ImGuiCol_Button, {0.f, 1.f, 0.f, 1.f});
+			}
+			const voxels::ItemType* item = hand.hotbar->getItem(i);
+			if (item == nullptr)
+			{
+				ImGui::Button("", {50, 50});
+			}
+			else
+			{
+				ImGui::Button(item->displayName.c_str(), {50, 50});
+			}
+			if (i == hand.getHandSlot())
+			{
+				ImGui::PopStyleColor(1);
+			}
+		}
 	}
 	ImGui::End();
 }

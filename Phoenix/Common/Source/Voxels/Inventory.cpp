@@ -34,16 +34,19 @@ using namespace phx::voxels;
 Inventory::Inventory(std::size_t size, ItemReferrer* referrer)
     : m_size(size), m_referrer(referrer)
 {
-	m_slots.reserve(m_size);
+	for (std::size_t i = 0; i < size; i++)
+	{
+		m_slots.emplace_back(nullptr);
+	}
 }
 
-const ItemType* Inventory::getItem(std::size_t slot)
+ItemType* Inventory::getItem(std::size_t slot)
 {
 	if (m_slots.size() <= slot)
 	{
 		return m_slots[slot];
 	}
-	return nullptr;
+	return m_referrer->items.get(ItemType::OUT_OF_BOUNDS_ITEM);
 }
 
 bool Inventory::addItem(std::size_t slot, Item item)
@@ -85,7 +88,7 @@ ItemType* Inventory::removeItem(std::size_t slot)
 		m_slots[slot]  = nullptr;
 		return item;
 	}
-	return nullptr;
+	m_referrer->items.get(ItemType::OUT_OF_BOUNDS_ITEM);
 }
 
 /**
@@ -127,6 +130,7 @@ phx::Serializer& Inventory::operator>>(phx::Serializer& ser) const
 phx::Serializer& Inventory::operator<<(phx::Serializer& ser)
 {
 	ser >> m_size;
+	m_slots.reserve(m_size);
 	for (std::size_t i = 0; i < m_size; i++)
 	{
 		std::size_t id = 0;
@@ -144,6 +148,4 @@ phx::Serializer& Inventory::operator<<(phx::Serializer& ser)
 			m_metadata[i] = data;
 		}
 	}
-
-	return ser;
 }

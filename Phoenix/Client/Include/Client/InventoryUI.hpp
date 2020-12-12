@@ -30,6 +30,7 @@
 
 #include <Common/Voxels/Inventory.hpp>
 
+#include <Client/Graphics/Camera.hpp>
 #include <Client/Graphics/Layer.hpp>
 #include <Client/Graphics/Window.hpp>
 
@@ -38,7 +39,7 @@
 namespace phx::client
 {
 	/**
-	 * @brief The escape menu within the game.
+	 * @brief The inventory menu within the game.
 	 *
 	 * @see Layer
 	 * @see LayerStack
@@ -46,17 +47,21 @@ namespace phx::client
 	class InventoryUI : public gfx::Overlay
 	{
 	public:
-		InventoryUI(gfx::Window* window, voxels::Inventory* inventory);
+		InventoryUI(gfx::Window* window, gfx::FPSCamera* camera,
+		            voxels::Inventory* inventory);
 		~InventoryUI() override = default;
 
 		void onAttach() override;
 		void onDetach() override;
 		void onEvent(events::Event& e) override;
-
 		void tick(float dt) override;
 
+		bool isActive() { return m_active; };
+
 	private:
+		bool               m_active = false;
 		gfx::Window*       m_window;
+		gfx::FPSCamera*    m_camera;
 		voxels::Inventory* m_inventory;
 	};
 } // namespace phx::client

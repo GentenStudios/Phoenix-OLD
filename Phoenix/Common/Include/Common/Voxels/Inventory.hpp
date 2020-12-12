@@ -48,7 +48,7 @@ namespace phx::voxels
 		 * @param slot The slot the item is in.
 		 * @return The item or nullptr if the slot is empty.
 		 */
-		const ItemType* getItem(std::size_t slot);
+		ItemType* getItem(std::size_t slot);
 
 		/**
 		 * Add an item to the inventory.

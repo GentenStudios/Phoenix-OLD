@@ -26,44 +26,48 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Client/GameTools.hpp>
+#pragma once
 
-#include <Common/Actor.hpp>
-#include <Common/Position.hpp>
+#include <Common/Math/Math.hpp>
+#include <Common/Save.hpp>
+#include <Common/Utility/BlockingQueue.hpp>
+#include <Common/Voxels/Inventory.hpp>
+#include <Common/Voxels/ItemReferrer.hpp>
 
-#include <imgui.h>
+#include <cstddef>
+#include <filesystem>
+#include <string_view>
+#include <unordered_map>
+#include <utility>
 
-using namespace phx::client;
-using namespace phx;
-
-GameTools::GameTools(bool* followCam, entt::registry* registry,
-                     entt::entity player)
-    : Overlay("GameTools"), m_followCam(followCam), m_registry(registry),
-      m_player(player)
+namespace phx::voxels
 {
-}
-
-void GameTools::onAttach() {}
-
-void GameTools::onDetach() {}
-
-void GameTools::onEvent(events::Event& e) {}
-
-void GameTools::tick(float dt)
-{
-	ImGui::Begin("Phoenix");
-	if (ImGui::CollapsingHeader("Game Tools"))
+	class InventoryManager
 	{
-		ImGui::Checkbox("Follow Camera", m_followCam);
+	public:
+		InventoryManager(Save* save, voxels::ItemReferrer* referrer);
 
-		ImGui::Text("X: %f\nY: %f\nZ: %f",
-		            m_registry->get<Position>(m_player).position.x,
-		            m_registry->get<Position>(m_player).position.y,
-		            m_registry->get<Position>(m_player).position.z);
+		/**
+		 * @brief Gets an inventory from storage.
+		 * @param index The index of the inventory.
+		 * @return The inventory or a nullptr if one doesn't exist.
+		 */
+		Inventory*  getInventory(std::size_t index);
+		std::size_t createInventory(std::size_t size);
+		void        eraseInventory(std::size_t index);
 
-		ImGui::Text(
-		    "Block in hand: %s",
-		    m_registry->get<Hand>(m_player).getHand()->displayName.c_str());
-	}
-	ImGui::End();
-}
+		void save(std::size_t index);
+
+	private:
+		bool load(std::size_t index);
+
+		std::filesystem::path toSavePath(std::size_t index);
+
+	private:
+		ItemReferrer* m_referrer;
+		Save*         m_save = nullptr;
+
+		std::unordered_map<std::size_t, Inventory> m_inventories;
+		std::queue<std::size_t>                    m_deletedSlots;
+	};
+} // namespace phx::voxels
