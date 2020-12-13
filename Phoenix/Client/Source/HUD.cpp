@@ -58,16 +58,18 @@ void HUD::tick(float dt)
 	ImGui::Begin("HUD", nullptr,
 	             ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove);
 	{
-		std::string targetDisplay;
-		auto        target =
+		auto target =
 		    ActorSystem::getTarget(m_registry, m_player).getCurrentPosition();
 		target.floor();
 		auto targetBlock = map->getBlockAt(target);
 		if (targetBlock->category == voxels::BlockCategory::SOLID)
 		{
-			targetDisplay = targetBlock->displayName;
+			ImGui::Text("%s", targetBlock->displayName.c_str());
 		}
-		ImGui::Text("%s", targetDisplay.c_str());
+		else
+		{
+			ImGui::Text("");
+		}
 
 		ImGui::Text("Hand: %s",
 		            m_registry->get<Hand>(m_player).hand->displayName.c_str());
