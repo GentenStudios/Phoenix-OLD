@@ -147,9 +147,9 @@ namespace phx::client
 				    }
 
 				    sol::optional<bool> rotV = luaBlock["roth"];
-				    if (rotH)
+				    if (rotV)
 				    {
-					    block.rotH = *rotV;
+					    block.rotV = *rotV;
 				    }
 
 				    sol::optional<sol::function> onPlace = luaBlock["onPlace"];
