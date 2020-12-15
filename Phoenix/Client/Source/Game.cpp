@@ -289,6 +289,9 @@ void Game::onEvent(events::Event& e)
 	default:
 		break;
 	}
+	case events::EventType::WINDOW_RESIZED:
+		m_camera->onWindowResize(e);
+		break;
 }
 
 void Game::tick(float dt)
