@@ -177,7 +177,7 @@ namespace phx::gfx
 		 * function will segfault due to improper memory access, and might
 		 * be difficult to trace.
 		 */
-		void onWindowResize(events::Event e);
+		void onWindowResize(const events::Event& e);
 
 		/**
 		 * @brief Sets the actor for the camera to "follow".
