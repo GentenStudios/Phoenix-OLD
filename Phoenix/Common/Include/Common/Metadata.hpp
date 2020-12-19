@@ -73,7 +73,7 @@ namespace phx
 		/**
 		 * @return the size of the contained map object.
 		 */
-		size_t size() { return m_data.size(); };
+		std::size_t size() { return m_data.size(); };
 
 		// serialize.
 		Serializer& operator>>(Serializer& ser) const override;
