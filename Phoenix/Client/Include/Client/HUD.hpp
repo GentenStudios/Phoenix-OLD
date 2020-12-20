@@ -55,6 +55,10 @@ namespace phx::client
 
 		void tick(float dt) override;
 
+		static constexpr float WIDTH  = 500;
+		static constexpr float HEIGHT = 50;
+		static constexpr float POSY   = 100;
+
 	private:
 		entt::registry* m_registry;
 
