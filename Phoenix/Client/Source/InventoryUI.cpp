@@ -62,6 +62,20 @@ void InventoryUI::onEvent(events::Event& e)
 }
 void InventoryUI::tick(float dt)
 {
+	ImGui::SetNextWindowPos({m_window->getSize().x / 2, 100});
+	ImGui::Begin("Inv Holding", nullptr, ImGuiWindowFlags_NoResize);
+	{
+		if (m_holding.type == nullptr)
+		{
+			ImGui::Button("", {50, 50});
+		}
+		else
+		{
+			ImGui::Button(m_holding.type->displayName.c_str(), {50, 50});
+		}
+	}
+	ImGui::End();
+
 	ImGui::SetNextWindowPos({m_window->getSize().x / 2 - WIDTH / 2,
 	                         m_window->getSize().y / 2 - HEIGHT / 2});
 	ImGui::SetNextWindowSize(ImVec2(WIDTH, HEIGHT));
@@ -76,27 +90,29 @@ void InventoryUI::tick(float dt)
 		const voxels::Item item = m_inventory->getItem(i);
 		if (item.type == nullptr)
 		{
-			ImGui::Button("", {50, 50});
+			if (ImGui::Button("", {50, 50}))
+			{
+				if (m_holding.type != nullptr)
+				{
+					m_inventory->addItem(i, m_holding);
+					m_holding = {nullptr, nullptr};
+				}
+			}
 		}
 		else
 		{
-			ImGui::Button(item.type->displayName.c_str(), {50, 50});
-		}
-		if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_None))
-		{
-			ImGui::SetDragDropPayload("DND_DEMO_CELL", &i, sizeof(size_t));
-			ImGui::EndDragDropSource();
-		}
-		if (ImGui::BeginDragDropTarget())
-		{
-			if (const ImGuiPayload* payload =
-			        ImGui::AcceptDragDropPayload("DND_DEMO_CELL"))
+			if (ImGui::Button(item.type->displayName.c_str(), {50, 50}))
 			{
-				IM_ASSERT(payload->DataSize == sizeof(size_t));
-				int          payload_n = *(const size_t*) payload->Data;
-				voxels::Item tmp       = m_inventory->removeItem(i);
-				m_inventory->addItem(i, m_inventory->removeItem(payload_n));
-				m_inventory->addItem(tmp);
+				if (m_holding.type == nullptr)
+				{
+					m_holding = m_inventory->removeItem(i);
+				}
+				else
+				{
+					auto tmp  = m_holding;
+					m_holding = m_inventory->removeItem(i);
+					m_inventory->addItem(i, tmp);
+				}
 			}
 		}
 	}
@@ -113,8 +129,11 @@ void InventoryUI::tick(float dt)
 			{
 				ImGui::SameLine();
 			}
-			ImGui::Button(m_referrer->items.get(i)->displayName.c_str(),
-			              {50, 50});
+			if (ImGui::Button(m_referrer->items.get(i)->displayName.c_str(),
+			                  {50, 50}))
+			{
+				m_holding = {m_referrer->items.get(i), nullptr};
+			}
 		}
 	}
 	ImGui::End();

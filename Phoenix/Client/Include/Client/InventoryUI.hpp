@@ -70,5 +70,6 @@ namespace phx::client
 		gfx::FPSCamera*       m_camera;
 		voxels::Inventory*    m_inventory;
 		voxels::ItemReferrer* m_referrer;
+		voxels::Item          m_holding = {nullptr, nullptr};
 	};
 } // namespace phx::client
