@@ -33,6 +33,7 @@
 #include <Common/Voxels/Block.hpp>
 #include <Common/Voxels/BlockReferrer.hpp>
 #include <Common/Registry.hpp>
+#include <Common/Metadata.hpp>
 
 #include <Common/Utility/Serializer.hpp>
 #include <vector>
@@ -107,17 +108,36 @@ namespace phx::voxels
 
 		/**
 		 * @brief Gets the Block at the supplied position.
-		 * @param position Position of the block relative to the chunk.
-		 * @return BlockType* The requested block.
+		 * @param index flattened location of the block in the chunk.
+		 * @return Block The requested block.
 		 */
-		BlockType* getBlockAt(math::vec3 position) const;
+		Block getBlockAt(std::size_t index);
 
 		/**
-		 * @brief Sets the Block At the supplied position.
+		 * @brief Gets the Block at the supplied position.
 		 * @param position Position of the block relative to the chunk.
-		 * @param newBlock The block that exists at this location.
+		 * @return Block The requested block.
 		 */
-		void setBlockAt(math::vec3 position, BlockType* newBlock);
+		Block getBlockAt(const math::vec3& position);
+
+		/**
+		 * @brief Sets the Block at the supplied position.
+		 * @param position Position of the block relative to the chunk.
+		 * @param newBlock The block that now exists at this location.
+		 */
+		void setBlockAt(const math::vec3& position, Block newBlock);
+
+		/**
+		 * @brief Sets metadata for the Block at the supplied position.
+		 * @param position Position of the block relative to the chunk.
+		 * @param key The key associated with the metadata.
+		 * @param newData The new value for the data.
+		 * @return true if the data was set.
+		 * @return false if the data already exists with a different data type
+		 * OR if the supplied position is out of bounds for the chunk.
+		 */
+		bool setMetadataAt(const phx::math::vec3& position,
+		                   const std::string& key, std::any* newData);
 
 		/// @brief How wide a chunk is (x axis).
 		static constexpr int CHUNK_WIDTH = 16;
@@ -166,13 +186,13 @@ namespace phx::voxels
 		// serialize.
 		Serializer& operator>>(Serializer& ser) const override;
 
-		// unserialize.
+		// deserialize.
 		Serializer& operator<<(Serializer& ser) override;
 
 	private:
-		math::vec3 m_pos;
-		BlockList m_blocks;
-
-		BlockReferrer* m_referrer;
+		math::vec3                                m_pos;
+		BlockList                                 m_blocks;
+		std::unordered_map<std::size_t, Metadata> m_metadata;
+		BlockReferrer*                            m_referrer;
 	};
 } // namespace phx::voxels

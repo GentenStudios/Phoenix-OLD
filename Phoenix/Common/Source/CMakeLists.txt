@@ -11,6 +11,7 @@ set(Sources
 
 	${currentDir}/Actor.cpp
 	${currentDir}/Settings.cpp
+	${currentDir}/Metadata.cpp
 	${currentDir}/Logger.cpp
 	${currentDir}/Commander.cpp
 	${currentDir}/Input.cpp

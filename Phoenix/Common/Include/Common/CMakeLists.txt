@@ -17,6 +17,7 @@ set(Headers
 	${currentDir}/CLIParser.hpp
 
 	${currentDir}/Settings.hpp
+	${currentDir}/Metadata.hpp
 	${currentDir}/Commander.hpp
 	${currentDir}/Position.hpp
 	${currentDir}/Movement.hpp
