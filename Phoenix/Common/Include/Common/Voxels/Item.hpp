@@ -57,7 +57,7 @@ namespace phx::voxels
 	 * world. For example a dirt block will have the same basic information
 	 * every time it exists in the world.
 	 */
-	class ItemType
+	struct ItemType
 	{
 	public:
 		// the base ItemReferrer object implements this.
