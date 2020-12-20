@@ -90,16 +90,7 @@ namespace phx::voxels
 		 */
 		void updateChunkQueue();
 
-		/*
-		 * @brief Parse a save string into a chunk.
-		 *
-		 * @param searchView A string view of the save data to be parsed.
-		 * @param chunk The chunk to be filled with the appropriate blocks.
-		 * @return true if the parsing was successful, otherwise false.
-		 */
-		bool parseChunkSave(std::string_view searchView, Chunk& chunk);
-
-		/*
+		/**
 		 * @brief Load a chunk from the save files.
 		 *
 		 * @param chunkPos The coordinates of the chunk.

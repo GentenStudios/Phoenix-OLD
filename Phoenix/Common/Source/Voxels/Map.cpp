@@ -224,31 +224,6 @@ void Map::updateChunkQueue()
 	return;
 }
 
-bool Map::parseChunkSave(std::string_view searchView, Chunk& chunk)
-{
-	// We will add blocks to the chunk as they are parsed.
-	Chunk::BlockList& blocks = chunk.getBlocks();
-
-	for (std::size_t delimiterPos = searchView.find_first_of(';');
-	     delimiterPos != std::string_view::npos;
-	     searchView.remove_prefix(delimiterPos + 1),
-	                 delimiterPos = searchView.find_first_of(';'))
-	{
-		const std::string blockName {searchView.substr(0, delimiterPos)};
-		blocks.push_back(
-		    m_referrer->blocks.get(*m_referrer->referrer.get(blockName)));
-	}
-
-	if (blocks.size() != Chunk::CHUNK_MAX_BLOCKS)
-	{
-		LOG_WARNING("MAP") << "Existing save for chunk at: "
-		                   << chunk.getChunkPos() << " is invalid";
-		return false;
-	}
-
-	return true;
-}
-
 bool Map::loadChunk(const phx::math::vec3& chunkPos)
 {
 	std::ifstream saveFile(toSavePath(static_cast<phx::math::vec3i>(chunkPos)),
