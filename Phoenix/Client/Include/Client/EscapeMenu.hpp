@@ -55,6 +55,9 @@ namespace phx::client
 
 		void tick(float dt) override;
 
+		static constexpr float WIDTH  = 300;
+		static constexpr float HEIGHT = 300;
+
 	private:
 		gfx::Window* m_window;
 
