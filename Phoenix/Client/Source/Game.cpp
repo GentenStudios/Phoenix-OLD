@@ -178,7 +178,8 @@ void Game::onAttach()
 
 	LOG_INFO("MAIN") << "Register GUI";
 	m_escapeMenu = new EscapeMenu(m_window, m_camera);
-	m_inventory  = new InventoryUI(m_window, m_camera, m_playerInventory);
+	m_inventory  = new InventoryUI(m_window, m_camera, m_playerInventory,
+                                  &m_itemRegistry.referrer);
 
 	if (Client::get()->isDebugLayerActive())
 	{

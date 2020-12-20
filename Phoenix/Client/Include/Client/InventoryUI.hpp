@@ -48,7 +48,8 @@ namespace phx::client
 	{
 	public:
 		InventoryUI(gfx::Window* window, gfx::FPSCamera* camera,
-		            voxels::Inventory* inventory);
+		            voxels::Inventory*    inventory,
+		            voxels::ItemReferrer* referrer);
 		~InventoryUI() override = default;
 
 		void onAttach() override;
@@ -58,13 +59,16 @@ namespace phx::client
 
 		bool isActive() { return m_active; };
 
-		static constexpr float WIDTH  = 590;
-		static constexpr float HEIGHT = 300;
+		static constexpr float WIDTH           = 590;
+		static constexpr float HEIGHT          = 300;
+		static constexpr float CREATIVE_WIDTH  = 300;
+		static constexpr float CREATIVE_HEIGHT = 600;
 
 	private:
-		bool               m_active = false;
-		gfx::Window*       m_window;
-		gfx::FPSCamera*    m_camera;
-		voxels::Inventory* m_inventory;
+		bool                  m_active = false;
+		gfx::Window*          m_window;
+		gfx::FPSCamera*       m_camera;
+		voxels::Inventory*    m_inventory;
+		voxels::ItemReferrer* m_referrer;
 	};
 } // namespace phx::client

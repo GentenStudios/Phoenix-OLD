@@ -34,9 +34,10 @@
 using namespace phx::client;
 using namespace phx;
 InventoryUI::InventoryUI(gfx::Window* window, gfx::FPSCamera* camera,
-                         voxels::Inventory* inventory)
+                         voxels::Inventory*    inventory,
+                         voxels::ItemReferrer* referrer)
     : gfx::Overlay("Inventory"), m_window(window), m_inventory(inventory),
-      m_camera(camera)
+      m_camera(camera), m_referrer(referrer)
 {
 }
 void InventoryUI::onAttach()
@@ -97,6 +98,23 @@ void InventoryUI::tick(float dt)
 				m_inventory->addItem(i, m_inventory->removeItem(payload_n));
 				m_inventory->addItem(tmp);
 			}
+		}
+	}
+	ImGui::End();
+	ImGui::SetNextWindowPos({m_window->getSize().x - CREATIVE_WIDTH,
+	                         m_window->getSize().y / 2 - CREATIVE_HEIGHT / 2});
+	ImGui::SetNextWindowSize(ImVec2(CREATIVE_WIDTH, CREATIVE_HEIGHT));
+
+	ImGui::Begin("Creative Inventory", nullptr, ImGuiWindowFlags_NoResize);
+	{
+		for (std::size_t i = 2; i < m_referrer->referrer.size(); i++)
+		{
+			if ((i % 5) != 0)
+			{
+				ImGui::SameLine();
+			}
+			ImGui::Button(m_referrer->items.get(i)->displayName.c_str(),
+			              {50, 50});
 		}
 	}
 	ImGui::End();
