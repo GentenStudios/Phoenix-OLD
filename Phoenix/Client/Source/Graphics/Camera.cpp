@@ -120,7 +120,7 @@ void FPSCamera::enable(bool enabled)
 	m_enabled = enabled;
 }
 
-void FPSCamera::onWindowResize(events::Event e)
+void FPSCamera::onWindowResize(const events::Event& e)
 {
 	// recalculate window size again, to not be inefficient.
 	const math::vec2 windowSize = m_window->getSize();
