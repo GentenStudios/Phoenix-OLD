@@ -55,8 +55,8 @@ namespace phx::client
 
 		void tick(float dt) override;
 
-		static constexpr float WIDTH  = 500;
-		static constexpr float HEIGHT = 50;
+		static constexpr float WIDTH  = 590;
+		static constexpr float HEIGHT = 80;
 		static constexpr float POSY   = 100;
 
 	private:

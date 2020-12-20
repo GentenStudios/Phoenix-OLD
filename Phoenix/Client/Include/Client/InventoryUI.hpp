@@ -58,6 +58,9 @@ namespace phx::client
 
 		bool isActive() { return m_active; };
 
+		static constexpr float WIDTH  = 590;
+		static constexpr float HEIGHT = 300;
+
 	private:
 		bool               m_active = false;
 		gfx::Window*       m_window;

@@ -61,10 +61,9 @@ void InventoryUI::onEvent(events::Event& e)
 }
 void InventoryUI::tick(float dt)
 {
-	ImGui::SetNextWindowPos(
-	    {m_window->getSize().x / 2 - 300, m_window->getSize().y / 2 - 250},
-	    ImGuiCond_Once);
-	ImGui::SetNextWindowSize(ImVec2(600, 300), ImGuiCond_Once);
+	ImGui::SetNextWindowPos({m_window->getSize().x / 2 - WIDTH / 2,
+	                         m_window->getSize().y / 2 - HEIGHT / 2});
+	ImGui::SetNextWindowSize(ImVec2(WIDTH, HEIGHT));
 
 	ImGui::Begin("Inventory", nullptr, ImGuiWindowFlags_NoResize);
 	for (size_t i = 0; i < m_inventory->getSize(); i++)
