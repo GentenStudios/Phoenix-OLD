@@ -27,88 +27,51 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <Client/Client.hpp>
-#include <Client/EscapeMenu.hpp>
+#include <Client/HUD.hpp>
+
+#include <Common/Actor.hpp>
+#include <Common/PlayerView.hpp>
 
 #include <imgui.h>
 
 using namespace phx::client;
 using namespace phx;
 
-EscapeMenu::EscapeMenu(gfx::Window* window)
-    : gfx::Overlay("EscapeMenu"), m_window(window)
+HUD::HUD(gfx::Window* window, entt::registry* registry, entt::entity player)
+    : gfx::Overlay("HUD"), m_window(window), m_registry(registry),
+      m_player(player)
 {
 }
 
-void EscapeMenu::onAttach()
-{
-	m_page = Page::MAIN;
+void HUD::onAttach() {}
+void HUD::onDetach() {}
+void HUD::onEvent(events::Event& e) {}
 
-	m_sensitivity        = Settings::get()->getSetting("camera:sensitivity");
-	m_currentSensitivity = m_sensitivity->value();
-}
-void EscapeMenu::onDetach() {}
-void EscapeMenu::onEvent(events::Event& e)
+void HUD::tick(float dt)
 {
-	switch (e.type)
+	voxels::Map* map = m_registry->get<PlayerView>(m_player).map;
+	ImGui::SetNextWindowPos(
+	    {m_window->getSize().x / 2 - WIDTH / 2, m_window->getSize().y - POSY});
+	ImGui::SetNextWindowSize(ImVec2(WIDTH, HEIGHT));
+
+	ImGui::Begin("HUD", nullptr,
+	             ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove);
 	{
-	case events::EventType::KEY_PRESSED:
-		switch (e.keyboard.key)
+		auto target =
+		    ActorSystem::getTarget(m_registry, m_player).getCurrentPosition();
+		target.floor();
+		auto targetBlock = map->getBlockAt(target);
+		if (targetBlock->category == voxels::BlockCategory::SOLID)
 		{
-		case events::Keys::KEY_ESCAPE:
-			switch (m_page)
-			{
-			case Page::MAIN:
-				break;
-			case Page::SETTINGS:
-				m_page    = Page::MAIN;
-				e.handled = true;
-				break;
-			}
-		default:
-			break;
+			ImGui::Text("%s", targetBlock->displayName.c_str());
 		}
-	default:
-		break;
-	}
-}
+		else
+		{
+			ImGui::Text("");
+		}
 
-void EscapeMenu::tick(float dt)
-{
-	ImGui::SetNextWindowPos({m_window->getSize().x / 2 - WIDTH / 2,
-	                         m_window->getSize().y / 2 - HEIGHT / 2});
-
-	ImGui::Begin("Menu", nullptr, ImGuiWindowFlags_NoResize);
-	switch (m_page)
-	{
-	case Page::MAIN:
-		if (ImGui::Button("Settings", {290, 30}))
-		{
-			m_page = Page::SETTINGS;
-		}
-		if (ImGui::Button("Exit", {290, 30}))
-		{
-			m_window->close();
-		}
-		break;
-	case Page::SETTINGS:
-		const std::unordered_map<std::string, Setting>& settings =
-		    Settings::get()->getSettings();
-
-		for (const auto& setting : settings)
-		{
-			int i = setting.second.value();
-			ImGui::SliderInt(setting.second.getName().c_str(), &i,
-			                 setting.second.getMin(), setting.second.getMax());
-			if (i != setting.second.value())
-			{
-				Settings::get()->getSetting(setting.second.getKey())->set(i);
-			}
-		}
-		if (ImGui::Button("Back", {290, 30}))
-		{
-			m_page = Page::MAIN;
-		}
-		break;
+		ImGui::Text("Hand: %s",
+		            m_registry->get<Hand>(m_player).hand->displayName.c_str());
 	}
 	ImGui::End();
 }

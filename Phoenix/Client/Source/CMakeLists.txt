@@ -12,6 +12,7 @@ set(Sources
         ${currentDir}/Crosshair.cpp
         ${currentDir}/Game.cpp
         ${currentDir}/EscapeMenu.cpp
+        ${currentDir}/HUD.cpp
         ${currentDir}/InputMap.cpp
         ${currentDir}/Network.cpp
 
