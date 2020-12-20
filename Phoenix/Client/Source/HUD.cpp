@@ -51,9 +51,8 @@ void HUD::tick(float dt)
 {
 	voxels::Map* map = m_registry->get<PlayerView>(m_player).map;
 	ImGui::SetNextWindowPos(
-	    {m_window->getSize().x / 2 - WIDTH / 2, m_window->getSize().y - POSY},
-	    ImGuiCond_Once);
-	ImGui::SetNextWindowSize(ImVec2(WIDTH, HEIGHT), ImGuiCond_Once);
+	    {m_window->getSize().x / 2 - WIDTH / 2, m_window->getSize().y - POSY});
+	ImGui::SetNextWindowSize(ImVec2(WIDTH, HEIGHT));
 
 	ImGui::Begin("HUD", nullptr,
 	             ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove);

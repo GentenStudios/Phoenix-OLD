@@ -74,9 +74,8 @@ void EscapeMenu::onEvent(events::Event& e)
 
 void EscapeMenu::tick(float dt)
 {
-	ImGui::SetNextWindowPos(
-	    {m_window->getSize().x / 2 - 150, m_window->getSize().y / 2 - 150},
-	    ImGuiCond_Once);
+	ImGui::SetNextWindowPos({m_window->getSize().x / 2 - WIDTH / 2,
+	                         m_window->getSize().y / 2 - HEIGHT / 2});
 
 	ImGui::Begin("Menu", nullptr, ImGuiWindowFlags_NoResize);
 	switch (m_page)
