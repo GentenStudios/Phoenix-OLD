@@ -48,7 +48,7 @@ namespace phx::voxels
 		 * @param slot The slot the item is in.
 		 * @return The item or nullptr if the slot is empty.
 		 */
-		ItemType* getItem(std::size_t slot);
+		Item getItem(std::size_t slot);
 
 		/**
 		 * Add an item to the inventory.
@@ -57,7 +57,7 @@ namespace phx::voxels
 		 * @return true If the item was inserted.
 		 * @return false If the item was not inserted.
 		 */
-		bool addItem(std::size_t slot, Item item);
+		bool addItem(std::size_t slot, const Item& item);
 
 		/**
 		 * Add an item to the next open slot in the inventory.
@@ -65,14 +65,14 @@ namespace phx::voxels
 		 * @return The index of the item slot if the item was inserted.
 		 * @return -1 If the item was not inserted.
 		 */
-		int addItem(Item item);
+		int addItem(const Item& item);
 
 		/**
 		 * Removes an item from the inventory.
 		 * @param slot The slot the item is in.
 		 * @return The item or nullptr if the slot is empty.
 		 */
-		ItemType* removeItem(std::size_t slot);
+		Item removeItem(std::size_t slot);
 
 		/**
 		 * @brief Sets metadata for the Item at the supplied slot.

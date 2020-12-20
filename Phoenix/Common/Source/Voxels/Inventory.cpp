@@ -40,30 +40,34 @@ Inventory::Inventory(std::size_t size, ItemReferrer* referrer)
 	}
 }
 
-ItemType* Inventory::getItem(std::size_t slot)
+Item Inventory::getItem(std::size_t slot)
 {
-	if (m_slots.size() <= slot)
+	if (m_slots.size() >= slot)
 	{
-		return m_slots[slot];
+		if (m_metadata.find(slot) != m_metadata.end())
+		{
+			return {m_slots[slot], m_metadata[slot]};
+		}
+		return {m_slots[slot], nullptr};
 	}
-	return m_referrer->items.get(ItemType::OUT_OF_BOUNDS_ITEM);
+	return {m_referrer->items.get(ItemType::OUT_OF_BOUNDS_ITEM), nullptr};
 }
 
-bool Inventory::addItem(std::size_t slot, Item item)
+bool Inventory::addItem(std::size_t slot, const Item& item)
 {
-	if (getItem(slot) == nullptr && m_size >= slot)
+	if (getItem(slot).type == nullptr && m_size >= slot)
 	{
 		m_slots[slot] = item.type;
 		if (item.metadata != nullptr)
 		{
-			m_metadata[slot] = *item.metadata;
+			m_metadata[slot] = item.metadata;
 		}
 		return true;
 	}
 	return false;
 }
 
-int Inventory::addItem(Item item)
+int Inventory::addItem(const Item& item)
 {
 	for (std::size_t i = 0; i < m_size; i++)
 	{
@@ -72,7 +76,7 @@ int Inventory::addItem(Item item)
 			m_slots[i] = item.type;
 			if (item.metadata != nullptr)
 			{
-				m_metadata[i] = *item.metadata;
+				m_metadata[i] = item.metadata;
 			}
 			return i;
 		}
@@ -80,15 +84,21 @@ int Inventory::addItem(Item item)
 	return -1;
 }
 
-ItemType* Inventory::removeItem(std::size_t slot)
+Item Inventory::removeItem(std::size_t slot)
 {
-	if (m_size <= slot)
+	if (m_slots.size() >= slot)
 	{
-		ItemType* item = m_slots[slot];
-		m_slots[slot]  = nullptr;
+		Item item;
+		item.type     = m_slots[slot];
+		m_slots[slot] = nullptr;
+		if (m_metadata.find(slot) != m_metadata.end())
+		{
+			item.metadata = m_metadata[slot];
+			m_metadata.erase(slot);
+		}
 		return item;
 	}
-	m_referrer->items.get(ItemType::OUT_OF_BOUNDS_ITEM);
+	return {m_referrer->items.get(ItemType::OUT_OF_BOUNDS_ITEM), nullptr};
 }
 
 /**
@@ -101,7 +111,7 @@ bool Inventory::setMetadataAt(std::size_t slot, const std::string& key,
 {
 	if (m_size <= slot)
 	{
-		return m_metadata[slot].set(key, newData);
+		return m_metadata[slot]->set(key, newData);
 	}
 	LOG_DEBUG("Inventory.cpp")
 	    << "Attempted to set metadata for out of bounds inventory slot";
@@ -117,7 +127,7 @@ phx::Serializer& Inventory::operator>>(phx::Serializer& ser) const
 		ser << m_slots[i]->uniqueIdentifier;
 		if (m_metadata.find(i) != m_metadata.end())
 		{
-			ser << '+' << m_metadata.at(i);
+			ser << '+' << *m_metadata.at(i);
 		}
 		else
 		{
@@ -143,9 +153,9 @@ phx::Serializer& Inventory::operator<<(phx::Serializer& ser)
 		}
 		else if (c == '+')
 		{
-			Metadata data;
-			ser >> data;
-			m_metadata[i] = data;
+			std::shared_ptr<Metadata> data;
+			ser >> *data;
+			m_metadata.emplace(i, data);
 		}
 	}
 }

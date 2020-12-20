@@ -81,7 +81,7 @@ void HUD::tick(float dt)
 			{
 				ImGui::PushStyleColor(ImGuiCol_Button, {0.f, 1.f, 0.f, 1.f});
 			}
-			const voxels::ItemType* item = hand.hotbar->getItem(i);
+			const voxels::ItemType* item = hand.hotbar->getItem(i).type;
 			if (item == nullptr)
 			{
 				ImGui::Button("", {50, 50});

@@ -163,7 +163,7 @@ bool ActorSystem::action2(entt::registry* registry, entt::entity entity)
 			math::vec3 back = ray.backtrace(RAY_INCREMENT);
 			back.floor();
 
-			voxels::ItemType* item = registry->get<Hand>(entity).getHand();
+			voxels::ItemType* item = registry->get<Hand>(entity).getHand().type;
 			if (!item->places.empty())
 			{
 				voxels::Block block {m_blockReferrer->getByID(item->places),

@@ -72,14 +72,31 @@ void InventoryUI::tick(float dt)
 		{
 			ImGui::SameLine();
 		}
-		const voxels::ItemType* item = m_inventory->getItem(i);
-		if (item == nullptr)
+		const voxels::Item item = m_inventory->getItem(i);
+		if (item.type == nullptr)
 		{
 			ImGui::Button("", {50, 50});
 		}
 		else
 		{
-			ImGui::Button(item->displayName.c_str(), {50, 50});
+			ImGui::Button(item.type->displayName.c_str(), {50, 50});
+		}
+		if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_None))
+		{
+			ImGui::SetDragDropPayload("DND_DEMO_CELL", &i, sizeof(size_t));
+			ImGui::EndDragDropSource();
+		}
+		if (ImGui::BeginDragDropTarget())
+		{
+			if (const ImGuiPayload* payload =
+			        ImGui::AcceptDragDropPayload("DND_DEMO_CELL"))
+			{
+				IM_ASSERT(payload->DataSize == sizeof(size_t));
+				int          payload_n = *(const size_t*) payload->Data;
+				voxels::Item tmp       = m_inventory->removeItem(i);
+				m_inventory->addItem(i, m_inventory->removeItem(payload_n));
+				m_inventory->addItem(tmp);
+			}
 		}
 	}
 	ImGui::End();

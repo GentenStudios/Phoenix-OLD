@@ -54,7 +54,7 @@ namespace phx
 	public:
 		Hand(size_t hand, voxels::Inventory* hotbar)
 		    : m_hand(hand), hotbar(hotbar) {};
-		voxels::ItemType* getHand() const { return hotbar->getItem(m_hand); };
+		voxels::Item getHand() const { return hotbar->getItem(m_hand); };
 
 		void setHandSlot(std::size_t slot)
 		{

@@ -39,6 +39,7 @@
 #include <Common/Utility/Serializer.hpp>
 
 #include <any>
+#include <memory>
 #include <string>
 #include <unordered_map>
 
@@ -52,7 +53,8 @@ namespace phx
 		 * @brief QOL "typedef" for use in implementations where metadata needs
 		 * stored in relation to indexed objects and this is obnoxious to type.
 		 */
-		using Container = std::unordered_map<std::size_t, Metadata>;
+		using Container =
+		    std::unordered_map<std::size_t, std::shared_ptr<Metadata>>;
 
 		/**
 		 * @brief Sets or inserts metadata.
@@ -61,7 +63,7 @@ namespace phx
 		 * @return false If the data already exists with a different data type
 		 * or an incompatible data type was provided.
 		 */
-		bool set(const std::string& key, const std::any& existing);
+		bool set(const std::string& key, const std::any& data);
 
 		/**
 		 * @brief Gets metadata by key.
