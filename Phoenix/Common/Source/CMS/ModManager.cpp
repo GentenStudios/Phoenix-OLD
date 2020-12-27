@@ -29,8 +29,10 @@
 #include <Common/CMS/ModManager.hpp>
 #include <Common/CMS/Mod.hpp>
 #include <Common/Logger.hpp>
-
 #include <Common/Math/Math.hpp>
+
+#include <fstream>
+#include <queue>
 
 using namespace phx::cms;
 
@@ -125,7 +127,8 @@ ModManager::Status ModManager::load(float* progress)
 				// error occured if return is not valid.
 				if (!pfr.valid())
 				{
-					sol::error err = pfr;
+					sol::error err = pfr; // visual studio marks this as an
+					                      // error, but it's fine.
 
 					std::string errString = "An error occured loading ";
 					errString += mod.getName();

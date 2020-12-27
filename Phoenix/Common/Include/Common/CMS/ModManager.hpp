@@ -33,7 +33,6 @@
 #include <sol/sol.hpp>
 
 #include <functional>
-#include <queue>
 #include <vector>
 
 namespace phx::cms

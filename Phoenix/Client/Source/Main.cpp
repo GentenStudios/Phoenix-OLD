@@ -31,12 +31,21 @@
 #include <Common/Logger.hpp>
 
 #include <Common/CoreIntrinsics.hpp>
+#include <Common/Settings.hpp>
 
 using namespace phx;
 
 #undef main
 int main(int argc, char** argv)
 {
+	settings::SettingsManager manager;
+	auto it = manager.valid<int>("monkey");
+	std::cout << std::boolalpha << it << std::endl;
+
+	auto setting = manager.get<int>("monkey");
+	setting      = 50;
+	std::cout << static_cast<int>(setting) << std::endl;
+	
 	CLIParser parser;
 
 	client::Client::get()->setupCLIParam(&parser);
@@ -49,7 +58,7 @@ int main(int argc, char** argv)
 		return 1;
 	}
 
-	client::Client::get()->run();
+	//client::Client::get()->run();
 
 	return 0;
 }

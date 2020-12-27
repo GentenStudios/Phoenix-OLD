@@ -128,4 +128,21 @@ namespace phx
 		// Dimension* m_defaultDimension;
 		// std::unordered_map<std::string, Dimension> m_loadedDimensions;
 	};
+
+	namespace save
+	{
+		class Dimension
+		{
+			
+		};
+
+		class Save
+		{
+		public:
+			Save(const std::string& directory);
+			~Save();
+
+			void getSavesList(const std::string& directories);
+		};
+	}
 } // namespace phx

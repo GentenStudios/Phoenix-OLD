@@ -39,9 +39,12 @@
 #include <Common/Singleton.hpp>
 #include <Common/CMS/ModManager.hpp>
 
+#include <nlohmann/json.hpp>
+
 #include <string>
 #include <unordered_map>
-#include <nlohmann/json.hpp>
+#include <algorithm>
+#include <type_traits>
 
 using json = nlohmann::json;
 
@@ -204,14 +207,68 @@ namespace phx
 {
 	namespace settings
 	{
+		namespace internal
+		{
+			// These templated structs are a form of "SFINAE". They allow a
+			// method to check whether the template parameter passed is a
+			// specialization of an existing class.
+			// For example:
+			//		IsSpecialisation<bool, std::vector>::value would be False.
+			//		IsSpecialisation<std::vector<int>, std::vector>::value would be True.
+			//
+			// If needed elsewhere in the future, this can be moved to a utility
+			// file and namespaced into something that's more generic.
+			
+			template <typename T, template<typename...> class Ref>
+			struct IsSpecialisation : std::false_type
+			{
+			};
+		
+			template <template<typename...> class Ref, typename... Args>
+			struct IsSpecialisation<Ref<Args...>, Ref> : std::true_type
+			{
+			};
+		}
+		
+		/**
+		 * @brief Represents a setting/configuration read from the config file.
+		 * @tparam T The underlying type of the setting.
+		 *
+		 * The only supported types as of right now are arithmetic types,
+		 * std::strings and booleans. These values are also supported as part of
+		 * an std::vector (you can ask for std::vector<std::string>, etc...)
+		 */
 		template <typename T>
 		class Setting
 		{
 		public:
+			using Type = T;
+			
+		public:
 			explicit Setting(nlohmann::json* json) : m_setting(json) {}
 
-			explicit operator T() { return m_setting->get_ref<T>(); }
-			explicit operator T() const { return m_setting->get_ref<T>(); }
+			explicit operator T() { return m_setting->get<T>(); }
+			explicit operator T() const { return m_setting->get<T>(); }
+			explicit operator T*() { return m_setting->get_ptr<T*>(); }
+			explicit operator const T*() const { return m_setting->get_ptr<const T*>(); }
+
+			Setting& operator=(const Setting& rhs)
+			{
+				m_setting = rhs.m_setting;
+				return *this;
+			}
+
+			Setting& operator=(const T& rhs)
+			{
+				*m_setting = rhs;
+				return *this;
+			}
+
+			Setting& operator=(T&& rhs)
+			{
+				*m_setting = std::move(rhs);
+				return *this;
+			}
 
 		private:
 			nlohmann::json* m_setting;
@@ -224,21 +281,109 @@ namespace phx
 			~SettingsManager() = default;
 
 			void registerAPI(cms::ModManager* manager);
+			void parse(const std::string& configFile);
+			void save();
 
-			template <typename Type>
-			bool valid(const std::string& key)
+			bool exists(const std::string& key) const
 			{
-				
+				return m_settings.find(key) != m_settings.end();
 			}
 
 			template <typename Type>
 			Setting<Type> get(const std::string& key)
 			{
-				return Setting<Type>(m_settings[key]);
+				bool doesExist = exists(key);
+				if (doesExist)
+				{
+					bool result = valid<Type>(key);
+					if (result)
+					{
+						return Setting<Type>(&m_settings[key]);
+					}
+					else
+					{
+						LOG_WARNING("CONFIG")
+						    << "An incorrect value was provided "
+						       "for the configuration parameter: "
+						    << key << " using a default value instead.";
+
+						m_invalidOverwriter[key] = Type {};
+						return Setting<Type>(&m_invalidOverwriter[key]);
+					}
+				}
+				else
+				{
+					m_settings[key] = Type {};
+					return Setting<Type>(&m_settings[key]);
+				}
 			}
 			
+			// have to turn clang-format off here otherwise it's actually
+			// painful...
+			// clang-format off
+			template <typename Type>
+			std::enable_if_t<internal::IsSpecialisation<Type, std::vector>::value, bool> valid(const std::string& key) const
+			{
+				const auto it = m_settings.find(key);
+				if (it != m_settings.end())
+				{
+					if (it->is_array())
+					{
+						// check what type we're working with.
+						// we have to do std::all_of to make sure all the values are that type otherwise it throws an exception.
+						// we currently only support arithmetic types, std::string and booleans - which really should be enough.
+						if constexpr (std::is_arithmetic_v<typename Type::value_type>)
+						{
+							return std::all_of(it->begin(), it->end(),
+							                   [](const nlohmann::json& val) {
+								                   return val.is_number();
+							                   });
+						}
+						else if constexpr (std::is_same_v<typename Type::value_type, std::string>)
+						{
+							return std::all_of(it->begin(), it->end(),
+							                   [](const nlohmann::json& val) {
+								                   return val.is_string();
+							                   });	
+						}
+						else if constexpr (std::is_same_v<typename Type::value_type, bool>)
+						{
+							return std::all_of(it->begin(), it->end(),
+							                   [](const nlohmann::json& val) {
+								                   return val.is_boolean();
+							                   });	
+						}
+					}
+				}
+
+				return false;
+			}
+
+			template <typename Type>
+			std::enable_if_t<std::is_arithmetic_v<Type> || std::is_same_v<Type, std::string> || std::is_same_v<Type, bool>, bool> valid(const std::string& key) const
+			{
+				const auto it = m_settings.find(key);
+				if (it != m_settings.end())
+				{
+					if      constexpr (std::is_arithmetic_v<Type>)        { return it->is_number(); }
+					else if constexpr (std::is_same_v<Type, std::string>) { return it->is_string(); }
+					else if constexpr (std::is_same_v<Type, bool>)        { return it->is_boolean(); }
+				}
+
+				return false;
+			}
+			// clang-format on
+			
 		private:
+			// path to the config file itself.
+			std::string m_configFilePath;
+			
+			// main settings storage object.
 			nlohmann::json m_settings;
+
+			// rather than overwriting invalid values, we just store and modify
+			// them in memory. we try to use this is least as we can.
+			nlohmann::json m_invalidOverwriter;
 		};
 	}
 }
