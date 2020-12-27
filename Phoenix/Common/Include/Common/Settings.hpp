@@ -307,7 +307,11 @@ namespace phx
 						       "for the configuration parameter: "
 						    << key << " using a default value instead.";
 
-						m_invalidOverwriter[key] = Type {};
+						if (m_invalidOverwriter.find(key) == m_invalidOverwriter.end())
+						{
+							m_invalidOverwriter[key] = Type {};
+						}
+						
 						return Setting<Type>(&m_invalidOverwriter[key]);
 					}
 				}
