@@ -26,49 +26,62 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+/**
+ * @file Metadata.hpp
+ * @brief Used to store unique data per individual instances
+ *
+ * @copyright Copyright (c) Genten Studios 2019 - 2020
+ *
+ */
+
 #pragma once
 
-#include <Client/Graphics/GUI/Button.hpp>
-#include <Client/Graphics/GUI/Container.hpp>
-#include <Client/Graphics/Layer.hpp>
-#include <Client/Graphics/Window.hpp>
+#include <Common/Utility/Serializer.hpp>
 
-#include <Common/Settings.hpp>
+#include <any>
+#include <string>
+#include <unordered_map>
 
-namespace phx::client
+namespace phx
 {
-	/**
-	 * @brief The escape menu within the game.
-	 *
-	 * @see Layer
-	 * @see LayerStack
-	 */
-	class EscapeMenu : public gfx::Overlay
+
+	class Metadata : public ISerializable
 	{
 	public:
-		EscapeMenu(gfx::Window* window);
-		~EscapeMenu() override = default;
+		/**
+		 * @brief Sets or inserts metadata.
+		 * @param key The key associated with the metadata.
+		 * @return true If the data was set.
+		 * @return false If the data already exists with a different data type
+		 * or an incompatible data type was provided.
+		 */
+		bool set(const std::string& key, const std::any& existing);
 
-		void onAttach() override;
-		void onDetach() override;
-		void onEvent(events::Event& e) override;
+		/**
+		 * @brief Gets metadata by key.
+		 * @param key The key associated with the metadata.
+		 * @return A pointer to the data.
+		 */
+		const std::any* get(const std::string& key) const;
 
-		void tick(float dt) override;
+		/**
+		 * @brief Erases metadata.
+		 * @param key The key associated with the metadata.
+		 */
+		void erase(const std::string& key) { m_data.erase(key); };
 
-		static constexpr float WIDTH  = 300;
-		static constexpr float HEIGHT = 300;
+		/**
+		 * @return the size of the contained map object.
+		 */
+		std::size_t size() { return m_data.size(); };
+
+		// serialize.
+		Serializer& operator>>(Serializer& ser) const override;
+
+		// deserialize.
+		Serializer& operator<<(Serializer& ser) override;
 
 	private:
-		gfx::Window* m_window;
-
-		enum class Page
-		{
-			MAIN,
-			SETTINGS
-		};
-		Page m_page = Page::MAIN;
-
-		int      m_currentSensitivity = 1;
-		Setting* m_sensitivity        = nullptr;
+		std::unordered_map<std::string, std::any> m_data;
 	};
-} // namespace phx::client
+}

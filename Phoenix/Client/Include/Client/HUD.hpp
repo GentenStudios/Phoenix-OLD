@@ -28,26 +28,26 @@
 
 #pragma once
 
-#include <Client/Graphics/GUI/Button.hpp>
-#include <Client/Graphics/GUI/Container.hpp>
 #include <Client/Graphics/Layer.hpp>
 #include <Client/Graphics/Window.hpp>
 
 #include <Common/Settings.hpp>
 
+#include <entt/entt.hpp>
+
 namespace phx::client
 {
 	/**
-	 * @brief The escape menu within the game.
+	 * @brief The Heads Up Display
 	 *
 	 * @see Layer
 	 * @see LayerStack
 	 */
-	class EscapeMenu : public gfx::Overlay
+	class HUD : public gfx::Overlay
 	{
 	public:
-		EscapeMenu(gfx::Window* window);
-		~EscapeMenu() override = default;
+		HUD(gfx::Window* window, entt::registry* registry, entt::entity player);
+		~HUD() override = default;
 
 		void onAttach() override;
 		void onDetach() override;
@@ -55,20 +55,15 @@ namespace phx::client
 
 		void tick(float dt) override;
 
-		static constexpr float WIDTH  = 300;
-		static constexpr float HEIGHT = 300;
+		static constexpr float WIDTH  = 500;
+		static constexpr float HEIGHT = 50;
+		static constexpr float POSY   = 100;
 
 	private:
+		entt::registry* m_registry;
+
 		gfx::Window* m_window;
 
-		enum class Page
-		{
-			MAIN,
-			SETTINGS
-		};
-		Page m_page = Page::MAIN;
-
-		int      m_currentSensitivity = 1;
-		Setting* m_sensitivity        = nullptr;
+		entt::entity m_player;
 	};
 } // namespace phx::client

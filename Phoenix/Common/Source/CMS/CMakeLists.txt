@@ -1,5 +1,7 @@
 set(currentDir ${CMAKE_CURRENT_LIST_DIR})
-set(cmsSources
+set(Sources
+	${Sources}
+
 	${currentDir}/Mod.cpp
 	${currentDir}/ModAPI.cpp
 	${currentDir}/ModManager.cpp

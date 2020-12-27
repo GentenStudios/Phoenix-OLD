@@ -26,49 +26,70 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#pragma once
+#include <Client/Game/Timestep.hpp>
 
-#include <Client/Graphics/GUI/Button.hpp>
-#include <Client/Graphics/GUI/Container.hpp>
-#include <Client/Graphics/Layer.hpp>
-#include <Client/Graphics/Window.hpp>
+#include <SDL.h>
 
-#include <Common/Settings.hpp>
+using namespace phx::client;
 
-namespace phx::client
+Timestep::Timestep()
 {
-	/**
-	 * @brief The escape menu within the game.
-	 *
-	 * @see Layer
-	 * @see LayerStack
-	 */
-	class EscapeMenu : public gfx::Overlay
-	{
-	public:
-		EscapeMenu(gfx::Window* window);
-		~EscapeMenu() override = default;
+	m_last = SDL_GetPerformanceCounter();
+}
 
-		void onAttach() override;
-		void onDetach() override;
-		void onEvent(events::Event& e) override;
+Timestep& Timestep::step()
+{
+	const std::size_t now = SDL_GetPerformanceCounter();
 
-		void tick(float dt) override;
+	// m_time is now delta time in SECONDS.
+	m_time = static_cast<float>(now - m_last) /
+	         static_cast<float>(SDL_GetPerformanceFrequency());
 
-		static constexpr float WIDTH  = 300;
-		static constexpr float HEIGHT = 300;
+	m_last = now;
+	
+	return *this;
+}
 
-	private:
-		gfx::Window* m_window;
+void Timestep::clear()
+{
+	// this will just mean that if you call clear, you can essentially eliminate
+	// any lag.
+	m_last = static_cast<float>(SDL_GetPerformanceCounter());
+	m_time = 0.f;
+}
 
-		enum class Page
-		{
-			MAIN,
-			SETTINGS
-		};
-		Page m_page = Page::MAIN;
+FixedTimestep::FixedTimestep(float timestep) : m_timestep(timestep)
+{
+	m_last = static_cast<float>(SDL_GetPerformanceCounter());
+}
 
-		int      m_currentSensitivity = 1;
-		Setting* m_sensitivity        = nullptr;
-	};
-} // namespace phx::client
+FixedTimestep& FixedTimestep::step()
+{
+	const float now = static_cast<float>(SDL_GetPerformanceCounter());
+
+	// m_time is delta time in seconds.
+	m_time = static_cast<float>(now - m_last) /
+	         static_cast<float>(SDL_GetPerformanceFrequency());
+
+	m_accumulator += m_time;
+
+	m_last = now;
+
+	return *this;
+}
+
+void FixedTimestep::clear()
+{
+	m_accumulator = 0.f;
+	m_time        = 0.f;
+	m_last        = SDL_GetPerformanceCounter();
+}
+
+bool FixedTimestep::shouldUpdate() const
+{
+	return m_accumulator >= m_timestep;
+}
+
+void FixedTimestep::update() { m_accumulator -= m_timestep; }
+
+float FixedTimestep::getTimestep() const { return m_timestep; }

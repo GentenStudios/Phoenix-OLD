@@ -39,34 +39,70 @@ Chunk::Chunk(const phx::math::vec3& chunkPos, BlockReferrer* referrer)
 phx::math::vec3   Chunk::getChunkPos() const { return m_pos; }
 Chunk::BlockList& Chunk::getBlocks() { return m_blocks; }
 
-BlockType* Chunk::getBlockAt(phx::math::vec3 position) const
+Block Chunk::getBlockAt(std::size_t index)
 {
-	if (position.x < CHUNK_WIDTH && position.y < CHUNK_HEIGHT &&
-	    position.z < CHUNK_DEPTH)
+	if (index < CHUNK_MAX_BLOCKS)
 	{
-		return m_blocks[getVectorIndex(position)];
+		if (m_metadata.find(index) != m_metadata.end())
+		{
+			return {m_blocks[index], &m_metadata.at(index)};
+		}
+		return {m_blocks[index], nullptr};
 	}
 
-	return m_referrer->blocks.get(BlockType::OUT_OF_BOUNDS_BLOCK);
+	return {m_referrer->blocks.get(BlockType::OUT_OF_BOUNDS_BLOCK), nullptr};
 }
 
-void Chunk::setBlockAt(phx::math::vec3 position, BlockType* newBlock)
+Block Chunk::getBlockAt(const phx::math::vec3& position)
+{
+	return getBlockAt(getVectorIndex(position));
+}
+
+void Chunk::setBlockAt(const phx::math::vec3& position, Block newBlock)
 {
 	if (position.x < CHUNK_WIDTH && position.y < CHUNK_HEIGHT &&
 	    position.z < CHUNK_DEPTH)
 	{
-		m_blocks[getVectorIndex(position)] = newBlock;
+		m_blocks[getVectorIndex(position)] = newBlock.type;
+		if (newBlock.metadata != nullptr)
+		{
+			m_metadata[getVectorIndex(position)] = *newBlock.metadata;
+		}
 	}
+}
+
+/**
+ * @TODO Should we return a tuple with an error type here? There are two things
+ * that could go wrong either the block is OOB or the metadata type is invalid.
+ * Or should we just assert on the second error?
+ */
+bool Chunk::setMetadataAt(const phx::math::vec3& position,
+                          const std::string& key, std::any* newData)
+{
+	if (position.x < CHUNK_WIDTH && position.y < CHUNK_HEIGHT &&
+	    position.z < CHUNK_DEPTH)
+	{
+		return m_metadata[getVectorIndex(position)].set(key, newData);
+	}
+	return false;
 }
 
 phx::Serializer& Chunk::operator>>(phx::Serializer& ser) const
 {
 	ser << m_pos.x << m_pos.y << m_pos.z;
-	for (const BlockType* block : m_blocks)
+	for (int i = 0; i < CHUNK_MAX_BLOCKS; i++)
+	// for (const BlockType* block : m_blocks)
 	{
-		ser << block->uniqueIdentifier;
+		ser << m_blocks[i]->id;
+		if (m_metadata.find(i) != m_metadata.end())
+		{
+			ser << '+' << m_metadata.at(i);
+		}
+		else
+		{
+			ser << ';';
+		}
 	}
-
 	return ser;
 }
 
@@ -76,11 +112,23 @@ phx::Serializer& Chunk::operator<<(phx::Serializer& ser)
 	m_blocks.reserve(4096);
 
 	ser >> m_pos.x >> m_pos.y >> m_pos.z;
-	for (int i = 0; i < CHUNK_DEPTH * CHUNK_WIDTH * CHUNK_HEIGHT; i++)
+	for (int i = 0; i < CHUNK_MAX_BLOCKS; i++)
 	{
-		std::size_t id = 0;
+		std::string id;
 		ser >> id;
-		m_blocks.push_back(m_referrer->blocks.get(id));
+		m_blocks.push_back(
+		    m_referrer->blocks.get(*m_referrer->referrer.get(id)));
+		char c;
+		ser >> c;
+		if (c == ';')
+		{
+		}
+		else if (c == '+')
+		{
+			Metadata data;
+			ser >> data;
+			m_metadata[i] = data;
+		}
 	}
 
 	return ser;

@@ -47,7 +47,6 @@ using namespace phx;
 
 Game::Game(gfx::Window* window, entt::registry* registry) : Layer("Game") {}
 
-
 //Game::Game(gfx::Window* window, entt::registry* registry)
 //    : Layer("Game"), m_registry(registry), m_window(window)
 //{

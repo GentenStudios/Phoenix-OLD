@@ -129,16 +129,28 @@ namespace phx::client
 							block.category = voxels::BlockCategory::LIQUID;
 						}
 					    else if (*cat == "Air")
-						{
-							block.category = voxels::BlockCategory::AIR;
-						}
-					}
-			    	else
-			    	{
+					    {
+						    block.category = voxels::BlockCategory::AIR;
+					    }
+				    }
+				    else
+				    {
 					    // make solid by default in case none of above
 					    // conditions are met.
 					    block.category = voxels::BlockCategory::SOLID;
-			    	}
+				    }
+
+				    sol::optional<bool> rotH = luaBlock["roth"];
+				    if (rotH)
+				    {
+					    block.rotH = *rotH;
+				    }
+
+				    sol::optional<bool> rotV = luaBlock["roth"];
+				    if (rotV)
+				    {
+					    block.rotV = *rotV;
+				    }
 
 				    sol::optional<sol::function> onPlace = luaBlock["onPlace"];
 				    if (onPlace)

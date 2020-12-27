@@ -1,5 +1,7 @@
 set(currentDir ${CMAKE_CURRENT_LIST_DIR})
-set(guiHeaders
+set(Headers
+	${Headers}
+
 	${currentDir}/IComponent.hpp
 	${currentDir}/Container.hpp
 	${currentDir}/BasicShapes.hpp

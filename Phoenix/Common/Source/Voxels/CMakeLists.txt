@@ -1,5 +1,7 @@
 set(currentDir ${CMAKE_CURRENT_LIST_DIR})
-set(voxelSources
+set(Sources
+	${Sources}
+
 	${currentDir}/Chunk.cpp
 	${currentDir}/Map.cpp
 

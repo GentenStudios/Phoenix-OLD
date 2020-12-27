@@ -1,12 +1,11 @@
 add_subdirectory(Events)
 add_subdirectory(Graphics)
 add_subdirectory(Voxels)
+add_subdirectory(Game)
 
 set(currentDir ${CMAKE_CURRENT_LIST_DIR})
 set(Headers
-        ${eventHeaders}
-        ${graphicsHeaders}
-        ${voxelHeaders}
+        ${Headers}
 
         ${currentDir}/InputQueue.hpp
 
@@ -15,6 +14,7 @@ set(Headers
         ${currentDir}/Crosshair.hpp
         ${currentDir}/Game.hpp
         ${currentDir}/EscapeMenu.hpp
+        ${currentDir}/HUD.hpp
         ${currentDir}/InputMap.hpp
         ${currentDir}/Network.hpp
 

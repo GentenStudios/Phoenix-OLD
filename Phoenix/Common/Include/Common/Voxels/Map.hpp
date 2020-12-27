@@ -77,7 +77,7 @@ namespace phx::voxels
 		static std::pair<math::vec3, math::vec3> getBlockPos(
 		    math::vec3 position);
 		BlockType* getBlockAt(math::vec3 position);
-		void       setBlockAt(math::vec3 pos, BlockType* block);
+		void       setBlockAt(math::vec3 pos, const Block& block);
 		void       save(const math::vec3& pos);
 
 		void registerEventSubscriber(MapEventSubscriber* subscriber);
@@ -90,16 +90,7 @@ namespace phx::voxels
 		 */
 		void updateChunkQueue();
 
-		/*
-		 * @brief Parse a save string into a chunk.
-		 *
-		 * @param searchView A string view of the save data to be parsed.
-		 * @param chunk The chunk to be filled with the appropriate blocks.
-		 * @return true if the parsing was successful, otherwise false.
-		 */
-		bool parseChunkSave(std::string_view searchView, Chunk& chunk);
-
-		/*
+		/**
 		 * @brief Load a chunk from the save files.
 		 *
 		 * @param chunkPos The coordinates of the chunk.

@@ -6,11 +6,7 @@ add_subdirectory(Network)
 
 set(currentDir ${CMAKE_CURRENT_LIST_DIR})
 set(Headers
-	${mathHeaders}
-	${voxelHeaders}
-	${cmsHeaders}
-	${utilityHeaders}
-	${networkHeaders}
+	${Headers}
 
 	${currentDir}/CoreIntrinsics.hpp
 	${currentDir}/EnumTools.hpp
@@ -21,6 +17,7 @@ set(Headers
 	${currentDir}/CLIParser.hpp
 
 	${currentDir}/Settings.hpp
+	${currentDir}/Metadata.hpp
 	${currentDir}/Commander.hpp
 	${currentDir}/Position.hpp
 	${currentDir}/Movement.hpp
