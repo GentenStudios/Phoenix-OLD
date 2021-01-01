@@ -27,13 +27,34 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <Client/Client.hpp>
+#include <Common/CLIParser.hpp>
+#include <Common/Logger.hpp>
+
+#include <Common/CoreIntrinsics.hpp>
+#include <Common/Settings.hpp>
 
 using namespace phx;
 
 #undef main
 int main(int argc, char** argv)
 {
-	client::Client::get()->run();
+	auto setting = manager.get<int>("monkey");
+	setting      = 50;
+	std::cout << static_cast<int>(setting) << std::endl;
+
+	CLIParser parser;
+
+	client::Client::get()->setupCLIParam(&parser);
+
+	// .parse returns true/false depending on success.
+	if (!parser.parse(argc, argv))
+	{
+		// if error, things have already been outputted so we can just leave it
+		// here.
+		return 1;
+	}
+
+	// client::Client::get()->run();
 
 	return 0;
 }
