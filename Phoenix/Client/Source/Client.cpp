@@ -139,8 +139,16 @@ void Client::onEvent(events::Event e)
 
 void Client::run()
 {
-	// Game* game = new Game(&m_window, &m_registry);
-	// m_layerStack.pushLayer(game);
+	Settings::get()->load("settings.txt");
+
+	LoggerConfig config;
+	config.logToFile = true;
+	config.logFile   = "PhoenixClient.log";
+	config.verbosity = LogVerbosity::DEBUG;
+	Logger::initialize(config);
+
+	Game* game = new Game(&m_window, &m_registry);
+	m_layerStack.pushLayer(game);
 
 	Timestep timer;
 	while (m_window.isRunning())
