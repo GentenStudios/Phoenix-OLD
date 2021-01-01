@@ -26,31 +26,36 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Client/Client.hpp>
-#include <Common/CLIParser.hpp>
-#include <Common/Logger.hpp>
+#pragma once
 
-#include <Common/CoreIntrinsics.hpp>
-#include <Common/Settings.hpp>
+#include <Client/Events/Event.hpp>
+#include <Client/Game/Timestep.hpp>
 
-using namespace phx;
+#include <string>
 
-#undef main
-int main(int argc, char** argv)
+namespace phx::client
 {
-	CLIParser parser;
+	class GameStateManager;
 
-	client::Client::get()->setupCLIParam(&parser);
-
-	// .parse returns true/false depending on success.
-	if (!parser.parse(argc, argv))
+	class GameState
 	{
-		// if error, things have already been outputted so we can just leave it
-		// here.
-		return 1;
-	}
+	public:
+		GameState(const std::string& stateName) : m_name(stateName) {}
+		virtual ~GameState() = default;
 
-	// client::Client::get()->run();
+		virtual void onEnter() = 0;
+		virtual void onExit()  = 0;
 
-	return 0;
-}
+		virtual void onEvent(events::Event& event) = 0;
+		virtual void onUpdate(const Timestep& dt)  = 0;
+
+		virtual void render() = 0;
+
+	protected:
+		friend class GameStateManager;
+
+	protected:
+		GameStateManager* m_gameManager;
+		std::string       m_name;
+	};
+} // namespace phx::client

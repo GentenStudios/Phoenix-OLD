@@ -2,6 +2,7 @@ add_subdirectory(Events)
 add_subdirectory(Graphics)
 add_subdirectory(Voxels)
 add_subdirectory(Game)
+add_subdirectory(Renderer)
 
 set(currentDir ${CMAKE_CURRENT_LIST_DIR})
 set(Headers

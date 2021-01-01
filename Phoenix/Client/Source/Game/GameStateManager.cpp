@@ -26,31 +26,70 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Client/Client.hpp>
-#include <Common/CLIParser.hpp>
-#include <Common/Logger.hpp>
+#include <Client/Game/GameStateManager.hpp>
 
-#include <Common/CoreIntrinsics.hpp>
-#include <Common/Settings.hpp>
+using namespace phx::client;
 
-using namespace phx;
-
-#undef main
-int main(int argc, char** argv)
+GameStateManager::GameStateManager(render::Window* window,
+                                   entt::registry* registry)
+    : m_window(window), m_registry(registry)
 {
-	CLIParser parser;
+}
 
-	client::Client::get()->setupCLIParam(&parser);
+GameStateManager::~GameStateManager()
+{
+	while (!m_states.empty())
+		popState();
+}
 
-	// .parse returns true/false depending on success.
-	if (!parser.parse(argc, argv))
+void GameStateManager::pushState(GameState* state)
+{
+	m_states.push_back(state);
+}
+
+void GameStateManager::popState()
+{
+	if (!m_states.empty())
 	{
-		// if error, things have already been outputted so we can just leave it
-		// here.
-		return 1;
+		delete m_states.back();
+		m_states.pop_back();
+	}
+}
+
+GameState* GameStateManager::getCurrentState()
+{
+	if (m_states.empty())
+	{
+		return nullptr;
 	}
 
-	// client::Client::get()->run();
+	return m_states.back();
+}
 
-	return 0;
+void GameStateManager::onEvent(events::Event& e)
+{
+	if (getCurrentState())
+	{
+		getCurrentState()->onEvent(e);
+	}
+}
+
+void GameStateManager::run()
+{
+	Timestep timer;
+
+	while (m_window->isRunning())
+	{
+		GameState* currentState = nullptr;
+
+		if ((currentState = getCurrentState()) == nullptr)
+		{
+			continue;
+		}
+
+		currentState->onUpdate(timer.step());
+		currentState->render();
+
+		m_window->swapBuffers();
+	}
 }

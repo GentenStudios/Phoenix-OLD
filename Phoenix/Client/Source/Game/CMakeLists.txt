@@ -3,6 +3,7 @@ set(Sources
 	${Sources}
 
 	${currentDir}/Timestep.cpp
+	${currentDir}/GameStateManager.cpp
 
 	PARENT_SCOPE
 )

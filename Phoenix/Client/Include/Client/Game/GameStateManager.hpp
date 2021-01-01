@@ -26,31 +26,34 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Client/Client.hpp>
-#include <Common/CLIParser.hpp>
-#include <Common/Logger.hpp>
+#pragma once
 
-#include <Common/CoreIntrinsics.hpp>
-#include <Common/Settings.hpp>
+#include <Client/Game/GameState.hpp>
+#include <Client/Game/Timestep.hpp>
+#include <Client/Renderer/Window.hpp>
 
-using namespace phx;
+#include <entt/entt.hpp>
 
-#undef main
-int main(int argc, char** argv)
+namespace phx::client
 {
-	CLIParser parser;
-
-	client::Client::get()->setupCLIParam(&parser);
-
-	// .parse returns true/false depending on success.
-	if (!parser.parse(argc, argv))
+	class GameStateManager : public events::IEventListener
 	{
-		// if error, things have already been outputted so we can just leave it
-		// here.
-		return 1;
-	}
+	public:
+		GameStateManager(render::Window* window, entt::registry* registry);
+		~GameStateManager();
 
-	// client::Client::get()->run();
+		void pushState(GameState* state);
+		void popState();
 
-	return 0;
-}
+		GameState* getCurrentState();
+
+		void onEvent(events::Event& e) override;
+		void run();
+
+	private:
+		render::Window* m_window;
+		entt::registry* m_registry;
+
+		std::vector<GameState*> m_states;
+	};
+} // namespace phx::client
