@@ -171,7 +171,7 @@ bool ActorSystem::action2(entt::registry* registry, entt::entity entity)
 				Metadata      data;
 				if (block.type->rotH)
 				{
-					math::vec3 rotation = {};
+					math::vec3 rotation;
 					if (dir.x > 0)
 					{
 						rotation.x += 180;
