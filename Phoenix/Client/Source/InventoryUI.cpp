@@ -40,16 +40,19 @@ InventoryUI::InventoryUI(gfx::Window* window, gfx::FPSCamera* camera,
       m_camera(camera), m_referrer(referrer)
 {
 }
+
 void InventoryUI::onAttach()
 {
 	m_active = true;
 	m_camera->enable(false);
 }
+
 void InventoryUI::onDetach()
 {
 	m_active = false;
 	m_camera->enable(true);
 }
+
 void InventoryUI::onEvent(events::Event& e)
 {
 	if (e.type == events::EventType::KEY_PRESSED &&
@@ -60,6 +63,7 @@ void InventoryUI::onEvent(events::Event& e)
 		e.handled = true;
 	}
 }
+
 void InventoryUI::tick(float dt)
 {
 	ImGui::SetNextWindowPos({m_window->getSize().x / 2, 100});
@@ -88,10 +92,12 @@ void InventoryUI::tick(float dt)
 			ImGui::SameLine();
 		}
 		const voxels::Item item = m_inventory->getItem(i);
+		ImGui::PushID(i);
 		if (item.type == nullptr)
 		{
 			if (ImGui::Button("", {50, 50}))
 			{
+				LOG_DEBUG("Inv") << "Click";
 				if (m_holding.type != nullptr)
 				{
 					m_inventory->addItem(i, m_holding);
@@ -115,6 +121,7 @@ void InventoryUI::tick(float dt)
 				}
 			}
 		}
+		ImGui::PopID();
 	}
 	ImGui::End();
 	ImGui::SetNextWindowPos({m_window->getSize().x - CREATIVE_WIDTH,

@@ -52,24 +52,25 @@ namespace phx
 	struct Hand
 	{
 	public:
-		Hand(size_t hand, voxels::Inventory* hotbar)
-		    : m_hand(hand), hotbar(hotbar) {};
-		voxels::Item getHand() const { return hotbar->getItem(m_hand); };
+		Hand(size_t hand, voxels::Inventory* inv)
+		    : m_hand(hand), inventory(inv) {};
+		voxels::Item getHand() const { return inventory->getItem(m_hand); };
 
 		void setHandSlot(std::size_t slot)
 		{
 			if (slot < 0)
 			{
-				m_hand = hotbar->getSize() - 1;
+				m_hand = size - 1;
 			}
 			else
 			{
-				m_hand = slot % hotbar->getSize();
+				m_hand = slot % size;
 			}
 		};
 		std::size_t getHandSlot() const { return m_hand; };
 
-		voxels::Inventory* hotbar;
+		voxels::Inventory*           inventory;
+		static constexpr std::size_t size = 10;
 
 	private:
 		std::size_t m_hand;

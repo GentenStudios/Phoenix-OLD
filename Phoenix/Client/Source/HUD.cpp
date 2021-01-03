@@ -71,17 +71,13 @@ void HUD::tick(float dt)
 		}
 
 		Hand& hand = m_registry->get<Hand>(m_player);
-		for (size_t i = 0; i < 10; i++)
+		for (size_t i = 0; i < hand.size; i++)
 		{
-			if ((i % 10) != 0)
-			{
-				ImGui::SameLine();
-			}
 			if (i == hand.getHandSlot())
 			{
 				ImGui::PushStyleColor(ImGuiCol_Button, {0.f, 1.f, 0.f, 1.f});
 			}
-			const voxels::ItemType* item = hand.hotbar->getItem(i).type;
+			const voxels::ItemType* item = hand.inventory->getItem(i).type;
 			if (item == nullptr)
 			{
 				ImGui::Button("", {50, 50});
@@ -94,6 +90,7 @@ void HUD::tick(float dt)
 			{
 				ImGui::PopStyleColor(1);
 			}
+			ImGui::SameLine();
 		}
 	}
 	ImGui::End();

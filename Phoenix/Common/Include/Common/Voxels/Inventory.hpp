@@ -33,6 +33,12 @@
 
 namespace phx::voxels
 {
+	/**
+	 * @brief Item storage container
+	 *
+	 * This is essentially a specialized wrapper for a vector of items and a
+	 * map of metadata.
+	 */
 	class Inventory : public ISerializable
 	{
 	public:
@@ -51,7 +57,7 @@ namespace phx::voxels
 		Item getItem(std::size_t slot);
 
 		/**
-		 * Add an item to the inventory.
+		 * Add an item to a specified slot in the inventory.
 		 * @param slot The slot you want to insert the item into.
 		 * @param item The item you want to insert into the inventory.
 		 * @return true If the item was inserted.

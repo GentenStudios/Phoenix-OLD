@@ -134,7 +134,7 @@ void Game::onAttach()
 	    new voxels::InventoryManager(m_save, &m_itemRegistry.referrer);
 	m_playerInventory =
 	    m_invManager->getInventory(m_invManager->createInventory(30));
-	auto hotbar = m_invManager->getInventory(m_invManager->createInventory(10));
+	m_registry->emplace<Hand>(m_player, std::size_t(1), m_playerInventory);
 
 	if (m_network)
 	{
@@ -148,8 +148,6 @@ void Game::onAttach()
 	m_registry->emplace<PlayerView>(m_player, m_map);
 	m_camera = new gfx::FPSCamera(m_window, m_registry);
 	m_camera->setActor(m_player);
-
-	m_registry->emplace<Hand>(m_player, std::size_t(1), hotbar);
 
 	LOG_INFO("MAIN") << "Prepare rendering";
 

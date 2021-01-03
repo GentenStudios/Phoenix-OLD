@@ -64,6 +64,7 @@ bool Inventory::addItem(std::size_t slot, const Item& item)
 		}
 		return true;
 	}
+	LOG_DEBUG("Inv") << getItem(slot).type << m_size << slot;
 	return false;
 }
 

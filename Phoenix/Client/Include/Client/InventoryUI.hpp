@@ -57,11 +57,14 @@ namespace phx::client
 		void onEvent(events::Event& e) override;
 		void tick(float dt) override;
 
-		bool isActive() { return m_active; };
+		bool isActive() const { return m_active; };
 
-		static constexpr float WIDTH           = 590;
-		static constexpr float HEIGHT          = 300;
-		static constexpr float CREATIVE_WIDTH  = 300;
+		// (10 slots * btn width) + (11 margins * margin width)
+		static constexpr float WIDTH = (10 * 50) + (11 * 8);
+		// (3 slots * btn height) + (4 margins * margin height) + title bar
+		static constexpr float HEIGHT = (3 * 50) + (4 * 8) + 15;
+		// (5 slots * btn width) + (6 margins * margin width) + scrollbar
+		static constexpr float CREATIVE_WIDTH  = (5 * 50) + (6 * 8) + 10;
 		static constexpr float CREATIVE_HEIGHT = 600;
 
 	private:
