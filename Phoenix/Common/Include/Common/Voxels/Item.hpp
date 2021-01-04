@@ -61,8 +61,8 @@ namespace phx::voxels
 	{
 	public:
 		// the base ItemReferrer object implements this.
-		static constexpr std::size_t UNKNOWN_ITEM       = 0;
-		static constexpr std::size_t OUT_OF_BOUNDS_ITEM = 1;
+		static constexpr std::size_t UNKNOWN_ITEM = 0;
+		static constexpr std::size_t INVALID_ITEM = 1;
 
 	public:
 		ItemType()  = default;
