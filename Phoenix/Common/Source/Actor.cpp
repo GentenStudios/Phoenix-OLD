@@ -163,34 +163,44 @@ bool ActorSystem::action2(entt::registry* registry, entt::entity entity)
 			math::vec3 back = ray.backtrace(RAY_INCREMENT);
 			back.floor();
 
-			voxels::Block block = {registry->get<Hand>(entity).hand, nullptr};
-			Metadata      data;
-			if (block.type->rotH)
+			voxels::ItemType* item = registry->get<Hand>(entity).hand;
+			if (!item->places.empty())
 			{
-				math::vec3 rotation = {};
-				if (dir.x > 0)
+				voxels::Block block {m_blockReferrer->getByID(item->places),
+				                     nullptr};
+				Metadata      data;
+				if (block.type->rotH)
 				{
-					rotation.x += 180;
+					math::vec3 rotation;
+					if (dir.x > 0)
+					{
+						rotation.x += 180;
+					}
+					if (dir.z > 0)
+					{
+						rotation.x += 90;
+					}
+					if (rotation.x > 0)
+					{
+						data.set("core.rotation", rotation);
+					}
 				}
-				if (dir.z > 0)
+				if (data.size() > 0)
 				{
-					rotation.x += 90;
+					block.metadata = &data;
 				}
-				if (rotation.x > 0)
+
+				map->setBlockAt(back, block);
+
+				// TODO move this to the map code
+				if (block.type->onPlace)
 				{
-					data.set("core.rotation", rotation);
+					block.type->onPlace(back.x, back.y, back.z);
 				}
 			}
-			if (data.size() > 0)
+			if (item->onPlace)
 			{
-				block.metadata = &data;
-			}
-
-			map->setBlockAt(back, block);
-
-			if (block.type->onPlace)
-			{
-				block.type->onPlace(back.x, back.y, back.z);
+				item->onPlace(back.x, back.y, back.z);
 			}
 
 			return true;
