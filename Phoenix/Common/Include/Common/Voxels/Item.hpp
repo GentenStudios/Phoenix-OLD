@@ -57,12 +57,12 @@ namespace phx::voxels
 	 * world. For example a dirt block will have the same basic information
 	 * every time it exists in the world.
 	 */
-	class ItemType
+	struct ItemType
 	{
 	public:
 		// the base ItemReferrer object implements this.
-		static constexpr std::size_t UNKNOWN_ITEM       = 0;
-		static constexpr std::size_t OUT_OF_BOUNDS_ITEM = 1;
+		static constexpr std::size_t UNKNOWN_ITEM = 0;
+		static constexpr std::size_t INVALID_ITEM = 1;
 
 	public:
 		ItemType()  = default;

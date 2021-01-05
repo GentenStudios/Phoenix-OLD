@@ -96,6 +96,11 @@ namespace phx::voxels
 			    blocks.get(voxels::BlockType::UNKNOWN_BLOCK));
 		}
 
+		/**
+		 * @brief Gets a BlockType from the registry by its string ID.
+		 * @param id The string ID of the BlockType.
+		 * @return Pointer to the block matching the string ID.
+		 */
 		BlockType* getByID(const std::string& id)
 		{
 			return blocks.get(*referrer.get(id));

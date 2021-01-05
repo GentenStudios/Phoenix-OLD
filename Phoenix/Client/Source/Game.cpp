@@ -295,6 +295,9 @@ void Game::onEvent(events::Event& e)
 		break;
 	default:
 		break;
+	case events::EventType::WINDOW_RESIZED:
+		m_camera->onWindowResize(e);
+		break;
 	}
 }
 
