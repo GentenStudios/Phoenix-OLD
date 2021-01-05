@@ -50,7 +50,7 @@ Item Inventory::getItem(std::size_t slot)
 		}
 		return {m_slots[slot], nullptr};
 	}
-	return {m_referrer->items.get(ItemType::OUT_OF_BOUNDS_ITEM), nullptr};
+	return {m_referrer->items.get(ItemType::INVALID_ITEM), nullptr};
 }
 
 bool Inventory::addItem(std::size_t slot, const Item& item)
@@ -99,7 +99,7 @@ Item Inventory::removeItem(std::size_t slot)
 		}
 		return item;
 	}
-	return {m_referrer->items.get(ItemType::OUT_OF_BOUNDS_ITEM), nullptr};
+	return {m_referrer->items.get(ItemType::INVALID_ITEM), nullptr};
 }
 
 /**
