@@ -16,7 +16,8 @@ add_subdirectory (sol2)
 add_subdirectory (lua)
 add_subdirectory (enet)
 add_subdirectory (entt)
-add_subdirectory (json)
+add_subdirectory(json)
+add_subdirectory(Catch2)
 
 # Stop SDL trying to control our main function.
 target_compile_definitions(SDL2main INTERFACE SDL_MAIN_HANDLED)
@@ -48,20 +49,20 @@ set(PHX_THIRD_PARTY_INCLUDES
 )
 
 set(PHX_THIRD_PARTY_LIBRARIES
-	SDL2-static 
-	SDL2main
-	Glad
-	ImGui
-	enet
-	sol2
-	liblua
-	nlohmann_json::nlohmann_json
-	$<$<PLATFORM_ID:Windows>:opengl32.lib> # link to opengl32.lib if windows.
-	$<$<PLATFORM_ID:Windows>:ws2_32.lib> # link to ws2_32.lib if windows.
-	$<$<PLATFORM_ID:Windows>:winmm.lib> # link to winmm.lib if windows.
-
-	PARENT_SCOPE
-)
+	SDL2-static
+		SDL2main
+		Glad
+		ImGui
+		enet
+		sol2
+		liblua
+		nlohmann_json::nlohmann_json
+		$<$<PLATFORM_ID:Windows>:opengl32.lib> # link to opengl32.lib if windows.
+		$<$<PLATFORM_ID:Windows>:ws2_32.lib> # link to ws2_32.lib if windows.
+		$<$<PLATFORM_ID:Windows>:winmm.lib> # link to winmm.lib if windows.
+		#Catch2::Catch2
+		PARENT_SCOPE
+		)
 
 target_compile_options(sol2 INTERFACE
   $<$<CXX_COMPILER_ID:MSVC>:/wd4996>
