@@ -73,3 +73,15 @@ voxel.block.register({
     rotV = true,
     textures = { "Assets/xpanel.png", "Assets/1.png", "Assets/2.png", "Assets/3.png", "Assets/dirt.png" }
 })
+
+register_block_pair("Chest", "core.chest_normal",
+    {
+        "chest_normal_front.png", "chest_normal_side.png", "chest_normal_side.png",
+        "chest_normal_side.png", "chest_normal_top.png", "chest_normal_bottom.png"
+    }, "chest_normal_front.png")
+register_block_pair("Iron Chest", "core.chest_iron", --Jack Co. Supply Crate ;3
+    {
+        "chest_iron_front.png", "chest_iron_side.png", "chest_iron_side.png",
+        "chest_iron_side.png", "chest_iron_top.png", "chest_iron_bottom.png"
+    }, "chest_iron_front.png")
+	
