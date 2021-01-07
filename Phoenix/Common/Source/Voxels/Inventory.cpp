@@ -159,4 +159,5 @@ phx::Serializer& Inventory::operator<<(phx::Serializer& ser)
 			m_metadata.emplace(i, data);
 		}
 	}
+	return ser;
 }
