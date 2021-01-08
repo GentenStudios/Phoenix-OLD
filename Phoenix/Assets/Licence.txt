@@ -1,10 +1,12 @@
 https://creativecommons.org/licenses/by-sa/3.0/deed
 CC BY-SA 3.0 UNPORTED. Created by toby109tt (Toby Plowy)
 
+TPXF.ttf
 test.png
 Crosshair.png
 unknown.png
 
-Chose a license. Created by beeperdeeper089
+https://creativecommons.org/licenses/by-sa/3.0/deed
+CC BY-SA 3.0 UNPORTED. Created by beeperdeeper089 (Vyom Fadia)
 
 GSLogo.png
