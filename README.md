@@ -6,7 +6,7 @@ Project Phoenix is an open world sandbox style voxel game with a twist. The prog
 More information on this project and its mission can be found [here](https://docs.google.com/document/d/1vwmE24GTWhpxHRwjLutI63bD4uRy_4bxJ21YoKZWDv8).
 
 ## Community
-[Here's a link to our public discord server](https://discord.gg/XRttqAm), where we collaborate and discuss the development of the Phoenix.
+[Here's a link to our public discord server](https://discord.gg/XRttqAm), where we collaborate and discuss the development of Phoenix.
 [Here's a link to our community guidelines](./CODE_OF_CONDUCT.md)
 
 ## Dependencies

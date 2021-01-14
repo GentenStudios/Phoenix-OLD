@@ -28,87 +28,60 @@
 
 #pragma once
 
-#include <Common/Voxels/Block.hpp>
 #include <Common/Registry.hpp>
+#include <Common/Voxels/Item.hpp>
 
 #include <string>
 
 namespace phx::voxels
 {
 	/**
-	 * @brief Acts as a universal pairing between string and block.
+	 * @brief Acts as a universal pairing between string and item.
 	 *
-	 * This class is a universal struct that can be passed around to act as a minimal set of data.
+	 * This class is a universal struct that can be passed around to act as a
+	 * minimal set of data.
 	 *
-	 * Originally we had a BlockRegistry that was on the Client/Server but we
-	 * realised that things like the Server don't need to store data about
-	 * textures and the likes, so by only having this as a common piece between
-	 * the two, the Client and Server can store extra data that they actually
-	 * need and potentially reduce unnecessary memory usage.
-	 *
-	 * Each application implements their own BlockRegistry with a few more
-	 * pieces of data and lua registration methods.
+	 * Each application implements their own Registry with a few more pieces
+	 * of data and lua registration methods.
 	 */
-	struct BlockReferrer
+	struct ItemReferrer
 	{
 		/**
 		 * @brief Automatically implements the Unknown, Out of Bounds and Air
 		 * blocks as necessary.
 		 */
-		BlockReferrer()
+		ItemReferrer()
 		{
-			// this will be 0, which is equivalent to BlockType::UNKNOWN_BLOCK
-			auto              uid = referrer.size();
-			voxels::BlockType unknown;
-			unknown.displayName      = "Unknown Block";
+			// this will be 0, which is equivalent to ItemType::UNKNOWN_ITEM
+			auto             uid = referrer.size();
+			voxels::ItemType unknown;
+			unknown.displayName      = "Unknown Item";
 			unknown.id               = "core.unknown";
-			unknown.category         = voxels::BlockCategory::SOLID;
 			unknown.uniqueIdentifier = uid;
 			referrer.add(unknown.id, uid);
-			blocks.add(uid, unknown);
+			items.add(uid, unknown);
 
 			// this will be 1, which is equivalent to
-			// BlockType::OUT_OF_BOUNDS_BLOCK.
+			// ItemType::OUT_OF_BOUNDS_ITEM.
 			uid = referrer.size();
-			voxels::BlockType outOfBounds;
+			voxels::ItemType outOfBounds;
 			outOfBounds.displayName      = "Out of Bounds";
-			outOfBounds.id               = "core.out_ouf_bounds";
-			outOfBounds.category         = voxels::BlockCategory::AIR;
+			outOfBounds.id               = "core.out_of_bounds";
 			outOfBounds.uniqueIdentifier = uid;
 			referrer.add(outOfBounds.id, uid);
-			blocks.add(uid, outOfBounds);
-
-			// this will be 2, which is equivalent to BlockType::AIR_BLOCK.
-			uid = referrer.size();
-			voxels::BlockType air;
-			air.displayName      = "Air";
-			air.id               = "core.air";
-			air.category         = voxels::BlockCategory::AIR;
-			air.uniqueIdentifier = uid;
-			referrer.add(air.id, uid);
-			blocks.add(uid, air);
+			items.add(uid, outOfBounds);
 
 			// by default will return unknown blocks if they don't exist.
 			// a tiny bit hacky but solves a lot of problems without writing a
 			// bunch of unnecessary code.
 			referrer.setUnknownReturnVal(referrer.get("core.unknown"));
-			blocks.setUnknownReturnVal(
-			    blocks.get(voxels::BlockType::UNKNOWN_BLOCK));
+			items.setUnknownReturnVal(
+			    items.get(voxels::ItemType::UNKNOWN_ITEM));
 		}
 
-		/**
-		 * @brief Gets a BlockType from the registry by its string ID.
-		 * @param id The string ID of the BlockType.
-		 * @return Pointer to the block matching the string ID.
-		 */
-		BlockType* getByID(const std::string& id)
-		{
-			return blocks.get(*referrer.get(id));
-		};
-
 		// referrer refers a string to int, which in turn is used to get the
-		// blocktype.
+		// item type.
 		Registry<std::string, std::size_t> referrer;
-		Registry<std::size_t, BlockType>   blocks;
+		Registry<std::size_t, ItemType>    items;
 	};
 } // namespace phx::voxels

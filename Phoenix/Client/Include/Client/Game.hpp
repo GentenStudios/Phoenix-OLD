@@ -42,6 +42,7 @@
 #include <Client/InputQueue.hpp>
 #include <Client/HUD.hpp>
 
+#include <Client/Voxels/ItemRegistry.hpp>
 #include <Common/CMS/ModManager.hpp>
 #include <Common/Save.hpp>
 
@@ -90,6 +91,7 @@ namespace phx::client
 
 	private:
 		BlockRegistry m_blockRegistry;
+		ItemRegistry  m_itemRegistry;
 
 		entt::registry* m_registry;
 		entt::entity    m_player;
