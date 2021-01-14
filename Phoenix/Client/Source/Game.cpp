@@ -80,7 +80,6 @@ Game::Game(gfx::Window* window, entt::registry* registry, bool networked)
 		m_network->sendMessage(text);
 	});
 
-	Settings::get()->registerAPI(m_modManager);
 	InputMap::get()->registerAPI(m_modManager);
 	CommandBook::get()->registerAPI(m_modManager);
 

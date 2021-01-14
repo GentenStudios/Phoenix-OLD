@@ -68,7 +68,7 @@ namespace phx::client
 		};
 		Page m_page = Page::MAIN;
 
-		int      m_currentSensitivity = 1;
-		Setting* m_sensitivity        = nullptr;
+		float          m_currentSensitivity = 50.f;
+		Setting<float> m_sensitivity;
 	};
 } // namespace phx::client

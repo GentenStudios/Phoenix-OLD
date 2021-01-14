@@ -112,7 +112,13 @@ void Client::onEvent(events::Event e)
 
 void Client::run()
 {
-	Settings::get()->load("settings.txt");
+	if (!Settings::instance()->parse("settings.txt"))
+	{
+		LOG_FATAL("STARTUP") << "Settings file failed to load. Please fix and "
+		                        "restart the client.";
+
+		exit(EXIT_FAILURE);
+	}
 
 	LoggerConfig config;
 	config.logToFile = true;
@@ -134,5 +140,5 @@ void Client::run()
 		m_window.endFrame();
 	}
 
-	Settings::get()->save("settings.txt");
+	Settings::instance()->save();
 }

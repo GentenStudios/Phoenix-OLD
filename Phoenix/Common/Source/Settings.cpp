@@ -35,130 +35,54 @@
 
 using namespace phx;
 
-Setting::Setting(std::string name, std::string key, int defaultValue,
-                 json* json_)
-    : m_name(std::move(name)), m_key(std::move(key)), m_value(defaultValue),
-      m_maxValue(SHRT_MAX), m_minValue(SHRT_MIN), m_default(defaultValue),
-      m_json(json_)
+Settings* Settings::instance()
 {
+	static Settings s_instance;
+	return &s_instance;
 }
 
-bool Setting::set(int value)
+bool Settings::parse(const std::string& configFile)
 {
-	if (value >= m_minValue && value <= m_maxValue)
+	m_configFilePath = configFile;
+
+	std::string data;
+
 	{
-		m_value          = value;
-		(*m_json)[m_key] = value;
-		return true;
-	}
-	return false;
-}
-
-void Setting::reset() { set(m_default); }
-
-void Setting::setMax(int value) { m_maxValue = value; }
-
-void Setting::setMin(int value) { m_minValue = value; }
-
-const std::string& Setting::getKey() const { return m_key; }
-
-const std::string& Setting::getName() const { return m_name; }
-
-int Setting::value() const { return m_value; }
-
-int Setting::getDefault() const { return m_default; }
-
-Settings::Settings() : m_data(json::object()) {}
-
-void Settings::registerAPI(cms::ModManager* manager)
-{
-	manager->registerFunction(
-	    "core.setting.register",[manager, this](sol::table data) {
-          sol::optional<std::string> name = data["name"];
-          if (!name)
-          {
-              // log the error and return to make this a recoverable error.
-              LOG_FATAL("MODDING")
-                      << "The mod at: " << manager->getCurrentModPath()
-                      << " attempted to register a block without "
-                      << "specifying a key.";
-              return;
-          }
-          sol::optional<std::string> key = data["key"];
-          if (!key)
-          {
-              // log the error and return to make this a recoverable error.
-              LOG_FATAL("MODDING")
-                      << "The mod at: " << manager->getCurrentModPath()
-                      << " attempted to register a setting without "
-                      << "specifying a key.";
-              return;
-          }
-          sol::optional<int> defaultVal = data["default"];
-          if (!defaultVal){defaultVal = 0;}
-
-		  auto setting = Settings::get()->add(*name, *key, *defaultVal);
-
-          sol::optional<int> max = data["max"];
-          if (max){setting->setMax(*max);}
-          sol::optional<int> min = data["min"];
-          if (min){setting->setMin(*min);}
-	    });
-
-	manager->registerFunction("core.setting.get", [](std::string key) {
-		return Settings::get()->getSetting(key)->value();
-	});
-
-	manager->registerFunction("core.setting.set",
-	                          [](std::string key, int value) {
-		                          Settings::get()->getSetting(key)->set(value);
-	                          });
-}
-
-Setting* Settings::add(const std::string& name, const std::string& key,
-                       int defaultValue)
-{
-	m_settings[key] = Setting(name, key, defaultValue, &m_data);
-	return &m_settings[key];
-}
-
-Setting* Settings::getSetting(const std::string& key)
-{
-	if (m_data.find(key) != m_data.end())
-	{
-		if (m_settings.find(key) == m_settings.end())
+		std::ifstream file {m_configFilePath};
+		if (!file.is_open())
 		{
-			add(key, key, m_data[key].get<int>());
+			return false;
 		}
-		return &m_settings[key];
+
+		file.seekg(0, std::ios::end);
+		data.resize(file.tellg());
+		file.seekg(0, std::ios::beg);
+		file.read(&data[0], data.size());
 	}
-	else
+	
+	m_settings = nlohmann::json::parse(data, nullptr, false);
+
+	// is_discarded returns false if the parsing failed.
+	if (m_settings.is_discarded())
 	{
-		m_data[key] = 0;
-		return add(key, key, 0);
+		return false;
 	}
+
+	return true;
 }
 
-void Settings::load(const std::string& saveFile)
+void Settings::save()
 {
-	std::ifstream file;
-	file.open(saveFile);
-	if (file)
-	{
-		file >> m_data;
-	}
-	file.close();
+	std::ofstream file {m_configFilePath};
+	file << std::setw(4) << m_settings << std::endl;
 }
 
-void Settings::save(const std::string& saveFile)
+void Settings::saveTo(const std::string& newConfig)
 {
-	std::ofstream file;
-	file.open(saveFile);
-	file << std::setw(4) << m_data << std::endl;
-	file.close();
+	m_configFilePath = newConfig;
 }
 
-const std::unordered_map<std::string, Setting>& Settings::getSettings()
+bool Settings::exists(const std::string& key) const
 {
-    return m_settings;
+	return m_settings.find(key) != m_settings.end();
 }

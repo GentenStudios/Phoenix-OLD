@@ -35,7 +35,8 @@ using namespace phx::client;
 using namespace phx;
 
 EscapeMenu::EscapeMenu(gfx::Window* window)
-    : gfx::Overlay("EscapeMenu"), m_window(window)
+    : gfx::Overlay("EscapeMenu"), m_window(window),
+      m_sensitivity(Settings::instance()->getOr("camera:sensitivity", 50.f))
 {
 }
 
@@ -43,10 +44,11 @@ void EscapeMenu::onAttach()
 {
 	m_page = Page::MAIN;
 
-	m_sensitivity        = Settings::get()->getSetting("camera:sensitivity");
-	m_currentSensitivity = m_sensitivity->value();
+	m_currentSensitivity = m_sensitivity;
 }
+
 void EscapeMenu::onDetach() {}
+
 void EscapeMenu::onEvent(events::Event& e)
 {
 	switch (e.type)
@@ -91,19 +93,20 @@ void EscapeMenu::tick(float dt)
 		}
 		break;
 	case Page::SETTINGS:
-		const std::unordered_map<std::string, Setting>& settings =
-		    Settings::get()->getSettings();
+		//const std::unordered_map<std::string, Setting>& settings =
+		//    Settings::get()->getSettings();
 
-		for (const auto& setting : settings)
-		{
-			int i = setting.second.value();
-			ImGui::SliderInt(setting.second.getName().c_str(), &i,
-			                 setting.second.getMin(), setting.second.getMax());
-			if (i != setting.second.value())
-			{
-				Settings::get()->getSetting(setting.second.getKey())->set(i);
-			}
-		}
+		//for (const auto& setting : settings)
+		//{
+		//	int i = setting.second.value();
+		//	ImGui::SliderInt(setting.second.getName().c_str(), &i,
+		//	                 setting.second.getMin(), setting.second.getMax());
+		//	if (i != setting.second.value())
+		//	{
+		//		Settings::get()->getSetting(setting.second.getKey())->set(i);
+		//	}
+		//}
+
 		if (ImGui::Button("Back", {290, 30}))
 		{
 			m_page = Page::MAIN;

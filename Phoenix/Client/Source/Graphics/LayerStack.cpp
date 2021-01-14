@@ -32,7 +32,6 @@
 #include <algorithm>
 
 using namespace phx::gfx;
-using namespace phx;
 
 LayerStack::LayerStack(gfx::Window* window) : m_window(window) {}
 
