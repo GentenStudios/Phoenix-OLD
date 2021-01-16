@@ -32,24 +32,23 @@
 #include <imgui.h>
 
 using namespace phx::client;
-using namespace phx;
 
-EscapeMenu::EscapeMenu(gfx::Window* window)
-    : gfx::Overlay("EscapeMenu"), m_window(window),
-      m_sensitivity(Settings::instance()->getOr("camera:sensitivity", 50.f))
+EscapeMenu::EscapeMenu(phx::gfx::Window* window)
+    : phx::gfx::Overlay("EscapeMenu"), m_window(window)
 {
+	// all settings have definitely been loaded by now.
+	// get the final settings list from settings instance.
+	m_settings = Settings::instance()->getImplFinalSettings();
 }
 
 void EscapeMenu::onAttach()
 {
 	m_page = Page::MAIN;
-
-	m_currentSensitivity = m_sensitivity;
 }
 
 void EscapeMenu::onDetach() {}
 
-void EscapeMenu::onEvent(events::Event& e)
+void EscapeMenu::onEvent(phx::events::Event& e)
 {
 	switch (e.type)
 	{
@@ -76,10 +75,16 @@ void EscapeMenu::onEvent(events::Event& e)
 
 void EscapeMenu::tick(float dt)
 {
+	static const double      DoubleMax = 100.0;
+	static const double      DoubleMin = 0.0;
+	static const std::size_t IntMax    = 100;
+	static const std::size_t IntMin    = 0;
+	
 	ImGui::SetNextWindowPos({m_window->getSize().x / 2 - WIDTH / 2,
 	                         m_window->getSize().y / 2 - HEIGHT / 2});
 
 	ImGui::Begin("Menu", nullptr, ImGuiWindowFlags_NoResize);
+
 	switch (m_page)
 	{
 	case Page::MAIN:
@@ -92,20 +97,32 @@ void EscapeMenu::tick(float dt)
 			m_window->close();
 		}
 		break;
-	case Page::SETTINGS:
-		//const std::unordered_map<std::string, Setting>& settings =
-		//    Settings::get()->getSettings();
-
-		//for (const auto& setting : settings)
-		//{
-		//	int i = setting.second.value();
-		//	ImGui::SliderInt(setting.second.getName().c_str(), &i,
-		//	                 setting.second.getMin(), setting.second.getMax());
-		//	if (i != setting.second.value())
-		//	{
-		//		Settings::get()->getSetting(setting.second.getKey())->set(i);
-		//	}
-		//}
+	case Page::SETTINGS:		
+		for (auto& setting : m_settings)
+		{
+			if (setting.val->is_boolean())
+			{
+				ImGui::Checkbox(setting.key.c_str(),
+				                setting.val->get_ptr<bool*>());
+			}
+			else if (setting.val->is_number_float())
+			{
+				double* val = setting.val->get_ptr<double*>();
+				ImGui::SliderScalar(
+				    setting.key.c_str(), ImGuiDataType_Double,
+				    static_cast<void*>(setting.val->get_ptr<double*>()),
+				    static_cast<const void*>(&DoubleMin),
+				    static_cast<const void*>(&DoubleMax), "%.2f");
+			}
+			else if (setting.val->is_number_integer())
+			{
+				ImGui::SliderScalar(
+				    setting.key.c_str(), ImGuiDataType_S64,
+				    static_cast<void*>(setting.val->get_ptr<std::size_t*>()),
+				    static_cast<const void*>(&IntMin),
+				    static_cast<const void*>(&IntMax));
+			}
+		}
 
 		if (ImGui::Button("Back", {290, 30}))
 		{
@@ -113,5 +130,6 @@ void EscapeMenu::tick(float dt)
 		}
 		break;
 	}
+
 	ImGui::End();
 }

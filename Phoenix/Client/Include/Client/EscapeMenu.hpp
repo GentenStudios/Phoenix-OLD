@@ -67,8 +67,7 @@ namespace phx::client
 			SETTINGS
 		};
 		Page m_page = Page::MAIN;
-
-		float          m_currentSensitivity = 50.f;
-		Setting<float> m_sensitivity;
+		
+		std::vector<Settings::KeyValPair> m_settings;
 	};
 } // namespace phx::client

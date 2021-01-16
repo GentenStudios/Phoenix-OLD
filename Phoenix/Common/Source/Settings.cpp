@@ -31,7 +31,7 @@
 #include <climits>
 #include <fstream>
 #include <iomanip>
-#include <iostream>
+#include <string>
 
 using namespace phx;
 
@@ -39,6 +39,96 @@ Settings* Settings::instance()
 {
 	static Settings s_instance;
 	return &s_instance;
+}
+
+void Settings::registerAPI(cms::ModManager* manager)
+{
+	// this lua integration only supports int, float, bool and strings right
+	// now.
+
+#define PHX_LUA_OVERLOAD(type)                                              \
+	[](const std::string& key, type defaultValue) {                         \
+		if (Settings::instance()->valid<type>(key))                         \
+		{                                                                   \
+			return static_cast<type>(                                       \
+			    Settings::instance()->get<type>(key, true));                \
+		}                                                                   \
+		if (!Settings::instance()->exists(key))                             \
+		{                                                                   \
+			return static_cast<type>(Settings::instance()->get<type>(key) = \
+			                             defaultValue);                     \
+		}                                                                   \
+		return defaultValue;                                                \
+	}
+
+	// we manually define the string one because we pass defaultValue as a const
+	// reference.
+	manager->registerFunction(
+	    "core.settings.get",
+	    sol::overload(
+	        PHX_LUA_OVERLOAD(int), PHX_LUA_OVERLOAD(float),
+	        PHX_LUA_OVERLOAD(bool),
+	        [](const std::string& key, const std::string& defaultValue) {
+		        if (Settings::instance()->valid<std::string>(key))
+		        {
+			        return static_cast<std::string>(
+			            Settings::instance()->get<std::string>(key, true));
+		        }
+
+		        if (!Settings::instance()->exists(key))
+		        {
+			        // get or will create an object since we know it doesn't
+			        // exist.
+			        // not super performant since the "exists" gets called twice
+			        // but since this is ideally done at the start of a game
+			        // being loaded, it should be fine.
+			        Settings::instance()->get<std::string>(key) = defaultValue;
+		        }
+
+		        return defaultValue;
+	        }));
+
+#undef PHX_LUA_OVERLOAD
+#define PHX_LUA_OVERLOAD(type)                                                 \
+	[](const std::string& key, type value) {                                   \
+		if (Settings::instance()->valid<type>(key))                            \
+		{                                                                      \
+			Settings::instance()->get<type>(key, true) = value;                \
+		}                                                                      \
+		else                                                                   \
+		{                                                                      \
+			if (!Settings::instance()->exists(key))                            \
+			{                                                                  \
+				Settings::instance()->get<type>(key) = value;                  \
+			}                                                                  \
+                                                                               \
+			LOG_FATAL("MODDING") << "A mod is attempting to store an invalid " \
+			                        "value into a setting.";                   \
+		}                                                                      \
+	}
+
+	manager->registerFunction(
+	    "core.settings.set",
+	    sol::overload(
+	        PHX_LUA_OVERLOAD(int), PHX_LUA_OVERLOAD(float),
+	        PHX_LUA_OVERLOAD(bool),
+	        [](const std::string& key, const std::string& value) {
+		        if (Settings::instance()->valid<std::string>(key))
+		        {
+			        Settings::instance()->get<std::string>(key, true) = value;
+		        }
+		        else
+		        {
+			        if (!Settings::instance()->exists(key))
+			        {
+				        Settings::instance()->get<std::string>(key) = value;
+			        }
+
+			        LOG_FATAL("MODDING")
+			            << "A mod is attempting to store an invalid "
+			               "value into a setting.";
+		        }
+	        }));
 }
 
 bool Settings::parse(const std::string& configFile)
@@ -59,7 +149,7 @@ bool Settings::parse(const std::string& configFile)
 		file.seekg(0, std::ios::beg);
 		file.read(&data[0], data.size());
 	}
-	
+
 	m_settings = nlohmann::json::parse(data, nullptr, false);
 
 	// is_discarded returns false if the parsing failed.
@@ -85,4 +175,22 @@ void Settings::saveTo(const std::string& newConfig)
 bool Settings::exists(const std::string& key) const
 {
 	return m_settings.find(key) != m_settings.end();
+}
+
+std::vector<Settings::KeyValPair> Settings::getImplFinalSettings()
+{
+	std::vector<KeyValPair> finalSettings;
+
+	for (auto& [key, val] : m_settings.items())
+	{
+		if (m_invalidOverwriter.find(key) == m_invalidOverwriter.end())
+		{
+			finalSettings.push_back({key, &val});
+			continue;
+		}
+
+		finalSettings.push_back({key, &m_invalidOverwriter[key]});
+	}
+
+	return finalSettings;
 }

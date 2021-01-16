@@ -119,11 +119,20 @@ namespace phx
 	class Settings
 	{
 	public:
+		struct KeyValPair
+		{
+			std::string key;
+			nlohmann::json* val;
+		};
+		
+	public:
 		Settings()  = default;
 		~Settings() = default;
 
 		static Settings* instance();
 
+		void registerAPI(cms::ModManager* manager);
+		
 		// void registerAPI(cms::ModManager* manager);
 		bool parse(const std::string& configFile);
 		void save();
@@ -303,6 +312,8 @@ namespace phx
 			return false;
 		}
 		// clang-format on
+
+		std::vector<KeyValPair> getImplFinalSettings();
 
 	private:
 		/**
