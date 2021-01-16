@@ -1,30 +1,39 @@
 core.log_info("Load mod 1")
 
-function hello (args)
-    if args[1] == "there" then
-        print("General Kenobi")
-    elseif args[1] == "world" then
-        print("World says hi")
-    else
-        print("with you, the force is not")
-    end
-end
+--function hello (args)
+--    if args[1] == "there" then
+--        print("General Kenobi")
+--    elseif args[1] == "world" then
+--        print("World says hi")
+--    else
+--        print("with you, the force is not")
+--    end
+--end
 
 --core.command.register("Hello", "Master the arts of the Jedi you must", hello)
 
 local Mod1TestSetting = core.settings.get("Mod1.Test1", 100)
 print(Mod1TestSetting)
 
-voxel.block.register({ name = "Dirt", id = "core.dirt", textures = { "Assets/dirt.png" } })
+function register_block_pair(_name, _id, _textures, _image)
+    local _obj = {
+        name = _name,
+        id = _id,
+        places = _id,
+        drops = _id,
+        textures = _textures,
+        image = _image
+    }
+    voxel.block.register(_obj)
+    voxel.item.register(_obj)
+end
 
-voxel.block.register({
-    name = "Grass",
-    id = "core.grass",
-    textures = {
+register_block_pair("Dirt", "core.dirt", { "Assets/dirt.png" }, "Assets/dirt.png")
+register_block_pair("Grass", "core.grass",
+    {
         "Assets/grass_side.png", "Assets/grass_side.png", "Assets/grass_side.png",
         "Assets/grass_side.png", "Assets/grass_top.png", "Assets/dirt.png"
-    }
-})
+    }, "Assets/grass_side.png")
 
 voxel.block.register({
     name = "Dirt Stair",
@@ -63,3 +72,15 @@ voxel.block.register({
     rotV = true,
     textures = { "Assets/xpanel.png", "Assets/1.png", "Assets/2.png", "Assets/3.png", "Assets/dirt.png" }
 })
+
+register_block_pair("Chest", "core.chest_normal",
+    {
+        "chest_normal_front.png", "chest_normal_side.png", "chest_normal_side.png",
+        "chest_normal_side.png", "chest_normal_top.png", "chest_normal_bottom.png"
+    }, "chest_normal_front.png")
+register_block_pair("Iron Chest", "core.chest_iron", --Jack Co. Supply Crate ;3
+    {
+        "chest_iron_front.png", "chest_iron_side.png", "chest_iron_side.png",
+        "chest_iron_side.png", "chest_iron_top.png", "chest_iron_bottom.png"
+    }, "chest_iron_front.png")
+	
