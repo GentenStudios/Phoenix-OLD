@@ -13,7 +13,6 @@ core.log_info("Load mod 1")
 --core.command.register("Hello", "Master the arts of the Jedi you must", hello)
 
 local Mod1TestSetting = core.settings.get("Mod1.Test1", 100)
-print(Mod1TestSetting)
 
 function register_block_pair(_name, _id, _textures, _image)
     local _obj = {
