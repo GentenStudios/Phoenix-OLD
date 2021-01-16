@@ -30,9 +30,6 @@
 #include <Common/CLIParser.hpp>
 #include <Common/Logger.hpp>
 
-#include <Common/CoreIntrinsics.hpp>
-#include <Common/Settings.hpp>
-
 using namespace phx;
 
 #undef main
