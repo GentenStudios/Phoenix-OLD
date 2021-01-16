@@ -97,7 +97,6 @@ void InventoryUI::tick(float dt)
 		{
 			if (ImGui::Button("", {50, 50}))
 			{
-				LOG_DEBUG("Inv") << "Click";
 				if (m_holding.type != nullptr)
 				{
 					m_inventory->addItem(i, m_holding);

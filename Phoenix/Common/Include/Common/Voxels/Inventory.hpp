@@ -93,7 +93,7 @@ namespace phx::voxels
 		                   std::any* newData);
 
 		const std::vector<ItemType*>& getItems() const { return m_slots; };
-		size_t                        getSize() const { return m_size; };
+		std::size_t                   getSize() const { return m_size; };
 
 		// serialize.
 		Serializer& operator>>(Serializer& ser) const override;
@@ -102,7 +102,7 @@ namespace phx::voxels
 		Serializer& operator<<(Serializer& ser) override;
 
 	private:
-		size_t                 m_size;
+		std::size_t            m_size;
 		std::vector<ItemType*> m_slots;
 		Metadata::Container    m_metadata;
 		ItemReferrer*          m_referrer;

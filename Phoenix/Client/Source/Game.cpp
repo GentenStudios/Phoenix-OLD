@@ -134,7 +134,7 @@ void Game::onAttach()
 	    new voxels::InventoryManager(m_save, &m_itemRegistry.referrer);
 	m_playerInventory =
 	    m_invManager->getInventory(m_invManager->createInventory(30));
-	m_registry->emplace<Hand>(m_player, std::size_t(1), m_playerInventory);
+	m_registry->emplace<Hand>(m_player, 1, m_playerInventory);
 
 	if (m_network)
 	{

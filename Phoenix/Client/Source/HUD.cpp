@@ -71,7 +71,7 @@ void HUD::tick(float dt)
 		}
 
 		Hand& hand = m_registry->get<Hand>(m_player);
-		for (size_t i = 0; i < hand.size; i++)
+		for (std::size_t i = 0; i < hand.size; i++)
 		{
 			if (i == hand.getHandSlot())
 			{
