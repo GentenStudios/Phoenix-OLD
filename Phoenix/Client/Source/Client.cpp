@@ -33,17 +33,44 @@
 #include <Common/Logger.hpp>
 #include <Common/Settings.hpp>
 
-#include <glad/glad.h>
-
 using namespace phx::client;
-using namespace phx;
 
 Client::Client() : m_window("Phoenix Game!", 1280, 720), m_layerStack(&m_window)
 {
 	m_window.registerEventListener(this);
 }
 
-void Client::pushLayer(gfx::Layer* layer)
+void Client::setupCLIParam(phx::CLIParser* parser)
+{
+	phx::CLIParameter saveParam;
+	saveParam.parameter       = "save";
+	saveParam.shorthand       = "s";
+	saveParam.enableShorthand = true;
+	saveParam.helpString =
+	    "Usage: \n\tPhoenixClient --save NameOfSaveToUse"
+	    "\n\tAlternatively: PhoenixClient -s NameOfSaveToUse";
+
+	phx::CLIParameter modParam;
+	modParam.parameter  = "mods";
+	modParam.multiValue = true;
+	modParam.helpString = "Usage: \n\tPhoenixClient --mods Mod1 Mod2 Mod3 Mod4";
+
+	phx::CLIParameter configParam;
+	configParam.parameter       = "config";
+	configParam.shorthand       = "c";
+	configParam.enableShorthand = true;
+	configParam.helpString =
+	    "Usage: \n\tPhoenixClient --config PathToConfigFileToUse"
+	    "\n\tAlternatively: PhoenixClient -c PathToConfigFileToUse";
+
+	parser->addParameter(saveParam);
+	parser->addParameter(modParam);
+	parser->addParameter(configParam);
+
+	m_cliArguments = parser;
+}
+
+void Client::pushLayer(phx::gfx::Layer* layer)
 {
 	if (layer->isOverlay())
 	{
@@ -55,7 +82,7 @@ void Client::pushLayer(gfx::Layer* layer)
 	}
 }
 
-void Client::popLayer(gfx::Layer* layer)
+void Client::popLayer(phx::gfx::Layer* layer)
 {
 	if (layer->isOverlay())
 	{
@@ -67,9 +94,9 @@ void Client::popLayer(gfx::Layer* layer)
 	}
 }
 
-void Client::onEvent(events::Event e)
+void Client::onEvent(phx::events::Event e)
 {
-	using namespace events;
+	using namespace phx::events;
 	switch (e.type)
 	{
 	case EventType::KEY_PRESSED:
@@ -114,11 +141,11 @@ void Client::run()
 {
 	Settings::get()->load("settings.txt");
 
-	LoggerConfig config;
+	phx::LoggerConfig config;
 	config.logToFile = true;
 	config.logFile   = "PhoenixClient.log";
-    config.verbosity = LogVerbosity::DEBUG;
-    Logger::initialize(config);
+	config.verbosity = LogVerbosity::DEBUG;
+	phx::Logger::initialize(config);
 
 	Game* game = new Game(&m_window, &m_registry);
 	m_layerStack.pushLayer(game);
@@ -133,6 +160,4 @@ void Client::run()
 
 		m_window.endFrame();
 	}
-
-	Settings::get()->save("settings.txt");
 }
