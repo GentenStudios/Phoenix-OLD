@@ -126,3 +126,8 @@ jobs:
           if (NOT result EQUAL 0)
             message(FATAL_ERROR "CMake Build command failed.")
           endif()
+
+      - name: Run Tests
+        shell: cmake -P {0}
+        run: |
+          Build/Phoenix/Common/PhoenixCommon_test
