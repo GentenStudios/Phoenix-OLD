@@ -70,7 +70,7 @@ void Client::setupCLIParam(phx::CLIParser* parser)
 	m_cliArguments = parser;
 }
 
-void Client::pushLayer(gfx::Layer* layer)
+void Client::pushLayer(phx::gfx::Layer* layer)
 {
 	if (layer->isOverlay())
 	{
@@ -82,7 +82,7 @@ void Client::pushLayer(gfx::Layer* layer)
 	}
 }
 
-void Client::popLayer(gfx::Layer* layer)
+void Client::popLayer(phx::gfx::Layer* layer)
 {
 	if (layer->isOverlay())
 	{
@@ -94,9 +94,9 @@ void Client::popLayer(gfx::Layer* layer)
 	}
 }
 
-void Client::onEvent(events::Event e)
+void Client::onEvent(phx::events::Event e)
 {
-	using namespace events;
+	using namespace phx::events;
 	switch (e.type)
 	{
 	case EventType::KEY_PRESSED:
@@ -141,11 +141,11 @@ void Client::run()
 {
 	Settings::get()->load("settings.txt");
 
-	LoggerConfig config;
+	phx::LoggerConfig config;
 	config.logToFile = true;
 	config.logFile   = "PhoenixClient.log";
 	config.verbosity = LogVerbosity::DEBUG;
-	Logger::initialize(config);
+	phx::Logger::initialize(config);
 
 	Game* game = new Game(&m_window, &m_registry);
 	m_layerStack.pushLayer(game);
