@@ -52,11 +52,11 @@ namespace phx
 	struct Hand
 	{
 	public:
-		Hand(size_t hand, voxels::Inventory* inv)
+		Hand(int hand, voxels::Inventory* inv)
 		    : m_hand(hand), inventory(inv) {};
 		voxels::Item getHand() const { return inventory->getItem(m_hand); };
 
-		void setHandSlot(std::size_t slot)
+		void setHandSlot(int slot)
 		{
 			if (slot < 0)
 			{
@@ -67,13 +67,13 @@ namespace phx
 				m_hand = slot % size;
 			}
 		};
-		std::size_t getHandSlot() const { return m_hand; };
+		int getHandSlot() const { return m_hand; };
 
-		voxels::Inventory*           inventory;
-		static constexpr std::size_t size = 10;
+		voxels::Inventory*   inventory;
+		static constexpr int size = 10;
 
 	private:
-		std::size_t m_hand;
+		int m_hand;
 	};
 
 	class ActorSystem
