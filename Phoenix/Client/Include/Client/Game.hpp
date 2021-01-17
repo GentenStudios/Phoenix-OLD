@@ -42,9 +42,11 @@
 #include <Client/InputQueue.hpp>
 #include <Client/HUD.hpp>
 
+#include "InventoryUI.hpp"
 #include <Client/Voxels/ItemRegistry.hpp>
 #include <Common/CMS/ModManager.hpp>
 #include <Common/Save.hpp>
+#include <Common/Voxels/InventoryManager.hpp>
 
 namespace phx::client
 {
@@ -93,13 +95,17 @@ namespace phx::client
 		BlockRegistry m_blockRegistry;
 		ItemRegistry  m_itemRegistry;
 
-		entt::registry* m_registry;
-		entt::entity    m_player;
+		entt::registry*    m_registry;
+		entt::entity       m_player;
+		voxels::Inventory* m_playerInventory = nullptr;
+		int                m_playerHand      = 0;
+
+		voxels::Map*              m_map        = nullptr;
+		voxels::InventoryManager* m_invManager = nullptr;
 
 		gfx::Window*        m_window;
 		gfx::FPSCamera*     m_camera        = nullptr;
 		gfx::ChunkRenderer* m_mapRenderer   = nullptr;
-		voxels::Map*        m_map           = nullptr;
 		gfx::WorldRenderer* m_worldRenderer = nullptr;
 
 		gfx::ShaderPipeline m_renderPipeline;
@@ -108,12 +114,12 @@ namespace phx::client
 
 		cms::ModManager* m_modManager;
 
-		HUD*        m_hud        = nullptr;
-		EscapeMenu* m_escapeMenu = nullptr;
-		GameTools*  m_gameDebug  = nullptr;
-		bool        m_followCam  = true;
-		math::vec3  m_prevPos;
-		int         m_playerHand = 0;
+		HUD*         m_hud        = nullptr;
+		InventoryUI* m_inventory  = nullptr;
+		EscapeMenu*  m_escapeMenu = nullptr;
+		GameTools*   m_gameDebug  = nullptr;
+		bool         m_followCam  = true;
+		math::vec3   m_prevPos;
 
 		client::Network*    m_network    = nullptr;
 		client::InputQueue* m_inputQueue = nullptr;

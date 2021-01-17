@@ -20,6 +20,7 @@ set(Headers
 
         ${currentDir}/DebugOverlay.hpp
         ${currentDir}/GameTools.hpp
+        ${currentDir}/InventoryUI.hpp
 
         PARENT_SCOPE
         )

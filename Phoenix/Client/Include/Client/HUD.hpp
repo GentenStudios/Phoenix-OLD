@@ -54,9 +54,9 @@ namespace phx::client
 		void onEvent(events::Event& e) override;
 
 		void tick(float dt) override;
-
-		static constexpr float WIDTH  = 500;
-		static constexpr float HEIGHT = 50;
+		// (10 slots * btn width) + (11 margins * margin width)
+		static constexpr float WIDTH  = (10 * 50) + (11 * 8);
+		static constexpr float HEIGHT = 80;
 		static constexpr float POSY   = 100;
 
 	private:

@@ -26,70 +26,53 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-/**
- * @file Metadata.hpp
- * @brief Used to store unique data per individual instances
- *
- * @copyright Copyright (c) Genten Studios 2019 - 2020
- *
- */
-
 #pragma once
 
-#include <Common/Utility/Serializer.hpp>
+#include <Common/Voxels/Inventory.hpp>
 
-#include <any>
-#include <memory>
-#include <string>
-#include <unordered_map>
+#include <Client/Graphics/Camera.hpp>
+#include <Client/Graphics/Layer.hpp>
+#include <Client/Graphics/Window.hpp>
 
-namespace phx
+#include <Common/Settings.hpp>
+
+namespace phx::client
 {
-
-	class Metadata : public ISerializable
+	/**
+	 * @brief The inventory menu within the game.
+	 *
+	 * @see Layer
+	 * @see LayerStack
+	 */
+	class InventoryUI : public gfx::Overlay
 	{
 	public:
-		/**
-		 * @brief QOL "typedef" for use in implementations where metadata needs
-		 * stored in relation to indexed objects and this is obnoxious to type.
-		 */
-		using Container =
-		    std::unordered_map<std::size_t, std::shared_ptr<Metadata>>;
+		InventoryUI(gfx::Window* window, gfx::FPSCamera* camera,
+		            voxels::Inventory*    inventory,
+		            voxels::ItemReferrer* referrer);
+		~InventoryUI() override = default;
 
-		/**
-		 * @brief Sets or inserts metadata.
-		 * @param key The key associated with the metadata.
-		 * @return true If the data was set.
-		 * @return false If the data already exists with a different data type
-		 * or an incompatible data type was provided.
-		 */
-		bool set(const std::string& key, const std::any& data);
+		void onAttach() override;
+		void onDetach() override;
+		void onEvent(events::Event& e) override;
+		void tick(float dt) override;
 
-		/**
-		 * @brief Gets metadata by key.
-		 * @param key The key associated with the metadata.
-		 * @return A pointer to the data.
-		 */
-		const std::any* get(const std::string& key) const;
+		bool isActive() const { return m_active; };
 
-		/**
-		 * @brief Erases metadata.
-		 * @param key The key associated with the metadata.
-		 */
-		void erase(const std::string& key) { m_data.erase(key); };
-
-		/**
-		 * @return the size of the contained map object.
-		 */
-		std::size_t size() { return m_data.size(); };
-
-		// serialize.
-		Serializer& operator>>(Serializer& ser) const override;
-
-		// deserialize.
-		Serializer& operator<<(Serializer& ser) override;
+		// (10 slots * btn width) + (11 margins * margin width)
+		static constexpr float WIDTH = (10 * 50) + (11 * 8);
+		// (3 slots * btn height) + (4 margins * margin height) + title bar
+		static constexpr float HEIGHT = (3 * 50) + (4 * 8) + 15;
+		// (5 slots * btn width) + (6 margins * margin width) + scrollbar
+		static constexpr float CREATIVE_WIDTH  = (5 * 50) + (6 * 8) + 10;
+		static constexpr float CREATIVE_HEIGHT = 600;
 
 	private:
-		std::unordered_map<std::string, std::any> m_data;
+		bool                  m_active = false;
+		gfx::Window*          m_window;
+		gfx::FPSCamera*       m_camera;
+		voxels::Inventory*    m_inventory;
+		voxels::ItemReferrer* m_referrer;
+		voxels::Item          m_holding = {nullptr, nullptr};
 	};
-}
+} // namespace phx::client

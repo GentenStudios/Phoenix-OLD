@@ -34,8 +34,8 @@
 using namespace phx::client;
 using namespace phx;
 
-EscapeMenu::EscapeMenu(gfx::Window* window)
-    : gfx::Overlay("EscapeMenu"), m_window(window)
+EscapeMenu::EscapeMenu(gfx::Window* window, gfx::FPSCamera* camera)
+    : gfx::Overlay("EscapeMenu"), m_window(window), m_camera(camera)
 {
 }
 
@@ -45,8 +45,14 @@ void EscapeMenu::onAttach()
 
 	m_sensitivity        = Settings::get()->getSetting("camera:sensitivity");
 	m_currentSensitivity = m_sensitivity->value();
+	m_camera->enable(false);
+	m_active = true;
 }
-void EscapeMenu::onDetach() {}
+void EscapeMenu::onDetach()
+{
+	m_active = false;
+	m_camera->enable(true);
+}
 void EscapeMenu::onEvent(events::Event& e)
 {
 	switch (e.type)
@@ -58,6 +64,8 @@ void EscapeMenu::onEvent(events::Event& e)
 			switch (m_page)
 			{
 			case Page::MAIN:
+				Client::get()->popLayer(this);
+				e.handled = true;
 				break;
 			case Page::SETTINGS:
 				m_page    = Page::MAIN;
@@ -84,6 +92,10 @@ void EscapeMenu::tick(float dt)
 		if (ImGui::Button("Settings", {290, 30}))
 		{
 			m_page = Page::SETTINGS;
+		}
+		if (ImGui::Button("Return", {290, 30}))
+		{
+			Client::get()->popLayer(this);
 		}
 		if (ImGui::Button("Exit", {290, 30}))
 		{

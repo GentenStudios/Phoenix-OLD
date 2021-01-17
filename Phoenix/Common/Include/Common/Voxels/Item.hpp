@@ -101,7 +101,7 @@ namespace phx::voxels
 	 */
 	struct Item
 	{
-		ItemType* type;
-		Metadata* metadata;
+		ItemType*                 type;
+		std::shared_ptr<Metadata> metadata;
 	};
 } // namespace phx::voxels
