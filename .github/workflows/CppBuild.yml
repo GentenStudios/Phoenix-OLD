@@ -130,4 +130,7 @@ jobs:
       - name: Run Tests
         shell: cmake -P {0}
         run: |
-          Build/Phoenix/Common/PhoenixCommon_test
+          execute_process(COMMAND Build/Phoenix/Common/PhoenixCommon_test RESULT_VARIABLE result)
+          if (NOT result EQUAL 0)
+            message(FATAL_ERROR "Tests Failed.")
+          endif()
