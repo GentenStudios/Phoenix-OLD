@@ -25,6 +25,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 		CXX_STANDARD_REQUIRED ON
 		CXX_EXTENSIONS OFF
 		)
+
 if (PHX_BUILD_TESTS)
 	add_subdirectory(Test)
 	add_executable(${PROJECT_NAME}_test ${Headers} ${Sources} ${Tests})
