@@ -60,7 +60,6 @@ set(PHX_THIRD_PARTY_LIBRARIES
 		$<$<PLATFORM_ID:Windows>:opengl32.lib> # link to opengl32.lib if windows.
 		$<$<PLATFORM_ID:Windows>:ws2_32.lib> # link to ws2_32.lib if windows.
 		$<$<PLATFORM_ID:Windows>:winmm.lib> # link to winmm.lib if windows.
-		#Catch2::Catch2
 		PARENT_SCOPE
 		)
 

@@ -97,6 +97,7 @@ jobs:
             -BBuild
             -GNinja
             -DCMAKE_BUILD_TYPE=${{ matrix.config.build_type }}
+            -DPHX_BUILD_TESTS=ON
             RESULT_VARIABLE result
           )
 
