@@ -66,8 +66,7 @@ void Settings::registerAPI(cms::ModManager* manager)
 	manager->registerFunction(
 	    "core.settings.get",
 	    sol::overload(
-	        PHX_LUA_OVERLOAD(int), PHX_LUA_OVERLOAD(float),
-	        PHX_LUA_OVERLOAD(bool),
+	        PHX_LUA_OVERLOAD(double), PHX_LUA_OVERLOAD(bool),
 	        [](const std::string& key, const std::string& defaultValue) {
 		        if (Settings::instance()->valid<std::string>(key))
 		        {
@@ -110,8 +109,7 @@ void Settings::registerAPI(cms::ModManager* manager)
 	manager->registerFunction(
 	    "core.settings.set",
 	    sol::overload(
-	        PHX_LUA_OVERLOAD(int), PHX_LUA_OVERLOAD(float),
-	        PHX_LUA_OVERLOAD(bool),
+	        PHX_LUA_OVERLOAD(double), PHX_LUA_OVERLOAD(bool),
 	        [](const std::string& key, const std::string& value) {
 		        if (Settings::instance()->valid<std::string>(key))
 		        {
