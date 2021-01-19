@@ -119,7 +119,7 @@ void EscapeMenu::tick(float dt)
 				// use long long int to allow negative.
 				ImGui::SliderScalar(
 				    setting.key.c_str(), ImGuiDataType_U64,
-				    static_cast<void*>(setting.val->get_ptr<unsigned long long*>()),
+				    static_cast<void*>(setting.val->get_ptr<std::size_t*>()),
 				    static_cast<const void*>(&IntMin),
 				    static_cast<const void*>(&IntMax));
 			}
