@@ -75,10 +75,10 @@ void EscapeMenu::onEvent(phx::events::Event& e)
 
 void EscapeMenu::tick(float dt)
 {
-	static const double             DoubleMax = 100.0;
-	static const double             DoubleMin = 0.0;
-	static const unsigned long long IntMax    = 100;
-	static const unsigned long long IntMin    = 0;
+	static const double    DoubleMax = 100.0;
+	static const double    DoubleMin = 0.0;
+	static const long long IntMax    = 100;
+	static const long long IntMin    = 0;
 	
 	ImGui::SetNextWindowPos({m_window->getSize().x / 2 - WIDTH / 2,
 	                         m_window->getSize().y / 2 - HEIGHT / 2});
@@ -118,8 +118,8 @@ void EscapeMenu::tick(float dt)
 			{
 				// use long long int to allow negative.
 				ImGui::SliderScalar(
-				    setting.key.c_str(), ImGuiDataType_U64,
-				    static_cast<void*>(setting.val->get_ptr<std::size_t*>()),
+				    setting.key.c_str(), ImGuiDataType_S64,
+				    static_cast<void*>(setting.val->get_ptr<long long*>()),
 				    static_cast<const void*>(&IntMin),
 				    static_cast<const void*>(&IntMax));
 			}
