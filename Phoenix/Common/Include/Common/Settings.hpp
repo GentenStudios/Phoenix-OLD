@@ -77,7 +77,7 @@ namespace phx
 	 * std::strings and booleans. These values are also supported as part of
 	 * an std::vector (you can ask for std::vector<std::string>, etc...)
 	 */
-	template <typename T>
+	template <typename T, typename std::enable_if_t<std::is_arithmetic_v<T> || std::is_same_v<std::string, T> || internal::IsSpecialisation<T, std::vector>::value, int> = 0>
 	class Setting
 	{
 	public:
@@ -89,8 +89,56 @@ namespace phx
 		operator T() { return m_setting->get<T>(); }
 		operator T() const { return m_setting->get<T>(); }
 
-		T*       getPointer() { return m_setting->get_ptr<T*>(); }
-		const T* getPointer() const { return m_setting->get_ptr<const T*>(); }
+		T* getPointer() // NOLINT: ALl control paths are covered.
+		{
+			if constexpr (std::is_same_v<std::string, T>)
+			{
+				return m_setting->get_ptr<nlohmann::json::string_t*>();
+			}
+			else if constexpr (std::is_same_v<bool, T>)
+			{
+				m_setting->get_ptr<nlohmann::json::boolean_t*>();
+			}
+			else if constexpr (std::is_floating_point_v<T>)
+			{
+				return m_setting->get_ptr<nlohmann::json::number_float_t*>();
+			}
+			else if constexpr (std::is_unsigned_v<T>)
+			{
+				return m_setting->get_ptr<nlohmann::json::number_unsigned_t*>();
+			}
+			else
+			{
+				return m_setting->get_ptr<nlohmann::json::number_integer_t*>();
+			}
+		}
+
+		const T* getPointer() const // NOLINT: ALl control paths are covered.
+		{
+			if constexpr (std::is_same_v<std::string, T>)
+			{
+				return m_setting->get_ptr<const nlohmann::json::string_t*>();
+			}
+			else if constexpr (std::is_same_v<bool, T>)
+			{
+				m_setting->get_ptr<const nlohmann::json::boolean_t*>();
+			}
+			else if constexpr (std::is_floating_point_v<T>)
+			{
+				return m_setting
+				    ->get_ptr<const nlohmann::json::number_float_t*>();
+			}
+			else if constexpr (std::is_unsigned_v<T>)
+			{
+				return m_setting
+				    ->get_ptr<const nlohmann::json::number_unsigned_t*>();
+			}
+			else
+			{
+				return m_setting
+				    ->get_ptr<const nlohmann::json::number_integer_t*>();
+			}
+		}
 
 		Setting& operator=(const Setting& rhs)
 		{
