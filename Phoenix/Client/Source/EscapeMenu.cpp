@@ -103,7 +103,7 @@ void EscapeMenu::tick(float dt)
 			if (setting.val->is_boolean())
 			{
 				ImGui::Checkbox(setting.key.c_str(),
-				                setting.val->get_ptr<bool*>());
+				                setting.val->get_ptr<nlohmann::json::boolean_t*>());
 			}
 			else if (setting.val->is_number_float())
 			{
