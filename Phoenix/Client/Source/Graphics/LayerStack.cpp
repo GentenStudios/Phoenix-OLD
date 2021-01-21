@@ -33,7 +33,7 @@
 
 using namespace phx::gfx;
 
-LayerStack::LayerStack(gfx::Window* window) : m_window(window) {}
+LayerStack::LayerStack(Window* window) : m_window(window) {}
 
 std::size_t LayerStack::size() const { return m_layers.size(); }
 
@@ -150,7 +150,7 @@ void LayerStack::popOverlay(Layer* overlay)
 	}
 }
 
-void LayerStack::onEvent(events::Event e)
+void LayerStack::onEvent(phx::events::Event e)
 {
 	for (std::size_t i = m_layers.size(); i > 0; --i)
 	{
