@@ -44,24 +44,15 @@ EscapeMenu::EscapeMenu(gfx::Window* window, gfx::FPSCamera* camera)
 void EscapeMenu::onAttach()
 {
 	m_page = Page::MAIN;
-}
 
-void EscapeMenu::onDetach() {}
-
-void EscapeMenu::onEvent(phx::events::Event& e)
-{
-	m_sensitivity        = Settings::get()->getSetting("camera:sensitivity");
-	m_currentSensitivity = m_sensitivity->value();
 	m_camera->enable(false);
 	m_active = true;
 }
-
 void EscapeMenu::onDetach()
 {
 	m_active = false;
 	m_camera->enable(true);
 }
-
 void EscapeMenu::onEvent(events::Event& e)
 {
 	switch (e.type)
