@@ -13,3 +13,6 @@
 [submodule "Phoenix/ThirdParty/json"]
 	path = Phoenix/ThirdParty/json
 	url = https://github.com/nlohmann/json.git
+[submodule "Phoenix/ThirdParty/Catch2"]
+	path = Phoenix/ThirdParty/Catch2
+	url = https://github.com/catchorg/Catch2

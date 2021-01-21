@@ -60,9 +60,6 @@ void GameTools::tick(float dt)
 		            m_registry->get<Position>(m_player).position.x,
 		            m_registry->get<Position>(m_player).position.y,
 		            m_registry->get<Position>(m_player).position.z);
-
-		ImGui::Text("Block in hand: %s",
-		            m_registry->get<Hand>(m_player).hand->displayName.c_str());
 	}
 	ImGui::End();
 }

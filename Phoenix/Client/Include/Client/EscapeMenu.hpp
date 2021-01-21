@@ -28,6 +28,7 @@
 
 #pragma once
 
+#include <Client/Graphics/Camera.hpp>
 #include <Client/Graphics/GUI/Button.hpp>
 #include <Client/Graphics/GUI/Container.hpp>
 #include <Client/Graphics/Layer.hpp>
@@ -46,7 +47,7 @@ namespace phx::client
 	class EscapeMenu : public gfx::Overlay
 	{
 	public:
-		EscapeMenu(gfx::Window* window);
+		EscapeMenu(gfx::Window* window, gfx::FPSCamera* camera);
 		~EscapeMenu() override = default;
 
 		void onAttach() override;
@@ -55,11 +56,15 @@ namespace phx::client
 
 		void tick(float dt) override;
 
+		bool isActive() { return m_active; };
+
 		static constexpr float WIDTH  = 300;
 		static constexpr float HEIGHT = 300;
 
 	private:
-		gfx::Window* m_window;
+		bool            m_active = false;
+		gfx::Window*    m_window;
+		gfx::FPSCamera* m_camera;
 
 		enum class Page
 		{

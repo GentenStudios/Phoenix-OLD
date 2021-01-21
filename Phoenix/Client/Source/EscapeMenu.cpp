@@ -33,8 +33,8 @@
 
 using namespace phx::client;
 
-EscapeMenu::EscapeMenu(phx::gfx::Window* window)
-    : phx::gfx::Overlay("EscapeMenu"), m_window(window)
+EscapeMenu::EscapeMenu(gfx::Window* window, gfx::FPSCamera* camera)
+    : gfx::Overlay("EscapeMenu"), m_window(window), m_camera(camera)
 {
 	// all settings have definitely been loaded by now.
 	// get the final settings list from settings instance.
@@ -50,6 +50,20 @@ void EscapeMenu::onDetach() {}
 
 void EscapeMenu::onEvent(phx::events::Event& e)
 {
+	m_sensitivity        = Settings::get()->getSetting("camera:sensitivity");
+	m_currentSensitivity = m_sensitivity->value();
+	m_camera->enable(false);
+	m_active = true;
+}
+
+void EscapeMenu::onDetach()
+{
+	m_active = false;
+	m_camera->enable(true);
+}
+
+void EscapeMenu::onEvent(events::Event& e)
+{
 	switch (e.type)
 	{
 	case events::EventType::KEY_PRESSED:
@@ -59,6 +73,8 @@ void EscapeMenu::onEvent(phx::events::Event& e)
 			switch (m_page)
 			{
 			case Page::MAIN:
+				Client::get()->popLayer(this);
+				e.handled = true;
 				break;
 			case Page::SETTINGS:
 				m_page    = Page::MAIN;
@@ -91,6 +107,10 @@ void EscapeMenu::tick(float dt)
 		if (ImGui::Button("Settings", {290, 30}))
 		{
 			m_page = Page::SETTINGS;
+		}
+		if (ImGui::Button("Return", {290, 30}))
+		{
+			Client::get()->popLayer(this);
 		}
 		if (ImGui::Button("Exit", {290, 30}))
 		{

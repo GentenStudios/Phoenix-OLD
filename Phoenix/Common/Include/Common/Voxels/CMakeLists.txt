@@ -5,9 +5,11 @@ set(Headers
         ${currentDir}/Block.hpp
         ${currentDir}/BlockReferrer.hpp
         ${currentDir}/Chunk.hpp
-        ${currentDir}/Map.hpp
+        ${currentDir}/Inventory.hpp
+        ${currentDir}/InventoryManager.hpp
         ${currentDir}/Item.hpp
         ${currentDir}/ItemReferrer.hpp
+        ${currentDir}/Map.hpp
 
         PARENT_SCOPE
         )
