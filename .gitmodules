@@ -13,3 +13,6 @@
 [submodule "Phoenix/ThirdParty/json"]
 	path = Phoenix/ThirdParty/json
 	url = https://github.com/nlohmann/json.git
+[submodule "Phoenix/ThirdParty/soloud"]
+	path = Phoenix/ThirdParty/soloud
+	url = https://github.com/jarikomppa/soloud.git

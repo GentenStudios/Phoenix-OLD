@@ -99,7 +99,11 @@ Game::Game(gfx::Window* window, entt::registry* registry, bool networked)
 	});
 }
 
-Game::~Game() { delete m_chat; }
+Game::~Game()
+{
+	delete m_chat;
+	m_soloud.deinit();
+}
 
 void Game::onAttach()
 {
@@ -195,6 +199,11 @@ void Game::onAttach()
 	}
 
 	LOG_INFO("MAIN") << "Game layer attached";
+
+	m_background.load("Assets/Audio/background_music.mp3");
+	m_soloud.init();
+	m_background.setLooping(true);
+	m_soloud.play(m_background);
 }
 
 void Game::onDetach()
