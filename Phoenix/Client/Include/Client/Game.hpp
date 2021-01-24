@@ -108,7 +108,6 @@ namespace phx::client
 		voxels::InventoryManager* m_invManager = nullptr;
 
 		SoLoud::Soloud m_soloud;
-		SoLoud::Wav    m_background;
 
 		gfx::Window*        m_window;
 		gfx::FPSCamera*     m_camera        = nullptr;

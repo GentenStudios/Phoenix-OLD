@@ -45,16 +45,16 @@ namespace phx::client
 
 		std::size_t add(const std::string& path, const std::string& id)
 		{
-			SoLoud::Wav source;
-			if (source.load(path.c_str()) == 0)
+
+			std::size_t next = sources.size();
+			sources.add(next, SoLoud::Wav());
+			referrer.add(id, next);
+			SoLoud::Wav* source = sources.get(next);
+			if (source->load(path.c_str()) != 0)
 			{
-				std::size_t next = sources.size();
-				sources.add(next, source);
-				referrer.add(id, next);
-				return next;
+				LOG_WARNING("Audio") << "Failed to load sound file: " << path;
 			}
-			LOG_WARNING("Audio") << "Failed to load sound file: " << path;
-			return 0;
+			return next;
 		}
 
 		/**

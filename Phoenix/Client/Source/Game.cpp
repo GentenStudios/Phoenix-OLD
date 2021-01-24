@@ -200,7 +200,7 @@ void Game::onAttach()
 	LOG_INFO("MAIN") << "Game layer attached";
 	SoLoud::Wav* bg = m_audioRegistry.get(
 	    m_audioRegistry.add("Assets/Audio/background_music.mp3", "core.bg"));
-	// m_background.load("Assets/Audio/background_music.mp3");
+	bg->setLooping(true);
 	m_soloud.init();
 	m_soloud.play(*bg);
 }
