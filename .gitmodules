@@ -16,3 +16,6 @@
 [submodule "Phoenix/ThirdParty/soloud"]
 	path = Phoenix/ThirdParty/soloud
 	url = https://github.com/jarikomppa/soloud.git
+[submodule "Phoenix/ThirdParty/Catch2"]
+	path = Phoenix/ThirdParty/Catch2
+	url = https://github.com/catchorg/Catch2

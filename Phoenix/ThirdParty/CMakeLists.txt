@@ -20,6 +20,7 @@ add_subdirectory(lua)
 add_subdirectory(enet)
 add_subdirectory(entt)
 add_subdirectory(json)
+add_subdirectory(Catch2)
 # IDEFK what I am doing - this made SoLoud work. TODO: Fix this disaster
 set(SDL2_INCLUDE_DIR ${CMAKE_CURRENT_LIST_DIR}/SDL2/include)
 set(SDL2_LIBRARY SDL2main)

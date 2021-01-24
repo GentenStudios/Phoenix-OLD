@@ -97,6 +97,7 @@ jobs:
             -BBuild
             -GNinja
             -DCMAKE_BUILD_TYPE=${{ matrix.config.build_type }}
+            -DPHX_BUILD_TESTS=ON
             RESULT_VARIABLE result
           )
 
@@ -125,4 +126,12 @@ jobs:
           # output a coherant message on failure.
           if (NOT result EQUAL 0)
             message(FATAL_ERROR "CMake Build command failed.")
+          endif()
+
+      - name: Run Tests
+        shell: cmake -P {0}
+        run: |
+          execute_process(COMMAND Build/Phoenix/Common/PhoenixCommon_test RESULT_VARIABLE result)
+          if (NOT result EQUAL 0)
+            message(FATAL_ERROR "Tests Failed.")
           endif()
