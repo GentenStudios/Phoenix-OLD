@@ -97,6 +97,7 @@ namespace phx::client
 	private:
 		BlockRegistry m_blockRegistry;
 		ItemRegistry  m_itemRegistry;
+		AudioRegistry m_audioRegistry;
 
 		entt::registry*    m_registry;
 		entt::entity       m_player;

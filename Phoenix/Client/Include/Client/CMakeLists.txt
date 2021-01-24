@@ -9,7 +9,7 @@ set(Headers
 
 	${currentDir}/InputQueue.hpp
 
-	${currentDir}/Audio.hpp
+	${currentDir}/AudioRegistry.hpp
 	${currentDir}/Client.hpp
 	${currentDir}/SplashScreen.hpp
 	${currentDir}/Crosshair.hpp

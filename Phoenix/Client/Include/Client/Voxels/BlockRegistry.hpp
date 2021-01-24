@@ -28,6 +28,7 @@
 
 #pragma once
 
+#include <Client/AudioRegistry.hpp>
 #include <Client/Graphics/BlockModel.hpp>
 #include <Client/Graphics/TexturePacker.hpp>
 
@@ -74,10 +75,15 @@ namespace phx::client
 
 		gfx::TexturePacker texturePacker;
 		Registry<std::size_t, std::vector<gfx::TexturePacker::Handle>>
-		    textureHandles;
+		                                                  textureHandles;
 		Registry<gfx::TexturePacker::Handle, std::string> textures;
 
 		Registry<std::size_t, gfx::BlockModel> models;
+
+		Registry<std::size_t, SoLoud::Wav*> SoundOnHit;
+		Registry<std::size_t, SoLoud::Wav*> SoundOnBreak;
+		Registry<std::size_t, SoLoud::Wav*> SoundOnPlace;
+		Registry<std::size_t, SoLoud::Wav*> SoundOnStep;
 
 		void registerAPI(cms::ModManager* manager)
 		{
@@ -85,10 +91,10 @@ namespace phx::client
 			    "voxel.block.register", [manager, this](sol::table luaBlock) {
 				    voxels::BlockType block;
 
-					sol::optional<std::string> name = luaBlock["name"];
-					if (name)
-					{
-						block.displayName = *name;
+				    sol::optional<std::string> name = luaBlock["name"];
+				    if (name)
+				    {
+					    block.displayName = *name;
 					}
 					else
 					{

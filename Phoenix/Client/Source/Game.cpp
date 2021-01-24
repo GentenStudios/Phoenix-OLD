@@ -197,13 +197,12 @@ void Game::onAttach()
 	{
 		m_inputQueue->start(std::chrono::milliseconds(50), m_network);
 	}
-
 	LOG_INFO("MAIN") << "Game layer attached";
-
-	m_background.load("Assets/Audio/background_music.mp3");
+	SoLoud::Wav* bg = m_audioRegistry.get(
+	    m_audioRegistry.add("Assets/Audio/background_music.mp3", "core.bg"));
+	// m_background.load("Assets/Audio/background_music.mp3");
 	m_soloud.init();
-	m_background.setLooping(true);
-	m_soloud.play(m_background);
+	m_soloud.play(*bg);
 }
 
 void Game::onDetach()
