@@ -45,7 +45,7 @@ Server::Server(const std::string& save)
     // even if the list is empty, it can create/load a save as required.
     // listing mods but loading an existing save will NOT load more mods, you
     // must manually edit the JSON to load an another mod after initialization.
-    std::vector<std::string> commandLineModList = {"mod1", "mod2", "mod3"};
+	std::vector<std::string> commandLineModList = {"core", "chests", "mod3"};
 	m_save = new Save(save, commandLineModList);
 	m_iris = new server::net::Iris(&m_registry);
 	m_game = new Game(&m_blockRegistry, &m_registry, m_iris, m_save);
