@@ -30,6 +30,7 @@
 
 #include <climits>
 #include <fstream>
+#include <filesystem>
 #include <iomanip>
 #include <string>
 
@@ -136,9 +137,13 @@ bool Settings::parse(const std::string& configFile)
 	std::string data;
 
 	{
+		namespace fs = std::filesystem;
+		
 		std::ifstream file {m_configFilePath};
-		if (!file.is_open())
+		if (!file.is_open() && fs::exists(m_configFilePath))
 		{
+			// if it exists, but isn't open - something clearly went wrong.
+			// if it isn't open but doesn't exist, it's not a problem.
 			return false;
 		}
 
@@ -162,10 +167,33 @@ bool Settings::parse(const std::string& configFile)
 void Settings::save()
 {
 	std::ofstream file {m_configFilePath};
+	if (!file.is_open())
+	{
+		// since ofstream will create a file, if the file is not open, there is
+		// another error - such as permissions.
+
+		// if logger is initialized.
+		if (Logger::get() != nullptr)
+		{
+			LOG_FATAL("SETTINGS") << "Could not open settings file to save, no "
+			                         "new/overridden settings will be written.";
+		}
+		else
+		{
+			// logger not initialized, output to std::cerr.
+			std::cerr << "[FATAL]"
+			          << " Could not open settings file to save to. No "
+			             "new/overridden settings will be written."
+			          << std::endl;
+		}
+		
+		return;
+	}
+	
 	file << std::setw(4) << m_settings << std::endl;
 }
 
-void Settings::saveTo(const std::string& newConfig)
+void Settings::changeSavePath(const std::string& newConfig)
 {
 	m_configFilePath = newConfig;
 }

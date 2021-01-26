@@ -184,7 +184,7 @@ namespace phx
 		// void registerAPI(cms::ModManager* manager);
 		bool parse(const std::string& configFile);
 		void save();
-		void saveTo(const std::string& newConfig);
+		void changeSavePath(const std::string& newConfig);
 		bool exists(const std::string& key) const;
 
 		/**

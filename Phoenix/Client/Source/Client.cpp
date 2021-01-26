@@ -139,10 +139,10 @@ void Client::onEvent(phx::events::Event e)
 
 void Client::run()
 {
-	if (!Settings::instance()->parse("settings.txt"))
+	if (!Settings::instance()->parse("settings.json"))
 	{
-		LOG_FATAL("STARTUP") << "Settings file failed to load. Please fix and "
-		                        "restart the client.";
+		std::cerr << "[STARTUP] " << "Settings file failed to load. Please fix and "
+		                        "restart the client." << std::endl;
 
 		exit(EXIT_FAILURE);
 	}
