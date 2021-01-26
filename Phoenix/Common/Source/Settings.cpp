@@ -140,13 +140,20 @@ bool Settings::parse(const std::string& configFile)
 		namespace fs = std::filesystem;
 		
 		std::ifstream file {m_configFilePath};
-		if (!file.is_open() && fs::exists(m_configFilePath))
+		if (!file.is_open())
 		{
-			// if it exists, but isn't open - something clearly went wrong.
-			// if it isn't open but doesn't exist, it's not a problem.
+			if (!fs::exists(m_configFilePath))
+			{
+				// it isn't open - because the file just doesn't exist.
+				// just return true since we can't read... an empty file.
+				return true;
+			}
+			
+			// the file isn't open, but it exists, so something went wrong,
+			// probably permissions.
 			return false;
 		}
-
+		
 		file.seekg(0, std::ios::end);
 		data.resize(file.tellg());
 		file.seekg(0, std::ios::beg);
