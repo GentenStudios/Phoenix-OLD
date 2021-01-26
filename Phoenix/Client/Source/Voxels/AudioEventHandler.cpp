@@ -26,56 +26,40 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#pragma once
+#include <Client/Voxels/AudioEventHandler.hpp>
 
-#include <Common/CMS/ModManager.hpp>
-#include <Common/Registry.hpp>
+using namespace phx::client;
 
-#include <string>
-
-#include <soloud.h>
-#include <soloud_wav.h>
-
-namespace phx::client
+AudioEventHandler::AudioEventHandler(voxels::Map*    map,
+                                     BlockRegistry*  blockRegistry,
+                                     SoLoud::Soloud* soloud)
+    : m_blockRegistry(blockRegistry), m_soloud(soloud)
 {
-	using SourceGroup = std::vector<SoLoud::Wav*>;
+	map->registerEventSubscriber(this);
+}
 
-	class AudioRegistry
+void AudioEventHandler::onMapEvent(const voxels::MapEvent& event)
+{
+	switch (event.type)
 	{
-	public:
-		void registerAPI(cms::ModManager* manager);
+	case voxels::MapEvent::Event::BLOCK_BREAK:
+		play(m_blockRegistry->SoundOnBreak.get(
+		    std::get<voxels::BlockType*>(event.data)->uniqueIdentifier));
+		break;
+	case voxels::MapEvent::Event::BLOCK_PLACE:
+		play(m_blockRegistry->SoundOnPlace.get(
+		    std::get<voxels::BlockType*>(event.data)->uniqueIdentifier));
+		break;
+	default:
+		break;
+	}
+}
 
-		std::size_t add(const std::string& path, const std::string& id);
-
-		/**
-		 * @brief Gets an Audio Source from the registry by its string ID.
-		 * @param id The string ID of the Audio Source.
-		 * @return Pointer to the Audio Source matching the string ID.
-		 *
-		 * @note The stringID only exists to persist data between runtimes, for
-		 * operations that exist within the scope of runtime, the numerical ID
-		 * should be used instead to enhance performance.
-		 */
-		SoLoud::Wav* getByID(const std::string& id)
-		{
-			return sources.get(*referrer.get(id));
-		};
-
-		/**
-		 * @brief Gets an Audio Source from the registry by its numerical ID.
-		 * @param id The numerical ID of the Audio Source.
-		 * @return Pointer to the Audio Source matching the numerical ID.
-		 *
-		 * @note The numerical ID is assigned on registration and does not
-		 * persist beyond runtime. This value should be used during runtime for
-		 * performance but never saved.
-		 */
-		SoLoud::Wav* get(std::size_t id) { return sources.get(id); };
-
-	private:
-		// referrer refers a string to int, which in turn is used to get the
-		// source.
-		Registry<std::string, std::size_t> referrer;
-		Registry<std::size_t, SoLoud::Wav> sources;
-	};
-} // namespace phx::client
+void AudioEventHandler::play(SourceGroup* source)
+{
+	if (source != nullptr)
+	{
+		SoLoud::Wav* wav = source->at(0);
+		m_soloud->play(*wav);
+	}
+}

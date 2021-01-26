@@ -48,6 +48,7 @@
 #include <Common/Save.hpp>
 #include <Common/Voxels/InventoryManager.hpp>
 
+#include <Client/Voxels/AudioEventHandler.hpp>
 #include <soloud.h>
 #include <soloud_wav.h>
 
@@ -95,9 +96,11 @@ namespace phx::client
 		void confirmState(const Position& position);
 
 	private:
+		AudioRegistry      m_audioRegistry;
+		AudioEventHandler* m_audioEventHandler;
+
 		BlockRegistry m_blockRegistry;
 		ItemRegistry  m_itemRegistry;
-		AudioRegistry m_audioRegistry;
 
 		entt::registry*    m_registry;
 		entt::entity       m_player;

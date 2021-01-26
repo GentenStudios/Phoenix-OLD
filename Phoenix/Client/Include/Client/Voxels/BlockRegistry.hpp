@@ -55,7 +55,8 @@ namespace phx::client
 	 */
 	struct BlockRegistry
 	{
-		BlockRegistry()
+		BlockRegistry(AudioRegistry* audioRegistry)
+		    : m_audioRegistry(audioRegistry)
 		{
 			textureHandles.add(voxels::BlockType::UNKNOWN_BLOCK, {0});
 			textureHandles.setUnknownReturnVal(
@@ -80,10 +81,12 @@ namespace phx::client
 
 		Registry<std::size_t, gfx::BlockModel> models;
 
-		Registry<std::size_t, SoLoud::Wav*> SoundOnHit;
-		Registry<std::size_t, SoLoud::Wav*> SoundOnBreak;
-		Registry<std::size_t, SoLoud::Wav*> SoundOnPlace;
-		Registry<std::size_t, SoLoud::Wav*> SoundOnStep;
+	private:
+		AudioRegistry* m_audioRegistry;
+
+	public:
+		Registry<std::size_t, SourceGroup> SoundOnBreak;
+		Registry<std::size_t, SourceGroup> SoundOnPlace;
 
 		void registerAPI(cms::ModManager* manager)
 		{
@@ -109,9 +112,9 @@ namespace phx::client
 					sol::optional<std::string> id = luaBlock["id"];
 					if (id)
 				    {
-						block.id          = luaBlock.get<std::string>("id");
-					}
-					else
+					    block.id = luaBlock.get<std::string>("id");
+				    }
+				    else
 				    {
 					    // log the error and return to make this a recoverable
 					    // error.
@@ -239,10 +242,58 @@ namespace phx::client
 						    {
 							    model = gfx::BlockModel::X_PANEL_CUBE;
 						    }
-			    		}
-			    		
+					    }
+
 					    models.add(blockUID, model);
-			    	}
+				    }
+
+				    sol::optional<std::vector<std::string>> luaSoundOnBreak =
+				        luaBlock["soundOnBreak"];
+				    SourceGroup onBreakSources;
+				    if (luaSoundOnBreak)
+				    {
+					    for (const auto& sourceID : *luaSoundOnBreak)
+					    {
+						    auto* source = m_audioRegistry->getByID(sourceID);
+						    if (source != nullptr)
+						    {
+							    onBreakSources.push_back(source);
+						    }
+						    else
+						    {
+							    LOG_WARNING("MODDING")
+							        << "The mod at: "
+							        << manager->getCurrentModPath()
+							        << " attempted to get unloaded audio file ("
+							        << sourceID << ")";
+						    }
+					    }
+					    SoundOnBreak.add(blockUID, onBreakSources);
+				    }
+
+				    sol::optional<std::vector<std::string>> luaSoundOnPlace =
+				        luaBlock["soundOnPlace"];
+				    SourceGroup onPlaceSources;
+				    if (luaSoundOnPlace)
+				    {
+					    for (const auto& sourceID : *luaSoundOnPlace)
+					    {
+						    auto* source = m_audioRegistry->getByID(sourceID);
+						    if (source != nullptr)
+						    {
+							    onPlaceSources.emplace_back(source);
+						    }
+						    else
+						    {
+							    LOG_WARNING("MODDING")
+							        << "The mod at: "
+							        << manager->getCurrentModPath()
+							        << " attempted to get unloaded audio file ("
+							        << sourceID << ")";
+						    }
+					    }
+					    SoundOnPlace.add(blockUID, onPlaceSources);
+				    }
 			    });
 		}
 	};

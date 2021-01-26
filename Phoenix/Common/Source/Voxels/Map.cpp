@@ -147,6 +147,9 @@ void Map::setBlockAt(phx::math::vec3 position, const Block& block)
 	const auto& pos   = getBlockPos(position);
 	Chunk*      chunk = getChunk(pos.first);
 
+	dispatchToSubscriber(
+	    {MapEvent::BLOCK_BREAK, chunk->getBlockAt(pos.second).type});
+
 	chunk->setBlockAt(pos.second, block);
 
 	if (m_queue == nullptr)
@@ -155,6 +158,7 @@ void Map::setBlockAt(phx::math::vec3 position, const Block& block)
 	}
 
 	dispatchToSubscriber({MapEvent::CHUNK_UPDATE, chunk});
+	dispatchToSubscriber({MapEvent::BLOCK_PLACE, block.type});
 }
 
 void Map::save(const phx::math::vec3& pos)

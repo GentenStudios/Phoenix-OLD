@@ -26,56 +26,51 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#pragma once
+#include <Client/AudioRegistry.hpp>
 
-#include <Common/CMS/ModManager.hpp>
-#include <Common/Registry.hpp>
+using namespace phx::client;
 
-#include <string>
-
-#include <soloud.h>
-#include <soloud_wav.h>
-
-namespace phx::client
+void AudioRegistry::registerAPI(cms::ModManager* manager)
 {
-	using SourceGroup = std::vector<SoLoud::Wav*>;
+	manager->registerFunction(
+	    "core.audio.register", [manager, this](sol::table source) {
+		    sol::optional<std::string> id = source["id"];
+		    if (!id)
+		    {
+			    // log the error and return to make this a recoverable
+			    // error.
+			    LOG_FATAL("MODDING")
+			        << "The mod at: " << manager->getCurrentModPath()
+			        << " attempted to register an audio source without "
+			        << "specifying an id.";
+			    return;
+		    }
+		    sol::optional<std::string> path = source["path"];
+		    if (!path)
+		    {
+			    // log the error and return to make this a recoverable
+			    // error.
+			    LOG_FATAL("MODDING")
+			        << "The mod at: " << manager->getCurrentModPath()
+			        << " attempted to register an audio source without "
+			        << "specifying a source path.";
+			    return;
+		    }
+		    add(manager->getCurrentModPath() + *path, *id);
+	    });
+}
 
-	class AudioRegistry
+std::size_t AudioRegistry::add(const std::string& path, const std::string& id)
+{
+
+	std::size_t next = sources.size();
+	sources.add(next, SoLoud::Wav());
+	referrer.add(id, next);
+	SoLoud::Wav* source = sources.get(next);
+	if (source->load(path.c_str()) != 0)
 	{
-	public:
-		void registerAPI(cms::ModManager* manager);
-
-		std::size_t add(const std::string& path, const std::string& id);
-
-		/**
-		 * @brief Gets an Audio Source from the registry by its string ID.
-		 * @param id The string ID of the Audio Source.
-		 * @return Pointer to the Audio Source matching the string ID.
-		 *
-		 * @note The stringID only exists to persist data between runtimes, for
-		 * operations that exist within the scope of runtime, the numerical ID
-		 * should be used instead to enhance performance.
-		 */
-		SoLoud::Wav* getByID(const std::string& id)
-		{
-			return sources.get(*referrer.get(id));
-		};
-
-		/**
-		 * @brief Gets an Audio Source from the registry by its numerical ID.
-		 * @param id The numerical ID of the Audio Source.
-		 * @return Pointer to the Audio Source matching the numerical ID.
-		 *
-		 * @note The numerical ID is assigned on registration and does not
-		 * persist beyond runtime. This value should be used during runtime for
-		 * performance but never saved.
-		 */
-		SoLoud::Wav* get(std::size_t id) { return sources.get(id); };
-
-	private:
-		// referrer refers a string to int, which in turn is used to get the
-		// source.
-		Registry<std::string, std::size_t> referrer;
-		Registry<std::size_t, SoLoud::Wav> sources;
-	};
-} // namespace phx::client
+		LOG_FATAL("AUDIO") << "Failed to load sound file: " << path;
+	}
+	LOG_INFO("AUDIO") << "Source registered";
+	return next;
+}

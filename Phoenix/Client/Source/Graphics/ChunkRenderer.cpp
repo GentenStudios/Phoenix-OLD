@@ -258,7 +258,7 @@ void ChunkRenderer::tick(float dt)
 	{
 		if (e.type == voxels::MapEvent::CHUNK_UPDATE)
 		{
-			update(e.chunk);
+			update(std::get<voxels::Chunk*>(e.data));
 		}
 	}
 	

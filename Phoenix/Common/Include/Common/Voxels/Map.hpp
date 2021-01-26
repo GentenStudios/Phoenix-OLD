@@ -52,11 +52,13 @@ namespace phx::voxels
 		// useful.
 		enum Event
 		{
-			CHUNK_UPDATE
+			CHUNK_UPDATE,
+			BLOCK_PLACE,
+			BLOCK_BREAK
 		};
 
-		Event          type;
-		voxels::Chunk* chunk;
+		Event                                            type;
+		std::variant<voxels::BlockType*, voxels::Chunk*> data;
 	};
 
 	class MapEventSubscriber

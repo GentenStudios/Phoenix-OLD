@@ -28,54 +28,25 @@
 
 #pragma once
 
-#include <Common/CMS/ModManager.hpp>
-#include <Common/Registry.hpp>
+#include <Client/AudioRegistry.hpp>
+#include <Client/Voxels/BlockRegistry.hpp>
 
-#include <string>
-
-#include <soloud.h>
-#include <soloud_wav.h>
+#include <Common/Voxels/Map.hpp>
 
 namespace phx::client
 {
-	using SourceGroup = std::vector<SoLoud::Wav*>;
-
-	class AudioRegistry
+	class AudioEventHandler : voxels::MapEventSubscriber
 	{
 	public:
-		void registerAPI(cms::ModManager* manager);
+		AudioEventHandler(voxels::Map* map, BlockRegistry* blockRegistry,
+		                  SoLoud::Soloud* soloud);
 
-		std::size_t add(const std::string& path, const std::string& id);
-
-		/**
-		 * @brief Gets an Audio Source from the registry by its string ID.
-		 * @param id The string ID of the Audio Source.
-		 * @return Pointer to the Audio Source matching the string ID.
-		 *
-		 * @note The stringID only exists to persist data between runtimes, for
-		 * operations that exist within the scope of runtime, the numerical ID
-		 * should be used instead to enhance performance.
-		 */
-		SoLoud::Wav* getByID(const std::string& id)
-		{
-			return sources.get(*referrer.get(id));
-		};
-
-		/**
-		 * @brief Gets an Audio Source from the registry by its numerical ID.
-		 * @param id The numerical ID of the Audio Source.
-		 * @return Pointer to the Audio Source matching the numerical ID.
-		 *
-		 * @note The numerical ID is assigned on registration and does not
-		 * persist beyond runtime. This value should be used during runtime for
-		 * performance but never saved.
-		 */
-		SoLoud::Wav* get(std::size_t id) { return sources.get(id); };
+		void onMapEvent(const voxels::MapEvent& event) override;
 
 	private:
-		// referrer refers a string to int, which in turn is used to get the
-		// source.
-		Registry<std::string, std::size_t> referrer;
-		Registry<std::size_t, SoLoud::Wav> sources;
+		void play(SourceGroup* source);
+
+		BlockRegistry*  m_blockRegistry;
+		SoLoud::Soloud* m_soloud;
 	};
 } // namespace phx::client
