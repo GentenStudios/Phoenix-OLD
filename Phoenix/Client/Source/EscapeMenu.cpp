@@ -33,7 +33,7 @@
 
 using namespace phx::client;
 
-EscapeMenu::EscapeMenu(gfx::Window* window, gfx::FPSCamera* camera)
+EscapeMenu::EscapeMenu(phx::gfx::Window* window, phx::gfx::FPSCamera* camera)
     : gfx::Overlay("EscapeMenu"), m_window(window), m_camera(camera)
 {
 	// all settings have definitely been loaded by now.
@@ -53,14 +53,14 @@ void EscapeMenu::onDetach()
 	m_active = false;
 	m_camera->enable(true);
 }
-void EscapeMenu::onEvent(events::Event& e)
+void EscapeMenu::onEvent(phx::events::Event& e)
 {
 	switch (e.type)
 	{
-	case events::EventType::KEY_PRESSED:
+	case phx::events::EventType::KEY_PRESSED:
 		switch (e.keyboard.key)
 		{
-		case events::Keys::KEY_ESCAPE:
+		case phx::events::Keys::KEY_ESCAPE:
 			switch (m_page)
 			{
 			case Page::MAIN:
