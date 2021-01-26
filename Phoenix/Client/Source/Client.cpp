@@ -33,6 +33,8 @@
 #include <Common/Logger.hpp>
 #include <Common/Settings.hpp>
 
+#include <iostream>
+
 using namespace phx::client;
 
 Client::Client() : m_window("Phoenix Game!", 1280, 720), m_layerStack(&m_window)

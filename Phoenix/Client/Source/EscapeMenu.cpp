@@ -29,6 +29,7 @@
 #include <Client/Client.hpp>
 #include <Client/EscapeMenu.hpp>
 
+#include <iostream>
 #include <imgui.h>
 
 using namespace phx::client;
