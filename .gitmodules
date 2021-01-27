@@ -1,18 +1,24 @@
 [submodule "Engine/ThirdParty/SDL2"]
+	branch = release-2.0.14
 	path = Phoenix/ThirdParty/SDL2
 	url = https://github.com/spurious/SDL-mirror.git
 [submodule "Engine/ThirdParty/sol2"]
+	branch = v3.2.3
 	path = Phoenix/ThirdParty/sol2
 	url = https://github.com/ThePhD/sol2.git
 [submodule "Phoenix/ThirdParty/entt"]
+	branch = v3.6.0
 	path = Phoenix/ThirdParty/entt
 	url = https://github.com/skypjack/entt.git
 [submodule "Phoenix/ThirdParty/enet"]
+	branch = v1.3.17
 	path = Phoenix/ThirdParty/enet
 	url = https://github.com/lsalzman/enet.git
 [submodule "Phoenix/ThirdParty/json"]
+	branch = v3.9.1
 	path = Phoenix/ThirdParty/json
 	url = https://github.com/nlohmann/json.git
 [submodule "Phoenix/ThirdParty/Catch2"]
+	branch = v3.0.0-preview3
 	path = Phoenix/ThirdParty/Catch2
 	url = https://github.com/catchorg/Catch2

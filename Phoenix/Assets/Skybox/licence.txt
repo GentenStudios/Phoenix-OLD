@@ -5,5 +5,5 @@ north.png
 west.png
 south.png
 east.png
-nadir.png
 zenith.png
+nadir.png
