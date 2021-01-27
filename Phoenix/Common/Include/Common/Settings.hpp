@@ -36,166 +36,357 @@
 
 #pragma once
 
-#include <Common/Singleton.hpp>
 #include <Common/CMS/ModManager.hpp>
+#include <Common/Singleton.hpp>
 
-#include <string>
-#include <unordered_map>
 #include <nlohmann/json.hpp>
 
-using json = nlohmann::json;
+#include <string>
 
 namespace phx
 {
+	namespace internal
+	{
+		// These templated structs are a form of "SFINAE". They allow a
+		// method to check whether the template parameter passed is a
+		// specialization of an existing class.
+		// For example:
+		//		IsSpecialisation<bool, std::vector>::value would be False.
+		//		IsSpecialisation<std::vector<int>, std::vector>::value would
+		// be True.
+		//
+		// If needed elsewhere in the future, this can be moved to a utility
+		// file and namespaced into something that's more generic.
+
+		template <typename T, template <typename...> class Ref>
+		struct IsSpecialisation : std::false_type
+		{
+		};
+
+		template <template <typename...> class Ref, typename... Args>
+		struct IsSpecialisation<Ref<Args...>, Ref> : std::true_type
+		{
+		};
+	} // namespace internal
+
 	/**
-	 * @brief A settings object to store a single setting.
+	 * @brief Represents a setting/configuration read from the config file.
+	 * @tparam T The underlying type of the setting.
 	 *
-	 * @description The settings object stores an integer that can be mapped to
-	 * other data. Maximum and minimum values can be set so a settings cant be
-	 * adjusted outside its limits.
-	 *
+	 * The only supported types as of right now are arithmetic types,
+	 * std::strings and booleans. These values are also supported as part of
+	 * an std::vector (you can ask for std::vector<std::string>, etc...)
 	 */
+	template <typename T, typename std::enable_if_t<std::is_arithmetic_v<T> || std::is_same_v<std::string, T> || internal::IsSpecialisation<T, std::vector>::value, int> = 0>
 	class Setting
 	{
-		/// @brief Human readable name for setting.
-		std::string m_name;
-
-		/// @brief Unique name for key ex: core:volume.
-		std::string m_key;
-
-		/// @brief Value of setting.
-		int m_value;
-
-		/// @brief Default value for setting.
-		int m_default;
-
-		/// @brief Maximum value that the setting can be set to.
-		int m_maxValue;
-
-		/// @brief Minimum value that the setting can be set to.
-		int m_minValue;
-
-		/// @brief A pointer to the JSON object to be able to update it
-		json* m_json;
+	public:
+		using Type = T;
 
 	public:
-		Setting() = default;
+		explicit Setting(nlohmann::json* json) : m_setting(json) {}
 
-		/**
-		 * @brief Construct a new Setting object.
-		 *
-		 * @param name The human readable name for the setting.
-		 * @param key The unique name for the setting in the format core:volume.
-		 * @param defaultValue The default value for the setting upon creation.
-		 */
-		Setting(std::string name, std::string key, int defaultValue, json* json_);
-	
-		/**
-		 * @brief Sets the value of an already existing setting.
-		 *
-		 * @param value The value to be set.
-		 * @return true if the setting was set.
-		 * @return false if the value was not within the settings max/min.
-		 */
-		bool set(int value);
+		operator T() { return m_setting->get<T>(); }
+		operator T() const { return m_setting->get<T>(); }
 
-		/**
-		 * @brief Resets the value of the setting back to the default.
-		 *
-		 */
-		void reset();
+		T* getPointer() // NOLINT: ALl control paths are covered.
+		{
+			if constexpr (std::is_same_v<std::string, T>)
+			{
+				return m_setting->get_ptr<nlohmann::json::string_t*>();
+			}
+			else if constexpr (std::is_same_v<bool, T>)
+			{
+				m_setting->get_ptr<nlohmann::json::boolean_t*>();
+			}
+			else if constexpr (std::is_floating_point_v<T>)
+			{
+				return m_setting->get_ptr<nlohmann::json::number_float_t*>();
+			}
+			else if constexpr (std::is_unsigned_v<T>)
+			{
+				return m_setting->get_ptr<nlohmann::json::number_unsigned_t*>();
+			}
+			else
+			{
+				return m_setting->get_ptr<nlohmann::json::number_integer_t*>();
+			}
+		}
 
-		/**
-		 * @brief Set the maximum value for the setting.
-		 *
-		 * @param value The maximum value the setting can be.
-		 */
-		void setMax(int value);
-		int  getMax() const { return m_maxValue; }
+		const T* getPointer() const // NOLINT: ALl control paths are covered.
+		{
+			if constexpr (std::is_same_v<std::string, T>)
+			{
+				return m_setting->get_ptr<const nlohmann::json::string_t*>();
+			}
+			else if constexpr (std::is_same_v<bool, T>)
+			{
+				m_setting->get_ptr<const nlohmann::json::boolean_t*>();
+			}
+			else if constexpr (std::is_floating_point_v<T>)
+			{
+				return m_setting
+				    ->get_ptr<const nlohmann::json::number_float_t*>();
+			}
+			else if constexpr (std::is_unsigned_v<T>)
+			{
+				return m_setting
+				    ->get_ptr<const nlohmann::json::number_unsigned_t*>();
+			}
+			else
+			{
+				return m_setting
+				    ->get_ptr<const nlohmann::json::number_integer_t*>();
+			}
+		}
 
-		/**
-		 * @brief Set the minimum value for the setting.
-		 *
-		 * @param value The minimum value the setting can be.
-		 */
-		void setMin(int value);
-		int  getMin() const { return m_minValue; }
+		Setting& operator=(const Setting& rhs)
+		{
+			m_setting = rhs.m_setting;
+			return *this;
+		}
 
-		/**
-		 * @brief Gets the value of a setting.
-		 *
-		 * @return std::string the unique key for the setting.
-		 */
-		const std::string& getKey() const;
+		Setting& operator=(const T& rhs)
+		{
+			*m_setting = rhs;
+			return *this;
+		}
 
-		const std::string& getName() const;
-
-		/**
-		 * @brief Gets the value of a setting.
-		 *
-		 * @return std::size_t The value of the setting.
-		 */
-		int value() const;
-
-		/**
-		 * @brief Gets the default of a setting
-		 *
-		 * @return std::size_t The value of the setting
-		 */
-		int getDefault() const;
-	};
-
-	/**
-	 * @brief A setting registry to store settings for universal access.
-	 *
-	 * @description This registry allows us to access any registered setting
-	 * from anywhere in the program just using the settings unique key in the
-	 * format core:volume.
-	 *
-	 */
-	class Settings : public Singleton<Settings>
-	{
-	public:
-		Settings();
-
-		void registerAPI(cms::ModManager* manager);
-
-		/**
-		 * @brief Adds a new setting.
-		 *
-		 * @param name Human readable name for setting.
-		 * @param key Unique Name for key ex: core:volume.
-		 * @param defaultValue The value the setting will be initially set to.
-		 * @return std::size_t Returns the numerical key the setting is stored
-		 * at.
-		 */
-		Setting* add(const std::string& name, const std::string& key,
-		             int defaultValue);
-
-		/**
-		 * @brief Get the Setting object.
-		 *
-		 * @param key Unique Name for key ex: core:volume.
-		 * @return Setting* A pointer to the setting object.
-		 */
-		Setting* getSetting(const std::string& key);
-
-		const std::unordered_map<std::string, Setting>& getSettings();
-
-		/**
-		 * @brief Loads settings from file.
-		 *
-		 * @note this must be run after all settings have been registered.
-		 */
-		void load(const std::string& saveFile);
-
-		/**
-		 * @brief Saves settings to file.
-		 */
-		void save(const std::string& saveFile);
+		Setting& operator=(T&& rhs)
+		{
+			*m_setting = std::move(rhs);
+			return *this;
+		}
 
 	private:
-		std::unordered_map<std::string, Setting> m_settings;
-		json m_data;
+		nlohmann::json* m_setting;
+	};
+
+	// can't use singleton cos the get function already exists. an instance
+	// method will be used.
+	class Settings
+	{
+	public:
+		struct KeyValPair
+		{
+			std::string key;
+			nlohmann::json* val;
+		};
+		
+	public:
+		Settings()  = default;
+		~Settings() = default;
+
+		static Settings* instance();
+
+		void registerAPI(cms::ModManager* manager);
+		
+		// void registerAPI(cms::ModManager* manager);
+		bool parse(const std::string& configFile);
+		void save();
+		void changeSavePath(const std::string& newConfig);
+		bool exists(const std::string& key) const;
+
+		/**
+		 * @brief Gets the setting requested, creates one if necessary.
+		 * @tparam Type The type being requested from the Settings object.
+		 * @param key The key/name of the value being requested.
+		 * @param skipVerif The option to skip validation if you have just
+		 * successfully validated it.
+		 * @return The setting object associated with the key provided.
+		 *
+		 * This method is expensive due to the checks involved. It checks
+		 * for existence of the value before then validating the value
+		 * itself.
+		 *
+		 * If the value is not valid, a new value will be made in another
+		 * "settings object" (an nlohmann::json object), this prevents
+		 * invalid values being overwritten in file and allows the program
+		 * to continue in the case of an invalid input. The new value
+		 * created will be default-initialized and set to the type that is
+		 * being requested.
+		 *
+		 * If the value does not exist, it will simply be created and stored
+		 * on save.
+		 *
+		 * If the parameter "skipVerif" is set to true, all the internal
+		 * checks are skipped. This is useful if you validate a setting
+		 * first and then get it - if the validation returns false however,
+		 * skipVerif must not be enabled otherwise there will be issues
+		 * during usage.
+		 *
+		 */
+		template <typename Type>
+		Setting<Type> get(const std::string& key, bool skipVerif = false)
+		{
+			if (skipVerif)
+			{
+				return Setting<Type>(&m_settings[key]);
+			}
+
+			if (exists(key))
+			{
+				if (valid<Type>(key))
+				{
+					return Setting<Type>(&m_settings[key]);
+				}
+				else
+				{
+					LOG_WARNING("CONFIG")
+					    << "An incorrect value was provided "
+					       "for the configuration parameter: "
+					    << key << " using a default value instead.";
+
+					if (m_invalidOverwriter.find(key) ==
+					    m_invalidOverwriter.end())
+					{
+						m_invalidOverwriter[key] = Type {};
+					}
+
+					return Setting<Type>(&m_invalidOverwriter[key]);
+				}
+			}
+			else
+			{
+				m_settings[key] = Type {};
+				return Setting<Type>(&m_settings[key]);
+			}
+		}
+
+		// same as above but with a default value provided.
+		template <typename Type>
+		Setting<Type> getOr(const std::string& key, Type&& defaultValue)
+		{
+			if (exists(key))
+			{
+				if (valid<Type>(key))
+				{
+					return Setting<Type>(&m_settings[key]);
+				}
+				else
+				{
+					LOG_WARNING("CONFIG")
+					    << "An incorrect value was provided "
+					       "for the configuration parameter: "
+					    << key << " using a default value instead.";
+
+					if (m_invalidOverwriter.find(key) ==
+					    m_invalidOverwriter.end())
+					{
+						m_invalidOverwriter[key] =
+						    std::forward<Type>(defaultValue);
+					}
+
+					return Setting<Type>(&m_invalidOverwriter[key]);
+				}
+			}
+			else
+			{
+				m_settings[key] = std::forward<Type>(defaultValue);
+				return Setting<Type>(&m_settings[key]);
+			}
+		}
+
+		// clang-format off
+		// have to turn clang-format off here otherwise it formats funkily.
+			
+		/**
+		 * @brief Validates the data type found at the value associated with requested key.
+		 * @tparam Type The underlying datatype, vector-based data type being validated.
+		 * @param key The actual key/name of the setting itself.
+		 * @return Whether the value paired with the key is valid or not.
+		 *
+		 * @notes Returns false if not exists too.
+		 *        Only arithmetic types, strings and booleans are supported as of right now.
+		 */
+		template <typename Type>
+		std::enable_if_t<internal::IsSpecialisation<Type, std::vector>::value, bool> valid(const std::string& key) const
+		{
+			const auto it = m_settings.find(key);
+			if (it != m_settings.end())
+			{
+				if (it->is_array())
+				{
+					// check what type we're working with.
+					// we have to do std::all_of to make sure all the values are that type otherwise it throws an exception.
+					// we currently only support arithmetic types, std::string and booleans - which really should be enough.
+					if constexpr (std::is_arithmetic_v<typename Type::value_type>)
+					{
+						return std::all_of(it->begin(), it->end(),
+						                   [](const nlohmann::json& val) {
+							                   return val.is_number();
+						                   });
+					}
+					else if constexpr (std::is_same_v<typename Type::value_type, std::string>)
+					{
+						return std::all_of(it->begin(), it->end(),
+						                   [](const nlohmann::json& val) {
+							                   return val.is_string();
+						                   });	
+					}
+					else if constexpr (std::is_same_v<typename Type::value_type, bool>)
+					{
+						return std::all_of(it->begin(), it->end(),
+						                   [](const nlohmann::json& val) {
+							                   return val.is_boolean();
+						                   });	
+					}
+				}
+			}
+
+			return false;
+		}
+
+		/**
+		 * @brief Validates the data type found at the value associated with requested key.
+		 * @tparam Type The underlying datatype, POD/string data type being validated.
+		 * @param key The actual key/name of the setting itself.
+		 * @return Whether the value paired with the key is valid or not.
+		 *
+		 * @notes Returns false if not exists too.
+		 *        Only arithmetic types, strings and booleans are supported as of right now.
+		 */
+		template <typename Type>
+		std::enable_if_t<std::is_arithmetic_v<Type> || std::is_same_v<Type, std::string> || std::is_same_v<Type, bool>, bool> valid(const std::string& key) const
+		{
+			const auto it = m_settings.find(key);
+			if (it != m_settings.end())
+			{
+				if      constexpr (std::is_arithmetic_v<Type>)        { return it->is_number(); }
+				else if constexpr (std::is_same_v<Type, std::string>) { return it->is_string(); }
+				else if constexpr (std::is_same_v<Type, bool>)        { return it->is_boolean(); }
+			}
+
+			return false;
+		}
+		// clang-format on
+
+		std::vector<KeyValPair> getImplFinalSettings();
+
+	private:
+		/**
+		 * @brief The filepath to the config file.
+		 */
+		std::string m_configFilePath = "PhoenixConfig.json";
+
+		/**
+		 * @brief The main settings object.
+		 *
+		 * This settings object is what a .json config file is read into.
+		 * Anything in this object is stored in the file.
+		 */
+		nlohmann::json m_settings;
+		
+		/**
+		 * @brief The secondary settings object for primarily in-ram
+		 * settings.
+		 *
+		 * This settings object is important for the potential cases of
+		 * invalid input by the user. It provides a way to create a
+		 * temporary object in RAM for the application to rely on. No values
+		 * in here are read from file, and vice versa - no values from this
+		 * object are written to the file.
+		 */
+		nlohmann::json m_invalidOverwriter;
 	};
 }; // namespace phx

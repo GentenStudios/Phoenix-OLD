@@ -30,135 +30,200 @@
 
 #include <climits>
 #include <fstream>
-#include <iomanip>
+#include <filesystem>
 #include <iostream>
+#include <string>
 
 using namespace phx;
 
-Setting::Setting(std::string name, std::string key, int defaultValue,
-                 json* json_)
-    : m_name(std::move(name)), m_key(std::move(key)), m_value(defaultValue),
-      m_maxValue(SHRT_MAX), m_minValue(SHRT_MIN), m_default(defaultValue),
-      m_json(json_)
+Settings* Settings::instance()
 {
+	static Settings s_instance;
+	return &s_instance;
 }
-
-bool Setting::set(int value)
-{
-	if (value >= m_minValue && value <= m_maxValue)
-	{
-		m_value          = value;
-		(*m_json)[m_key] = value;
-		return true;
-	}
-	return false;
-}
-
-void Setting::reset() { set(m_default); }
-
-void Setting::setMax(int value) { m_maxValue = value; }
-
-void Setting::setMin(int value) { m_minValue = value; }
-
-const std::string& Setting::getKey() const { return m_key; }
-
-const std::string& Setting::getName() const { return m_name; }
-
-int Setting::value() const { return m_value; }
-
-int Setting::getDefault() const { return m_default; }
-
-Settings::Settings() : m_data(json::object()) {}
 
 void Settings::registerAPI(cms::ModManager* manager)
 {
+	// this lua integration only supports int, float, bool and strings right
+	// now.
+
+#define PHX_LUA_OVERLOAD(type)                                              \
+	[](const std::string& key, type defaultValue) {                         \
+		if (Settings::instance()->valid<type>(key))                         \
+		{                                                                   \
+			return static_cast<type>(                                       \
+			    Settings::instance()->get<type>(key, true));                \
+		}                                                                   \
+		if (!Settings::instance()->exists(key))                             \
+		{                                                                   \
+			return static_cast<type>(Settings::instance()->get<type>(key) = \
+			                             defaultValue);                     \
+		}                                                                   \
+		return defaultValue;                                                \
+	}
+
+	// we manually define the string one because we pass defaultValue as a const
+	// reference.
 	manager->registerFunction(
-	    "core.setting.register",[manager, this](sol::table data) {
-          sol::optional<std::string> name = data["name"];
-          if (!name)
-          {
-              // log the error and return to make this a recoverable error.
-              LOG_FATAL("MODDING")
-                      << "The mod at: " << manager->getCurrentModPath()
-                      << " attempted to register a block without "
-                      << "specifying a key.";
-              return;
-          }
-          sol::optional<std::string> key = data["key"];
-          if (!key)
-          {
-              // log the error and return to make this a recoverable error.
-              LOG_FATAL("MODDING")
-                      << "The mod at: " << manager->getCurrentModPath()
-                      << " attempted to register a setting without "
-                      << "specifying a key.";
-              return;
-          }
-          sol::optional<int> defaultVal = data["default"];
-          if (!defaultVal){defaultVal = 0;}
+	    "core.settings.get",
+	    sol::overload(
+	        PHX_LUA_OVERLOAD(double), PHX_LUA_OVERLOAD(bool),
+	        [](const std::string& key, const std::string& defaultValue) {
+		        if (Settings::instance()->valid<std::string>(key))
+		        {
+			        return static_cast<std::string>(
+			            Settings::instance()->get<std::string>(key, true));
+		        }
 
-		  auto setting = Settings::get()->add(*name, *key, *defaultVal);
+		        if (!Settings::instance()->exists(key))
+		        {
+			        // get or will create an object since we know it doesn't
+			        // exist.
+			        // not super performant since the "exists" gets called twice
+			        // but since this is ideally done at the start of a game
+			        // being loaded, it should be fine.
+			        Settings::instance()->get<std::string>(key) = defaultValue;
+		        }
 
-          sol::optional<int> max = data["max"];
-          if (max){setting->setMax(*max);}
-          sol::optional<int> min = data["min"];
-          if (min){setting->setMin(*min);}
-	    });
+		        return defaultValue;
+	        }));
 
-	manager->registerFunction("core.setting.get", [](std::string key) {
-		return Settings::get()->getSetting(key)->value();
-	});
+#undef PHX_LUA_OVERLOAD
+#define PHX_LUA_OVERLOAD(type)                                                 \
+	[](const std::string& key, type value) {                                   \
+		if (Settings::instance()->valid<type>(key))                            \
+		{                                                                      \
+			Settings::instance()->get<type>(key, true) = value;                \
+		}                                                                      \
+		else                                                                   \
+		{                                                                      \
+			if (!Settings::instance()->exists(key))                            \
+			{                                                                  \
+				Settings::instance()->get<type>(key) = value;                  \
+			}                                                                  \
+                                                                               \
+			LOG_FATAL("MODDING") << "A mod is attempting to store an invalid " \
+			                        "value into a setting.";                   \
+		}                                                                      \
+	}
 
-	manager->registerFunction("core.setting.set",
-	                          [](std::string key, int value) {
-		                          Settings::get()->getSetting(key)->set(value);
-	                          });
+	manager->registerFunction(
+	    "core.settings.set",
+	    sol::overload(
+	        PHX_LUA_OVERLOAD(double), PHX_LUA_OVERLOAD(bool),
+	        [](const std::string& key, const std::string& value) {
+		        if (Settings::instance()->valid<std::string>(key))
+		        {
+			        Settings::instance()->get<std::string>(key, true) = value;
+		        }
+		        else
+		        {
+			        if (!Settings::instance()->exists(key))
+			        {
+				        Settings::instance()->get<std::string>(key) = value;
+			        }
+
+			        LOG_FATAL("MODDING")
+			            << "A mod is attempting to store an invalid "
+			               "value into a setting.";
+		        }
+	        }));
 }
 
-Setting* Settings::add(const std::string& name, const std::string& key,
-                       int defaultValue)
+bool Settings::parse(const std::string& configFile)
 {
-	m_settings[key] = Setting(name, key, defaultValue, &m_data);
-	return &m_settings[key];
-}
+	m_configFilePath = configFile;
 
-Setting* Settings::getSetting(const std::string& key)
-{
-	if (m_data.find(key) != m_data.end())
+	std::string data;
+
 	{
-		if (m_settings.find(key) == m_settings.end())
+		namespace fs = std::filesystem;
+		
+		std::ifstream file {m_configFilePath};
+		if (!file.is_open())
 		{
-			add(key, key, m_data[key].get<int>());
+			if (!fs::exists(m_configFilePath))
+			{
+				// it isn't open - because the file just doesn't exist.
+				// just return true since we can't read... an empty file.
+				return true;
+			}
+			
+			// the file isn't open, but it exists, so something went wrong,
+			// probably permissions.
+			return false;
 		}
-		return &m_settings[key];
+		
+		file.seekg(0, std::ios::end);
+		data.resize(file.tellg());
+		file.seekg(0, std::ios::beg);
+		file.read(&data[0], data.size());
 	}
-	else
+
+	m_settings = nlohmann::json::parse(data, nullptr, false);
+
+	// is_discarded returns false if the parsing failed.
+	if (m_settings.is_discarded())
 	{
-		m_data[key] = 0;
-		return add(key, key, 0);
+		return false;
 	}
+
+	return true;
 }
 
-void Settings::load(const std::string& saveFile)
+void Settings::save()
 {
-	std::ifstream file;
-	file.open(saveFile);
-	if (file)
+	std::ofstream file {m_configFilePath};
+	if (!file.is_open())
 	{
-		file >> m_data;
+		// since ofstream will create a file, if the file is not open, there is
+		// another error - such as permissions.
+
+		// if logger is initialized.
+		if (Logger::get() != nullptr)
+		{
+			LOG_FATAL("SETTINGS") << "Could not open settings file to save, no "
+			                         "new/overridden settings will be written.";
+		}
+		else
+		{
+			// logger not initialized, output to std::cerr.
+			std::cerr << "[FATAL]"
+			          << " Could not open settings file to save to. No "
+			             "new/overridden settings will be written."
+			          << std::endl;
+		}
+		
+		return;
 	}
-	file.close();
+	
+	file << std::setw(4) << m_settings << std::endl;
 }
 
-void Settings::save(const std::string& saveFile)
+void Settings::changeSavePath(const std::string& newConfig)
 {
-	std::ofstream file;
-	file.open(saveFile);
-	file << std::setw(4) << m_data << std::endl;
-	file.close();
+	m_configFilePath = newConfig;
 }
 
-const std::unordered_map<std::string, Setting>& Settings::getSettings()
+bool Settings::exists(const std::string& key) const
 {
-    return m_settings;
+	return m_settings.find(key) != m_settings.end();
+}
+
+std::vector<Settings::KeyValPair> Settings::getImplFinalSettings()
+{
+	std::vector<KeyValPair> finalSettings;
+
+	for (auto& [key, val] : m_settings.items())
+	{
+		if (m_invalidOverwriter.find(key) == m_invalidOverwriter.end())
+		{
+			finalSettings.push_back({key, &val});
+			continue;
+		}
+
+		finalSettings.push_back({key, &m_invalidOverwriter[key]});
+	}
+
+	return finalSettings;
 }

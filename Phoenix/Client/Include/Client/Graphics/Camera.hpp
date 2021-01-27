@@ -197,7 +197,7 @@ namespace phx::gfx
 		std::atomic<bool>  m_enabled;
 		client::Crosshair* m_crosshair = nullptr;
 
-		Setting* m_settingSensitivity;
+		Setting<float> m_settingSensitivity;
 
 		entt::registry* m_registry;
 		entt::entity    m_actor;

@@ -29,22 +29,23 @@
 #include <Client/Client.hpp>
 #include <Client/EscapeMenu.hpp>
 
+#include <iostream>
 #include <imgui.h>
 
 using namespace phx::client;
-using namespace phx;
 
-EscapeMenu::EscapeMenu(gfx::Window* window, gfx::FPSCamera* camera)
+EscapeMenu::EscapeMenu(phx::gfx::Window* window, phx::gfx::FPSCamera* camera)
     : gfx::Overlay("EscapeMenu"), m_window(window), m_camera(camera)
 {
+	// all settings have definitely been loaded by now.
+	// get the final settings list from settings instance.
+	m_settings = Settings::instance()->getImplFinalSettings();
 }
 
 void EscapeMenu::onAttach()
 {
 	m_page = Page::MAIN;
 
-	m_sensitivity        = Settings::get()->getSetting("camera:sensitivity");
-	m_currentSensitivity = m_sensitivity->value();
 	m_camera->enable(false);
 	m_active = true;
 }
@@ -53,14 +54,14 @@ void EscapeMenu::onDetach()
 	m_active = false;
 	m_camera->enable(true);
 }
-void EscapeMenu::onEvent(events::Event& e)
+void EscapeMenu::onEvent(phx::events::Event& e)
 {
 	switch (e.type)
 	{
-	case events::EventType::KEY_PRESSED:
+	case phx::events::EventType::KEY_PRESSED:
 		switch (e.keyboard.key)
 		{
-		case events::Keys::KEY_ESCAPE:
+		case phx::events::Keys::KEY_ESCAPE:
 			switch (m_page)
 			{
 			case Page::MAIN:
@@ -82,10 +83,16 @@ void EscapeMenu::onEvent(events::Event& e)
 
 void EscapeMenu::tick(float dt)
 {
+	constexpr static double   DoubleMax = 100.0;
+	constexpr static double   DoubleMin = 0.0;
+	constexpr static uint64_t IntMax    = 100;
+	constexpr static uint64_t IntMin    = 0;
+	
 	ImGui::SetNextWindowPos({m_window->getSize().x / 2 - WIDTH / 2,
 	                         m_window->getSize().y / 2 - HEIGHT / 2});
 
 	ImGui::Begin("Menu", nullptr, ImGuiWindowFlags_NoResize);
+
 	switch (m_page)
 	{
 	case Page::MAIN:
@@ -102,25 +109,51 @@ void EscapeMenu::tick(float dt)
 			m_window->close();
 		}
 		break;
-	case Page::SETTINGS:
-		const std::unordered_map<std::string, Setting>& settings =
-		    Settings::get()->getSettings();
-
-		for (const auto& setting : settings)
+	case Page::SETTINGS:		
+		for (auto& setting : m_settings)
 		{
-			int i = setting.second.value();
-			ImGui::SliderInt(setting.second.getName().c_str(), &i,
-			                 setting.second.getMin(), setting.second.getMax());
-			if (i != setting.second.value())
+			if (setting.val->is_boolean())
 			{
-				Settings::get()->getSetting(setting.second.getKey())->set(i);
+				ImGui::Checkbox(setting.key.c_str(),
+				                setting.val->get_ptr<nlohmann::json::boolean_t*>());
+			}
+			else if (setting.val->is_number_float())
+			{
+				double* val = setting.val->get_ptr<double*>();
+				ImGui::SliderScalar(
+				    setting.key.c_str(), ImGuiDataType_Double,
+				    static_cast<void*>(setting.val->get_ptr<nlohmann::json::number_float_t*>()),
+				    static_cast<const void*>(&DoubleMin),
+				    static_cast<const void*>(&DoubleMax), "%.2f");
+			}
+			else if (setting.val->is_number_unsigned())
+			{
+				// use long long int to allow negative.
+				ImGui::SliderScalar(
+				    setting.key.c_str(), ImGuiDataType_U64,
+				    static_cast<void*>(
+				        setting.val
+				            ->get_ptr<nlohmann::json::number_unsigned_t*>()),
+				    static_cast<const void*>(&IntMin),
+				    static_cast<const void*>(&IntMax));
+			}
+			else if (setting.val->is_number_integer())
+			{
+				// use long long int to allow negative.
+				ImGui::SliderScalar(
+				    setting.key.c_str(), ImGuiDataType_S64,
+				    static_cast<void*>(setting.val->get_ptr<nlohmann::json::number_integer_t*>()),
+				    static_cast<const void*>(&IntMin),
+				    static_cast<const void*>(&IntMax));
 			}
 		}
+
 		if (ImGui::Button("Back", {290, 30}))
 		{
 			m_page = Page::MAIN;
 		}
 		break;
 	}
+
 	ImGui::End();
 }

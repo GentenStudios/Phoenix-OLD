@@ -11,9 +11,7 @@
 
 --core.command.register("Hello", "Master the arts of the Jedi you must", hello)
 
-core.setting.register({ name = "Test1", key = "Mod1.test1", default = 50, max = 100, min = 0 })
-core.setting.register({ name = "Test2", key = "Mod1.test2", default = 50, max = 100, min = 0 })
-core.setting.register({ name = "Test3", key = "Mod1.test3", default = 50, max = 100, min = 0 })
+local Mod1TestSetting = core.settings.get("Mod1.Test1", 100)
 
 function register_block_pair(_obj)
     _obj.places = _obj.places or _obj.id

@@ -35,7 +35,9 @@ using namespace phx;
 using namespace gfx;
 
 FPSCamera::FPSCamera(Window* window, entt::registry* registry)
-    : m_registry(registry), m_enabled(true), m_window(window)
+    : m_window(window), m_enabled(true), m_settingSensitivity(
+	      Settings::instance()->getOr("camera:sensitivity", 50.f)),
+      m_registry(registry)
 {
 	m_window->setCursorState(CursorState::DISABLED);
 
@@ -48,11 +50,6 @@ FPSCamera::FPSCamera(Window* window, entt::registry* registry)
 	// size every frame, which is incredibly inefficient.
 	m_windowCentre = {std::floor(windowSize.x / 2.f),
 	                  std::floor(windowSize.y / 2.f)};
-
-	m_settingSensitivity =
-	    Settings::get()->add("Sensitivity", "camera:sensitivity", 50);
-	m_settingSensitivity->setMax(100);
-	m_settingSensitivity->setMin(1);
 
 	m_crosshair = new client::Crosshair(m_window);
 	client::Client::get()->pushLayer(m_crosshair);
@@ -86,8 +83,7 @@ void FPSCamera::tick(float dt)
 
 	m_window->setCursorPosition(m_windowCentre);
 
-	const float sensitivity =
-	    static_cast<float>(m_settingSensitivity->value()) / 50.f;
+	const float sensitivity = static_cast<float>(m_settingSensitivity) / 50.f;
 
 	Position& pos = m_registry->get<Position>(m_actor);
 
