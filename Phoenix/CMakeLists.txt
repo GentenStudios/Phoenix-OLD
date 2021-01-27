@@ -1,30 +1,15 @@
-project(Phoenix)
-
 add_subdirectory(ThirdParty)
 
-add_subdirectory(Include/Phoenix)
-add_subdirectory(Source)
+# propagate these variables down the line into the child CMakeLists.
+set(PHX_THIRD_PARTY_LIBRARIES ${PHX_THIRD_PARTY_LIBRARIES})
+set(PHX_THIRD_PARTY_INCLUDES ${PHX_THIRD_PARTY_INCLUDES})
+set(PHX_COMMON_INCLUDES ${CMAKE_CURRENT_LIST_DIR}/Common/Include)
 
-add_executable(${PROJECT_NAME} ${Headers} ${Sources})
-target_link_libraries(${PROJECT_NAME} PRIVATE ${PHX_THIRD_PARTY_LIBRARIES})
-target_include_directories(${PROJECT_NAME} PRIVATE Include ${PHX_THIRD_PARTY_INCLUDES})
-set_target_properties(${PROJECT_NAME} PROPERTIES
-	CXX_STANDARD 17
-	CMAKE_CXX_STANDARD_REQUIRED ON
-	CMAKE_CXX_EXTENSIONS OFF
-)
+add_subdirectory(Client)
+add_subdirectory(Common)
+#add_subdirectory(Server)
 
-#################################################
-## ORGANISE FILES FOR IDEs (Xcode, VS, etc...) ##
-#################################################
+add_subdirectory(Assets)
+add_subdirectory(Modules)
 
-source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/Include/Phoenix" PREFIX "Header Files" FILES ${Headers})
-source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/Source" PREFIX "Source Files" FILES ${Sources})
-
-#################################################
-## COPY SAVE, ASSETS, and MODULES TO BUILD DIR ##
-#################################################
-
-file(COPY Save DESTINATION ${CMAKE_BINARY_DIR}/Phoenix)
-file(COPY Modules DESTINATION ${CMAKE_BINARY_DIR}/Phoenix)
-file(COPY Assets DESTINATION ${CMAKE_BINARY_DIR}/Phoenix)
+set_target_properties(PhoenixAssets-client PhoenixModules-client PhoenixModules-server PROPERTIES FOLDER Dependencies)
