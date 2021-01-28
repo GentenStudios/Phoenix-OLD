@@ -72,8 +72,7 @@ namespace phx::client
 			SETTINGS
 		};
 		Page m_page = Page::MAIN;
-
-		int      m_currentSensitivity = 1;
-		Setting* m_sensitivity        = nullptr;
+		
+		std::vector<Settings::KeyValPair> m_settings;
 	};
 } // namespace phx::client

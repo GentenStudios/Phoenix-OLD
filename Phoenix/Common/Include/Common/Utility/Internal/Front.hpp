@@ -31,7 +31,7 @@
 #include <string>
 #include <queue>
 
-namespace
+namespace phx
 {
 	namespace internal
 	{

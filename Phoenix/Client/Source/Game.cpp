@@ -66,7 +66,7 @@ Game::Game(gfx::Window* window, entt::registry* registry, bool networked)
 	// even if the list is empty, it can create/load a save as required.
 	// listing mods but loading an existing save will NOT load more mods, you
 	// must manually edit the JSON to load an another mod after initialization.
-	std::vector<std::string> commandLineModList = {"mod1", "mod2", "mod3"};
+	std::vector<std::string> commandLineModList = {"core", "chests", "mod3"};
 	m_save = new Save(saveToUse, commandLineModList);
 
 	m_modManager = new cms::ModManager(m_save->getModList(), {"Modules"});
@@ -83,7 +83,7 @@ Game::Game(gfx::Window* window, entt::registry* registry, bool networked)
 		m_network->sendMessage(text);
 	});
 
-	Settings::get()->registerAPI(m_modManager);
+	Settings::instance()->registerAPI(m_modManager);
 	InputMap::get()->registerAPI(m_modManager);
 	CommandBook::get()->registerAPI(m_modManager);
 
