@@ -19,6 +19,7 @@
 	path = Phoenix/ThirdParty/json
 	url = https://github.com/nlohmann/json.git
 [submodule "Phoenix/ThirdParty/soloud"]
+	branch = master
 	path = Phoenix/ThirdParty/soloud
 	url = https://github.com/GentenStudios/soloud.git
 [submodule "Phoenix/ThirdParty/Catch2"]
