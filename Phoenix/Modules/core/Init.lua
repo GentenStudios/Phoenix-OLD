@@ -53,7 +53,9 @@ register_block_pair({
     model = "Stair",
     rotH = true,
     rotV = true,
-    textures = { "Assets/dirt.png" }
+    textures = { "Assets/dirt.png" },
+    soundOnPlace = { "mod1.dirt_place" },
+    soundOnBreak = { "mod1.dirt_place" }
 })
 
 register_block_pair({
@@ -61,7 +63,9 @@ register_block_pair({
     id = "core.test_xpanel",
     model = "XPanel",
     rotH = true,
-    textures = { "Assets/1.png", "Assets/2.png", "Assets/3.png", "Assets/4.png" }
+    textures = { "Assets/1.png", "Assets/2.png", "Assets/3.png", "Assets/4.png" },
+    soundOnPlace = { "mod1.dirt_place" },
+    soundOnBreak = { "mod1.dirt_place" }
 })
 
 register_block_pair({
@@ -73,7 +77,9 @@ register_block_pair({
         "Assets/1.png", "Assets/2.png", "Assets/3.png", "Assets/4.png",
         "Assets/dirt.png", "Assets/dirt.png", "Assets/dirt.png", "Assets/dirt.png",
         "Assets/dirt.png", "Assets/dirt.png", "Assets/dirt.png"
-    }
+    },
+    soundOnPlace = { "mod1.dirt_place" },
+    soundOnBreak = { "mod1.dirt_place" }
 })
 
 register_block_pair({
@@ -82,6 +88,8 @@ register_block_pair({
     model = "Slope",
     rotH = true,
     rotV = true,
-    textures = { "Assets/xpanel.png", "Assets/1.png", "Assets/2.png", "Assets/3.png", "Assets/dirt.png" }
+    textures = { "Assets/xpanel.png", "Assets/1.png", "Assets/2.png", "Assets/3.png", "Assets/dirt.png" },
+    soundOnPlace = { "mod1.dirt_place" },
+    soundOnBreak = { "mod1.dirt_place" }
 })
 	

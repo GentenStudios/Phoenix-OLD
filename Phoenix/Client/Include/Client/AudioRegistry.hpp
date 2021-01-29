@@ -43,7 +43,7 @@ namespace phx::client
 	class AudioRegistry
 	{
 	public:
-		void registerAPI(cms::ModManager* manager);
+		void registerAPI(cms::ModManager* manager, SoLoud::Soloud* soloud);
 
 		std::size_t add(const std::string& path, const std::string& id);
 

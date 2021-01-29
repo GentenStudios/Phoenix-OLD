@@ -30,7 +30,8 @@
 
 using namespace phx::client;
 
-void AudioRegistry::registerAPI(cms::ModManager* manager)
+void AudioRegistry::registerAPI(cms::ModManager* manager,
+                                SoLoud::Soloud*  soloud)
 {
 	manager->registerFunction(
 	    "core.audio.register", [manager, this](sol::table source) {
@@ -58,6 +59,11 @@ void AudioRegistry::registerAPI(cms::ModManager* manager)
 		    }
 		    add(manager->getCurrentModPath() + *path, *id);
 	    });
+
+	manager->registerFunction("core.audio.play",
+	                          [soloud, this](const std::string& source) {
+		                          soloud->play(*getByID(source));
+	                          });
 }
 
 std::size_t AudioRegistry::add(const std::string& path, const std::string& id)

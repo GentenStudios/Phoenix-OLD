@@ -71,7 +71,7 @@ Game::Game(gfx::Window* window, entt::registry* registry, bool networked)
 
 	m_modManager = new cms::ModManager(m_save->getModList(), {"Modules"});
 
-	m_audioRegistry.registerAPI(m_modManager);
+	m_audioRegistry.registerAPI(m_modManager, &m_soloud);
 	m_blockRegistry.registerAPI(m_modManager);
 	m_itemRegistry.registerAPI(m_modManager);
 
