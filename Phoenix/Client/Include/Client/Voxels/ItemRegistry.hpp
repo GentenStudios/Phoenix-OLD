@@ -88,6 +88,12 @@ namespace phx::client
 					    return;
 				    }
 
+				    sol::optional<size_t> maxStack = luaItem["max_stack"];
+				    if (maxStack)
+				    {
+					    item.maxStack = *maxStack;
+				    }
+
 				    sol::optional<std::string> places = luaItem["places"];
 				    if (places)
 				    {

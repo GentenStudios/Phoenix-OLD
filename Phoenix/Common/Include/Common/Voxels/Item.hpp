@@ -78,6 +78,9 @@ namespace phx::voxels
 		/// variable.
 		std::size_t uniqueIdentifier = -1;
 
+		/// @brief The maximum number of items that can exist in a stack
+		std::size_t maxStack = 1;
+
 		/**
 		 * @brief The block that is placed when onPlace is called. If left
 		 * undefined, no block is placed.
@@ -103,5 +106,6 @@ namespace phx::voxels
 	{
 		ItemType*                 type;
 		std::shared_ptr<Metadata> metadata;
+		std::size_t               volume;
 	};
 } // namespace phx::voxels
