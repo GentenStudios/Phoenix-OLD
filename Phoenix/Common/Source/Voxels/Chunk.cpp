@@ -98,17 +98,18 @@ phx::Serializer& Chunk::operator>>(phx::Serializer& ser) const
 		{
 			ser << '+' << m_metadata.at(i);
 		}
-		else if (m_blocks[i + 1]->id == m_blocks[i]->id)
+		else if (i + 1 < CHUNK_MAX_BLOCKS &&
+		         m_blocks[i + 1]->id == m_blocks[i]->id &&
+		         m_metadata.find(i + 1) == m_metadata.end())
 		{
-			std::size_t j;
-			for (j = 1; i + 1 < CHUNK_MAX_BLOCKS &&
-			            m_blocks[i + 1]->id == m_blocks[i]->id &&
-			            m_metadata.find(i + 1) == m_metadata.end();
-			     j++)
+			std::size_t j = i;
+			while (i + 1 < CHUNK_MAX_BLOCKS &&
+			       m_blocks[i + 1]->id == m_blocks[i]->id &&
+			       m_metadata.find(i + 1) == m_metadata.end())
 			{
 				i++;
 			}
-			ser << '*' << j;
+			ser << '*' << i - j;
 		}
 		else
 		{
