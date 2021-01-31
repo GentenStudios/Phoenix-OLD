@@ -4,7 +4,7 @@
 
 using namespace phx::voxels;
 
-ItemType* addTestItem(ItemReferrer referrer)
+ItemType* addTestItem(ItemReferrer& referrer)
 {
 	auto     uid = referrer.referrer.size();
 	ItemType temp;
@@ -91,8 +91,8 @@ TEST_CASE("Validate Inventory Behavior")
 				{
 					REQUIRE(inventory.getItem(0).volume == 32);
 					REQUIRE(inventory.getItem(0).type == itemA.type);
-					REQUIRE(inventory.getItem(0).volume == 64);
-					REQUIRE(inventory.getItem(0).type == itemB.type);
+					REQUIRE(inventory.getItem(1).volume == 64);
+					REQUIRE(inventory.getItem(1).type == itemB.type);
 				}
 			}
 		}
