@@ -131,11 +131,6 @@ bool ActorSystem::action1(entt::registry* registry, entt::entity entity)
 			    pos, {m_blockReferrer->blocks.get(voxels::BlockType::AIR_BLOCK),
 			          nullptr});
 
-			if (currentBlock->onBreak)
-			{
-				currentBlock->onBreak(pos.x, pos.y, pos.z);
-			}
-
 			return true;
 		}
 
@@ -151,6 +146,13 @@ bool ActorSystem::action2(entt::registry* registry, entt::entity entity)
 	const math::vec3& dir = registry->get<Position>(entity).getDirection();
 	voxels::Map*      map = registry->get<PlayerView>(entity).map;
 
+	Hand         hand = registry->get<Hand>(entity);
+	voxels::Item item = hand.getHand();
+	if (item.type == nullptr)
+	{
+		return false;
+	}
+
 	math::Ray ray(pos, dir);
 
 	while (ray.getLength() < m_reach)
@@ -162,13 +164,12 @@ bool ActorSystem::action2(entt::registry* registry, entt::entity entity)
 		{
 			math::vec3 back = ray.backtrace(RAY_INCREMENT);
 			back.floor();
-
-			voxels::ItemType* item = registry->get<Hand>(entity).getHand().type;
-			if (!item->places.empty())
+			if (!item.type->places.empty())
 			{
-				voxels::Block block {m_blockReferrer->getByID(item->places),
-				                     nullptr};
-				Metadata      data;
+				item = hand.inventory->removeItem(hand.getHandSlot(), false);
+				voxels::Block block {
+				    m_blockReferrer->getByID(item.type->places), nullptr};
+				Metadata data;
 				if (block.type->rotH)
 				{
 					math::vec3 rotation;
@@ -191,16 +192,10 @@ bool ActorSystem::action2(entt::registry* registry, entt::entity entity)
 				}
 
 				map->setBlockAt(back, block);
-
-				// TODO move this to the map code
-				if (block.type->onPlace)
-				{
-					block.type->onPlace(back.x, back.y, back.z);
-				}
 			}
-			if (item->onPlace)
+			if (item.type->onPlace)
 			{
-				item->onPlace(back.x, back.y, back.z);
+				item.type->onPlace(back.x, back.y, back.z);
 			}
 
 			return true;
