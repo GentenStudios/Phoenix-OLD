@@ -71,6 +71,7 @@ bool Inventory::addItem(std::size_t slot, Item& item)
 			m_metadata[slot] = item.metadata;
 		}
 		m_stacks[slot] = item.volume;
+		item.volume    = 0;
 		return true;
 	}
 	if (m_slots.at(slot) == item.type &&
@@ -84,11 +85,12 @@ bool Inventory::addItem(std::size_t slot, Item& item)
 		}
 		if (m_stacks[slot] + item.volume > item.type->maxStack)
 		{
-			item.volume -= m_stacks[slot] - item.type->maxStack;
+			item.volume    = item.volume + m_stacks[slot] - item.type->maxStack;
 			m_stacks[slot] = item.type->maxStack;
 			return false;
 		}
 		m_stacks[slot] += item.volume;
+		item.volume = 0;
 		return true;
 	}
 	LOG_DEBUG("Inventory") << "Attempted to insert item into occupied slot";
@@ -101,7 +103,7 @@ int Inventory::addItem(Item& item)
 	{
 		if (m_slots.at(i) == nullptr || m_slots.at(i) == item.type)
 		{
-			if (addItem(item))
+			if (addItem(i, item))
 			{
 				return i;
 			}
