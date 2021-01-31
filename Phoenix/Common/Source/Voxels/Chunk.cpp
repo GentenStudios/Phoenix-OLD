@@ -98,6 +98,17 @@ phx::Serializer& Chunk::operator>>(phx::Serializer& ser) const
 		{
 			ser << '+' << m_metadata.at(i);
 		}
+		else if (m_blocks[i + 1]->id == m_blocks[i]->id)
+		{
+			std::size_t j;
+			for (j = 1; i + 1 < CHUNK_MAX_BLOCKS &&
+			            m_blocks[i + 1]->id == m_blocks[i]->id;
+			     j++)
+			{
+				i++;
+			}
+			ser << '*' << j;
+		}
 		else
 		{
 			ser << ';';
@@ -128,6 +139,16 @@ phx::Serializer& Chunk::operator<<(phx::Serializer& ser)
 			Metadata data;
 			ser >> data;
 			m_metadata[i] = data;
+		}
+		else if (c == '*')
+		{
+			std::size_t rep;
+			ser >> rep;
+			for (std::size_t j = 1; j < rep; j++)
+			{
+				m_blocks.push_back(
+				    m_referrer->blocks.get(*m_referrer->referrer.get(id)));
+			}
 		}
 	}
 
