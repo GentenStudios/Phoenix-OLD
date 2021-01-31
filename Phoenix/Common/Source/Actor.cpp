@@ -166,7 +166,10 @@ bool ActorSystem::action2(entt::registry* registry, entt::entity entity)
 			back.floor();
 			if (!item.type->places.empty())
 			{
-				item = hand.inventory->removeItem(hand.getHandSlot(), false);
+				if (!m_creative)
+				{
+					hand.inventory->removeItem(hand.getHandSlot(), false);
+				}
 				voxels::Block block {
 				    m_blockReferrer->getByID(item.type->places), nullptr};
 				Metadata data;
