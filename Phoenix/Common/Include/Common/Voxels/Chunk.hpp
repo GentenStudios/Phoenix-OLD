@@ -190,6 +190,10 @@ namespace phx::voxels
 		Serializer& operator<<(Serializer& ser) override;
 
 	private:
+		///@brief Utility function for serialization
+		bool canRepeat(std::size_t i) const;
+
+	private:
 		math::vec3                                m_pos;
 		BlockList                                 m_blocks;
 		std::unordered_map<std::size_t, Metadata> m_metadata;

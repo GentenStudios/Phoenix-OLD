@@ -87,8 +87,20 @@ bool Chunk::setMetadataAt(const phx::math::vec3& position,
 	return false;
 }
 
+bool Chunk::canRepeat(std::size_t i) const
+{
+	if (i + 1 >= CHUNK_MAX_BLOCKS)
+		return false;
+	if (m_blocks[i + 1]->id != m_blocks[i]->id)
+		return false;
+	if (m_metadata.find(i + 1) != m_metadata.end())
+		return false;
+	return true;
+};
+
 phx::Serializer& Chunk::operator>>(phx::Serializer& ser) const
 {
+
 	ser << m_pos.x << m_pos.y << m_pos.z;
 	for (int i = 0; i < CHUNK_MAX_BLOCKS; i++)
 	// for (const BlockType* block : m_blocks)
@@ -98,15 +110,11 @@ phx::Serializer& Chunk::operator>>(phx::Serializer& ser) const
 		{
 			ser << '+' << m_metadata.at(i);
 		}
-		else if (i + 1 < CHUNK_MAX_BLOCKS &&
-		         m_blocks[i + 1]->id == m_blocks[i]->id &&
-		         m_metadata.find(i + 1) == m_metadata.end())
+		else if (canRepeat(i))
 		{
 			std::size_t j = i;
 			i++;
-			while (i + 1 < CHUNK_MAX_BLOCKS &&
-			       m_blocks[i + 1]->id == m_blocks[i]->id &&
-			       m_metadata.find(i + 1) == m_metadata.end())
+			while (canRepeat(i))
 			{
 				i++;
 			}
