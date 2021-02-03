@@ -113,7 +113,6 @@ phx::Serializer& Chunk::operator>>(phx::Serializer& ser) const
 		else if (canRepeat(i))
 		{
 			std::size_t j = i;
-			i++;
 			while (canRepeat(i))
 			{
 				i++;
@@ -155,10 +154,11 @@ phx::Serializer& Chunk::operator<<(phx::Serializer& ser)
 		{
 			std::size_t rep;
 			ser >> rep;
-			for (std::size_t j = 1; j < rep; j++)
+			for (std::size_t j = 0; j < rep; j++)
 			{
 				m_blocks.push_back(
 				    m_referrer->blocks.get(*m_referrer->referrer.get(id)));
+				i++;
 			}
 		}
 	}
