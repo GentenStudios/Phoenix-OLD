@@ -164,6 +164,11 @@ bool ActorSystem::action2(entt::registry* registry, entt::entity entity)
 			back.floor();
 
 			voxels::ItemType* item = registry->get<Hand>(entity).getHand().type;
+			if (!item)
+			{
+				return false;
+			}
+			
 			if (!item->places.empty())
 			{
 				voxels::Block block {m_blockReferrer->getByID(item->places),
@@ -198,6 +203,7 @@ bool ActorSystem::action2(entt::registry* registry, entt::entity entity)
 					block.type->onPlace(back.x, back.y, back.z);
 				}
 			}
+
 			if (item->onPlace)
 			{
 				item->onPlace(back.x, back.y, back.z);

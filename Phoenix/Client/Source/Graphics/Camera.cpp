@@ -104,13 +104,11 @@ void FPSCamera::enable(bool enabled)
 		// gain control of the cursor
 		m_window->setCursorState(gfx::CursorState::DISABLED);
 		m_window->setCursorPosition(m_windowCentre);
-		client::Client::get()->pushLayer(m_crosshair);
 	}
 	else
 	{
 		// release cursor for the user to do whatever they want.
 		m_window->setCursorState(gfx::CursorState::NORMAL);
-		client::Client::get()->popLayer(m_crosshair);
 	}
 
 	m_enabled = enabled;
