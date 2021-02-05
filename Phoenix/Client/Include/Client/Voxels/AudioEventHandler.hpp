@@ -38,9 +38,19 @@ namespace phx::client
 	class AudioEventHandler : voxels::MapEventSubscriber
 	{
 	public:
+		/**
+		 * @brief Event handler for playing sounds on block events
+		 * @param map Pointer to the map we are playing sound events for
+		 * @param blockRegistry Pointer to runtime block registry
+		 * @param soloud Pointer to runtime soloud instance
+		 */
 		AudioEventHandler(voxels::Map* map, BlockRegistry* blockRegistry,
 		                  SoLoud::Soloud* soloud);
 
+		/**
+		 * @brief Callback used by the map
+		 * @see map.hpp dispatchToSubscriber
+		 */
 		void onMapEvent(const voxels::MapEvent& event) override;
 
 	private:

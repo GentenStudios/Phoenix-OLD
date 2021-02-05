@@ -45,6 +45,12 @@ namespace phx::client
 	public:
 		void registerAPI(cms::ModManager* manager, SoLoud::Soloud* soloud);
 
+		/**
+		 * @brief Add a new Audio Source to the AudioRegistry
+		 * @param path Complete system path to the audio file
+		 * @param id String ID of the Audio Source
+		 * @return Numerical ID of the Audio Source
+		 */
 		std::size_t add(const std::string& path, const std::string& id);
 
 		/**

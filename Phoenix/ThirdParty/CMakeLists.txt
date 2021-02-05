@@ -9,8 +9,6 @@ set(JSON_BuildTests OFF CACHE INTERNAL "")
 # turn off the EnTT tests.
 set(BUILD_TESTING OFF)
 
-# Set the SoLoud backend
-set(WITH_SDL2 ON)
 
 add_subdirectory(SDL2)
 add_subdirectory(Glad)
