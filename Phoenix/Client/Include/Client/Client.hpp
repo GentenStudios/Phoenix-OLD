@@ -61,8 +61,8 @@ namespace phx::client
 
 		entt::registry m_registry;
 
-		gfx::Window     m_window;
 		gfx::LayerStack m_layerStack;
+		gfx::Window     m_window;
 
 		bool          m_debugOverlayActive = false;
 		DebugOverlay* m_debugOverlay       = nullptr;
