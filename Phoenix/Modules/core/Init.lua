@@ -24,7 +24,8 @@ register_block_pair({
     name = "Dirt",
     id = "core.dirt",
     textures = { "Assets/dirt.png" },
-    image = "Assets/dirt.png"
+    image = "Assets/dirt.png",
+    max_stack = 64,
 })
 
 register_block_pair({
@@ -34,7 +35,8 @@ register_block_pair({
         "Assets/grass_side.png", "Assets/grass_side.png", "Assets/grass_side.png",
         "Assets/grass_side.png", "Assets/grass_top.png", "Assets/dirt.png"
     },
-    image = "Assets/grass_side.png"
+    image = "Assets/grass_side.png",
+    max_stack = 64,
 })
 
 register_block_pair({

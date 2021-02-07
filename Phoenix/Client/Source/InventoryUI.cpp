@@ -75,7 +75,10 @@ void InventoryUI::tick(float dt)
 		}
 		else
 		{
-			ImGui::Button(m_holding.type->displayName.c_str(), {50, 50});
+			ImGui::Button(
+			    (m_holding.type->displayName + std::to_string(m_holding.volume))
+			        .c_str(),
+			    {50, 50});
 		}
 	}
 	ImGui::End();
@@ -100,17 +103,37 @@ void InventoryUI::tick(float dt)
 				if (m_holding.type != nullptr)
 				{
 					m_inventory->addItem(i, m_holding);
-					m_holding = {nullptr, nullptr};
+					m_holding = {nullptr, nullptr, 0};
 				}
 			}
 		}
 		else
 		{
-			if (ImGui::Button(item.type->displayName.c_str(), {50, 50}))
+			if (ImGui::Button(
+			        (item.type->displayName + std::to_string(item.volume))
+			            .c_str(),
+			        {50, 50}))
 			{
 				if (m_holding.type == nullptr)
 				{
 					m_holding = m_inventory->removeItem(i);
+				}
+				else if (m_holding.type == item.type)
+				{
+					if (m_holding.volume + item.volume <
+					    m_holding.type->maxStack)
+					{
+						m_holding.volume += item.volume;
+						m_inventory->removeItem(i);
+					}
+					else
+					{
+						auto temp = m_inventory->removeItem(i);
+						temp.volume -=
+						    m_holding.type->maxStack - m_holding.volume;
+						m_holding.volume = m_holding.type->maxStack;
+						m_inventory->addItem(i, temp);
+					}
 				}
 				else
 				{
@@ -138,7 +161,17 @@ void InventoryUI::tick(float dt)
 			if (ImGui::Button(m_referrer->items.get(i)->displayName.c_str(),
 			                  {50, 50}))
 			{
-				m_holding = {m_referrer->items.get(i), nullptr};
+				if (m_holding.type == m_referrer->items.get(i))
+				{
+					if (m_holding.volume < m_holding.type->maxStack)
+					{
+						m_holding.volume++;
+					}
+				}
+				else
+				{
+					m_holding = {m_referrer->items.get(i), nullptr, 1};
+				}
 			}
 		}
 	}

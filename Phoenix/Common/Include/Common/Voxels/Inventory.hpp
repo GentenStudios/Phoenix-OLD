@@ -60,25 +60,36 @@ namespace phx::voxels
 		 * Add an item to a specified slot in the inventory.
 		 * @param slot The slot you want to insert the item into.
 		 * @param item The item you want to insert into the inventory.
-		 * @return true If the item was inserted.
-		 * @return false If the item was not inserted.
+		 * @return true If the item (or full stack of items) was inserted.
+		 * @return false If the item was not inserted or only part of a stack
+		 * of items was inserted.
+		 *
+		 * @note If a stack of items is inserted into a slot with an existing
+		 * partial stack of items, this will fill that slot and return false.
+		 * In this scenario, the item supplied as an argument will have its
+		 * volume reduced.
 		 */
-		bool addItem(std::size_t slot, const Item& item);
+		bool addItem(std::size_t slot, Item& item);
 
 		/**
 		 * Add an item to the next open slot in the inventory.
 		 * @param item The item you want to insert into the inventory.
 		 * @return The index of the item slot if the item was inserted.
-		 * @return -1 If the item was not inserted.
+		 * @return -1 If the item was not inserted or only part of a stack
+		 * of items was inserted.
+		 *
+		 * @note If a stack of items is inserted, this will attempt to find a
+		 * home for every item in the stack. If there is only enough space for
+		 * some items, the stack will be reduced but -1 is still returned.
 		 */
-		int addItem(const Item& item);
+		int addItem(Item& item);
 
 		/**
 		 * Removes an item from the inventory.
 		 * @param slot The slot the item is in.
 		 * @return The item or nullptr if the slot is empty.
 		 */
-		Item removeItem(std::size_t slot);
+		Item removeItem(std::size_t slot, bool all = true);
 
 		/**
 		 * @brief Sets metadata for the Item at the supplied slot.
@@ -102,9 +113,10 @@ namespace phx::voxels
 		Serializer& operator<<(Serializer& ser) override;
 
 	private:
-		std::size_t            m_size;
-		std::vector<ItemType*> m_slots;
-		Metadata::Container    m_metadata;
-		ItemReferrer*          m_referrer;
+		std::size_t              m_size;
+		std::vector<ItemType*>   m_slots;
+		std::vector<std::size_t> m_stacks;
+		Metadata::Container      m_metadata;
+		ItemReferrer*            m_referrer;
 	};
 } // namespace phx::voxels

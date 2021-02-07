@@ -124,6 +124,8 @@ namespace phx::voxels
 		 * @brief Sets the Block at the supplied position.
 		 * @param position Position of the block relative to the chunk.
 		 * @param newBlock The block that now exists at this location.
+		 *
+		 * @note The old block gets destroyed and any metadata will be lost.
 		 */
 		void setBlockAt(const math::vec3& position, Block newBlock);
 
