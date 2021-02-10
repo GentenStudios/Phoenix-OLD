@@ -9,15 +9,20 @@ set(JSON_BuildTests OFF CACHE INTERNAL "")
 # turn off the EnTT tests.
 set(BUILD_TESTING OFF)
 
-add_subdirectory (SDL2)
-add_subdirectory (Glad)
-add_subdirectory (ImGui)
-add_subdirectory (sol2)
-add_subdirectory (lua)
-add_subdirectory (enet)
-add_subdirectory (entt)
+
+add_subdirectory(SDL2)
+add_subdirectory(Glad)
+add_subdirectory(ImGui)
+add_subdirectory(sol2)
+add_subdirectory(lua)
+add_subdirectory(enet)
+add_subdirectory(entt)
 add_subdirectory(json)
 add_subdirectory(Catch2)
+# IDEFK what I am doing - this made SoLoud work. TODO: Fix this disaster
+set(SDL2_INCLUDE_DIR ${CMAKE_CURRENT_LIST_DIR}/SDL2/include)
+set(SDL2_LIBRARY SDL2main)
+add_subdirectory(soloud/contrib)
 
 # Stop SDL trying to control our main function.
 target_compile_definitions(SDL2main INTERFACE SDL_MAIN_HANDLED)
@@ -44,24 +49,26 @@ set(PHX_THIRD_PARTY_INCLUDES
 	${CMAKE_CURRENT_LIST_DIR}/stb_rectpack
 	${CMAKE_CURRENT_LIST_DIR}/entt/src
 	${CMAKE_CURRENT_LIST_DIR}/json/include
+	${CMAKE_CURRENT_LIST_DIR}/soloud/include
 
 	PARENT_SCOPE
-)
+	)
 
 set(PHX_THIRD_PARTY_LIBRARIES
 	SDL2-static
-		SDL2main
-		Glad
-		ImGui
-		enet
-		sol2
-		liblua
-		nlohmann_json::nlohmann_json
-		$<$<PLATFORM_ID:Windows>:opengl32.lib> # link to opengl32.lib if windows.
-		$<$<PLATFORM_ID:Windows>:ws2_32.lib> # link to ws2_32.lib if windows.
-		$<$<PLATFORM_ID:Windows>:winmm.lib> # link to winmm.lib if windows.
-		PARENT_SCOPE
-		)
+	SDL2main
+	Glad
+	ImGui
+	enet
+	sol2
+	soloud
+	liblua
+	nlohmann_json::nlohmann_json
+	$<$<PLATFORM_ID:Windows>:opengl32.lib> # link to opengl32.lib if windows.
+	$<$<PLATFORM_ID:Windows>:ws2_32.lib> # link to ws2_32.lib if windows.
+	$<$<PLATFORM_ID:Windows>:winmm.lib> # link to winmm.lib if windows.
+	PARENT_SCOPE
+	)
 
 target_compile_options(sol2 INTERFACE
   $<$<CXX_COMPILER_ID:MSVC>:/wd4996>

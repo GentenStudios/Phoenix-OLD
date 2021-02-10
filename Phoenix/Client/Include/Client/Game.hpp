@@ -32,21 +32,25 @@
 #include <Client/GameTools.hpp>
 
 #include <Client/Graphics/Camera.hpp>
+#include <Client/Graphics/ChatBox.hpp>
 #include <Client/Graphics/ChunkRenderer.hpp>
-#include <Client/Graphics/WorldRenderer.hpp>
 #include <Client/Graphics/Layer.hpp>
 #include <Client/Graphics/ShaderPipeline.hpp>
 #include <Client/Graphics/Window.hpp>
-#include <Client/Graphics/ChatBox.hpp>
-#include <Client/Voxels/BlockRegistry.hpp>
-#include <Client/InputQueue.hpp>
+#include <Client/Graphics/WorldRenderer.hpp>
 #include <Client/HUD.hpp>
+#include <Client/InputQueue.hpp>
+#include <Client/Voxels/BlockRegistry.hpp>
 
 #include "InventoryUI.hpp"
 #include <Client/Voxels/ItemRegistry.hpp>
 #include <Common/CMS/ModManager.hpp>
 #include <Common/Save.hpp>
 #include <Common/Voxels/InventoryManager.hpp>
+
+#include <Client/Voxels/AudioEventHandler.hpp>
+#include <soloud.h>
+#include <soloud_wav.h>
 
 namespace phx::client
 {
@@ -92,6 +96,9 @@ namespace phx::client
 		void confirmState(const Position& position);
 
 	private:
+		AudioRegistry      m_audioRegistry;
+		AudioEventHandler* m_audioEventHandler;
+
 		BlockRegistry m_blockRegistry;
 		ItemRegistry  m_itemRegistry;
 
@@ -102,6 +109,8 @@ namespace phx::client
 
 		voxels::Map*              m_map        = nullptr;
 		voxels::InventoryManager* m_invManager = nullptr;
+
+		SoLoud::Soloud m_soloud;
 
 		gfx::Window*        m_window;
 		gfx::FPSCamera*     m_camera        = nullptr;

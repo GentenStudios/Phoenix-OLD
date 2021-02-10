@@ -46,7 +46,8 @@ using namespace phx::client;
 using namespace phx;
 
 Game::Game(gfx::Window* window, entt::registry* registry, bool networked)
-    : Layer("Game"), m_registry(registry), m_window(window)
+    : Layer("Game"), m_registry(registry), m_window(window),
+      m_blockRegistry(BlockRegistry(&m_audioRegistry))
 {
 	if (networked)
 	{
@@ -70,6 +71,7 @@ Game::Game(gfx::Window* window, entt::registry* registry, bool networked)
 
 	m_modManager = new cms::ModManager(m_save->getModList(), {"Modules"});
 
+	m_audioRegistry.registerAPI(m_modManager, &m_soloud);
 	m_blockRegistry.registerAPI(m_modManager);
 	m_itemRegistry.registerAPI(m_modManager);
 
@@ -99,7 +101,11 @@ Game::Game(gfx::Window* window, entt::registry* registry, bool networked)
 	});
 }
 
-Game::~Game() { delete m_chat; }
+Game::~Game()
+{
+	delete m_chat;
+	m_soloud.deinit();
+}
 
 void Game::onAttach()
 {
@@ -193,8 +199,14 @@ void Game::onAttach()
 	{
 		m_inputQueue->start(std::chrono::milliseconds(50), m_network);
 	}
-
 	LOG_INFO("MAIN") << "Game layer attached";
+	SoLoud::Wav* bg = m_audioRegistry.get(
+	    m_audioRegistry.add("Assets/Audio/background_music.mp3", "core.bg"));
+	bg->setLooping(true);
+	m_soloud.init();
+	m_soloud.play(*bg);
+	m_audioEventHandler =
+	    new AudioEventHandler(m_map, &m_blockRegistry, &m_soloud);
 }
 
 void Game::onDetach()
@@ -203,6 +215,7 @@ void Game::onDetach()
 	delete m_inputQueue;
 	delete m_network;
 	delete m_camera;
+	delete m_audioEventHandler;
 }
 
 void Game::onEvent(events::Event& e)

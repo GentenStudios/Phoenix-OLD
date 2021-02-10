@@ -28,6 +28,7 @@
 
 #pragma once
 
+#include <Client/AudioRegistry.hpp>
 #include <Client/Graphics/BlockModel.hpp>
 #include <Client/Graphics/TexturePacker.hpp>
 
@@ -54,7 +55,8 @@ namespace phx::client
 	 */
 	struct BlockRegistry
 	{
-		BlockRegistry()
+		BlockRegistry(AudioRegistry* audioRegistry)
+		    : m_audioRegistry(audioRegistry)
 		{
 			textureHandles.add(voxels::BlockType::UNKNOWN_BLOCK, {0});
 			textureHandles.setUnknownReturnVal(
@@ -74,10 +76,17 @@ namespace phx::client
 
 		gfx::TexturePacker texturePacker;
 		Registry<std::size_t, std::vector<gfx::TexturePacker::Handle>>
-		    textureHandles;
+		                                                  textureHandles;
 		Registry<gfx::TexturePacker::Handle, std::string> textures;
 
 		Registry<std::size_t, gfx::BlockModel> models;
+
+	private:
+		AudioRegistry* m_audioRegistry;
+
+	public:
+		Registry<std::size_t, SourceGroup> SoundOnBreak;
+		Registry<std::size_t, SourceGroup> SoundOnPlace;
 
 		void registerAPI(cms::ModManager* manager)
 		{
@@ -85,10 +94,10 @@ namespace phx::client
 			    "voxel.block.register", [manager, this](sol::table luaBlock) {
 				    voxels::BlockType block;
 
-					sol::optional<std::string> name = luaBlock["name"];
-					if (name)
-					{
-						block.displayName = *name;
+				    sol::optional<std::string> name = luaBlock["name"];
+				    if (name)
+				    {
+					    block.displayName = *name;
 					}
 					else
 					{
@@ -103,9 +112,9 @@ namespace phx::client
 					sol::optional<std::string> id = luaBlock["id"];
 					if (id)
 				    {
-						block.id          = luaBlock.get<std::string>("id");
-					}
-					else
+					    block.id = luaBlock.get<std::string>("id");
+				    }
+				    else
 				    {
 					    // log the error and return to make this a recoverable
 					    // error.
@@ -233,10 +242,58 @@ namespace phx::client
 						    {
 							    model = gfx::BlockModel::X_PANEL_CUBE;
 						    }
-			    		}
-			    		
+					    }
+
 					    models.add(blockUID, model);
-			    	}
+				    }
+
+				    sol::optional<std::vector<std::string>> luaSoundOnBreak =
+				        luaBlock["soundOnBreak"];
+				    SourceGroup onBreakSources;
+				    if (luaSoundOnBreak)
+				    {
+					    for (const auto& sourceID : *luaSoundOnBreak)
+					    {
+						    auto* source = m_audioRegistry->getByID(sourceID);
+						    if (source != nullptr)
+						    {
+							    onBreakSources.push_back(source);
+						    }
+						    else
+						    {
+							    LOG_WARNING("MODDING")
+							        << "The mod at: "
+							        << manager->getCurrentModPath()
+							        << " attempted to get unloaded audio file ("
+							        << sourceID << ")";
+						    }
+					    }
+					    SoundOnBreak.add(blockUID, onBreakSources);
+				    }
+
+				    sol::optional<std::vector<std::string>> luaSoundOnPlace =
+				        luaBlock["soundOnPlace"];
+				    SourceGroup onPlaceSources;
+				    if (luaSoundOnPlace)
+				    {
+					    for (const auto& sourceID : *luaSoundOnPlace)
+					    {
+						    auto* source = m_audioRegistry->getByID(sourceID);
+						    if (source != nullptr)
+						    {
+							    onPlaceSources.emplace_back(source);
+						    }
+						    else
+						    {
+							    LOG_WARNING("MODDING")
+							        << "The mod at: "
+							        << manager->getCurrentModPath()
+							        << " attempted to get unloaded audio file ("
+							        << sourceID << ")";
+						    }
+					    }
+					    SoundOnPlace.add(blockUID, onPlaceSources);
+				    }
 			    });
 		}
 	};
