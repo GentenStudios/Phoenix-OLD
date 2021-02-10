@@ -77,14 +77,17 @@ void HUD::tick(float dt)
 			{
 				ImGui::PushStyleColor(ImGuiCol_Button, {0.f, 1.f, 0.f, 1.f});
 			}
-			const voxels::ItemType* item = hand.inventory->getItem(i).type;
-			if (item == nullptr)
+			const voxels::Item item = hand.inventory->getItem(i);
+			if (item.type == nullptr)
 			{
 				ImGui::Button("", {50, 50});
 			}
 			else
 			{
-				ImGui::Button(item->displayName.c_str(), {50, 50});
+				ImGui::Button(
+				    (item.type->displayName + std::to_string(item.volume))
+				        .c_str(),
+				    {50, 50});
 			}
 			if (i == hand.getHandSlot())
 			{

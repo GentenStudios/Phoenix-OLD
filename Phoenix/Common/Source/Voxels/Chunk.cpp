@@ -63,10 +63,19 @@ void Chunk::setBlockAt(const phx::math::vec3& position, Block newBlock)
 	if (position.x < CHUNK_WIDTH && position.y < CHUNK_HEIGHT &&
 	    position.z < CHUNK_DEPTH)
 	{
+		Block oldBlock = getBlockAt(position);
+		if (oldBlock.type->onBreak)
+		{
+			oldBlock.type->onBreak(position.x, position.y, position.z);
+		}
 		m_blocks[getVectorIndex(position)] = newBlock.type;
 		if (newBlock.metadata != nullptr)
 		{
 			m_metadata[getVectorIndex(position)] = *newBlock.metadata;
+		}
+		if (newBlock.type->onPlace)
+		{
+			newBlock.type->onPlace(position.x, position.y, position.z);
 		}
 	}
 }
@@ -87,8 +96,20 @@ bool Chunk::setMetadataAt(const phx::math::vec3& position,
 	return false;
 }
 
+bool Chunk::canRepeat(std::size_t i) const
+{
+	if (i + 1 >= CHUNK_MAX_BLOCKS)
+		return false;
+	if (m_blocks[i + 1]->id != m_blocks[i]->id)
+		return false;
+	if (m_metadata.find(i + 1) != m_metadata.end())
+		return false;
+	return true;
+};
+
 phx::Serializer& Chunk::operator>>(phx::Serializer& ser) const
 {
+
 	ser << m_pos.x << m_pos.y << m_pos.z;
 	for (int i = 0; i < CHUNK_MAX_BLOCKS; i++)
 	// for (const BlockType* block : m_blocks)
@@ -97,6 +118,15 @@ phx::Serializer& Chunk::operator>>(phx::Serializer& ser) const
 		if (m_metadata.find(i) != m_metadata.end())
 		{
 			ser << '+' << m_metadata.at(i);
+		}
+		else if (canRepeat(i))
+		{
+			std::size_t j = i;
+			while (canRepeat(i))
+			{
+				i++;
+			}
+			ser << '*' << i - j;
 		}
 		else
 		{
@@ -128,6 +158,17 @@ phx::Serializer& Chunk::operator<<(phx::Serializer& ser)
 			Metadata data;
 			ser >> data;
 			m_metadata[i] = data;
+		}
+		else if (c == '*')
+		{
+			std::size_t rep;
+			ser >> rep;
+			for (std::size_t j = 0; j < rep; j++)
+			{
+				m_blocks.push_back(
+				    m_referrer->blocks.get(*m_referrer->referrer.get(id)));
+				i++;
+			}
 		}
 	}
 

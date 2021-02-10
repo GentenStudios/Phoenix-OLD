@@ -44,7 +44,7 @@ ChatBox::ChatBox(Window* window, phx::BlockingQueue<std::string>* messageQueue)
 	std::memset(m_input, 0, MAX_INPUT_LIMIT);
 }
 
-ChatBox::~ChatBox() { delete m_input; }
+ChatBox::~ChatBox() { delete[] m_input; }
 
 void ChatBox::setDrawBox(bool drawBox) { m_drawBox = drawBox; }
 

@@ -65,7 +65,7 @@ void EscapeMenu::onEvent(phx::events::Event& e)
 			switch (m_page)
 			{
 			case Page::MAIN:
-				Client::get()->popLayer(this);
+				signalRemoval();
 				e.handled = true;
 				break;
 			case Page::SETTINGS:
@@ -102,7 +102,7 @@ void EscapeMenu::tick(float dt)
 		}
 		if (ImGui::Button("Return", {290, 30}))
 		{
-			Client::get()->popLayer(this);
+			signalRemoval();
 		}
 		if (ImGui::Button("Exit", {290, 30}))
 		{

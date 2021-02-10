@@ -1,4 +1,3 @@
-core.log_info("Load mod 1")
 
 --function hello (args)
 --    if args[1] == "there" then
@@ -32,7 +31,8 @@ register_block_pair({
     textires = { "Assets/dirt.png" },
     image = "Assets/dirt.png",
     soundOnPlace = { "mod1.dirt_place" },
-    soundOnBreak = { "mod1.dirt_place" }
+    soundOnBreak = { "mod1.dirt_place" },
+    max_stack = 64,
 })
 
 register_block_pair({
@@ -44,7 +44,8 @@ register_block_pair({
     },
     image = "Assets/grass_side.png",
     soundOnPlace = { "mod1.dirt_place" },
-    soundOnBreak = { "mod1.dirt_place" }
+    soundOnBreak = { "mod1.dirt_place" },
+    max_stack = 64,
 })
 
 register_block_pair({

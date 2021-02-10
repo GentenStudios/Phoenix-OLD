@@ -37,6 +37,7 @@ Inventory::Inventory(std::size_t size, ItemReferrer* referrer)
 	for (std::size_t i = 0; i < size; i++)
 	{
 		m_slots.emplace_back(nullptr);
+		m_stacks.emplace_back(0);
 	}
 }
 
@@ -44,54 +45,94 @@ Item Inventory::getItem(std::size_t slot)
 {
 	if (m_slots.size() >= slot)
 	{
+		Item item({m_slots[slot], nullptr, m_stacks[slot]});
 		if (m_metadata.find(slot) != m_metadata.end())
 		{
-			return {m_slots[slot], m_metadata[slot]};
+			item.metadata = m_metadata[slot];
 		}
-		return {m_slots[slot], nullptr};
+		return item;
 	}
-	return {m_referrer->items.get(ItemType::INVALID_ITEM), nullptr};
+	return {m_referrer->items.get(ItemType::INVALID_ITEM), nullptr, 0};
 }
 
-bool Inventory::addItem(std::size_t slot, const Item& item)
+bool Inventory::addItem(std::size_t slot, Item& item)
 {
-	if (getItem(slot).type == nullptr && m_size >= slot)
+	if (m_size <= slot)
+	{
+		LOG_DEBUG("Inventory")
+		    << "Attempted to insert item into non-existent slot";
+		return false;
+	}
+	if (getItem(slot).type == nullptr)
 	{
 		m_slots[slot] = item.type;
 		if (item.metadata != nullptr)
 		{
 			m_metadata[slot] = item.metadata;
 		}
+		m_stacks[slot] = item.volume;
+		item.volume    = 0;
 		return true;
 	}
-	LOG_DEBUG("Inv") << getItem(slot).type << m_size << slot;
+	if (m_slots.at(slot) == item.type &&
+	    m_stacks.at(slot) < item.type->maxStack)
+	{
+		if (m_metadata.find(slot) != m_metadata.end() ||
+		    item.metadata != nullptr)
+		{
+			LOG_DEBUG("Inventory") << "Attempted to stack items with metadata";
+			return false;
+		}
+		if (m_stacks[slot] + item.volume > item.type->maxStack)
+		{
+			item.volume    = item.volume + m_stacks[slot] - item.type->maxStack;
+			m_stacks[slot] = item.type->maxStack;
+			return false;
+		}
+		m_stacks[slot] += item.volume;
+		item.volume = 0;
+		return true;
+	}
+	LOG_DEBUG("Inventory") << "Attempted to insert item into occupied slot";
 	return false;
 }
 
-int Inventory::addItem(const Item& item)
+int Inventory::addItem(Item& item)
 {
 	for (std::size_t i = 0; i < m_size; i++)
 	{
-		if (m_slots.at(i) == nullptr)
+		if (m_slots.at(i) == nullptr || m_slots.at(i) == item.type)
 		{
-			m_slots[i] = item.type;
-			if (item.metadata != nullptr)
+			if (addItem(i, item))
 			{
-				m_metadata[i] = item.metadata;
+				return i;
 			}
-			return i;
 		}
 	}
 	return -1;
 }
 
-Item Inventory::removeItem(std::size_t slot)
+Item Inventory::removeItem(std::size_t slot, bool all)
 {
 	if (m_slots.size() >= slot)
 	{
 		Item item;
-		item.type     = m_slots[slot];
-		m_slots[slot] = nullptr;
+		item.type = m_slots.at(slot);
+		if (all)
+		{
+			item.volume       = m_stacks.at(slot);
+			m_stacks.at(slot) = 0;
+			m_slots.at(slot)  = nullptr;
+		}
+		else
+		{
+			item.volume = 1;
+			m_stacks.at(slot)--;
+			if (m_stacks.at(slot) == 0)
+			{
+				m_slots.at(slot) = nullptr;
+			}
+		}
 		if (m_metadata.find(slot) != m_metadata.end())
 		{
 			item.metadata = m_metadata[slot];
@@ -99,7 +140,7 @@ Item Inventory::removeItem(std::size_t slot)
 		}
 		return item;
 	}
-	return {m_referrer->items.get(ItemType::INVALID_ITEM), nullptr};
+	return {m_referrer->items.get(ItemType::INVALID_ITEM), nullptr, 0};
 }
 
 /**
@@ -112,23 +153,37 @@ bool Inventory::setMetadataAt(std::size_t slot, const std::string& key,
 {
 	if (m_size <= slot)
 	{
-		return m_metadata[slot]->set(key, newData);
+		LOG_DEBUG("Inventory")
+		    << "Attempted to set metadata for out of bounds inventory slot";
+		return false;
 	}
-	LOG_DEBUG("Inventory.cpp")
-	    << "Attempted to set metadata for out of bounds inventory slot";
-	return false;
+	if (m_slots.at(slot) == nullptr)
+	{
+		LOG_DEBUG("Inventory")
+		    << "Attempted to set metadata for empty inventory slot";
+		return false;
+	}
+	if (m_stacks.at(slot) > 1)
+	{
+		LOG_DEBUG("Inventory") << "Attempted to set metadata a stack of items";
+		return false;
+	}
+	return m_metadata[slot]->set(key, newData);
 }
 
 phx::Serializer& Inventory::operator>>(phx::Serializer& ser) const
 {
 	ser << m_size;
 	for (std::size_t i = 0; i < m_size; i++)
-	// for (const BlockType* block : m_blocks)
 	{
 		ser << m_slots[i]->uniqueIdentifier;
 		if (m_metadata.find(i) != m_metadata.end())
 		{
 			ser << '+' << *m_metadata.at(i);
+		}
+		else if (m_stacks.at(i) > 1)
+		{
+			ser << '*' << m_stacks.at(i);
 		}
 		else
 		{
@@ -147,6 +202,7 @@ phx::Serializer& Inventory::operator<<(phx::Serializer& ser)
 		std::size_t id = 0;
 		ser >> id;
 		m_slots.push_back(m_referrer->items.get(id));
+		m_stacks.at(i) = 1;
 		char c;
 		ser >> c;
 		if (c == ';')
@@ -157,6 +213,12 @@ phx::Serializer& Inventory::operator<<(phx::Serializer& ser)
 			std::shared_ptr<Metadata> data;
 			ser >> *data;
 			m_metadata.emplace(i, data);
+		}
+		else if (c == '*')
+		{
+			std::size_t volume;
+			ser >> volume;
+			m_stacks.at(i) = volume;
 		}
 	}
 	return ser;

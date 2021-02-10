@@ -79,11 +79,12 @@ namespace phx
 	class ActorSystem
 	{
 	public:
-		// TODO this should be unique to each actor
-		static constexpr float m_reach = 32.f;
+		// TODO these should be unique to each actor
+		static constexpr float m_reach    = 32.f;
+		static constexpr bool  m_creative = false;
 
 		static void setBlockReferrer(voxels::BlockReferrer* referrer);
-		
+
 		static math::Ray    getTarget(entt::registry* registry,
 		                              entt::entity    entity);
 		static entt::entity registerActor(entt::registry* registry);
