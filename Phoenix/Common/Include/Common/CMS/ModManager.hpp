@@ -100,6 +100,10 @@ namespace phx::cms
 		template <typename F>
 		void registerFunction(const std::string& funcName, const F& func);
 
+		template <typename T, typename... Args>
+		sol::usertype<T> registerType(std::string name,
+		                              sol::constructors<Args...>);
+
 		// unimplemented function, exists as a reminder for when we need it.
 		template <typename T>
 		void exposeVariable(const std::string& name, T var);

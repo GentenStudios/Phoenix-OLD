@@ -26,6 +26,7 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+#include <Common/Logger.hpp>
 #include <Common/Voxels/Chunk.hpp>
 
 using namespace phx::voxels;
@@ -66,7 +67,7 @@ void Chunk::setBlockAt(const phx::math::vec3& position, Block newBlock)
 		Block oldBlock = getBlockAt(position);
 		if (oldBlock.type->onBreak)
 		{
-			oldBlock.type->onBreak(position.x, position.y, position.z);
+			oldBlock.type->onBreak(position);
 		}
 		m_blocks[getVectorIndex(position)] = newBlock.type;
 		if (newBlock.metadata != nullptr)
@@ -75,7 +76,7 @@ void Chunk::setBlockAt(const phx::math::vec3& position, Block newBlock)
 		}
 		if (newBlock.type->onPlace)
 		{
-			newBlock.type->onPlace(position.x, position.y, position.z);
+			newBlock.type->onPlace(position);
 		}
 	}
 }

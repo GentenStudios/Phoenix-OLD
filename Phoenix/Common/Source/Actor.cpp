@@ -120,6 +120,9 @@ bool ActorSystem::action1(entt::registry* registry, entt::entity entity)
 
 	math::Ray ray(pos, registry->get<Position>(entity).getDirection());
 
+	Hand         hand = registry->get<Hand>(entity);
+	voxels::Item item = hand.getHand();
+
 	while (ray.getLength() < m_reach)
 	{
 		pos.floor();
@@ -127,16 +130,33 @@ bool ActorSystem::action1(entt::registry* registry, entt::entity entity)
 		const auto* currentBlock = map->getBlockAt(pos);
 		if (currentBlock->category == voxels::BlockCategory::SOLID)
 		{
+			if (item.type)
+			{
+				if (item.type->onPrimary)
+				{
+					item.type->onPrimary(pos);
+					return true;
+				}
+			}
 			map->setBlockAt(
 			    pos, {m_blockReferrer->blocks.get(voxels::BlockType::AIR_BLOCK),
 			          nullptr});
-
 			return true;
 		}
 
 		pos = ray.advance(RAY_INCREMENT);
 	}
-
+	/* TODO: This doesn't feel right but IDK how to get the position to the
+	 * callback otherwise
+	 */
+	if (item.type)
+	{
+		if (item.type->onPrimary)
+		{
+			item.type->onPrimary(pos);
+			return true;
+		}
+	}
 	return false;
 }
 
@@ -196,15 +216,19 @@ bool ActorSystem::action2(entt::registry* registry, entt::entity entity)
 
 				map->setBlockAt(back, block);
 			}
-			if (item.type->onPlace)
+			if (item.type->onSecondary)
 			{
-				item.type->onPlace(back.x, back.y, back.z);
+				item.type->onSecondary(back);
 			}
 
 			return true;
 		}
 
 		pos = ray.advance(RAY_INCREMENT);
+	}
+	if (item.type->onSecondary)
+	{
+		item.type->onSecondary(pos);
 	}
 
 	return false;

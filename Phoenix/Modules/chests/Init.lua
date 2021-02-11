@@ -9,6 +9,11 @@ register_block_pair({
     rotH = true,
 })
 
+onbreak = function(_pos)
+    core.log_info("Called")
+    voxel.map.getBlock(_pos)
+end
+
 register_block_pair({
     name = "Iron Chest",
     id = "chests.iron", --Jack Co. Supply Crate ;3
@@ -18,4 +23,5 @@ register_block_pair({
     },
     image = "Assets/chest_iron_front.png",
     rotH = true,
+    onBreak = onbreak
 })
