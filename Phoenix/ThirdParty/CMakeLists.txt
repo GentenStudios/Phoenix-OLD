@@ -1,12 +1,12 @@
-# SDL needs this variable set, who knows why.
-set(HAVE_LIBC TRUE)
-
 # SDL2 setup
 # Exposes targets SDL2main and SDL2-static
-add_subdirectory(SDL2)
+
+set(HAVE_LIBC TRUE)
 
 # Make SDL build ONLY the static lib, we don't use the shared lib.
 set(SDL_SHARED_ENABLED_BY_DEFAULT OFF)
+
+add_subdirectory(SDL2)
 
 # Stop SDL trying to control our main function.
 target_compile_definitions(SDL2main INTERFACE SDL_MAIN_HANDLED)
