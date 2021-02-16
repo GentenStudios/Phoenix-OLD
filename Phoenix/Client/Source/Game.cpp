@@ -113,7 +113,6 @@ Game::Game(gfx::Window* window, entt::registry* registry, bool networked)
 		                               // being called before the map is
 		                               // initialized
 		                               auto block = m_map->getBlockAt(pos);
-		                               LOG_DEBUG("TEMP") << block->id;
 		                               return block->id;
 	                               });
 }

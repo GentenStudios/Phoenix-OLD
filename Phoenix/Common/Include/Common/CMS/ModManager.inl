@@ -98,7 +98,7 @@ namespace phx::cms
 	}
 
 	template <typename T, typename... Args>
-	sol::usertype<T> ModManager::registerType(std::string name,
+	sol::usertype<T> ModManager::registerType(const std::string& name,
 	                                          sol::constructors<Args...>)
 	{
 		return m_luaState.new_usertype<T>(name, sol::constructors<Args...>());

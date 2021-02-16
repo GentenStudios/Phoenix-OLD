@@ -124,7 +124,7 @@ namespace phx::cms
 		 * @endcode
 		 */
 		template <typename T, typename... Args>
-		sol::usertype<T> registerType(std::string name,
+		sol::usertype<T> registerType(const std::string& name,
 		                              sol::constructors<Args...>);
 
 		// unimplemented function, exists as a reminder for when we need it.
