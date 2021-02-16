@@ -9,13 +9,11 @@ add_library(${PROJECT_NAME} STATIC ${Headers} ${Sources})
 
 target_link_libraries(${PROJECT_NAME}
 	PRIVATE
-	${PHX_THIRD_PARTY_LIBRARIES}
+	PhoenixThirdParty
 	$<$<AND:$<CXX_COMPILER_ID:GNU>,$<VERSION_LESS:$<CXX_COMPILER_VERSION>,9.0>>:stdc++fs>
 	)
 
 target_include_directories(${PROJECT_NAME}
-	PRIVATE
-	${PHX_THIRD_PARTY_INCLUDES}
 	PUBLIC
 	Include
 	)
@@ -32,14 +30,12 @@ if (PHX_BUILD_TESTS)
 
 	target_link_libraries(${PROJECT_NAME}_test
 		PRIVATE
-		${PHX_THIRD_PARTY_LIBRARIES}
+		PhoenixThirdParty
 		Catch2::Catch2
 		$<$<AND:$<CXX_COMPILER_ID:GNU>,$<VERSION_LESS:$<CXX_COMPILER_VERSION>,9.0>>:stdc++fs>
 		)
 
 	target_include_directories(${PROJECT_NAME}_test
-		PRIVATE
-		${PHX_THIRD_PARTY_INCLUDES}
 		PUBLIC
 		Include
 		)
