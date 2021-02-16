@@ -100,6 +100,29 @@ namespace phx::cms
 		template <typename F>
 		void registerFunction(const std::string& funcName, const F& func);
 
+		/**
+		 * @brief Registers a C++ class as a usertype in Lua.
+		 * @tparam T The Class being exposed to Lua.
+		 * @tparam Args Constructors that Lua will have access to
+		 * @param name Name of the usertype in Lua, should follow PascalCase
+		 * naming.
+		 * @return The usertype object, used for registering member functions in
+		 * lua.
+		 *
+		 * This function allows us to define user types in Lua see
+		 * https://www.lua.org/pil/28.html for more information on user types.
+		 *
+		 * @note Member functions and variables are not accessible by default,
+		 * you need to expose each member individually.
+		 *
+		 * @code{.cpp}
+		 * auto typeVec3 = m_modManager->registerType<math::vec3>("Vec3",
+		 * sol::constructors<math::vec3(), math::vec3(float, float, float)>());
+		 * typeVec3["x"] = &math::vec3::x;
+		 * typeVec3["y"] = &math::vec3::y;
+		 * typeVec3["z"] = &math::vec3::z;
+		 * @endcode
+		 */
 		template <typename T, typename... Args>
 		sol::usertype<T> registerType(std::string name,
 		                              sol::constructors<Args...>);

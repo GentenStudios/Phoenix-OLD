@@ -10,7 +10,7 @@ register_block_pair({
 })
 
 onbreak = function(_pos)
-    core.log_info("Called")
+    core.log_info("CalledBreak")
     voxel.map.getBlock(_pos)
 end
 
@@ -23,5 +23,9 @@ register_block_pair({
     },
     image = "Assets/chest_iron_front.png",
     rotH = true,
-    onBreak = onbreak
+    onBreak = onbreak,
+    onPlace = function(_pos)
+        core.log_info("CalledPlace")
+        voxel.map.getBlock(_pos)
+    end,
 })
