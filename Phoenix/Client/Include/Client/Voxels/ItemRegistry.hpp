@@ -100,17 +100,18 @@ namespace phx::client
 					    item.places = *places;
 				    }
 
-				    sol::optional<sol::function> onPlace = luaItem["onPlace"];
-				    if (onPlace)
+				    sol::optional<sol::function> onPrimary =
+				        luaItem["onPrimary"];
+				    if (onPrimary)
 				    {
-					    item.onPlace = *onPlace;
+					    item.onPrimary = *onPrimary;
 				    }
 
-				    sol::optional<sol::function> onInteract =
-				        luaItem["onInteract"];
-				    if (onInteract)
+				    sol::optional<sol::function> onSecondary =
+				        luaItem["onSecondary"];
+				    if (onSecondary)
 				    {
-					    item.onInteract = *onInteract;
+					    item.onSecondary = *onSecondary;
 				    }
 
 				    std::size_t itemUID   = referrer.referrer.size();

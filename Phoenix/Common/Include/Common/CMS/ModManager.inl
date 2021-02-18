@@ -96,4 +96,12 @@ namespace phx::cms
 			       "\"core.block.register\".";
 		}
 	}
-} // namespace phx::mods
+
+	template <typename T, typename... Args>
+	sol::usertype<T> ModManager::registerType(const std::string& name,
+	                                          sol::constructors<Args...>)
+	{
+		return m_luaState.new_usertype<T>(name, sol::constructors<Args...>());
+	}
+
+} // namespace phx::cms

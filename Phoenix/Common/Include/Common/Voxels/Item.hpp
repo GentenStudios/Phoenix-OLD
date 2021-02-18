@@ -90,10 +90,10 @@ namespace phx::voxels
 		std::string places;
 
 		/// @brief Callback for when the secondary interaction button is called.
-		ItemCallback onPlace;
+		ItemCallback onPrimary;
 
 		/// @brief Callback for when the primary interaction is called.
-		ItemCallback onInteract;
+		ItemCallback onSecondary;
 	};
 
 	/**

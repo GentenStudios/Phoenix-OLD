@@ -99,6 +99,22 @@ Game::Game(gfx::Window* window, entt::registry* registry, bool networked)
 	m_modManager->registerFunction("core.log_debug", [](std::string message) {
 		LOG_DEBUG("MODULE") << message;
 	});
+
+	auto typeVec3 = m_modManager->registerType<math::vec3>(
+	    "Vec3",
+	    sol::constructors<math::vec3(), math::vec3(float, float, float)>());
+	typeVec3["x"] = &math::vec3::x;
+	typeVec3["y"] = &math::vec3::y;
+	typeVec3["z"] = &math::vec3::z;
+
+	m_modManager->registerFunction("voxel.map.getBlock",
+	                               [this](math::vec3 pos) {
+		                               // TODO: We should prevent this from
+		                               // being called before the map is
+		                               // initialized
+		                               auto block = m_map->getBlockAt(pos);
+		                               return block->id;
+	                               });
 }
 
 Game::~Game()
