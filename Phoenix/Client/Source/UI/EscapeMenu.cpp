@@ -27,7 +27,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <Client/Client.hpp>
-#include <Client/EscapeMenu.hpp>
+#include <Client/UI/EscapeMenu.hpp>
 
 #include <iostream>
 #include <imgui.h>

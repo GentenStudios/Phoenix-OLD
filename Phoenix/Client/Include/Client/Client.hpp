@@ -28,10 +28,10 @@
 
 #pragma once
 
-#include <Client/DebugOverlay.hpp>
 #include <Client/Events/IEventListener.hpp>
 #include <Client/Graphics/LayerStack.hpp>
 #include <Client/Graphics/Window.hpp>
+#include <Client/UI/DebugOverlay.hpp>
 
 #include <Common/CLIParser.hpp>
 #include <Common/Settings.hpp>

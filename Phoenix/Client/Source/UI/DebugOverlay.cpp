@@ -26,75 +26,69 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Client/Client.hpp>
-#include <Client/HUD.hpp>
+#include <Client/UI/DebugOverlay.hpp>
 
-#include <Common/Actor.hpp>
-#include <Common/PlayerView.hpp>
-
+#include <Client/Graphics/ImGuiExtensions.hpp>
 #include <imgui.h>
+
+#include <glad/glad.h>
 
 using namespace phx::client;
 using namespace phx;
 
-HUD::HUD(gfx::Window* window, entt::registry* registry, entt::entity player)
-    : gfx::Overlay("HUD"), m_window(window), m_registry(registry),
-      m_player(player)
+DebugOverlay::DebugOverlay() : Overlay("DebugOverlay")
 {
+	SDL_DisplayMode current;
+
+	for (int i = 0; i < SDL_GetNumVideoDisplays(); ++i)
+	{
+		if (SDL_GetCurrentDisplayMode(i, &current) == 0)
+		{
+			if (current.refresh_rate > m_maxSampleRate)
+				m_maxSampleRate = current.refresh_rate;
+		}
+	}
 }
 
-void HUD::onAttach() {}
-void HUD::onDetach() {}
-void HUD::onEvent(events::Event& e) {}
+void DebugOverlay::onAttach() {}
 
-void HUD::tick(float dt)
+void DebugOverlay::onDetach() {}
+
+void DebugOverlay::onEvent(events::Event& e) {}
+
+void DebugOverlay::tick(float dt)
 {
-	voxels::Map* map = m_registry->get<PlayerView>(m_player).map;
-	ImGui::SetNextWindowPos(
-	    {m_window->getSize().x / 2 - WIDTH / 2, m_window->getSize().y - POSY});
-	ImGui::SetNextWindowSize(ImVec2(WIDTH, HEIGHT));
+	ImGui::SetNextWindowPos({50, 50}, ImGuiCond_Once);
+	ImGui::Begin("Phoenix");
 
-	ImGui::Begin("HUD", nullptr,
-	             ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove);
+	if (ImGui::CollapsingHeader("Graphics Information"))
 	{
-		auto target =
-		    ActorSystem::getTarget(m_registry, m_player).getCurrentPosition();
-		target.floor();
-		auto targetBlock = map->getBlockAt(target);
-		if (targetBlock->category == voxels::BlockCategory::SOLID)
+		if (ImGui::Checkbox("Wireframe", &m_wireframe))
 		{
-			ImGui::Text("%s", targetBlock->displayName.c_str());
+			if (m_wireframe)
+				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+			else
+				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		}
+
+		ImGui::Text("Frame Time: %.2f ms/frame\n", dt * 1000.f);
+		ImGui::Text("FPS: %d\n", static_cast<int>(1.f / dt));
+
+		ImGui::SliderInt("Debug Sample Rate", &m_sampleRate, 1, 60);
+		ImGui::Checkbox("Pause Debug Graph", &m_pauseSampling);
+
+		if (m_time % m_sampleRate == 0 && !m_pauseSampling)
+		{
+			ImGui::PlotVariable("Frame Time: ", dt * 1000.f);
 		}
 		else
 		{
-			ImGui::Text("");
-		}
-
-		Hand& hand = m_registry->get<Hand>(m_player);
-		for (std::size_t i = 0; i < hand.size; i++)
-		{
-			if (i == hand.getHandSlot())
-			{
-				ImGui::PushStyleColor(ImGuiCol_Button, {0.f, 1.f, 0.f, 1.f});
-			}
-			const voxels::Item item = hand.inventory->getItem(i);
-			if (item.type == nullptr)
-			{
-				ImGui::Button("", {50, 50});
-			}
-			else
-			{
-				ImGui::Button(
-				    (item.type->displayName + std::to_string(item.volume))
-				        .c_str(),
-				    {50, 50});
-			}
-			if (i == hand.getHandSlot())
-			{
-				ImGui::PopStyleColor(1);
-			}
-			ImGui::SameLine();
+			ImGui::PlotVariable("Frame Time: ", FLT_MAX);
 		}
 	}
 	ImGui::End();
+
+	++m_time;
+	if (m_time >= 3600)
+		m_time = 0;
 }

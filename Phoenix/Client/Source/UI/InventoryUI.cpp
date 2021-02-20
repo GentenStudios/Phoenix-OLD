@@ -27,7 +27,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <Client/Client.hpp>
-#include <Client/InventoryUI.hpp>
+#include <Client/UI/InventoryUI.hpp>
 
 #include <imgui.h>
 

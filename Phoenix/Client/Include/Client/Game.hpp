@@ -28,8 +28,8 @@
 
 #pragma once
 
-#include <Client/EscapeMenu.hpp>
-#include <Client/GameTools.hpp>
+#include <Client/UI/EscapeMenu.hpp>
+#include <Client/UI/GameTools.hpp>
 
 #include <Client/Graphics/Camera.hpp>
 #include <Client/Graphics/ChatBox.hpp>
@@ -38,11 +38,11 @@
 #include <Client/Graphics/ShaderPipeline.hpp>
 #include <Client/Graphics/Window.hpp>
 #include <Client/Graphics/WorldRenderer.hpp>
-#include <Client/HUD.hpp>
 #include <Client/InputQueue.hpp>
+#include <Client/UI/HUD.hpp>
 #include <Client/Voxels/BlockRegistry.hpp>
 
-#include "InventoryUI.hpp"
+#include "Client/UI/InventoryUI.hpp"
 #include <Client/Voxels/ItemRegistry.hpp>
 #include <Common/CMS/ModManager.hpp>
 #include <Common/Save.hpp>
