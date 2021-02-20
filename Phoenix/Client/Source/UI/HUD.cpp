@@ -26,40 +26,75 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Client/GameTools.hpp>
+#include <Client/Client.hpp>
+#include <Client/UI/HUD.hpp>
 
 #include <Common/Actor.hpp>
-#include <Common/Position.hpp>
+#include <Common/PlayerView.hpp>
 
 #include <imgui.h>
 
 using namespace phx::client;
 using namespace phx;
 
-GameTools::GameTools(bool* followCam, entt::registry* registry,
-                     entt::entity player)
-    : Overlay("GameTools"), m_followCam(followCam), m_registry(registry),
+HUD::HUD(gfx::Window* window, entt::registry* registry, entt::entity player)
+    : gfx::Overlay("HUD"), m_window(window), m_registry(registry),
       m_player(player)
 {
 }
 
-void GameTools::onAttach() {}
+void HUD::onAttach() {}
+void HUD::onDetach() {}
+void HUD::onEvent(events::Event& e) {}
 
-void GameTools::onDetach() {}
-
-void GameTools::onEvent(events::Event& e) {}
-
-void GameTools::tick(float dt)
+void HUD::tick(float dt)
 {
-	ImGui::Begin("Phoenix");
-	if (ImGui::CollapsingHeader("Game Tools"))
-	{
-		ImGui::Checkbox("Follow Camera", m_followCam);
+	voxels::Map* map = m_registry->get<PlayerView>(m_player).map;
+	ImGui::SetNextWindowPos(
+	    {m_window->getSize().x / 2 - WIDTH / 2, m_window->getSize().y - POSY});
+	ImGui::SetNextWindowSize(ImVec2(WIDTH, HEIGHT));
 
-		ImGui::Text("X: %f\nY: %f\nZ: %f",
-		            m_registry->get<Position>(m_player).position.x,
-		            m_registry->get<Position>(m_player).position.y,
-		            m_registry->get<Position>(m_player).position.z);
+	ImGui::Begin("HUD", nullptr,
+	             ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove);
+	{
+		auto target =
+		    ActorSystem::getTarget(m_registry, m_player).getCurrentPosition();
+		target.floor();
+		auto targetBlock = map->getBlockAt(target);
+		if (targetBlock->category == voxels::BlockCategory::SOLID)
+		{
+			ImGui::Text("%s", targetBlock->displayName.c_str());
+		}
+		else
+		{
+			ImGui::Text("");
+		}
+
+		Hand& hand = m_registry->get<Hand>(m_player);
+		for (std::size_t i = 0; i < hand.size; i++)
+		{
+			if (i == hand.getHandSlot())
+			{
+				ImGui::PushStyleColor(ImGuiCol_Button, {0.f, 1.f, 0.f, 1.f});
+			}
+			const voxels::Item item = hand.inventory->getItem(i);
+			if (item.type == nullptr)
+			{
+				ImGui::Button("", {50, 50});
+			}
+			else
+			{
+				ImGui::Button(
+				    (item.type->displayName + std::to_string(item.volume))
+				        .c_str(),
+				    {50, 50});
+			}
+			if (i == hand.getHandSlot())
+			{
+				ImGui::PopStyleColor(1);
+			}
+			ImGui::SameLine();
+		}
 	}
 	ImGui::End();
 }

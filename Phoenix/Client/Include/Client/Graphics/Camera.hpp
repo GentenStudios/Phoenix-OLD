@@ -35,9 +35,9 @@
 
 #pragma once
 
-#include <Client/Crosshair.hpp>
 #include <Client/Graphics/Window.hpp>
 #include <Client/InputMap.hpp>
+#include <Client/UI/Crosshair.hpp>
 
 #include <Common/Math/Math.hpp>
 #include <Common/Settings.hpp>

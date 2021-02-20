@@ -26,7 +26,7 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Client/SplashScreen.hpp>
+#include <Client/UI/SplashScreen.hpp>
 
 #include <glad/glad.h>
 #include <stb_image.h>
