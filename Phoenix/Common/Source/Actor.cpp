@@ -35,13 +35,6 @@
 
 using namespace phx;
 
-voxels::BlockReferrer* ActorSystem::m_blockReferrer = nullptr;
-
-void ActorSystem::setBlockReferrer(voxels::BlockReferrer* referrer)
-{
-	m_blockReferrer = referrer;
-}
-
 entt::entity ActorSystem::registerActor(entt::registry* registry)
 {
 	auto entity = registry->create();
@@ -50,6 +43,7 @@ entt::entity ActorSystem::registerActor(entt::registry* registry)
 	registry->emplace<Movement>(entity, DEFAULT_MOVE_SPEED);
 	return entity;
 }
+
 void ActorSystem::tick(entt::registry* registry, entt::entity entity,
                        const float dt, const InputState& input)
 {
@@ -113,7 +107,8 @@ math::Ray ActorSystem::getTarget(entt::registry* registry, entt::entity entity)
 	return ray;
 }
 
-bool ActorSystem::action1(entt::registry* registry, entt::entity entity)
+bool ActorSystem::action1(voxels::BlockReferrer* blockReferrer,
+                          entt::registry* registry, entt::entity entity)
 {
 	math::vec3   pos = (registry->get<Position>(entity).position / 2.f) + .5f;
 	voxels::Map* map = registry->get<PlayerView>(entity).map;
@@ -139,7 +134,7 @@ bool ActorSystem::action1(entt::registry* registry, entt::entity entity)
 				}
 			}
 			map->setBlockAt(
-			    pos, {m_blockReferrer->blocks.get(voxels::BlockType::AIR_BLOCK),
+			    pos, {blockReferrer->blocks.get(voxels::BlockType::AIR_BLOCK),
 			          nullptr});
 			return true;
 		}
@@ -160,7 +155,8 @@ bool ActorSystem::action1(entt::registry* registry, entt::entity entity)
 	return false;
 }
 
-bool ActorSystem::action2(entt::registry* registry, entt::entity entity)
+bool ActorSystem::action2(voxels::BlockReferrer* blockReferrer,
+                          entt::registry* registry, entt::entity entity)
 {
 	math::vec3 pos = (registry->get<Position>(entity).position / 2.f) + .5f;
 	const math::vec3& dir = registry->get<Position>(entity).getDirection();
@@ -190,9 +186,9 @@ bool ActorSystem::action2(entt::registry* registry, entt::entity entity)
 				{
 					hand.inventory->removeItem(hand.getHandSlot(), false);
 				}
-				voxels::Block block {
-				    m_blockReferrer->getByID(item.type->places), nullptr};
-				Metadata data;
+				voxels::Block block {blockReferrer->getByID(item.type->places),
+				                     nullptr};
+				Metadata      data;
 				if (block.type->rotH)
 				{
 					math::vec3 rotation;
