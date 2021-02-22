@@ -88,9 +88,9 @@ namespace phx
 		static entt::entity registerActor(entt::registry* registry);
 		static void         tick(entt::registry* registry, entt::entity entity,
 		                         float dt, const InputState& input);
-		static bool action1(entt::registry* registry, entt::entity entity,
-		                    voxels::BlockReferrer* blockReferrer);
-		static bool action2(entt::registry* registry, entt::entity entity,
-		                    voxels::BlockReferrer* blockReferrer);
+		static bool         action1(voxels::BlockReferrer* blockReferrer,
+		                            entt::registry* registry, entt::entity entity);
+		static bool         action2(voxels::BlockReferrer* blockReferrer,
+		                            entt::registry* registry, entt::entity entity);
 	};
 } // namespace phx

@@ -302,14 +302,14 @@ void Game::onEvent(events::Event& e)
 		switch (e.mouse.button)
 		{
 		case events::MouseButtons::LEFT:
-			ActorSystem::action1(m_registry, m_player,
-			                     &m_blockRegistry.referrer);
+			ActorSystem::action1(&m_blockRegistry.referrer, m_registry,
+			                     m_player);
 			e.handled = true;
 			break;
 
 		case events::MouseButtons::RIGHT:
-			ActorSystem::action2(m_registry, m_player,
-			                     &m_blockRegistry.referrer);
+			ActorSystem::action2(&m_blockRegistry.referrer, m_registry,
+			                     m_player);
 			e.handled = true;
 			break;
 

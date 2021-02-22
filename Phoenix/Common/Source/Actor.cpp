@@ -107,8 +107,8 @@ math::Ray ActorSystem::getTarget(entt::registry* registry, entt::entity entity)
 	return ray;
 }
 
-bool ActorSystem::action1(entt::registry* registry, entt::entity entity,
-                          voxels::BlockReferrer* blockReferrer)
+bool ActorSystem::action1(voxels::BlockReferrer* blockReferrer,
+                          entt::registry* registry, entt::entity entity)
 {
 	math::vec3   pos = (registry->get<Position>(entity).position / 2.f) + .5f;
 	voxels::Map* map = registry->get<PlayerView>(entity).map;
@@ -155,8 +155,8 @@ bool ActorSystem::action1(entt::registry* registry, entt::entity entity,
 	return false;
 }
 
-bool ActorSystem::action2(entt::registry* registry, entt::entity entity,
-                          voxels::BlockReferrer* blockReferrer)
+bool ActorSystem::action2(voxels::BlockReferrer* blockReferrer,
+                          entt::registry* registry, entt::entity entity)
 {
 	math::vec3 pos = (registry->get<Position>(entity).position / 2.f) + .5f;
 	const math::vec3& dir = registry->get<Position>(entity).getDirection();
