@@ -130,7 +130,6 @@ void Game::onAttach()
 		m_network->start();
 	}
 
-	ActorSystem::setBlockReferrer(&m_blockRegistry.referrer);
 	m_player = ActorSystem::registerActor(m_registry);
 
 	float progress = 0.f;
@@ -303,12 +302,14 @@ void Game::onEvent(events::Event& e)
 		switch (e.mouse.button)
 		{
 		case events::MouseButtons::LEFT:
-			ActorSystem::action1(m_registry, m_player);
+			ActorSystem::action1(m_registry, m_player,
+			                     &m_blockRegistry.referrer);
 			e.handled = true;
 			break;
 
 		case events::MouseButtons::RIGHT:
-			ActorSystem::action2(m_registry, m_player);
+			ActorSystem::action2(m_registry, m_player,
+			                     &m_blockRegistry.referrer);
 			e.handled = true;
 			break;
 
