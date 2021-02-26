@@ -28,7 +28,7 @@ core.audio.register({
 register_block_pair({
     name = "Dirt",
     id = "core.dirt",
-    textires = { "Assets/dirt.png" },
+    textures = { "Assets/dirt.png" },
     image = "Assets/dirt.png",
     soundOnPlace = { "mod1.dirt_place" },
     soundOnBreak = { "mod1.dirt_place" },
