@@ -42,20 +42,16 @@ EscapeMenu::EscapeMenu(phx::gfx::Window* window, phx::gfx::FPSCamera* camera)
 	m_settings = Settings::instance()->getImplFinalSettings();
 }
 
-void EscapeMenu::onAttach()
-{
-	m_page = Page::MAIN;
+void EscapeMenu::onAttach() {}
+void EscapeMenu::onDetach() {}
 
-	m_camera->enable(false);
-	m_active = true;
-}
-void EscapeMenu::onDetach()
-{
-	m_active = false;
-	m_camera->enable(true);
-}
 void EscapeMenu::onEvent(phx::events::Event& e)
 {
+	if (!m_active)
+	{
+		return;
+	}
+	
 	switch (e.type)
 	{
 	case phx::events::EventType::KEY_PRESSED:
@@ -65,7 +61,7 @@ void EscapeMenu::onEvent(phx::events::Event& e)
 			switch (m_page)
 			{
 			case Page::MAIN:
-				signalRemoval();
+				disableMenu();
 				e.handled = true;
 				break;
 			case Page::SETTINGS:
@@ -83,6 +79,11 @@ void EscapeMenu::onEvent(phx::events::Event& e)
 
 void EscapeMenu::tick(float dt)
 {
+	if (!m_active)
+	{
+		return;
+	}
+	
 	constexpr static double   DoubleMax = 100.0;
 	constexpr static double   DoubleMin = 0.0;
 	constexpr static uint64_t IntMax    = 100;
@@ -102,7 +103,7 @@ void EscapeMenu::tick(float dt)
 		}
 		if (ImGui::Button("Return", {290, 30}))
 		{
-			signalRemoval();
+			disableMenu();
 		}
 		if (ImGui::Button("Exit", {290, 30}))
 		{
@@ -156,4 +157,18 @@ void EscapeMenu::tick(float dt)
 	}
 
 	ImGui::End();
+}
+
+void EscapeMenu::enableMenu()
+{
+	m_page = Page::MAIN;
+
+	m_active = true;
+	m_camera->enable(false);
+}
+
+void EscapeMenu::disableMenu()
+{
+	m_active = false;
+	m_camera->enable(true);
 }

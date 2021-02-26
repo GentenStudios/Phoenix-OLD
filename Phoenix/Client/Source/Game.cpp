@@ -188,6 +188,9 @@ void Game::onAttach()
 	m_hud = new HUD(m_window, m_registry, m_player);
 	Client::get()->pushLayer(m_hud);
 
+	m_escapeMenu = new EscapeMenu(m_window, m_camera);
+	Client::get()->pushLayer(m_escapeMenu);
+	
 	m_inputQueue = new InputQueue(m_registry, m_player, m_camera);
 	if (m_network != nullptr)
 	{
@@ -213,7 +216,8 @@ void Game::onEvent(events::Event& e)
 		switch (e.keyboard.key)
 		{
 		case events::Keys::KEY_ESCAPE:
-			Client::get()->pushLayer(m_escapeMenu);
+			// on attach sets the m_active variable to true which renders the escape menu.
+			m_escapeMenu->enableMenu();
 			e.handled = true;
 			break;
 
