@@ -57,6 +57,8 @@ namespace phx::client
 		void tick(float dt) override;
 
 		bool isActive() { return m_active; };
+		void enableMenu();
+		void disableMenu();
 
 		static constexpr float WIDTH  = 300;
 		static constexpr float HEIGHT = 300;
