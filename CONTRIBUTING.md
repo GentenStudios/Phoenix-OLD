@@ -1,5 +1,7 @@
 # GENTEN STUDIOS CONTRIBITING GUIDELINES
-These are mostly guidelines, not rules. Use your best judgment, and feel free to propose changes to this document in a pull request.
+These are mostly guidelines, not rules. Use your best judgment, and feel free to propose changes to this document in a pull request. However a PR may have changes requested on it if it does not adhear to guidelines outlined here.
+
+If you are just browsing through quick before starting, it's worth keeping [the PR checklist](#pr-checklist) in mind before you open a new PR to help make your PR review go smoother. 
 
 ## TABLE OF CONTENTS
 
@@ -18,23 +20,23 @@ Familiarity with Git, specifically with using branches, is a must for interactin
 **The Master Branch** is the *most* stable source for the code, this contains major/ minor releases and nothing else. Only release and hotfix branches can be pushed here.
 - All Genten Developers and Staff Members must approve any push to the master branch - unless said otherwise (e.g. last minute hotfixes).
 - The code must be thoroughly tested on all supported systems before being pushed here.
+- Pre-compiled distributable code should be pushed to the releases section of GitHub when pushing code to the Master branch.
+- The release version should be incremented any time code is pushed to the release branch. See [Versioning and releases](#VERSIONING-AND-RELEASES)
 
 **Hot Fix Branches** are a method for pushing code to the master branch after a release. These should be minor fixes that add no functionality (unless the bug restricts a certain functionality) to the project.
 
 **Release Branches** are the staging area for a release. Similar to a hotfix branch only bug testing is to be done here and no new features should be added. 
-- A 3/4 developer approval to push to the release branch.
-- The code must be tested on all supported systems before being pushed here.
+- A > 75% active developer approval to push to the release branch.
 
 **The Develop Branch** Is where new features are added, however not where they are worked on. Commits should be merged from a feature branch into the develop branch and from nowhere else.
-- It takes a greater than 2/3 developer approval to push to the develop branch.
-- The code must be tested on all supported systems before being pushed here.
+- It takes at least 2 developer approvals to push to the develop branch.
+- CI must pass for all supported systems before being pushed here.
 
 **Feature Branches** are where the action happens, each feature branch contains the addition of a single new feature. This is where all main development work happens and it is required to create a feature branch to push code. Any Genten developer can accept code into a feature branch.
-- These branches must follow the naming convention of ``feat-[feature name]`` (e.g. ``feat-voxels``)
+- A single developer can approve merging code into a feature branch.
+- A feature branch may also potentially only exist on a fork if multiple people are not collaborating on a feature branch.
+- These branches should follow the naming convention of ``feat-[feature name]`` (e.g. ``feat-voxels``)
 - Sub branches will generally follow a similar naming convention of ``feat-[feature name]-[subfeature]`` (e.g. ``feat-voxels-blocks``)
-
-### Pull Requests
-- A pull request from a contributors repository can be approved by a single developer, this code can only be pulled into feature branches and not directly into the development or higher branches.
 
 ### PR checklist
 This section lists the requirements for merging code. All of these requirements must be satisfied before code is merged into any branch.
@@ -43,8 +45,8 @@ All Branches:
 - Accomplish the feature(s) it was designed to accomplish
 - Has the branch it's merging into merged onto itself and all conflicts are resolved
 - Clean of all binaries and other non-source material
-- Code is documented
-- Complies with style guide
+- All classes, functions, and variables are documented with doxygen style comments
+- Complies with style guide and other contributing guidelines
 - All Developer reviewer comments are resolved
 - Code is formatted with cLang
 
@@ -129,24 +131,34 @@ Multiline comments should use the /* */ method of commenting, where the /* and *
 When documenting classes, methods and similar we follow the Doxygen Javadoc syntax. For example, this convention should be followed:
 ```cpp
 /**
- * @brief This class is for documentation reasons. 
+ * @brief This class is for documentation reasons.
  */
 class FooBar {
 public:
 	/**
 	 * @brief This does an important thing
-	 * @param desc A description of the thing
-	 * @return A very important integer. (probably an error code or something)
-	 */
-  	int doThing(std::string desc);
+	 * 
+	 * @param desc A description of the provided parameter
+     * @return What does the value returned by this function mean?
+     */
+    int doThing(std::string desc);
   	
-  	float randomNumber; //< This is a single line description for a member
+    float randomNumber; //< This is a single line description for a member
 
-      /// @brief This member variable requires a longer single line comment. (filling space)
-      bool foobarred;
+    /// @brief This member variable requires a longer single line comment. (filling space)
+    bool  foobarred;
 };
 ```
 Multiline Doxygen comments should start with a /** and end with a normal */. The second asterisk is something that Doxygen recogises through its own interpreter. There are two ways for single line comments, choose whichever one looks right, a slightly longer one however should use the second method, just so we don’t have to become grannies to read.
 ## MODULARISATION
 Currently the code is separated by function, eg all the code for rendering is in one spot. Each module should sport a easy-to-use public API. This API should be as generic as possible in order to make the replacing, and use of code easier.
 ## TODO: FORMATTING, USAGE OF C++ FEATURES
+
+# THIRD PARTIES
+We use many third party libraries to support the functionality of our projects. While working with third parties there are a couple things to keep in mind:
+### 1. Qualifications
+When choosing a third party, we need to make sure the third party is right for our needs. You need to consider the license, how maintained the library is, how stable the library is, and if there are any alternatives better suited for what we need. It's best to reach out in #programming on our Discord to discuss the viability of a third party before selecting one. You don't want to have these questions unanswered when making your PR request.
+### 2. Install
+When working with C++ code, we should use a submodule for third parties if possible. We also want to keep the third party code seperate from our own source code so it should be placed in the ThirdParties folder of the project.
+### 3. Never modify the third party
+To help with maintainability, third parties should have no modified code in them. When it comes to updating the third party it should be as easy as replacing the current version with the new version. If it is absolutely needed, we may choose to maintain a fork of a third party in another repo, however it is preferred to submit a PR to their repo instead
