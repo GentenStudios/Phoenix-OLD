@@ -32,6 +32,8 @@
 
 #include <Common/Math/Math.hpp>
 
+#include <sol/sol.hpp>
+
 using namespace phx::cms;
 
 static void CustomPanicHandler(sol::optional<std::string> maybe_msg)
@@ -53,8 +55,8 @@ ModManager::ModManager(const ModList& toLoad, const ModList& paths)
     : m_modsRequired(toLoad), m_modPaths(paths)
 {
 	m_luaState.open_libraries(sol::lib::base);
-	m_luaState.set_panic(
-	    sol::c_call<decltype(&CustomPanicHandler), &CustomPanicHandler>);
+	lua_atpanic(m_luaState,
+			sol::c_call<decltype(&CustomPanicHandler), &CustomPanicHandler>);
 }
 
 ModManager::Status ModManager::load(float* progress)
