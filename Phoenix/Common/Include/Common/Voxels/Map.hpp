@@ -29,7 +29,6 @@
 #pragma once
 
 #include <Common/Math/Math.hpp>
-#include <Common/Save.hpp>
 #include <Common/Utility/BlockingQueue.hpp>
 #include <Common/Voxels/BlockReferrer.hpp>
 #include <Common/Voxels/Chunk.hpp>
@@ -70,7 +69,8 @@ namespace phx::voxels
 	class Map
 	{
 	public:
-		Map(Save* save, const std::string& name,
+		Map(std::filesystem::path* savePath,
+		    const std::string& name,
 		    voxels::BlockReferrer* referrer);
 		Map(BlockingQueue<std::pair<math::vec3, std::vector<std::byte>>>* queue,
 		    voxels::BlockReferrer* referrer);
@@ -123,8 +123,8 @@ namespace phx::voxels
 
 		BlockReferrer* m_referrer;
 
-		Save*       m_save = nullptr;
-		std::string m_mapName;
+        std::filesystem::path* m_savePath = nullptr;
+		std::string m_name;
 
 		BlockingQueue<std::pair<math::vec3, std::vector<std::byte>>>* m_queue =
 		    nullptr;

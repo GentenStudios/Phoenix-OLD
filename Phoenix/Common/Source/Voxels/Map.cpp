@@ -41,17 +41,21 @@
 
 using namespace phx::voxels;
 
-Map::Map(phx::Save* save, const std::string& name, BlockReferrer* referrer)
-    : m_referrer(referrer), m_save(save), m_mapName(name)
+Map::Map(std::filesystem::path* savePath,
+         const std::string& name,
+         BlockReferrer* referrer)
+    : m_referrer(referrer), m_savePath(savePath), m_name(name)
 {
+	if (!std::filesystem::exists(*m_savePath / m_name))
+	{
+        std::filesystem::create_directory(*m_savePath / m_name);
+	}
 }
 
 Map::Map(phx::BlockingQueue<std::pair<phx::math::vec3, std::vector<std::byte>>>*
                         queue,
          BlockReferrer* referrer)
-    : m_referrer(referrer), m_queue(queue)
-{
-}
+    : m_referrer(referrer), m_queue(queue) {}
 
 /*
     Chunks are kept in an unordered map of vec3 : Chunk. The algorithm looks
@@ -224,8 +228,6 @@ void Map::updateChunkQueue()
 
 		m_chunks.emplace(chunk.getChunkPos(), chunk);
 	}
-
-	return;
 }
 
 bool Map::loadChunk(const phx::math::vec3& chunkPos)
@@ -291,11 +293,10 @@ std::filesystem::path Map::toSavePath(const phx::math::vec3i& chunkPos) const
 {
 	const std::string posString = std::to_string(chunkPos.x) + '_' +
 	                              std::to_string(chunkPos.y) + '_' +
-	                              std::to_string(chunkPos.z);
+	                              std::to_string(chunkPos.z) + ".save";
 
-	const std::filesystem::path savePath = phx::saveDir + m_save->getName() +
-	                                       '/' + m_mapName + '.' + posString +
-	                                       ".save";
+	const std::filesystem::path savePath
+	    = *m_savePath / m_name / posString;
 
 	return savePath;
 }

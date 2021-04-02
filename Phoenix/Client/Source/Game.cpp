@@ -125,12 +125,12 @@ Game::~Game()
 
 void Game::onAttach()
 {
-	if (m_network != nullptr)
+	if (m_network)
 	{
 		m_network->start();
 	}
 
-	m_player = ActorSystem::registerActor(m_registry);
+    LOG_INFO("MAIN") << "Loading Modules";
 
 	float progress = 0.f;
 	auto  result   = m_modManager->load(&progress);
@@ -142,30 +142,24 @@ void Game::onAttach()
 	}
 
 	LOG_INFO("MAIN") << "Registering world";
-	if (m_network != nullptr)
+	if (m_network)
 	{
+        m_chat = new gfx::ChatBox(m_window, &m_network->messageQueue);
 		m_map =
 		    new voxels::Map(&m_network->chunkQueue, &m_blockRegistry.referrer);
 	}
 	else
 	{
-		m_map = new voxels::Map(m_save, "map1", &m_blockRegistry.referrer);
+        m_chat = new gfx::ChatBox(m_window, nullptr);
+		m_map = m_save->getOrCreateMap("Map1", &m_blockRegistry.referrer);
 	}
 	m_invManager =
 	    new voxels::InventoryManager(m_save, &m_itemRegistry.referrer);
 	m_playerInventory =
 	    m_invManager->getInventory(m_invManager->createInventory(30));
+
+    m_player = ActorSystem::registerActor(m_registry);
 	m_registry->emplace<Hand>(m_player, 1, m_playerInventory);
-
-	if (m_network)
-	{
-		m_chat = new gfx::ChatBox(m_window, &m_network->messageQueue);
-	}
-	else
-	{
-		m_chat = new gfx::ChatBox(m_window, nullptr);
-	}
-
 	m_registry->emplace<PlayerView>(m_player, m_map);
 	m_camera = new gfx::FPSCamera(m_window, m_registry);
 	m_camera->setActor(m_player);
@@ -229,6 +223,7 @@ void Game::onDetach()
 	delete m_mapRenderer;
 	delete m_inputQueue;
 	delete m_network;
+    delete m_save;
 	delete m_camera;
 	delete m_audioEventHandler;
 }

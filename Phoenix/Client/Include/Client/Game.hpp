@@ -107,9 +107,6 @@ namespace phx::client
 		voxels::Inventory* m_playerInventory = nullptr;
 		int                m_playerHand      = 0;
 
-		voxels::Map*              m_map        = nullptr;
-		voxels::InventoryManager* m_invManager = nullptr;
-
 		SoLoud::Soloud m_soloud;
 
 		gfx::Window*        m_window;
@@ -136,6 +133,8 @@ namespace phx::client
 		// This is an internal log of the recent input states sent to the server
 		std::list<InputState> m_states;
 
-		Save* m_save = nullptr;
+        Save* m_save = nullptr;
+        voxels::Map*              m_map        = nullptr;
+        voxels::InventoryManager* m_invManager = nullptr;
 	};
 } // namespace phx::client
