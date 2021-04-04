@@ -29,7 +29,6 @@
 #include <Common/Logger.hpp>
 #include <Common/Save.hpp>
 
-#include <filesystem>
 #include <fstream>
 #include <iomanip>
 
@@ -40,16 +39,16 @@ Save::Save(const std::string& save, const std::vector<std::string>& mods,
 {
 	namespace fs = std::filesystem;
 
-	auto path = fs::current_path() / phx::saveDir / save;
+	m_savePath = fs::current_path() / phx::saveDir / save;
 
 	// does not necessarily mean it's empty, it just means there's no save.json
 	// so we can do whatever.
-	if (!fs::exists(path / (save + ".json")))
+	if (!fs::exists(m_savePath / (save + ".json")))
 	{
 		LOG_INFO("SAVES") << "Save doesn't exist, creating.";
 		
 		// save doesn't already exist, lets make it.
-		fs::create_directories(path);
+		fs::create_directories(m_savePath);
 
 		// we make a new json thing so we don't double the size of the config
 		// struct.
@@ -59,7 +58,7 @@ Save::Save(const std::string& save, const std::vector<std::string>& mods,
 		saveSettings["mods"]     = mods;
 		saveSettings["settings"] = settings;
 
-		std::ofstream json(path / (save + ".json"));
+		std::ofstream json(m_savePath / (save + ".json"));
 		json << std::setw(4) << saveSettings;
 		json.close();
 
@@ -72,7 +71,7 @@ Save::Save(const std::string& save, const std::vector<std::string>& mods,
 		LOG_INFO("SAVES") << "Loading existing save.";
 		
 		// save exists, lets load what we need.
-		std::ifstream json(path.append(save + ".json"));
+		std::ifstream json(m_savePath.append(save + ".json"));
 		if (!json.is_open())
 		{
 			LOG_FATAL("SAVES")
@@ -159,10 +158,10 @@ void Save::toFile(const std::string& name)
 	{
 		m_name = name;
 
-		const auto path = fs::current_path() / phx::saveDir / name;
+        m_savePath = fs::current_path() / phx::saveDir / name;
 
 		// save already exists, overwrite json.
-		if (fs::exists(path))
+		if (fs::exists(m_savePath))
 		{
 			LOG_WARNING("SAVES")
 			    << "Target folder for save renaming operation already exists, "
@@ -171,7 +170,7 @@ void Save::toFile(const std::string& name)
 			/// @todo implement system to potentially backup the existing save
 
 			// empty the folder of the existing save.
-			for (auto& p : fs::directory_iterator(path))
+			for (auto& p : fs::directory_iterator(m_savePath))
 			{
 				fs::remove(p);
 			}
@@ -182,14 +181,14 @@ void Save::toFile(const std::string& name)
 			saveSettings["mods"] = m_mods;
 			saveSettings["settings"] = m_settings;
 
-			std::ofstream json(path / (name + ".json"));
+			std::ofstream json(m_savePath / (name + ".json"));
 			json << std::setw(4) << saveSettings;
 			json.close();
 		}
 		else
 		{
 			// folder doesn't already exist, lets make it.
-			fs::create_directory(path);
+			fs::create_directory(m_savePath);
 
 			// write new json file.
 			nlohmann::json saveSettings;
@@ -197,7 +196,7 @@ void Save::toFile(const std::string& name)
 			saveSettings["mods"]     = m_mods;
 			saveSettings["settings"] = m_settings;
 
-			std::ofstream json(path / (m_name + ".json"));
+			std::ofstream json(m_savePath / (m_name + ".json"));
 			json << std::setw(4) << saveSettings;
 			json.close();
 		}
@@ -207,16 +206,14 @@ void Save::toFile(const std::string& name)
 		// the save hasn't been renamed, and the settings have changed, now
 		// update file, otherwise there's no point.
 
-		const auto path = fs::current_path() / phx::saveDir / m_name;
-
 		// this exists as a error check to prevent an exception being thrown when opening the json file.
-		if (!fs::exists(path))
+		if (!fs::exists(m_savePath))
 		{
 			LOG_WARNING("SAVES")
 			    << "The save that was originally opened no longer exists, it "
 			       "will be recreated, however there may be data loss.";
 
-			fs::create_directory(path);
+			fs::create_directory(m_savePath);
 
 			// setting this will make sure that the settings file is created in the below if statement.
 			m_settingsChanged = true;
@@ -229,7 +226,7 @@ void Save::toFile(const std::string& name)
 			saveSettings["mods"] = m_mods;
 			saveSettings["settings"] = m_settings;
 
-			std::ofstream writeSettings(path);
+			std::ofstream writeSettings(m_savePath);
 			writeSettings << std::setw(4) << saveSettings;
 			writeSettings.close();
 		}
@@ -242,4 +239,13 @@ void Save::toFile(const std::string& name)
 	// we've already altered all the JSON's and paths, now save all dimensions
 	// (etc...). dimensions will need a function like this where the
 	// save/dimension name is "changeable".
+}
+
+voxels::Map* Save::getOrCreateMap(const std::string& name,
+                                  voxels::BlockReferrer* referrer) {
+    if (m_maps.find(name) == m_maps.end())
+    {
+        m_maps.emplace(name,voxels::Map(&m_savePath, name, referrer));
+    }
+    return &m_maps.at(name);
 }

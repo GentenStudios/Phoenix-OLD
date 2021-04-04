@@ -28,10 +28,11 @@
 
 #pragma once
 
-#include <Common/Voxels/Chunk.hpp>
+#include <Common/Voxels/Map.hpp>
 
 #include <nlohmann/json.hpp>
 
+#include <filesystem>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -40,11 +41,6 @@ namespace phx
 {
 
 	inline constexpr const char* saveDir {"Saves/"};
-
-	// temporary class until map is updated.
-	class Dimension
-	{
-	};
 
 	/**
 	 * @brief A class to handle data within a save.
@@ -90,14 +86,11 @@ namespace phx
 		 */
 		const nlohmann::json& getSettings() const;
 
-		/// @todo Implement Dimension system.
-		/// keeping these empty methods so we know what we need, I'll work on
-		/// this fairly soon with worldgen probably. - beeper.
-		// Dimension* createDimension(const std::string& name);
-		// Dimension* getDimension(const std::string& name);
-		// void       setDefaultDimension(Dimension* dimension);
-		// Dimension* getDefaultDimension();
-		// const std::vector<std::string>& getDimensions() const;
+        voxels::Map* getOrCreateMap(const std::string& name,
+                                    voxels::BlockReferrer* referrer);
+//		void         setDefaultMap(voxels::Map* map);
+//      voxels::Map* getDefaultMap();
+//		const std::vector<std::string>& getMaps() const;
 
 		/**
 		 * @brief Saves everything to be saved in the Save.
@@ -111,9 +104,13 @@ namespace phx
 		void toFile(const std::string& name = "");
 
 	private:
-		std::string              m_name;
+		std::string           m_name;
+        std::filesystem::path m_savePath;
+
 		std::vector<std::string> m_mods;
 		nlohmann::json           m_settings;
+
+        std::unordered_map<std::string, voxels::Map> m_maps;
 
 		/**
 		 * @brief Tells the saving operations whether settings have changed.
@@ -125,7 +122,5 @@ namespace phx
 		 */
 		bool m_settingsChanged = false;
 
-		// Dimension* m_defaultDimension;
-		// std::unordered_map<std::string, Dimension> m_loadedDimensions;
 	};
 } // namespace phx
