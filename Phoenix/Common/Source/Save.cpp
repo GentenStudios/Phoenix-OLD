@@ -71,7 +71,7 @@ Save::Save(const std::string& save, const std::vector<std::string>& mods,
 		LOG_INFO("SAVES") << "Loading existing save.";
 		
 		// save exists, lets load what we need.
-		std::ifstream json(m_savePath.append(save + ".json"));
+		std::ifstream json(m_savePath / (save + ".json"));
 		if (!json.is_open())
 		{
 			LOG_FATAL("SAVES")
