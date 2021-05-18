@@ -112,11 +112,10 @@ namespace phx::client
 
 		gfx::Window*        m_window;
 		gfx::FPSCamera*     m_camera        = nullptr;
-		gfx::ChunkRenderer* m_mapRenderer   = nullptr;
-		gfx::SkyboxRenderer m_skyboxRenderer;
-		gfx::SelectionboxRenderer m_selectionboxRenderer;
 
-		gfx::ShaderPipeline m_renderPipeline;
+		gfx::ChunkRenderer        m_chunkRenderer;
+		gfx::SkyboxRenderer       m_skyboxRenderer;
+		gfx::SelectionboxRenderer m_selectionboxRenderer;
 
 		gfx::ChatBox* m_chat = nullptr;
 

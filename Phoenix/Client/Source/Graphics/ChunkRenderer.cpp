@@ -37,11 +37,8 @@
 
 using namespace phx::gfx;
 
-ChunkRenderer::ChunkRenderer(phx::voxels::Map*           map,
-                             phx::client::BlockRegistry* blockRegistry,
-                             entt::registry* registry, entt::entity entity)
-    : m_blockRegistry(blockRegistry), m_map(map), m_registry(registry),
-      m_entity(entity)
+ChunkRenderer::ChunkRenderer(phx::client::BlockRegistry* blockRegistry)
+    : m_blockRegistry(blockRegistry)
 {
 	// lets say you have a view distance of 10, so lets do 10x10x10 and
 	// just say you're gonna have 100 chunks in view at a time. you'll be
@@ -49,6 +46,15 @@ ChunkRenderer::ChunkRenderer(phx::voxels::Map*           map,
 	// optimisation.
 	m_chunks.reserve(100);
 	m_buffers.reserve(100);
+
+    m_renderPipeline.prepare("Assets/SimpleWorld.vert",
+                             "Assets/SimpleWorld.frag",
+                             gfx::ChunkRenderer::getRequiredShaderLayout());
+
+    m_renderPipeline.activate();
+
+    const math::mat4 model;
+    m_renderPipeline.setMatrix("u_model", model);
 }
 
 ChunkRenderer::~ChunkRenderer() { clear(); }
@@ -66,8 +72,6 @@ void ChunkRenderer::prep()
 {
 	m_blockRegistry->texturePacker.pack();
 }
-
-void ChunkRenderer::attachCamera(FPSCamera* camera) { m_camera = camera; }
 
 void ChunkRenderer::add(phx::voxels::Chunk* chunk)
 {
@@ -234,9 +238,26 @@ void ChunkRenderer::onMapEvent(const phx::voxels::MapEvent& mapEvent)
 	m_mapEvents.push(mapEvent);
 }
 
-void ChunkRenderer::tick(float dt)
+void ChunkRenderer::tick(const Position& position, const math::mat4& projection, const float& dt, entt::registry* registry, entt::entity entity)
 {
-	for (auto& chunk : PlayerView::update(m_registry, m_entity))
+	// temp, will change in the future, based on game time
+    static math::vec3 lightdir(0.f, -1.f, 0.f);
+    static float      time = 0.f;
+
+    time += dt;
+
+    lightdir.y = std::sin(time);
+    lightdir.x = std::cos(time);
+
+    m_renderPipeline.activate();
+    m_renderPipeline.setInt("u_TexArray", 0);
+    m_renderPipeline.setMatrix("u_view", position.getView());
+    m_renderPipeline.setMatrix("u_projection", projection);
+    m_renderPipeline.setFloat("u_AmbientStrength", 0.7f);
+    m_renderPipeline.setVector3("u_LightDir", lightdir);
+    m_renderPipeline.setFloat("u_Brightness", 0.6f);
+
+	for (auto& chunk : PlayerView::update(registry, entity))
 	{
 		add(chunk);
 	}
@@ -257,7 +278,4 @@ void ChunkRenderer::tick(float dt)
 		glBindVertexArray(buffer.second.vao);
 		glDrawArrays(GL_TRIANGLES, 0, buffer.second.vertexCount);
 	}
-
-	// we shouldn't render the selection box in here since you might be
-	// spectating. the box should really be a thing the player stuff renders.
 }

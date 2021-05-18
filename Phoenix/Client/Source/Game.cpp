@@ -47,7 +47,8 @@ using namespace phx;
 
 Game::Game(gfx::Window* window, entt::registry* registry, bool networked)
     : Layer("Game"), m_registry(registry), m_window(window),
-      m_blockRegistry(BlockRegistry(&m_audioRegistry))
+      m_blockRegistry(BlockRegistry(&m_audioRegistry)),
+      m_chunkRenderer(gfx::ChunkRenderer(&m_blockRegistry))
 {
 	if (networked)
 	{
@@ -166,20 +167,8 @@ void Game::onAttach()
 
 	LOG_INFO("MAIN") << "Prepare rendering";
 
-	m_mapRenderer =
-	    new gfx::ChunkRenderer(m_map, &m_blockRegistry, m_registry, m_player);
-	m_mapRenderer->attachCamera(m_camera);
-	m_map->registerEventSubscriber(m_mapRenderer);
-	m_mapRenderer->prep();
-
-	m_renderPipeline.prepare("Assets/SimpleWorld.vert",
-	                         "Assets/SimpleWorld.frag",
-	                         gfx::ChunkRenderer::getRequiredShaderLayout());
-
-	m_renderPipeline.activate();
-
-	const math::mat4 model;
-	m_renderPipeline.setMatrix("u_model", model);
+	m_map->registerEventSubscriber(&m_chunkRenderer);
+	m_chunkRenderer.prep();
 
 	m_skyboxRenderer.setSkyboxTextures(
 	    {"Assets/Skybox/north.png", "Assets/Skybox/west.png",
@@ -217,7 +206,6 @@ void Game::onAttach()
 
 void Game::onDetach()
 {
-	delete m_mapRenderer;
 	delete m_inputQueue;
 	delete m_network;
     delete m_save;
@@ -325,15 +313,6 @@ void Game::onEvent(events::Event& e)
 
 void Game::tick(float dt)
 {
-	// temp, will change in the future, based on game time
-	static math::vec3 lightdir(0.f, -1.f, 0.f);
-	static float      time = 0.f;
-
-	time += dt;
-
-	lightdir.y = std::sin(time);
-	lightdir.x = std::cos(time);
-
 	const Position& position = m_registry->get<Position>(m_player);
 
 	m_camera->tick(dt);
@@ -351,20 +330,11 @@ void Game::tick(float dt)
 	}
 
 
-	m_renderPipeline.activate();
-	m_renderPipeline.setInt("u_TexArray", 0);
-	m_renderPipeline.setMatrix("u_view", m_camera->calculateViewMatrix());
-	m_renderPipeline.setMatrix("u_projection", m_camera->getProjection());
-	m_renderPipeline.setFloat("u_AmbientStrength", 0.7f);
-	m_renderPipeline.setVector3("u_LightDir", lightdir);
-	m_renderPipeline.setFloat("u_Brightness", 0.6f);
-
-	m_mapRenderer->tick(dt);
-
     const auto windowSize = m_window->getSize();
     const auto projection = math::mat4::perspective(windowSize.x/ windowSize.y, 45.f,
                                            1000.f, 0.1f);
 
+    m_chunkRenderer.tick(position, projection, dt, m_registry, m_player);
 	m_skyboxRenderer.tick(position, projection, dt);
 
     auto selection =
