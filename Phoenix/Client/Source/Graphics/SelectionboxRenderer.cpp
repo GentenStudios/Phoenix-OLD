@@ -28,6 +28,7 @@
 
 #include <Client/Graphics/OpenGLTools.hpp>
 #include <Client/Graphics/SelectionboxRenderer.hpp>
+#include <Common/Actor.hpp>
 
 using namespace phx::gfx;
 
@@ -45,10 +46,14 @@ SelectionboxRenderer::SelectionboxRenderer()
 }
 
 void SelectionboxRenderer::tick(
-    const Position& position,
-    const math::mat4& projection,
-    math::vec3 selection)
+    entt::registry* registry,
+    entt::entity entity,
+    const math::mat4& projection)
 {
+	auto position = registry->get<Position>(entity);
+    auto selection =
+        ActorSystem::getTarget(registry, entity).getCurrentPosition();
+    selection.floor();
     // do not waste cpu time if we aren't targeting a solid block
     if (position.map->getBlockAt(selection)->category !=
         voxels::BlockCategory::SOLID)

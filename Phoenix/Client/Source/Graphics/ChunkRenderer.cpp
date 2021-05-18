@@ -238,8 +238,13 @@ void ChunkRenderer::onMapEvent(const phx::voxels::MapEvent& mapEvent)
 	m_mapEvents.push(mapEvent);
 }
 
-void ChunkRenderer::tick(const Position& position, const math::mat4& projection, const float& dt, entt::registry* registry, entt::entity entity)
+void ChunkRenderer::tick(
+    entt::registry* registry,
+    entt::entity entity,
+    const math::mat4& projection,
+    const float& dt)
 {
+    auto position = registry->get<Position>(entity);
 	// temp, will change in the future, based on game time
     static math::vec3 lightdir(0.f, -1.f, 0.f);
     static float      time = 0.f;

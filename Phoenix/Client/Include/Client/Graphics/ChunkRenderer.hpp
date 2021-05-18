@@ -121,7 +121,7 @@ namespace phx::gfx
 
 		void onMapEvent(const voxels::MapEvent& mapEvent) override;
 
-		void tick(const Position& position, const math::mat4& projection, const float& dt, entt::registry* registry, entt::entity entity);
+		void tick(entt::registry* registry, entt::entity entity, const math::mat4& projection, const float& dt);
 
 		/**
 		 * @brief Gets the shader vertex layout that this renderer requires.

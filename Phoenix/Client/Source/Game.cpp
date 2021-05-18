@@ -334,13 +334,9 @@ void Game::tick(float dt)
     const auto projection = math::mat4::perspective(windowSize.x/ windowSize.y, 45.f,
                                            1000.f, 0.1f);
 
-    m_chunkRenderer.tick(position, projection, dt, m_registry, m_player);
-	m_skyboxRenderer.tick(position, projection, dt);
-
-    auto selection =
-        ActorSystem::getTarget(m_registry, m_player).getCurrentPosition();
-	selection.floor();
-	m_selectionboxRenderer.tick(position, projection, selection);
+    m_chunkRenderer.tick(m_registry, m_player, projection, dt);
+	m_skyboxRenderer.tick(m_registry, m_player, projection, dt);
+    m_selectionboxRenderer.tick(m_registry, m_player, projection);
 
 	m_chat->draw();
 }

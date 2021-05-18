@@ -171,10 +171,12 @@ void SkyboxRenderer::setSkyboxTextures(const std::vector<std::string>& textures)
 }
 
 void SkyboxRenderer::tick(
-    const Position&   position,
+    entt::registry*   registry,
+    entt::entity      entity,
     const math::mat4& projection,
     const float&      dt)
 {
+    auto position = registry->get<Position>(entity);
 	if (m_initialTick)
 	{
 		if (m_enabled)

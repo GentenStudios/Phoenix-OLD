@@ -32,6 +32,7 @@
 
 #include <Common/Position.hpp>
 
+#include <entt/entity/registry.hpp>
 #include <string>
 #include <vector>
 
@@ -52,7 +53,7 @@ namespace phx::gfx
 		 * @param projection Calculated projection matrix
 		 * @param dt Time since the last frame
 		 */
-		void tick(const Position& position, const math::mat4& projection, const float& dt);
+		void tick(entt::registry* registry, entt::entity entity, const math::mat4& projection, const float& dt);
 
 	private:
 		bool         m_initialTick   = true;

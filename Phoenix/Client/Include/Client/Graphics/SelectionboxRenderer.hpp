@@ -32,6 +32,7 @@
 
 #include <Common/Position.hpp>
 
+#include <entt/entity/registry.hpp>
 #include <string>
 #include <vector>
 
@@ -47,7 +48,7 @@ namespace phx::gfx
 		 * @param projection Calculated projection matrix.
 		 * @param selection Position of block to be highlighted.
 		 */
-        void tick(const Position& position, const math::mat4& projection, math::vec3 selection);
+        void tick(entt::registry* registry, entt::entity entity, const math::mat4& projection);
 	private:
         unsigned int   m_selectionBoxVAO = 0;
         unsigned int   m_selectionBoxVBO = 0;
