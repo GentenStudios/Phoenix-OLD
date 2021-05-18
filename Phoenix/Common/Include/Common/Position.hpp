@@ -29,6 +29,7 @@
 #pragma once
 
 #include <Common/Math/Math.hpp>
+#include <Common/Voxels/Map.hpp>
 
 namespace phx
 {
@@ -41,6 +42,8 @@ namespace phx
 		math::vec3 rotation;
 		/// @brief The cardinal position of the entity
 		math::vec3 position;
+		/// @brief The map the entity is located on
+        voxels::Map* map;
 
 		/**
 		 * @brief Gets the direction the object is facing.
@@ -71,6 +74,16 @@ namespace phx
 		math::vec3 getForward() const
 		{
 			return math::vec3 {std::sin(rotation.x), 0.f, std::cos(rotation.x)};
+		};
+
+		math::vec3 getUp() const
+        {
+			return math::vec3::cross(getRight(), getDirection());
+		};
+
+		math::mat4 getView() const
+        {
+			return math::mat4::lookAt(position, (position + getDirection()), getUp());
 		};
 	};
 } // namespace phx

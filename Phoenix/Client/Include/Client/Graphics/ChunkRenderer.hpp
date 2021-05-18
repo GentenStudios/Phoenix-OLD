@@ -37,8 +37,8 @@
 
 #include <Client/Graphics/Camera.hpp>
 #include <Client/Graphics/ShaderPipeline.hpp>
-#include <Client/Voxels/BlockRegistry.hpp>
 #include <Client/Graphics/TexturePacker.hpp>
+#include <Client/Voxels/BlockRegistry.hpp>
 
 #include <Common/Voxels/Map.hpp>
 
@@ -125,8 +125,6 @@ namespace phx::gfx
 		// we don't need dt on here yet, but put it here for consistency.
 		void tick(float dt);
 
-		void renderSelectionBox();
-
 		/**
 		 * @brief Gets the shader vertex layout that this renderer requires.
 		 * @return The layout that the ShaderPipeline needs to guarantee.
@@ -163,9 +161,5 @@ namespace phx::gfx
 		const int m_uvAttributeLocation     = 1;
 		const int m_normalAttributeLocation = 2;
 		const int m_colorAttributeLocation  = 3;
-
-		unsigned int   m_selectionBoxVAO = 0;
-		unsigned int   m_selectionBoxVBO = 0;
-		ShaderPipeline m_selectionBoxPipeline;
 	};
 } // namespace phx::gfx

@@ -16,7 +16,8 @@ set(Sources
 	${currentDir}/TexturePacker.cpp
 	${currentDir}/ChunkMesher.cpp
 	${currentDir}/ChunkRenderer.cpp
-	${currentDir}/WorldRenderer.cpp
+	${currentDir}/SelectionboxRenderer.cpp
+	${currentDir}/SkyboxRenderer.cpp
 
 	PARENT_SCOPE
 )

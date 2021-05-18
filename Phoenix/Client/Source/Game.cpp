@@ -158,7 +158,7 @@ void Game::onAttach()
 	m_playerInventory =
 	    m_invManager->getInventory(m_invManager->createInventory(30));
 
-    m_player = ActorSystem::registerActor(m_registry);
+    m_player = ActorSystem::registerActor(m_registry, m_map);
 	m_registry->emplace<Hand>(m_player, 1, m_playerInventory);
 	m_registry->emplace<PlayerView>(m_player, m_map);
 	m_camera = new gfx::FPSCamera(m_window, m_registry);
@@ -181,13 +181,10 @@ void Game::onAttach()
 	const math::mat4 model;
 	m_renderPipeline.setMatrix("u_model", model);
 
-	m_worldRenderer = new gfx::WorldRenderer();
-
-	m_worldRenderer->setSkyboxTextures(
+	m_skyboxRenderer.setSkyboxTextures(
 	    {"Assets/Skybox/north.png", "Assets/Skybox/west.png",
 	     "Assets/Skybox/south.png", "Assets/Skybox/east.png",
 	     "Assets/Skybox/zenith.png", "Assets/Skybox/nadir.png"});
-	m_worldRenderer->attachCamera(m_camera);
 
 	LOG_INFO("MAIN") << "Register GUI";
 	m_escapeMenu = new EscapeMenu(m_window, m_camera);
@@ -353,6 +350,7 @@ void Game::tick(float dt)
 		m_prevPos = position.position;
 	}
 
+
 	m_renderPipeline.activate();
 	m_renderPipeline.setInt("u_TexArray", 0);
 	m_renderPipeline.setMatrix("u_view", m_camera->calculateViewMatrix());
@@ -362,9 +360,17 @@ void Game::tick(float dt)
 	m_renderPipeline.setFloat("u_Brightness", 0.6f);
 
 	m_mapRenderer->tick(dt);
-	m_mapRenderer->renderSelectionBox();
 
-	m_worldRenderer->tick(dt);
+    const auto windowSize = m_window->getSize();
+    const auto projection = math::mat4::perspective(windowSize.x/ windowSize.y, 45.f,
+                                           1000.f, 0.1f);
+
+	m_skyboxRenderer.tick(position, projection, dt);
+
+    auto selection =
+        ActorSystem::getTarget(m_registry, m_player).getCurrentPosition();
+	selection.floor();
+	m_selectionboxRenderer.tick(position, projection, selection);
 
 	m_chat->draw();
 }
