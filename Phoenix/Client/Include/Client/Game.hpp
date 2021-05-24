@@ -48,7 +48,7 @@
 #include <Common/Save.hpp>
 #include <Common/Voxels/InventoryManager.hpp>
 
-#include <Client/Graphics/SelectionboxRenderer.hpp>
+#include <Client/Graphics/SelectionBoxRenderer.hpp>
 #include <Client/Voxels/AudioEventHandler.hpp>
 #include <soloud.h>
 #include <soloud_wav.h>
@@ -115,7 +115,7 @@ namespace phx::client
 
 		gfx::ChunkRenderer        m_chunkRenderer;
 		gfx::SkyboxRenderer       m_skyboxRenderer;
-		gfx::SelectionboxRenderer m_selectionboxRenderer;
+		gfx::SelectionBoxRenderer m_selectionboxRenderer;
 
 		gfx::ChatBox* m_chat = nullptr;
 

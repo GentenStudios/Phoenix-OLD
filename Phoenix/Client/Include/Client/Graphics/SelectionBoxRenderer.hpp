@@ -38,10 +38,10 @@
 
 namespace phx::gfx
 {
-	class SelectionboxRenderer
-    {
+	class SelectionBoxRenderer
+	{
 	public:
-		SelectionboxRenderer();
+		SelectionBoxRenderer();
 		/**
 		 * @brief Highlights a block for the rendered frame.
 		 * @param position Position of the entity viewing the block.
@@ -49,6 +49,7 @@ namespace phx::gfx
 		 * @param selection Position of block to be highlighted.
 		 */
         void tick(entt::registry* registry, entt::entity entity, const math::mat4& projection);
+
 	private:
         unsigned int   m_selectionBoxVAO = 0;
         unsigned int   m_selectionBoxVBO = 0;

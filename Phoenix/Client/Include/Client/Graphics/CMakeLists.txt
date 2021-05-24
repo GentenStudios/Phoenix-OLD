@@ -22,7 +22,7 @@ set(Headers
 	${currentDir}/ChunkMesher.hpp
 	${currentDir}/ChunkRenderer.hpp
 	${currentDir}/SkyboxRenderer.hpp
-	${currentDir}/SelectionboxRenderer.hpp
+	${currentDir}/SelectionBoxRenderer.hpp
 
 	PARENT_SCOPE
 )

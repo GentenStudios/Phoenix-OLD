@@ -27,12 +27,12 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <Client/Graphics/OpenGLTools.hpp>
-#include <Client/Graphics/SelectionboxRenderer.hpp>
+#include <Client/Graphics/SelectionBoxRenderer.hpp>
 #include <Common/Actor.hpp>
 
 using namespace phx::gfx;
 
-SelectionboxRenderer::SelectionboxRenderer()
+SelectionBoxRenderer::SelectionBoxRenderer()
 {
     glGenVertexArrays(1, &m_selectionBoxVAO);
     glBindVertexArray(m_selectionBoxVAO);
@@ -45,7 +45,7 @@ SelectionboxRenderer::SelectionboxRenderer()
     "Assets/SimpleLines.frag", {{"a_Pos", 0}});
 }
 
-void SelectionboxRenderer::tick(
+void SelectionBoxRenderer::tick(
     entt::registry* registry,
     entt::entity entity,
     const math::mat4& projection)
