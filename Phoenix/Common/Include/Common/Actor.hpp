@@ -88,8 +88,8 @@ namespace phx
         static entt::entity registerActor(
 		    entt::registry* registry,
 		    voxels::Map*    map,
-		    math::vec3      position = {0,0,0},
-		    math::vec3      rotation = {0,0,0});
+		    math::vec3      position,
+		    math::vec3      rotation);
 		static void         tick(entt::registry* registry, entt::entity entity,
 		                         float dt, const InputState& input);
 		static bool         action1(voxels::BlockReferrer* blockReferrer,

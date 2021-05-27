@@ -159,7 +159,7 @@ void Game::onAttach()
 	m_playerInventory =
 	    m_invManager->getInventory(m_invManager->createInventory(30));
 
-    m_player = ActorSystem::registerActor(m_registry, m_map);
+    m_player = ActorSystem::registerActor(m_registry, m_map, {0,0,0}, {0,0,0});
 	m_registry->emplace<Hand>(m_player, 1, m_playerInventory);
 	m_registry->emplace<PlayerView>(m_player, m_map);
 	m_camera = new gfx::FPSCamera(m_window, m_registry);
