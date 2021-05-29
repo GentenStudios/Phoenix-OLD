@@ -28,9 +28,7 @@
 
 #include <Client/Graphics/ChunkMesher.hpp>
 #include <Client/Graphics/ChunkRenderer.hpp>
-#include <Client/Graphics/OpenGLTools.hpp>
 
-#include <Common/Actor.hpp>
 #include <Common/PlayerView.hpp>
 
 #include <glad/glad.h>
@@ -39,11 +37,8 @@
 
 using namespace phx::gfx;
 
-ChunkRenderer::ChunkRenderer(phx::voxels::Map*           map,
-                             phx::client::BlockRegistry* blockRegistry,
-                             entt::registry* registry, entt::entity entity)
-    : m_blockRegistry(blockRegistry), m_map(map), m_registry(registry),
-      m_entity(entity)
+ChunkRenderer::ChunkRenderer(phx::client::BlockRegistry* blockRegistry)
+    : m_blockRegistry(blockRegistry)
 {
 	// lets say you have a view distance of 10, so lets do 10x10x10 and
 	// just say you're gonna have 100 chunks in view at a time. you'll be
@@ -52,15 +47,14 @@ ChunkRenderer::ChunkRenderer(phx::voxels::Map*           map,
 	m_chunks.reserve(100);
 	m_buffers.reserve(100);
 
-	glGenVertexArrays(1, &m_selectionBoxVAO);
-	glBindVertexArray(m_selectionBoxVAO);
-	glGenBuffers(1, &m_selectionBoxVBO);
-	glBindBuffer(GL_ARRAY_BUFFER, m_selectionBoxVBO);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
-	glEnableVertexAttribArray(0);
+    m_renderPipeline.prepare("Assets/SimpleWorld.vert",
+                             "Assets/SimpleWorld.frag",
+                             gfx::ChunkRenderer::getRequiredShaderLayout());
 
-	m_selectionBoxPipeline.prepare("Assets/SimpleLines.vert",
-	                               "Assets/SimpleLines.frag", {{"a_Pos", 0}});
+    m_renderPipeline.activate();
+
+    const math::mat4 model;
+    m_renderPipeline.setMatrix("u_model", model);
 }
 
 ChunkRenderer::~ChunkRenderer() { clear(); }
@@ -78,8 +72,6 @@ void ChunkRenderer::prep()
 {
 	m_blockRegistry->texturePacker.pack();
 }
-
-void ChunkRenderer::attachCamera(FPSCamera* camera) { m_camera = camera; }
 
 void ChunkRenderer::add(phx::voxels::Chunk* chunk)
 {
@@ -246,9 +238,31 @@ void ChunkRenderer::onMapEvent(const phx::voxels::MapEvent& mapEvent)
 	m_mapEvents.push(mapEvent);
 }
 
-void ChunkRenderer::tick(float dt)
+void ChunkRenderer::tick(
+    entt::registry* registry,
+    entt::entity entity,
+    const math::mat4& projection,
+    const float& dt)
 {
-	for (auto& chunk : PlayerView::update(m_registry, m_entity))
+    auto position = registry->get<Position>(entity);
+	// temp, will change in the future, based on game time
+    static math::vec3 lightdir(0.f, -1.f, 0.f);
+    static float      time = 0.f;
+
+    time += dt;
+
+    lightdir.y = std::sin(time);
+    lightdir.x = std::cos(time);
+
+    m_renderPipeline.activate();
+    m_renderPipeline.setInt("u_TexArray", 0);
+    m_renderPipeline.setMatrix("u_view", position.getView());
+    m_renderPipeline.setMatrix("u_projection", projection);
+    m_renderPipeline.setFloat("u_AmbientStrength", 0.7f);
+    m_renderPipeline.setVector3("u_LightDir", lightdir);
+    m_renderPipeline.setFloat("u_Brightness", 0.6f);
+
+	for (auto& chunk : PlayerView::update(registry, entity))
 	{
 		add(chunk);
 	}
@@ -269,94 +283,4 @@ void ChunkRenderer::tick(float dt)
 		glBindVertexArray(buffer.second.vao);
 		glDrawArrays(GL_TRIANGLES, 0, buffer.second.vertexCount);
 	}
-
-	// we shouldn't render the selection box in here since you might be
-	// spectating. the box should really be a thing the player stuff renders.
-}
-
-void ChunkRenderer::renderSelectionBox()
-{
-	if (m_camera == nullptr)
-	{
-		// return if no camera set.
-		return;
-	}
-
-	auto pos =
-	    ActorSystem::getTarget(m_registry, m_entity).getCurrentPosition();
-	pos.floor();
-	// do not waste cpu time if we aren't targeting a solid block
-	if (m_registry->get<PlayerView>(m_entity).map->getBlockAt(pos)->category !=
-	    voxels::BlockCategory::SOLID)
-	{
-		return;
-	}
-
-	// voxel position to camera position
-	pos.x = (pos.x - 0.5f) * 2.f;
-	pos.y = (pos.y - 0.5f) * 2.f;
-	pos.z = (pos.z - 0.5f) * 2.f;
-
-	/*
-	       1 +--------+ 2
-	        /|       /|
-	       / |   3  / |
-	    0 +--------+  |
-	      |  |6    |  |
-	      |  x-----|--+ 7
-	      | /      | /
-	      |/       |/
-	    5 +--------+ 4
-	 */
-
-	const float more = 2.001f;
-	const float less = 0.001f;
-
-	float vertices[] = {pos.x + more, pos.y + more, pos.z - less, // 0-1
-	                    pos.x - less, pos.y + more, pos.z - less,
-
-	                    pos.x - less, pos.y + more, pos.z - less, // 1-2
-	                    pos.x - less, pos.y + more, pos.z + more,
-
-	                    pos.x - less, pos.y + more, pos.z + more, // 2-3
-	                    pos.x + more, pos.y + more, pos.z + more,
-
-	                    pos.x + more, pos.y + more, pos.z + more, // 3-4
-	                    pos.x + more, pos.y - less, pos.z + more,
-
-	                    pos.x + more, pos.y - less, pos.z + more, // 4-5
-	                    pos.x + more, pos.y - less, pos.z - less,
-
-	                    pos.x + more, pos.y - less, pos.z - less, // 5-6
-	                    pos.x - less, pos.y - less, pos.z - less,
-
-	                    pos.x - less, pos.y - less, pos.z - less, // 6-7
-	                    pos.x - less, pos.y - less, pos.z + more,
-
-	                    pos.x - less, pos.y - less, pos.z + more, // 7-4
-	                    pos.x + more, pos.y - less, pos.z + more,
-
-	                    pos.x - less, pos.y - less, pos.z + more, // 7-2
-	                    pos.x - less, pos.y + more, pos.z + more,
-
-	                    pos.x - less, pos.y + more, pos.z - less, // 1-6
-	                    pos.x - less, pos.y - less, pos.z - less,
-
-	                    pos.x + more, pos.y + more, pos.z - less, // 0-3
-	                    pos.x + more, pos.y + more, pos.z + more,
-
-	                    pos.x + more, pos.y + more, pos.z - less, // 0-5
-	                    pos.x + more, pos.y - less, pos.z - less};
-
-	glBindVertexArray(m_selectionBoxVAO);
-	glBindBuffer(GL_ARRAY_BUFFER, m_selectionBoxVBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_DYNAMIC_DRAW);
-
-	m_selectionBoxPipeline.activate();
-
-	// @todo fix so we aren't calculating the same thing twice (once in the main
-	// render loop and once more here).
-	m_selectionBoxPipeline.setMatrix("u_view", m_camera->calculateViewMatrix());
-	m_selectionBoxPipeline.setMatrix("u_projection", m_camera->getProjection());
-	glDrawArrays(GL_LINES, 0, 24);
 }

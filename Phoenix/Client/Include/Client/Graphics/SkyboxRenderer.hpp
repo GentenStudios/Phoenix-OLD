@@ -28,36 +28,40 @@
 
 #pragma once
 
-#include <Client/Graphics/Camera.hpp>
 #include <Client/Graphics/ShaderPipeline.hpp>
 
-#include <vector>
+#include <Common/Position.hpp>
+
+#include <entt/entity/registry.hpp>
 #include <string>
+#include <vector>
 
 namespace phx::gfx
 {
 	// currently only renders skybox, will do more in the future.
-	class WorldRenderer
+	class SkyboxRenderer
 	{
 	public:
-		WorldRenderer() = default;
-		~WorldRenderer() = default;
+		SkyboxRenderer() = default;
+		~SkyboxRenderer() = default;
 
 		// give in front, left, back, right, top, bottom
 		void setSkyboxTextures(const std::vector<std::string>& textures);
-
-		void attachCamera(FPSCamera* camera);
-		void tick(float dt);
+		/**
+		 * @brief Renders the skybox for a particular frame
+		 * @param position Position of the entity the skybox is being rendered for
+		 * @param projection Calculated projection matrix
+		 * @param dt Time since the last frame
+		 */
+		void tick(entt::registry* registry, entt::entity entity, const math::mat4& projection, const float& dt);
 
 	private:
 		bool         m_initialTick   = true;
-		bool         m_skyboxEnabled = false;
+		bool         m_enabled       = false;
 
 		unsigned int   m_skyboxTex;
 		unsigned int   m_skyboxVao;
 		unsigned int   m_skyboxVbo;
 		ShaderPipeline m_skyboxPipeline;
-
-		FPSCamera* m_camera = nullptr;
 	};
 } // namespace phx::gfx

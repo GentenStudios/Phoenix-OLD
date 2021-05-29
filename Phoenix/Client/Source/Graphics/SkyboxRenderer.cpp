@@ -26,8 +26,8 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Client/Graphics/WorldRenderer.hpp>
 #include <Client/Graphics/OpenGLTools.hpp>
+#include <Client/Graphics/SkyboxRenderer.hpp>
 
 #include <Common/Logger.hpp>
 
@@ -81,12 +81,12 @@ float skyboxVertices[] = {
 
 using namespace phx::gfx;
 
-void WorldRenderer::setSkyboxTextures(const std::vector<std::string>& textures)
+void SkyboxRenderer::setSkyboxTextures(const std::vector<std::string>& textures)
 {
 	// we want the order front, left, back, right, top, bottom
 	if (textures.size() == 6)
 	{
-		m_skyboxEnabled = true;
+		m_enabled = true;
 		
 		int width[6] = {};
 		int height[6] = {};
@@ -102,9 +102,8 @@ void WorldRenderer::setSkyboxTextures(const std::vector<std::string>& textures)
 				    << "The skybox texture: " << textures[i]
 				    << " is not a square. No skybox will be used.";
 
-				m_skyboxEnabled = false;
-				
-				break;
+				m_enabled = false;
+				return;
 			}
 
 			// this will make sure all the files are equal in dimensions.
@@ -116,16 +115,9 @@ void WorldRenderer::setSkyboxTextures(const std::vector<std::string>& textures)
 				    << height[i]
 				    << " set by the initially loaded skybox texture.";
 
-				m_skyboxEnabled = false;
-
-				break;
+				m_enabled = false;
+                return;
 			}
-		}
-
-		// now check if the above loop ran properly.
-		if (!m_skyboxEnabled)
-		{
-			return;
 		}
 
 		GLCheck(glGenTextures(1, &m_skyboxTex));
@@ -134,7 +126,7 @@ void WorldRenderer::setSkyboxTextures(const std::vector<std::string>& textures)
 		stbi_set_flip_vertically_on_load(false);
 		auto loadData = [this](const std::string& tex, GLenum cubemapLoc)
 		{
-			if (m_skyboxEnabled)
+			if (m_enabled)
 			{
 				int            x, y, chan;
 				unsigned char* data = stbi_load(tex.c_str(), &x, &y, &chan, 0);
@@ -144,7 +136,7 @@ void WorldRenderer::setSkyboxTextures(const std::vector<std::string>& textures)
 					    << "The texture: " << tex
 					    << " could not be loaded correctly.";
 
-					m_skyboxEnabled = false;
+					m_enabled = false;
 				}
 				else
 				{
@@ -178,19 +170,16 @@ void WorldRenderer::setSkyboxTextures(const std::vector<std::string>& textures)
 	}
 }
 
-void WorldRenderer::attachCamera(FPSCamera* camera) { m_camera = camera; }
-
-void WorldRenderer::tick(float dt)
+void SkyboxRenderer::tick(
+    entt::registry*   registry,
+    entt::entity      entity,
+    const math::mat4& projection,
+    const float&      dt)
 {
-	if (m_camera == nullptr)
-	{
-		// don't do anything if a camera is not attached.
-		return;
-	}
-	
+    auto position = registry->get<Position>(entity);
 	if (m_initialTick)
 	{
-		if (m_skyboxEnabled)
+		if (m_enabled)
 		{
 			glGenVertexArrays(1, &m_skyboxVao);
 			glBindVertexArray(m_skyboxVao);
@@ -215,7 +204,7 @@ void WorldRenderer::tick(float dt)
 	}
 
 	// skybox should be rendered last.
-	if (m_skyboxEnabled)
+	if (m_enabled)
 	{
 		glBindVertexArray(m_skyboxVao);
 
@@ -227,7 +216,7 @@ void WorldRenderer::tick(float dt)
 		// @todo prevent calculating view matrix like 5 times a frame for no
 		// reason. implement cache.
 
-		auto view = m_camera->calculateViewMatrix();
+		auto view = position.getView();
 		view.elements[0 + 3 * 4] = 0;
 		view.elements[1 + 3 * 4] = 0;
 		view.elements[2 + 3 * 4] = 0;
@@ -237,7 +226,7 @@ void WorldRenderer::tick(float dt)
 		view.elements[3 + 2 * 4] = 0;
 		
 		m_skyboxPipeline.setMatrix("u_view", view);
-		m_skyboxPipeline.setMatrix("u_projection", m_camera->getProjection());
+		m_skyboxPipeline.setMatrix("u_projection", projection);
 
 		glDisable(GL_CULL_FACE);
 		glDepthFunc(GL_LEQUAL);

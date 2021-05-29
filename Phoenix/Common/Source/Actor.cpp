@@ -27,19 +27,20 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <Common/Actor.hpp>
-
 #include <Common/Movement.hpp>
 #include <Common/PlayerView.hpp>
 #include <Common/Position.hpp>
-#include <Common/Voxels/Block.hpp>
 
 using namespace phx;
 
-entt::entity ActorSystem::registerActor(entt::registry* registry)
+entt::entity ActorSystem::registerActor(
+    entt::registry* registry,
+    voxels::Map*    map,
+    math::vec3      position,
+    math::vec3      rotation)
 {
 	auto entity = registry->create();
-	registry->emplace<Position>(entity, math::vec3 {0, 0, 0},
-	                            math::vec3 {0, 0, 0});
+	registry->emplace<Position>(entity, position, rotation, map);
 	registry->emplace<Movement>(entity, DEFAULT_MOVE_SPEED);
 	return entity;
 }

@@ -37,13 +37,14 @@
 
 #include <Client/Graphics/Camera.hpp>
 #include <Client/Graphics/ShaderPipeline.hpp>
-#include <Client/Voxels/BlockRegistry.hpp>
 #include <Client/Graphics/TexturePacker.hpp>
+#include <Client/Voxels/BlockRegistry.hpp>
 
 #include <Common/Voxels/Map.hpp>
 
 #include <entt/entt.hpp>
 
+#include <Common/Position.hpp>
 #include <unordered_map>
 #include <vector>
 
@@ -107,12 +108,10 @@ namespace phx::gfx
 		using AssociativeTextureTable =
 		    std::unordered_map<std::string, std::size_t>;
 
-		ChunkRenderer(voxels::Map* map, client::BlockRegistry* blockRegistry,
-		              entt::registry* registry, entt::entity entity);
+		ChunkRenderer(client::BlockRegistry* blockRegistry);
 		~ChunkRenderer();
 
 		void prep();
-		void attachCamera(FPSCamera* camera);
 
 		void add(voxels::Chunk* chunk);
 		void update(voxels::Chunk* chunk);
@@ -121,11 +120,8 @@ namespace phx::gfx
 		void clear();
 
 		void onMapEvent(const voxels::MapEvent& mapEvent) override;
-		
-		// we don't need dt on here yet, but put it here for consistency.
-		void tick(float dt);
 
-		void renderSelectionBox();
+		void tick(entt::registry* registry, entt::entity entity, const math::mat4& projection, const float& dt);
 
 		/**
 		 * @brief Gets the shader vertex layout that this renderer requires.
@@ -146,11 +142,6 @@ namespace phx::gfx
 		voxels::Map*           m_map;
 		BlockingQueue<voxels::MapEvent> m_mapEvents;
 
-		entt::registry* m_registry;
-		entt::entity    m_entity;
-
-		FPSCamera* m_camera = nullptr;
-
 		// keep another copy of chunk pointers so we can know which chunks need
 		// to be remeshed that are being rendered rn.
 		std::vector<voxels::Chunk*> m_chunks;
@@ -159,13 +150,11 @@ namespace phx::gfx
 		                   math::Vector3KeyComparator>
 		    m_buffers;
 
-		const int m_vertexAttributeLocation = 0;
-		const int m_uvAttributeLocation     = 1;
-		const int m_normalAttributeLocation = 2;
-		const int m_colorAttributeLocation  = 3;
+		static const int m_vertexAttributeLocation = 0;
+		static const int m_uvAttributeLocation     = 1;
+		static const int m_normalAttributeLocation = 2;
+		static const int m_colorAttributeLocation  = 3;
 
-		unsigned int   m_selectionBoxVAO = 0;
-		unsigned int   m_selectionBoxVBO = 0;
-		ShaderPipeline m_selectionBoxPipeline;
+        gfx::ShaderPipeline m_renderPipeline;
 	};
 } // namespace phx::gfx

@@ -21,7 +21,8 @@ set(Headers
 	${currentDir}/TexturePacker.hpp
 	${currentDir}/ChunkMesher.hpp
 	${currentDir}/ChunkRenderer.hpp
-	${currentDir}/WorldRenderer.hpp
+	${currentDir}/SkyboxRenderer.hpp
+	${currentDir}/SelectionBoxRenderer.hpp
 
 	PARENT_SCOPE
 )

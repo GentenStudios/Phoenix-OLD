@@ -37,9 +37,8 @@
 #include <Common/Voxels/Block.hpp>
 #include <Common/Voxels/BlockReferrer.hpp>
 #include <Common/Voxels/Item.hpp>
-
-#include <Common/Logger.hpp>
 #include <Common/Voxels/Inventory.hpp>
+#include <Common/Voxels/Map.hpp>
 
 #include <entt/entt.hpp>
 
@@ -85,7 +84,12 @@ namespace phx
 
 		static math::Ray    getTarget(entt::registry* registry,
 		                              entt::entity    entity);
-		static entt::entity registerActor(entt::registry* registry);
+
+        static entt::entity registerActor(
+		    entt::registry* registry,
+		    voxels::Map*    map,
+		    math::vec3      position,
+		    math::vec3      rotation);
 		static void         tick(entt::registry* registry, entt::entity entity,
 		                         float dt, const InputState& input);
 		static bool         action1(voxels::BlockReferrer* blockReferrer,

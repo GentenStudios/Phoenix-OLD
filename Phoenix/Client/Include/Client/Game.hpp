@@ -31,13 +31,13 @@
 #include <Client/UI/EscapeMenu.hpp>
 #include <Client/UI/GameTools.hpp>
 
-#include <Client/Graphics/Camera.hpp>
 #include <Client/Graphics/ChatBox.hpp>
 #include <Client/Graphics/ChunkRenderer.hpp>
+#include <Client/Graphics/Camera.hpp>
 #include <Client/Graphics/Layer.hpp>
 #include <Client/Graphics/ShaderPipeline.hpp>
+#include <Client/Graphics/SkyboxRenderer.hpp>
 #include <Client/Graphics/Window.hpp>
-#include <Client/Graphics/WorldRenderer.hpp>
 #include <Client/InputQueue.hpp>
 #include <Client/UI/HUD.hpp>
 #include <Client/Voxels/BlockRegistry.hpp>
@@ -48,6 +48,7 @@
 #include <Common/Save.hpp>
 #include <Common/Voxels/InventoryManager.hpp>
 
+#include <Client/Graphics/SelectionBoxRenderer.hpp>
 #include <Client/Voxels/AudioEventHandler.hpp>
 #include <soloud.h>
 #include <soloud_wav.h>
@@ -111,10 +112,10 @@ namespace phx::client
 
 		gfx::Window*        m_window;
 		gfx::FPSCamera*     m_camera        = nullptr;
-		gfx::ChunkRenderer* m_mapRenderer   = nullptr;
-		gfx::WorldRenderer* m_worldRenderer = nullptr;
 
-		gfx::ShaderPipeline m_renderPipeline;
+		gfx::ChunkRenderer        m_chunkRenderer;
+		gfx::SkyboxRenderer       m_skyboxRenderer;
+		gfx::SelectionBoxRenderer m_selectionboxRenderer;
 
 		gfx::ChatBox* m_chat = nullptr;
 
