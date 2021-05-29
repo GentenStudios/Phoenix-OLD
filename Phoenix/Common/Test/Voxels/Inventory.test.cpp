@@ -8,10 +8,10 @@ ItemType* addTestItem(ItemReferrer& referrer)
 {
 	auto     uid = referrer.referrer.size();
 	ItemType temp;
-	temp.displayName      = &"Test"[uid];
-	temp.id               = &"core.test"[uid];
-	temp.uniqueIdentifier = uid;
-	temp.maxStack         = 64;
+	temp.displayName = &"Test"[uid];
+	temp.id          = &"core.test"[uid];
+	temp.uid         = uid;
+	temp.maxStack    = 64;
 	referrer.referrer.add(temp.id, uid);
 	referrer.items.add(uid, temp);
 	return referrer.items.get(uid);
