@@ -176,7 +176,7 @@ phx::Serializer& Inventory::operator>>(phx::Serializer& ser) const
 	ser << m_size;
 	for (std::size_t i = 0; i < m_size; i++)
 	{
-		ser << m_slots[i]->uniqueIdentifier;
+		ser << m_slots[i]->uid;
 		if (m_metadata.find(i) != m_metadata.end())
 		{
 			ser << '+' << *m_metadata.at(i);

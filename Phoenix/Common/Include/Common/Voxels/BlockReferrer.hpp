@@ -63,7 +63,7 @@ namespace phx::voxels
 			unknown.displayName      = "Unknown Block";
 			unknown.id               = "core.unknown";
 			unknown.category         = voxels::BlockCategory::SOLID;
-			unknown.uniqueIdentifier = uid;
+			unknown.uid              = uid;
 			referrer.add(unknown.id, uid);
 			blocks.add(uid, unknown);
 
@@ -74,7 +74,7 @@ namespace phx::voxels
 			outOfBounds.displayName      = "Out of Bounds";
 			outOfBounds.id               = "core.out_ouf_bounds";
 			outOfBounds.category         = voxels::BlockCategory::AIR;
-			outOfBounds.uniqueIdentifier = uid;
+			outOfBounds.uid              = uid;
 			referrer.add(outOfBounds.id, uid);
 			blocks.add(uid, outOfBounds);
 
@@ -84,7 +84,7 @@ namespace phx::voxels
 			air.displayName      = "Air";
 			air.id               = "core.air";
 			air.category         = voxels::BlockCategory::AIR;
-			air.uniqueIdentifier = uid;
+			air.uid              = uid;
 			referrer.add(air.id, uid);
 			blocks.add(uid, air);
 

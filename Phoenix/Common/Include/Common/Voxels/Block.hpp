@@ -100,13 +100,14 @@ namespace phx::voxels
 
 		/// @brief The unique *identifier* for the block, this is an internal
 		/// variable.
-		std::size_t uniqueIdentifier = -1;
+		std::size_t uid = -1;
 
 		/// @brief The material state of the block.
 		BlockCategory category = BlockCategory::AIR;
 
 		/// @brief If the object can be rotated horizontally
 		bool rotH = false;
+
 		/// @brief If the block can be rotated vertically, [[rotH]] must already
 		/// be true
 		bool rotV = false;
