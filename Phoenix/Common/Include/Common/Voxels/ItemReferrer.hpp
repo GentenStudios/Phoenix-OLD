@@ -57,7 +57,7 @@ namespace phx::voxels
 			voxels::ItemType unknown;
 			unknown.displayName      = "Unknown Item";
 			unknown.id               = "core.unknown";
-			unknown.uniqueIdentifier = uid;
+			unknown.uid              = uid;
 			referrer.add(unknown.id, uid);
 			items.add(uid, unknown);
 
@@ -67,7 +67,7 @@ namespace phx::voxels
 			voxels::ItemType outOfBounds;
 			outOfBounds.displayName      = "Out of Bounds";
 			outOfBounds.id               = "core.out_of_bounds";
-			outOfBounds.uniqueIdentifier = uid;
+			outOfBounds.uid              = uid;
 			referrer.add(outOfBounds.id, uid);
 			items.add(uid, outOfBounds);
 

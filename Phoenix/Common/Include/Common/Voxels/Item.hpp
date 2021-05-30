@@ -76,7 +76,7 @@ namespace phx::voxels
 
 		/// @brief The unique *identifier* for the item, this is an internal
 		/// variable.
-		std::size_t uniqueIdentifier = -1;
+		std::size_t uid = -1;
 
 		/// @brief The maximum number of items that can exist in a stack
 		std::size_t maxStack = 1;

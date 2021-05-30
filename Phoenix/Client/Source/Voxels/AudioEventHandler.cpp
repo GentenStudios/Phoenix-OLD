@@ -44,11 +44,11 @@ void AudioEventHandler::onMapEvent(const voxels::MapEvent& event)
 	{
 	case voxels::MapEvent::Event::BLOCK_BREAK:
 		play(m_blockRegistry->SoundOnBreak.get(
-		    std::get<voxels::BlockType*>(event.data)->uniqueIdentifier));
+		    std::get<voxels::BlockType*>(event.data)->uid));
 		break;
 	case voxels::MapEvent::Event::BLOCK_PLACE:
 		play(m_blockRegistry->SoundOnPlace.get(
-		    std::get<voxels::BlockType*>(event.data)->uniqueIdentifier));
+		    std::get<voxels::BlockType*>(event.data)->uid));
 		break;
 	default:
 		break;

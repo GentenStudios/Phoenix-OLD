@@ -196,16 +196,14 @@ namespace phx::client
 					    }
 				    }
 
-				    std::size_t blockUID   = referrer.referrer.size();
-				    block.uniqueIdentifier = blockUID;
-
-				    referrer.referrer.add(block.id, blockUID);
-				    referrer.blocks.add(blockUID, block);
+				    block.uid = referrer.referrer.size();
+				    referrer.referrer.add(block.id, block.uid);
+				    referrer.blocks.add(block.uid, block);
 
 			    	// if handles are empty, then there clearly aren't any textures so don't waste any memory :)
 			    	if (!handles.empty())
 			    	{
-					    textureHandles.add(blockUID, handles);
+					    textureHandles.add(block.uid, handles);
 			    	}
 
 			    	// only add model if a solid (entities will have different
@@ -244,7 +242,7 @@ namespace phx::client
 						    }
 					    }
 
-					    models.add(blockUID, model);
+					    models.add(block.uid, model);
 				    }
 
 				    sol::optional<std::vector<std::string>> luaSoundOnBreak =
@@ -268,7 +266,7 @@ namespace phx::client
 							        << sourceID << ")";
 						    }
 					    }
-					    SoundOnBreak.add(blockUID, onBreakSources);
+					    SoundOnBreak.add(block.uid, onBreakSources);
 				    }
 
 				    sol::optional<std::vector<std::string>> luaSoundOnPlace =
@@ -292,7 +290,7 @@ namespace phx::client
 							        << sourceID << ")";
 						    }
 					    }
-					    SoundOnPlace.add(blockUID, onPlaceSources);
+					    SoundOnPlace.add(block.uid, onPlaceSources);
 				    }
 			    });
 		}

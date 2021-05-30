@@ -114,11 +114,9 @@ namespace phx::client
 					    item.onSecondary = *onSecondary;
 				    }
 
-				    std::size_t itemUID   = referrer.referrer.size();
-				    item.uniqueIdentifier = itemUID;
-
-				    referrer.referrer.add(item.id, itemUID);
-				    referrer.items.add(itemUID, item);
+				    item.uid = referrer.referrer.size();
+				    referrer.referrer.add(item.id, item.uid);
+				    referrer.items.add(item.uid, item);
 			    });
 		}
 	};

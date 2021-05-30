@@ -56,7 +56,7 @@ std::vector<float> ChunkMesher::mesh(phx::voxels::Chunk*         chunk,
 
 		// get textures since at this point we know we're gonna be meshing
 		// something.
-		std::vector<TexturePacker::Handle>* tex = blockRegistry->textureHandles.get(block->uniqueIdentifier);
+		std::vector<TexturePacker::Handle>* tex = blockRegistry->textureHandles.get(block->uid);
 
 		auto insertToMesh = [&mesh, tex, blockRegistry,
 		                     chunkPos](DefaultMeshVertex const* vertex,
@@ -108,7 +108,7 @@ std::vector<float> ChunkMesher::mesh(phx::voxels::Chunk*         chunk,
 		// kill any modern GPU. This was written 1st Oct, 2020.
 
 		const BlockModel blockModel =
-		    *blockRegistry->models.get(block->uniqueIdentifier);
+		    *blockRegistry->models.get(block->uid);
 
 		switch (blockModel)
 		{
@@ -129,7 +129,7 @@ std::vector<float> ChunkMesher::mesh(phx::voxels::Chunk*         chunk,
 				// if the block to the north is not solid, or is not a full
 				// block, add the north face.
 				if (north->category != BlockCategory::SOLID ||
-				    *blockRegistry->models.get(north->uniqueIdentifier) !=
+				    *blockRegistry->models.get(north->uid) !=
 				        BlockModel::BLOCK)
 				{
 					insertToMesh(BLOCK_FRONT, BLOCK_FACE_VERT_COUNT,
@@ -151,7 +151,7 @@ std::vector<float> ChunkMesher::mesh(phx::voxels::Chunk*         chunk,
 				// if the block to the south is not solid, or is not a full
 				// block, add the south face.
 				if (south->category != BlockCategory::SOLID ||
-				    *blockRegistry->models.get(south->uniqueIdentifier) !=
+				    *blockRegistry->models.get(south->uid) !=
 				        BlockModel::BLOCK)
 				{
 					insertToMesh(BLOCK_BACK, BLOCK_FACE_VERT_COUNT,
@@ -172,7 +172,7 @@ std::vector<float> ChunkMesher::mesh(phx::voxels::Chunk*         chunk,
 				BlockType* bottom = blocks[Chunk::getVectorIndex(x, y - 1, z)];
 
 				if (bottom->category != BlockCategory::SOLID ||
-				    *blockRegistry->models.get(bottom->uniqueIdentifier) !=
+				    *blockRegistry->models.get(bottom->uid) !=
 				        BlockModel::BLOCK)
 				{
 					insertToMesh(BLOCK_BOTTOM, BLOCK_FACE_VERT_COUNT,
@@ -192,7 +192,7 @@ std::vector<float> ChunkMesher::mesh(phx::voxels::Chunk*         chunk,
 				BlockType* top = blocks[Chunk::getVectorIndex(x, y + 1, z)];
 
 				if (top->category != BlockCategory::SOLID ||
-				    *blockRegistry->models.get(top->uniqueIdentifier) !=
+				    *blockRegistry->models.get(top->uid) !=
 				        BlockModel::BLOCK)
 				{
 					insertToMesh(BLOCK_TOP, BLOCK_FACE_VERT_COUNT,
@@ -210,7 +210,7 @@ std::vector<float> ChunkMesher::mesh(phx::voxels::Chunk*         chunk,
 				BlockType* east = blocks[Chunk::getVectorIndex(x - 1, y, z)];
 
 				if (east->category != BlockCategory::SOLID ||
-				    *blockRegistry->models.get(east->uniqueIdentifier) !=
+				    *blockRegistry->models.get(east->uid) !=
 				        BlockModel::BLOCK)
 				{
 					insertToMesh(BLOCK_RIGHT, BLOCK_FACE_VERT_COUNT,
@@ -228,7 +228,7 @@ std::vector<float> ChunkMesher::mesh(phx::voxels::Chunk*         chunk,
 				BlockType* west = blocks[Chunk::getVectorIndex(x + 1, y, z)];
 
 				if (west->category != BlockCategory::SOLID ||
-				    *blockRegistry->models.get(west->uniqueIdentifier) !=
+				    *blockRegistry->models.get(west->uid) !=
 				        BlockModel::BLOCK)
 				{
 					insertToMesh(BLOCK_LEFT, BLOCK_FACE_VERT_COUNT,
