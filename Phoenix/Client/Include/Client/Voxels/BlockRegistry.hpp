@@ -53,7 +53,7 @@ namespace phx::client
 	 * the server does not need to store things like texture paths - which is
 	 * quite essential on the client.
 	 */
-	struct BlockRegistry
+	struct BlockRegistry : public voxels::BlockReferrer
 	{
 		BlockRegistry(AudioRegistry* audioRegistry)
 		    : m_audioRegistry(audioRegistry)
@@ -71,8 +71,6 @@ namespace phx::client
 			models.setUnknownReturnVal(
 			    models.get(voxels::BlockType::UNKNOWN_BLOCK));
 		}
-
-		voxels::BlockReferrer referrer;
 
 		gfx::TexturePacker texturePacker;
 		Registry<std::size_t, std::vector<gfx::TexturePacker::Handle>>
@@ -196,9 +194,9 @@ namespace phx::client
 					    }
 				    }
 
-				    block.uid = referrer.referrer.size();
-				    referrer.referrer.add(block.id, block.uid);
-				    referrer.blocks.add(block.uid, block);
+				    block.uid = referrer.size();
+				    referrer.add(block.id, block.uid);
+				    blocks.add(block.uid, block);
 
 			    	// if handles are empty, then there clearly aren't any textures so don't waste any memory :)
 			    	if (!handles.empty())

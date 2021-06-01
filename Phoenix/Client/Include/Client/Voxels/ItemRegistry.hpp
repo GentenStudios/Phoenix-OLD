@@ -45,10 +45,8 @@ namespace phx::client
 	 * This holds a block referrer which handles default initialized blocks and
 	 * then provides an API registration for registering blocks from within Lua.
 	 */
-	struct ItemRegistry
+	struct ItemRegistry : public voxels::ItemReferrer
 	{
-		voxels::ItemReferrer referrer;
-
 		void registerAPI(cms::ModManager* manager)
 		{
 			manager->registerFunction(
@@ -114,10 +112,11 @@ namespace phx::client
 					    item.onSecondary = *onSecondary;
 				    }
 
-				    item.uid = referrer.referrer.size();
-				    referrer.referrer.add(item.id, item.uid);
-				    referrer.items.add(item.uid, item);
-			    });
+				    item.uid = referrer.size();
+				    referrer.add(item.id, item.uid);
+				    items.add(item.uid, item);
+			    }
+			);
 		}
 	};
 } // namespace phx::client

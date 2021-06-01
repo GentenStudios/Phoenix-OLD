@@ -147,15 +147,15 @@ void Game::onAttach()
 	{
         m_chat = new gfx::ChatBox(m_window, &m_network->messageQueue);
 		m_map =
-		    new voxels::Map(&m_network->chunkQueue, &m_blockRegistry.referrer);
+		    new voxels::Map(&m_network->chunkQueue, &m_blockRegistry);
 	}
 	else
 	{
         m_chat = new gfx::ChatBox(m_window, nullptr);
-		m_map = m_save->getOrCreateMap("Map1", &m_blockRegistry.referrer);
+		m_map = m_save->getOrCreateMap("Map1", &m_blockRegistry);
 	}
 	m_invManager =
-	    new voxels::InventoryManager(m_save, &m_itemRegistry.referrer);
+	    new voxels::InventoryManager(m_save, &m_itemRegistry);
 	m_playerInventory =
 	    m_invManager->getInventory(m_invManager->createInventory(30));
 
@@ -178,7 +178,7 @@ void Game::onAttach()
 	LOG_INFO("MAIN") << "Register GUI";
 	m_escapeMenu = new EscapeMenu(m_window, m_camera);
 	m_inventory  = new InventoryUI(m_window, m_camera, m_playerInventory,
-                                  &m_itemRegistry.referrer);
+                                  &m_itemRegistry);
 
 	if (Client::get()->isDebugLayerActive())
 	{
@@ -282,13 +282,13 @@ void Game::onEvent(events::Event& e)
 		switch (e.mouse.button)
 		{
 		case events::MouseButtons::LEFT:
-			ActorSystem::action1(&m_blockRegistry.referrer, m_registry,
+			ActorSystem::action1(&m_blockRegistry, m_registry,
 			                     m_player);
 			e.handled = true;
 			break;
 
 		case events::MouseButtons::RIGHT:
-			ActorSystem::action2(&m_blockRegistry.referrer, m_registry,
+			ActorSystem::action2(&m_blockRegistry, m_registry,
 			                     m_player);
 			e.handled = true;
 			break;
