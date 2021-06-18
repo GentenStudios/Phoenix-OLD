@@ -57,6 +57,22 @@ namespace phx::gfx
 		math::vec3 normal;
 	};
 
+    /**
+     * @brief A struct to store the data required to render chunks.
+     *
+     * Don't worry about this if you don't have OpenGL knowledge, this is
+     * mainly an internal data format anyway.
+     */
+    struct ChunkRenderData
+    {
+        /// @brief The vertex array object.
+        unsigned int vao;
+        /// @brief The buffer object.
+        unsigned int vbo;
+        /// @brief The amount of vertices to render.
+        std::size_t vertexCount;
+    };
+
 	/**
 	 * @brief Renders submitted chunks, and allows for dropping and updating of
 	 * chunks.
@@ -88,23 +104,6 @@ namespace phx::gfx
 	class ChunkRenderer : public voxels::MapEventSubscriber
 	{
 	public:
-        /**
-         * @brief A struct to store the data required to render chunks.
-         *
-         * Don't worry about this if you don't have OpenGL knowledge, this is
-         * mainly an internal data format anyway.
-         */
-        struct ChunkRenderData
-        {
-			ChunkRenderData() = default;
-            explicit ChunkRenderData(std::vector<float> mesh);
-            /// @brief The vertex array object.
-            unsigned int vao{};
-            /// @brief The buffer object.
-            unsigned int buffer{};
-            /// @brief The amount of vertices to render.
-            std::size_t vertexCount{};
-        };
 
 		/// @brief Typedef to make it easier for use outside of this class.
 		using AssociativeTextureTable =
@@ -115,10 +114,13 @@ namespace phx::gfx
 
 		void prep();
 
+    private:
+        static ChunkRenderData generate(std::vector<float> mesh);
+
+	public:
 		void add(voxels::Chunk* chunk);
 		void update(voxels::Chunk* chunk);
 		void remove(voxels::Chunk* chunk);
-
 		void clear();
 
 		void onMapEvent(const voxels::MapEvent& mapEvent) override;
@@ -156,6 +158,6 @@ namespace phx::gfx
 		static const int m_normalAttributeLocation = 2;
 		static const int m_colorAttributeLocation  = 3;
 
-        gfx::ShaderPipeline m_renderPipeline{};
+        gfx::ShaderPipeline m_renderPipeline = {};
 	};
 } // namespace phx::gfx
