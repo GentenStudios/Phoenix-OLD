@@ -101,5 +101,8 @@ set_target_properties(SDL2main SDL2-static uninstall
 	Glad ImGui
 	lua liblua
 	enet aob
+	soloud
+	NlohmannJson
+	Catch2WithMain
 	PROPERTIES FOLDER Dependencies
 )
