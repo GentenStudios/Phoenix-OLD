@@ -115,7 +115,7 @@ namespace phx::gfx
 		void prep();
 
     private:
-        static ChunkRenderData generate(std::vector<float> mesh);
+        static ChunkRenderData generate(const std::vector<float>& mesh);
 
 	public:
 		void add(voxels::Chunk* chunk);

@@ -73,7 +73,7 @@ void ChunkRenderer::prep()
 	m_blockRegistry->texturePacker.pack();
 }
 
-ChunkRenderData ChunkRenderer::generate(std::vector<float> mesh)
+ChunkRenderData ChunkRenderer::generate(const std::vector<float>& mesh)
 {
     ChunkRenderData data = {};
     glGenVertexArrays(1, &data.vao);
