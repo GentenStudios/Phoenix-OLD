@@ -56,22 +56,22 @@ namespace phx::gfx
 		math::vec3 uv;
 		math::vec3 normal;
 	};
-	
-	/**
-	 * @brief A struct to store the data required to render chunks.
-	 *
-	 * Don't worry about this if you don't have OpenGL knowledge, this is
-	 * mainly an internal data format anyway.
-	 */
-	struct ChunkRenderData
-	{
-		/// @brief The vertex array object.
-		unsigned int vao;
-		/// @brief The buffer object.
-		unsigned int buffer;
-		/// @brief The amount of vertices to render.
-		std::size_t vertexCount;
-	};
+
+    /**
+     * @brief A struct to store the data required to render chunks.
+     *
+     * Don't worry about this if you don't have OpenGL knowledge, this is
+     * mainly an internal data format anyway.
+     */
+    struct ChunkRenderData
+    {
+        /// @brief The vertex array object.
+        unsigned int vao;
+        /// @brief The buffer object.
+        unsigned int vbo;
+        /// @brief The amount of vertices to render.
+        std::size_t vertexCount;
+    };
 
 	/**
 	 * @brief Renders submitted chunks, and allows for dropping and updating of
@@ -104,6 +104,7 @@ namespace phx::gfx
 	class ChunkRenderer : public voxels::MapEventSubscriber
 	{
 	public:
+
 		/// @brief Typedef to make it easier for use outside of this class.
 		using AssociativeTextureTable =
 		    std::unordered_map<std::string, std::size_t>;
@@ -113,10 +114,13 @@ namespace phx::gfx
 
 		void prep();
 
+    private:
+        static ChunkRenderData generate(const std::vector<float>& mesh);
+
+	public:
 		void add(voxels::Chunk* chunk);
 		void update(voxels::Chunk* chunk);
 		void remove(voxels::Chunk* chunk);
-
 		void clear();
 
 		void onMapEvent(const voxels::MapEvent& mapEvent) override;
@@ -139,7 +143,6 @@ namespace phx::gfx
 
 	private:
 		client::BlockRegistry* m_blockRegistry;
-		voxels::Map*           m_map;
 		BlockingQueue<voxels::MapEvent> m_mapEvents;
 
 		// keep another copy of chunk pointers so we can know which chunks need
@@ -155,6 +158,6 @@ namespace phx::gfx
 		static const int m_normalAttributeLocation = 2;
 		static const int m_colorAttributeLocation  = 3;
 
-        gfx::ShaderPipeline m_renderPipeline;
+        gfx::ShaderPipeline m_renderPipeline = {};
 	};
 } // namespace phx::gfx

@@ -73,6 +73,39 @@ void ChunkRenderer::prep()
 	m_blockRegistry->texturePacker.pack();
 }
 
+ChunkRenderData ChunkRenderer::generate(const std::vector<float>& mesh)
+{
+    ChunkRenderData data = {};
+    glGenVertexArrays(1, &data.vao);
+    glBindVertexArray(data.vao);
+
+    glGenBuffers(1, &data.vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, data.vbo);
+
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * mesh.size(), mesh.data(),
+                 GL_DYNAMIC_DRAW);
+
+    glVertexAttribPointer(m_vertexAttributeLocation, 3, GL_FLOAT, GL_FALSE,
+                          sizeof(Vertex),
+                          reinterpret_cast<void*>(offsetof(Vertex, pos)));
+
+    // we're gonna pack texLayer into the UV struct cos why not.
+    glVertexAttribPointer(m_uvAttributeLocation, 3, GL_FLOAT, GL_FALSE,
+                          sizeof(Vertex),
+                          reinterpret_cast<void*>(offsetof(Vertex, uv)));
+
+    glVertexAttribPointer(
+        m_normalAttributeLocation, 3, GL_FLOAT, GL_TRUE, sizeof(Vertex),
+        reinterpret_cast<void*>(offsetof(Vertex, normal)));
+
+    glEnableVertexAttribArray(m_vertexAttributeLocation);
+    glEnableVertexAttribArray(m_uvAttributeLocation);
+    glEnableVertexAttribArray(m_normalAttributeLocation);
+
+    data.vertexCount = mesh.size();
+    return data;
+}
+
 void ChunkRenderer::add(phx::voxels::Chunk* chunk)
 {
 	const auto it = std::find(m_chunks.begin(), m_chunks.end(), chunk);
@@ -93,35 +126,7 @@ void ChunkRenderer::add(phx::voxels::Chunk* chunk)
 		return;
 	}
 
-	unsigned int vao;
-	unsigned int buf;
-
-	glGenVertexArrays(1, &vao);
-	glBindVertexArray(vao);
-
-	glGenBuffers(1, &buf);
-	glBindBuffer(GL_ARRAY_BUFFER, buf);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * mesh.size(), mesh.data(),
-	             GL_DYNAMIC_DRAW);
-
-	glVertexAttribPointer(m_vertexAttributeLocation, 3, GL_FLOAT, GL_FALSE,
-	                      sizeof(Vertex),
-	                      reinterpret_cast<void*>(offsetof(Vertex, pos)));
-
-	// we're gonna pack texLayer into the UV struct cos why not.
-	glVertexAttribPointer(m_uvAttributeLocation, 3, GL_FLOAT, GL_FALSE,
-	                      sizeof(Vertex),
-	                      reinterpret_cast<void*>(offsetof(Vertex, uv)));
-
-	glVertexAttribPointer(
-	    m_normalAttributeLocation, 3, GL_FLOAT, GL_TRUE, sizeof(Vertex),
-	    reinterpret_cast<void*>(offsetof(Vertex, normal)));
-
-	glEnableVertexAttribArray(m_vertexAttributeLocation);
-	glEnableVertexAttribArray(m_uvAttributeLocation);
-	glEnableVertexAttribArray(m_normalAttributeLocation);
-
-	m_buffers.insert({chunk->getChunkPos(), {vao, buf, mesh.size()}});
+	m_buffers.insert({chunk->getChunkPos(), generate(mesh)});
 }
 
 void ChunkRenderer::update(phx::voxels::Chunk* chunk)
@@ -140,7 +145,6 @@ void ChunkRenderer::update(phx::voxels::Chunk* chunk)
 	// a mesh (breaking the final block in a chunk so only air is left or
 	// something)
 
-	ChunkRenderData data;
 	auto            bufferExist = m_buffers.find(chunk->getChunkPos());
 	if (bufferExist == m_buffers.end())
 	{
@@ -151,40 +155,13 @@ void ChunkRenderer::update(phx::voxels::Chunk* chunk)
 			return;
 		}
 
-		glGenVertexArrays(1, &data.vao);
-		glBindVertexArray(data.vao);
-
-		glGenBuffers(1, &data.buffer);
-		glBindBuffer(GL_ARRAY_BUFFER, data.buffer);
-
-		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * mesh.size(), mesh.data(),
-		             GL_DYNAMIC_DRAW);
-
-		glVertexAttribPointer(m_vertexAttributeLocation, 3, GL_FLOAT, GL_FALSE,
-		                      sizeof(Vertex),
-		                      reinterpret_cast<void*>(offsetof(Vertex, pos)));
-
-		// we're gonna pack texLayer into the UV struct cos why not.
-		glVertexAttribPointer(m_uvAttributeLocation, 3, GL_FLOAT, GL_FALSE,
-		                      sizeof(Vertex),
-		                      reinterpret_cast<void*>(offsetof(Vertex, uv)));
-
-		glVertexAttribPointer(
-		    m_normalAttributeLocation, 3, GL_FLOAT, GL_TRUE, sizeof(Vertex),
-		    reinterpret_cast<void*>(offsetof(Vertex, normal)));
-
-		glEnableVertexAttribArray(m_vertexAttributeLocation);
-		glEnableVertexAttribArray(m_uvAttributeLocation);
-		glEnableVertexAttribArray(m_normalAttributeLocation);
-
-		data.vertexCount = mesh.size();
-		m_buffers.insert({chunk->getChunkPos(), data});
+		m_buffers.insert({chunk->getChunkPos(), generate(mesh)});
 	}
 	else
 	{
 		// buffer already exists.
 		glBindVertexArray(bufferExist->second.vao);
-		glBindBuffer(GL_ARRAY_BUFFER, bufferExist->second.buffer);
+		glBindBuffer(GL_ARRAY_BUFFER, bufferExist->second.vbo);
 
 		if (mesh.size() == bufferExist->second.vertexCount)
 		{
@@ -214,7 +191,7 @@ void ChunkRenderer::remove(phx::voxels::Chunk* chunk)
 		const auto buffer = m_buffers.find((*it)->getChunkPos());
 		if (buffer != m_buffers.end())
 		{
-			glDeleteBuffers(1, &buffer->second.buffer);
+			glDeleteBuffers(1, &buffer->second.vbo);
 			glDeleteVertexArrays(1, &buffer->second.vao);
 		}
 
@@ -228,7 +205,7 @@ void ChunkRenderer::clear()
 {
 	for (auto& buffer : m_buffers)
 	{
-		glDeleteBuffers(1, &buffer.second.buffer);
+		glDeleteBuffers(1, &buffer.second.vbo);
 		glDeleteVertexArrays(1, &buffer.second.vao);
 	}
 }
@@ -284,3 +261,4 @@ void ChunkRenderer::tick(
 		glDrawArrays(GL_TRIANGLES, 0, buffer.second.vertexCount);
 	}
 }
+
