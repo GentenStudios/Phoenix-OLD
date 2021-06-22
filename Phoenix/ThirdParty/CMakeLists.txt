@@ -50,11 +50,8 @@ target_compile_definitions(EnTT INTERFACE $<$<PLATFORM_ID:Windows>:NOMINMAX>)
 # Turn off the EnTT tests.
 set(BUILD_TESTING OFF)
 
-# Turn off the JSON tests.
-set(JSON_BuildTests OFF CACHE INTERNAL "")
-
 # JSON setup
-# Exposes target nlohmann_json::nlohmann_json
+# Exposes target NlohmannJson
 add_subdirectory(json)
 
 # Catch2 setup
@@ -82,7 +79,7 @@ target_link_libraries(PhoenixThirdParty INTERFACE
 	sol2::sol2
 	soloud
 	liblua
-	nlohmann_json::nlohmann_json
+	NlohmannJson
 
 	$<$<PLATFORM_ID:Windows>:opengl32.lib> # link to opengl32.lib if windows.
 	$<$<PLATFORM_ID:Windows>:ws2_32.lib> # link to ws2_32.lib if windows.
@@ -104,5 +101,8 @@ set_target_properties(SDL2main SDL2-static uninstall
 	Glad ImGui
 	lua liblua
 	enet aob
+	soloud
+	NlohmannJson
+	Catch2WithMain
 	PROPERTIES FOLDER Dependencies
 )
